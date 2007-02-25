@@ -1,0 +1,93 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C024C0B1-401B-4644-8918-D87C28716898}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Physics2DDotNet</RootNamespace>
+    <AssemblyName>Physics2DDotNet</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Joints\HingeJoint.cs" />
+    <Compile Include="Math2D\ALVector2D.cs" />
+    <Compile Include="Math2D\BoundingBox2D.cs" />
+    <Compile Include="BroadPhaseCollisionDetector.cs" />
+    <Compile Include="DataTypes\Coefficients.cs" />
+    <Compile Include="DataTypes\CollisionEventArgs.cs" />
+    <Compile Include="CollisionIgnorer.cs" />
+    <Compile Include="CollisionSolver.cs" />
+    <Compile Include="Detectors\SweepAndPruneDetector.cs" />
+    <Compile Include="DistanceGrid.cs" />
+    <Compile Include="Math2D\Matrix2D.cs" />
+    <Compile Include="PhysicsHelper.cs" />
+    <Compile Include="PhysicsLogic\GravityField.cs" />
+    <Compile Include="PhysicsLogic\GravityPointField.cs" />
+    <Compile Include="PhysicsLogic\GravityPointMass.cs" />
+    <Compile Include="PhysicsLogic\PhysicsLogic.cs" />
+    <Compile Include="Interfaces.cs" />
+    <Compile Include="DataTypes\IntersectionInfo.cs" />
+    <Compile Include="Joints\Joint.cs" />
+    <Compile Include="Lifespan.cs" />
+    <Compile Include="DataTypes\MassInertia.cs" />
+    <Compile Include="DataTypes\PairID.cs" />
+    <Compile Include="PhysicsEngine.cs" />
+    <Compile Include="Body.cs" />
+    <Compile Include="DataTypes\PhysicsState.cs" />
+    <Compile Include="PhysicsLogic\VelocityLimiter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shapes\Circle.cs" />
+    <Compile Include="Shapes\Line.cs" />
+    <Compile Include="Shapes\Particle.cs" />
+    <Compile Include="Shapes\Polygon.cs" />
+    <Compile Include="Solvers\SequentialImpulses.cs" />
+    <Compile Include="Shapes\Shape.cs" />
+    <Compile Include="Collections\AdvReaderWriterLock.cs" />
+    <Compile Include="Collections\WrappedCollection.cs" />
+    <Compile Include="Collections\WrappedDictonary.cs" />
+    <Compile Include="Collections\WrappedEnumerable.cs" />
+    <Compile Include="Collections\WrappedEnumerator.cs" />
+    <Compile Include="Collections\WrappedList.cs" />
+    <Compile Include="Collections\ThreadSafeDictonary.cs" />
+    <Compile Include="Collections\ThreadSafeList.cs" />
+    <Compile Include="DataTypes\UpdatedEventArgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AdvanceMath\AdvanceMath.csproj">
+      <Project>{A979FDB4-7AB7-444E-9632-77D69D22D743}</Project>
+      <Name>AdvanceMath</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,50 @@
+AdvanceMath:
+1.5.0.0: 
+Added: Lerp to the matrix structs.
+changed: only a few things fxCop pointed out.
+added: a few of the parameter checking FxCop complained about.
+fixed: a potetial bug with the pass by reference version of Vector2D.ZCross, GetRightHandNormal and GetLeftHandNormal methods
+change: some method names to be closer to XNAs math classes. 
+added: methods for adding and subtracting matrices and vectors of different size.
+
+Physics2D.Net
+1.1.0.0:
+changed: made it so the line's thickness is actaully its thickness so the lines are no longer twice as thick as the parameter passed.
+removed: the add methods to collision detector and solver since they will only use addRange now.
+changed: how objects are added now they are always added to a pending queue first then truly added to the engine on a call to update. 
+Changed: made it so 2 bodies with infinite mass cannot collide.
+changed: made the StateChanged event get generated on calls to apply matrix or in PhysicsEngine.Update.
+added: The event Body.ShapedChanged.
+renamed: the event Body.Collision to Collided.
+renamed: the event Body.NewState to StateChanged
+changed: the Matrix2D struct to have the three versions of each operator. 
+changed: the Sequential Impulese Solver to be in the Solvers Namespace and all classes used by it to be in it. 
+changed: it so the angular position will be bounded between -2PI and 2PI with every parameterless call to apply matrix.
+fixed: a bug that really slowed the UpdatePosition if the angular position's absolute value was very large.
+added: BroadPhaseDetectionOnly property to Body
+fixed: a bug with the wrapped collection that could allow access to a non locked Enumerator.
+Changed: all the collection wrappers names from *wrapper to Wrapped* becuase of fxCop.
+changed: a few properties and names FxCop complained about.
+added: allot of the parameter checking FxCop complained about.
+fixed: In theory a bug when a Body is set to Expired in the middle of a call to RemoveExpired and when a object is re-added in its removed event. causing multiple nodes and wrappers for the Body in Sweep and prune.(this bug was/is hard to generate)
+Added: the newer versions of The Sequential Impuleses Solver that impliments the newest Algorithms from Box2D
+changed: the math in the joints and arbiters to look better using the PhysicsHelper.
+Added: a static PhysicsHelper class and methods for impulse, relative velocity calcualtions and other physics related math. 
+Added: SolversTag and DetectorsTag properties to Body
+Added: A SolversVelocity value to PhysicsState.(this is the bias velocity for the newer solver)
+fixed: the distance grid so that it will no longer throw a index out of bounds exception.
+Changed: The Sweep and prune to store LinkList nodes in the wrapper instead of searching for them when its time to remove them.
+changed: The Linked list in Sweep and prune to store Bodies instead of Nodes.
+Removed: junk code from the Polygon.CreateRectangle method.
+Changed: the SequentialImpulsesSolver.Solve method to copy the Arbiters into an array before running apply and preApply
+
+
+AdvanceMath:
+1.4.0.0: 
+Added pass by reference versions of most methods.
+Removed all copyrighted code for re-licensing as MIT except for the Quaternion. 
+Re-licensed as MIT.
+
+Physics2D.Net
+1.0.0.0:
+Completely new, See release notes for explanation.

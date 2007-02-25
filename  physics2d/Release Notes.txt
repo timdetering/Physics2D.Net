@@ -1,0 +1,28 @@
+Release Notes fo Physics2D.Net
+
+Since God Created me and Jesus Saved me All glory goes to God.
+
+1.1.0.0
+Mostly this has been an optimization and bug fix release. The only major change was the update of the sequential impulses to used split impulses like the more recent version of Box2D. 
+
+You can check the change log for every detail but here are a few important changes:
+
+A lot of renaming happened but mostly on parameter names and only changing the case to be acceptable to fxCop. Like LifeSpan and LifeTime became Lifespan and Lifetime respectively. A few event names changed like NewState became StateChanged. If your code breaks it should be rather easy to find the slightly renamed methods and such.
+
+Added a new event to the Body called ShapeChanged which is called when the shape property is assigned to a different shape.
+
+Changed the logic on how some event are called. StateChanged was only called inside the update method but now its called every time apply matrix is called. (the assumption is if you are calling apply matrix you’ve changed the state.)
+
+I’ve been trying to refactor and rename my AdvanceMath lib so it can be interchangeable with XNA’s so once I get that done. I can switch back and forth with a few define and reference changes. Making it so it can be used with XNA without having to convert vectors and such back and forth. I’m still at the design stage of this idea but I have been making the math classes similar. 
+
+Though it’s not part of the engine I made the demo run faster by using display lists and added two more demos. 
+
+
+1.0.0.0
+This is a complete rewrite/redesign of Physics2D very few 
+classes where copied over like PhysicsState and MassInfo. 
+The rest were completely rewritten or brand new. I tried 
+the minimalist approach with this version. Allot of the 
+classes are just gone, since there were either confusing 
+or unnecessary bloat. 
+
