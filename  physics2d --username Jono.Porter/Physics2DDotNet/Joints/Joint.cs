@@ -79,8 +79,8 @@ namespace Physics2DDotNet
             get { return engine; }
         }
 
-        public abstract void PreApply(Scalar dtInv);
-        public abstract void Apply();
+      /*  public abstract void PreApply(Scalar dtInv);
+        public abstract void Apply();*/
 
         protected internal virtual void UpdateTime(Scalar dt) { }
         internal void OnAddedInternal(PhysicsEngine engine)

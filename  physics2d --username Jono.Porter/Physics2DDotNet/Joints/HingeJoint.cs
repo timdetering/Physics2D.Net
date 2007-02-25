@@ -43,7 +43,7 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-    public sealed class HingeJoint : Joint
+    public sealed class HingeJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
         Matrix2x2 M;
         Vector2D localAnchor1, localAnchor2;
@@ -85,7 +85,7 @@ namespace Physics2DDotNet
             set { biasFactor = value; }
         }
 
-        public override void PreApply(Scalar dtInv)
+        void Solvers.ISequentialImpulsesJoint.PreApply(Scalar dtInv)
         {
 
             float mass1Inv = body1.Mass.MassInv;
@@ -149,7 +149,7 @@ namespace Physics2DDotNet
                 ref r2, ref mass2Inv, ref inertia2Inv);
         }
 
-        public override void Apply()
+        void Solvers.ISequentialImpulsesJoint.Apply()
         {
 
             float mass1Inv = body1.Mass.MassInv;

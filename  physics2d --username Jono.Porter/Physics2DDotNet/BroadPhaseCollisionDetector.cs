@@ -65,11 +65,11 @@ namespace Physics2DDotNet
         {
             if (this.engine != null)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("A broadphsed Detector cannot be added to more then one engine.");
             }
             this.engine = engine;
             OnAdded();
-            this.AddRange(engine.bodies);
+            this.AddBodyRange(engine.bodies);
         }
         internal void OnRemovedInternal()
         {
@@ -80,8 +80,8 @@ namespace Physics2DDotNet
         protected virtual void OnAdded() { }
         protected virtual void OnRemoved() { }
 
-        protected internal virtual void AddRange(ICollection<Body> collection) { }
-        protected internal virtual void RemoveExpired() { }
+        protected internal virtual void AddBodyRange(List<Body> collection) { }
+        protected internal virtual void RemoveExpiredBodies() { }
 
         protected internal virtual void Clear() { }
         protected void OnCollision(Scalar dt, Body first, Body second)

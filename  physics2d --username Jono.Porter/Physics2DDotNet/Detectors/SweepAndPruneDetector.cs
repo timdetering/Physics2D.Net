@@ -42,8 +42,9 @@ namespace Physics2DDotNet.Detectors
     [Serializable]
     public sealed class SweepAndPruneDetector : BroadPhaseCollisionDetector
     {
-        class Wrapper
+        sealed class Wrapper
         {
+            public LinkedListNode<Body> node;
             public Body body;
             Stub[] stubs;
             public Wrapper(Body entity)
@@ -73,9 +74,8 @@ namespace Physics2DDotNet.Detectors
                 stubs[2].value = box.Lower.Y;
                 stubs[3].value = box.Upper.Y;
             }
-            public LinkedListNode<Body> node;
         }
-        class Stub
+        sealed class Stub
         {
             public Wrapper wrapper;
             public bool begin;
@@ -121,6 +121,7 @@ namespace Physics2DDotNet.Detectors
         List<Wrapper> wrappers;
         List<Stub> xStubs;
         List<Stub> yStubs;
+        int extraCapacity = 1000;
         int lastXCount = 50;
         public SweepAndPruneDetector()
         {
@@ -128,7 +129,19 @@ namespace Physics2DDotNet.Detectors
             this.xStubs = new List<Stub>();
             this.yStubs = new List<Stub>();
         }
-        protected internal override void AddRange(ICollection<Body> collection)
+        /// <summary>
+        /// The amount of extra capacity for the collection that stores all collisions along the x-axis.
+        /// </summary>
+        public int ExtraCapacity
+        {
+            get { return extraCapacity; }
+            set
+            {
+                if (extraCapacity < 0) { throw new ArgumentOutOfRangeException("value", "The value must be equal or greater to zero."); }
+                extraCapacity = value;
+            }
+        }
+        protected internal override void AddBodyRange(List<Body> collection)
         {
             int wrappercount = collection.Count + wrappers.Count;
             if (wrappers.Capacity < wrappercount)
@@ -154,7 +167,7 @@ namespace Physics2DDotNet.Detectors
             xStubs.Clear();
             yStubs.Clear();
         }
-        protected internal override void RemoveExpired()
+        protected internal override void RemoveExpiredBodies()
         {
             if (wrappers.RemoveAll(WrapperIsRemoved) > 0)
             {
@@ -171,7 +184,7 @@ namespace Physics2DDotNet.Detectors
             }
             xStubs.Sort(StubComparison);
             yStubs.Sort(StubComparison);
-            Dictionary<long, object> colliders = new Dictionary<long, object>(lastXCount+1000);
+            Dictionary<long, object> colliders = new Dictionary<long, object>(lastXCount + extraCapacity);
 
             LinkedList<Body> currentBodies = new LinkedList<Body>();
             Count = xStubs.Count;

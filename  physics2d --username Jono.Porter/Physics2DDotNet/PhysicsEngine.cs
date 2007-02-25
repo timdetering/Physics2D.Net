@@ -242,7 +242,7 @@ namespace Physics2DDotNet
         public void AddJoint(Joint item)
         {
             CheckChild(item);
-
+            solver.CheckJoint(item);
             lock (pendingJoints)
             {
                 pendingJoints.Add(item);
@@ -258,6 +258,7 @@ namespace Physics2DDotNet
             foreach (Joint item in collection)
             {
                 CheckChild(item);
+                solver.CheckJoint(item);
             }
             lock (pendingJoints)
             {
@@ -388,9 +389,10 @@ namespace Physics2DDotNet
         private void RemoveExpired()
         {
             bodies.RemoveAll(IsBodyExpired);
-            solver.RemoveExpired();
-            broadPhase.RemoveExpired();
+            solver.RemoveExpiredBodies();
+            broadPhase.RemoveExpiredBodies();
             joints.RemoveAll(IsJointExpired);
+            solver.RemoveExpiredJoints();
             logics.RemoveAll(IsLogicExpired);
         }
         private void AddPending()
@@ -410,8 +412,8 @@ namespace Physics2DDotNet
                     item.OnAdded(this);
                 }
                 bodies.AddRange(pendingBodies);
-                solver.AddRange(pendingBodies);
-                broadPhase.AddRange(pendingBodies);
+                solver.AddBodyRange(pendingBodies);
+                broadPhase.AddBodyRange(pendingBodies);
                 pendingBodies.Clear();
             }
         }
@@ -424,6 +426,7 @@ namespace Physics2DDotNet
                     item.OnAddedInternal(this);
                 }
                 joints.AddRange(pendingJoints);
+                solver.AddJointRange(pendingJoints);
                 pendingJoints.Clear();
             }
         }
@@ -445,8 +448,6 @@ namespace Physics2DDotNet
             if (this.broadPhase == null) { throw new InvalidOperationException("The BroadPhase property must be set."); }
             if (this.solver == null) { throw new InvalidOperationException("The Solver property must be set."); }
         }
-
-
 
         internal void RunLogic(Scalar dt)
         {
