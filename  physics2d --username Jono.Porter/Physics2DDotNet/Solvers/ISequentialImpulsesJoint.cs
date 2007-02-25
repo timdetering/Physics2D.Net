@@ -22,20 +22,12 @@
 #endregion
 
 
-
-// because this code was basically copied from Box2D
-// Copyright (c) 2006 Erin Catto http://www.gphysics.com
 #if UseDouble
 using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-
-using AdvanceMath;
-using Physics2DDotNet.Math2D;
-
 
 namespace Physics2DDotNet.Solvers
 {
