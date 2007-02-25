@@ -68,7 +68,7 @@ namespace Physics2DDotNet
             if (this.engine != null) { throw new InvalidOperationException(); }
             this.engine = engine;
             OnAdded();
-            this.AddRange(engine.bodies);
+            this.AddBodyRange(engine.bodies);
         }
         internal void OnRemovedInternal()
         {
@@ -82,13 +82,17 @@ namespace Physics2DDotNet
 
         protected internal virtual void Clear() { }
 
-        protected internal virtual void AddRange(ICollection<Body> collection) { }
-        protected internal virtual void RemoveExpired() { }
+        protected internal virtual void AddBodyRange(List<Body> collection) { }
+        protected internal virtual void AddJointRange(List<Joint> collection) { }
+
+        protected internal virtual void RemoveExpiredBodies() { }
+        protected internal virtual void RemoveExpiredJoints() { }
         protected void Detect(Scalar dt)
         {
             engine.BroadPhase.Detect(dt);
         }
 
+        protected internal abstract void CheckJoint(Joint joint);
     }
 
 }
