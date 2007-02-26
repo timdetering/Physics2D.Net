@@ -37,6 +37,8 @@ using System.Runtime.InteropServices;
 
 using AdvanceMath;
 using Physics2DDotNet.Math2D;
+using Physics2DDotNet.Solvers;
+using Physics2DDotNet.Detectors;
 using Physics2DDotNet.Collections;
 
 namespace Physics2DDotNet
@@ -472,18 +474,23 @@ namespace Physics2DDotNet
             {
                 if (first.BroadPhaseDetectionOnly)
                 {
-                    first.OnCollision(second);
+                    first.OnCollision(second, null);
                 }
                 if (second.BroadPhaseDetectionOnly)
                 {
-                    second.OnCollision(first);
+                    second.OnCollision(first, null);
                 }
             }
-            else if (solver.HandleCollision(dt, first, second))
+            else
             {
-                first.OnCollision(second);
-                second.OnCollision(first);
+                ICollisionInfo info = solver.HandleCollision(dt, first, second);
+                if (info.Collided)
+                {
+                    first.OnCollision(second, info);
+                    second.OnCollision(first, info);
+                }
             }
+
         }
         #endregion
     }

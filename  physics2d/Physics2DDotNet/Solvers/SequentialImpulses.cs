@@ -48,7 +48,7 @@ namespace Physics2DDotNet.Solvers
         {
             public int CollisionCount;
         }
-        sealed class Contact
+        sealed class Contact : IContactInfo
         {
             public int id;
             public Vector2D position;
@@ -64,8 +64,22 @@ namespace Physics2DDotNet.Solvers
 
             public Vector2D r1;
             public Vector2D r2;
+
+
+            Vector2D IContactInfo.Position
+            {
+                get { return position; }
+            }
+            Vector2D IContactInfo.Normal
+            {
+                get { return normal; }
+            }
+            Scalar IContactInfo.Distance
+            {
+                get { return distance; }
+            }
         }
-        sealed class Arbiter
+        sealed class Arbiter : ICollisionInfo
         {
             static void Collide(List<Contact> contacts, Body entity1, Body entity2)
             {
@@ -118,9 +132,14 @@ namespace Physics2DDotNet.Solvers
                     }
                 }
             }
+
+
             List<Contact> contacts;
             Body body1;
             Body body2;
+            SITag tag1;
+            SITag tag2;
+
             bool biasPreservesMomentum;
             Scalar biasFactor;
             Scalar allowedPenetration;
@@ -132,11 +151,15 @@ namespace Physics2DDotNet.Solvers
                 {
                     this.body1 = entity1;
                     this.body2 = entity2;
+                    this.tag1 = (SITag)entity1.SolverTag;
+                    this.tag2 = (SITag)entity2.SolverTag;
                 }
                 else
                 {
                     this.body1 = entity2;
                     this.body2 = entity1;
+                    this.tag1 = (SITag)entity2.SolverTag;
+                    this.tag2 = (SITag)entity1.SolverTag;
                 }
                 this.friction = MathHelper.Sqrt(
                     this.body1.Coefficients.DynamicFriction *
@@ -151,11 +174,7 @@ namespace Physics2DDotNet.Solvers
                 get { return updated; }
                 set { updated = value; }
             }
-            public int Count { get { return contacts.Count; } }
-            int ContactCompare(Contact c1, Contact c2)
-            {
-                return c2.distance.CompareTo(c1.distance);
-            }
+
             public void Update()
             {
                 updated = true;
@@ -170,33 +189,35 @@ namespace Physics2DDotNet.Solvers
                     if (newContacts.Count == 0)
                     {
                         contacts.Clear();
-                        return;
                     }
-                    List<Contact> mergedContacts = new List<Contact>();
-                    foreach (Contact contact in newContacts)
+                    else
                     {
-                        Contact oldcontact = contacts.Find(delegate(Contact old) { return old.id == contact.id; });
-                        if (oldcontact != null)
+                        List<Contact> mergedContacts = new List<Contact>();
+                        foreach (Contact contact in newContacts)
                         {
-                            contact.Pn = oldcontact.Pn;
-                            contact.Pt = oldcontact.Pt;
+                            Contact oldcontact = contacts.Find(delegate(Contact old) { return old.id == contact.id; });
+                            if (oldcontact != null)
+                            {
+                                contact.Pn = oldcontact.Pn;
+                                contact.Pt = oldcontact.Pt;
+                            }
+                            mergedContacts.Add(contact);
                         }
-                        mergedContacts.Add(contact);
+                        contacts.Clear();
+                        contacts = mergedContacts;
                     }
-                    contacts.Clear();
-                    contacts = mergedContacts;
                 }
-                contacts.Sort(ContactCompare);
+                if (contacts.Count > 0)
+                {
+                    tag1.CollisionCount++;
+                    tag2.CollisionCount++;
+                }
             }
+            static Random rand = new Random();
             public void PreApply(Scalar dtInv)
             {
 
-                Scalar biasMultiplier = 1 / MathHelper.Pow(
-                    Math.Max(Math.Min(
-                    ((SITag)body1.SolverTag).CollisionCount,
-                    ((SITag)body2.SolverTag).CollisionCount) - 1,
-                    1),
-                    2);
+                Scalar biasMultiplier = 1 / MathHelper.Pow(Math.Max(Math.Min(tag1.CollisionCount, tag2.CollisionCount) - 1, 1), 2);
 
 
                 Scalar mass1Inv = body1.Mass.MassInv;
@@ -398,6 +419,24 @@ namespace Physics2DDotNet.Solvers
                         ref I2Inv);
                 }
             }
+
+
+            public bool Collided
+            {
+                get { return contacts.Count > 0; }
+            }
+            IContactInfo[] ICollisionInfo.Contacts
+            {
+                get
+                {
+                    IContactInfo[] result = new IContactInfo[contacts.Count];
+                    for (int index = 0; index < result.Length; ++index)
+                    {
+                        result[index] = contacts[index];
+                    }
+                    return result;
+                }
+            }
         }
 
         static bool IsJointRemoved(ISequentialImpulsesJoint joint)
@@ -447,46 +486,38 @@ namespace Physics2DDotNet.Solvers
             set { superDuperPositionCorrectionIterations = value; }
         }
 
-        protected internal override bool HandleCollision(Scalar dt, Body first, Body second)
+        protected internal override ICollisionInfo HandleCollision(Scalar dt, Body first, Body second)
         {
-            Body entity1 = first;
-            Body entity2 = second;
-            long id = PairID.GetId(entity1.ID, entity2.ID);
+            long id = PairID.GetId(first.ID, second.ID);
             Arbiter arbiter;
             if (arbiters.TryGetValue(id, out arbiter))
             {
                 arbiter.Update();
-                if (arbiter.Count == 0)
+                if (!arbiter.Collided)
                 {
-
                     arbiters.Remove(id);
                 }
             }
             else
             {
-                arbiter = new Arbiter(entity1, entity2, splitImpulse, biasFactor, allowedPenetration);
+                arbiter = new Arbiter(first, second, splitImpulse, biasFactor, allowedPenetration);
                 arbiter.Update();
-                if (!entity1.IgnoresCollisionResponse &&
-                    !entity2.IgnoresCollisionResponse &&
-                    arbiter.Count > 0)
+                if (!first.IgnoresCollisionResponse &&
+                    !second.IgnoresCollisionResponse &&
+                    arbiter.Collided)
                 {
                     arbiters.Add(id, arbiter);
                 }
             }
-            bool rv = arbiter.Count > 0;
-            if (rv)
-            {
-                ((SITag)first.SolverTag).CollisionCount++;
-                ((SITag)second.SolverTag).CollisionCount++;
-            }
-            return rv;
+            return arbiter;
         }
         void RemoveEmpty()
         {
             List<long> empty = new List<long>();
             foreach (KeyValuePair<long, Arbiter> pair in arbiters)
             {
-                if (pair.Value.Count == 0 || !pair.Value.Updated)
+                Arbiter value = pair.Value;
+                if (!value.Collided || !value.Updated)
                 {
                     empty.Add(pair.Key);
                 }

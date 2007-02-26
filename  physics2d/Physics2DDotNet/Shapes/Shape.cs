@@ -45,6 +45,7 @@ namespace Physics2DDotNet
     [Serializable]
     public abstract class Shape : IDuplicateable<Shape>
     {
+        #region static methods
         public static Scalar InertiaOfCylindricalShell(Scalar radius)
         {
             return radius * radius;
@@ -92,8 +93,8 @@ namespace Physics2DDotNet
         }
         public static Vector2D[] CreateCircle(Scalar radius, int vertexCount)
         {
-            if (radius <= 0) { throw new ArgumentOutOfRangeException("radius","Must be greater then zero."); }
-            if (vertexCount < 3) { throw new ArgumentOutOfRangeException("vertexCount","Must be equal or greater then 3"); }
+            if (radius <= 0) { throw new ArgumentOutOfRangeException("radius", "Must be greater then zero."); }
+            if (vertexCount < 3) { throw new ArgumentOutOfRangeException("vertexCount", "Must be equal or greater then 3"); }
             Vector2D[] result = new Vector2D[vertexCount];
             Scalar angleIncrement = MathHelper.TWO_PI / vertexCount;
             for (int index = 0; index < vertexCount; ++index)
@@ -136,9 +137,8 @@ namespace Physics2DDotNet
                 distance = nProj;
             }
         }
-
-
-
+        #endregion
+        #region fields
         object tag;
         protected Matrix2D matrix2D;
         protected Matrix2D matrix2DInv;
@@ -146,8 +146,9 @@ namespace Physics2DDotNet
         protected Scalar inertiaMultiplier;
         protected Vector2D[] originalVertexes;
         protected Vector2D[] vertexes;
-        private Body parent;
-
+        private Body parent; 
+        #endregion
+        #region constructors
         protected Shape(Vector2D[] vertexes)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
@@ -172,8 +173,9 @@ namespace Physics2DDotNet
             }
             this.originalVertexes = copy.originalVertexes;
             this.vertexes = (Vector2D[])copy.vertexes.Clone();
-        }
-
+        } 
+        #endregion
+        #region properties
         public Body Parent
         {
             get { return parent; }
@@ -200,7 +202,6 @@ namespace Physics2DDotNet
         {
             get { return matrix2DInv; }
         }
-
         public Vector2D[] OriginalVertices
         {
             get { return originalVertexes; }
@@ -208,8 +209,9 @@ namespace Physics2DDotNet
         public Vector2D[] Vertices
         {
             get { return vertexes; }
-        }
-
+        } 
+        #endregion
+        #region methods
         public abstract void CalcBoundingBox2D();
         public virtual void ApplyMatrix(ref Matrix2D matrix)
         {
@@ -239,7 +241,7 @@ namespace Physics2DDotNet
         internal void OnRemoved()
         {
             this.parent = null;
-        }
+        } 
+        #endregion
     }
-
 }

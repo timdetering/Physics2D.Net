@@ -43,14 +43,20 @@ namespace Physics2DDotNet
     [Serializable]
     public class CollisionEventArgs : EventArgs
     {
+        IContactInfo[] contacts;
         Body other;
-        public CollisionEventArgs(Body other)
+        public CollisionEventArgs(Body other, IContactInfo[] contacts)
         {
             this.other = other;
+            this.contacts = contacts;
         }
         public Body Other
         {
             get { return other; }
+        }
+        public IContactInfo[] Contacts
+        {
+            get { return contacts; }
         }
     }
 

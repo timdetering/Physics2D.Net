@@ -98,10 +98,10 @@ namespace Physics2DDotNet
         void Solvers.ISequentialImpulsesJoint.PreStep(Scalar dtInv)
         {
 
-            float mass1Inv = body1.Mass.MassInv;
-            float mass2Inv = body2.Mass.MassInv;
-            float inertia1Inv = body1.Mass.MomentofInertiaInv;
-            float inertia2Inv = body2.Mass.MomentofInertiaInv;
+            Scalar mass1Inv = body1.Mass.MassInv;
+            Scalar mass2Inv = body2.Mass.MassInv;
+            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
+            Scalar inertia2Inv = body2.Mass.MomentofInertiaInv;
 
             // Pre-compute anchors, mass matrix, and bias.
             Matrix2x2 matrix1 = body1.Shape.Matrix.NormalMatrix;
@@ -166,10 +166,10 @@ namespace Physics2DDotNet
         void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
         {
 
-            float mass1Inv = body1.Mass.MassInv;
-            float mass2Inv = body2.Mass.MassInv;
-            float inertia1Inv = body1.Mass.MomentofInertiaInv;
-            float inertia2Inv = body2.Mass.MomentofInertiaInv;
+            Scalar mass1Inv = body1.Mass.MassInv;
+            Scalar mass2Inv = body2.Mass.MassInv;
+            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
+            Scalar inertia2Inv = body2.Mass.MomentofInertiaInv;
 
 
             Vector2D dv;
@@ -201,10 +201,10 @@ namespace Physics2DDotNet
         }
         void Solvers.ISequentialImpulsesJoint.PrePositionStep()
         {
-            float mass1Inv = body1.Mass.MassInv;
-            float mass2Inv = body2.Mass.MassInv;
-            float inertia1Inv = body1.Mass.MomentofInertiaInv;
-            float inertia2Inv = body2.Mass.MomentofInertiaInv;
+            Scalar mass1Inv = body1.Mass.MassInv;
+            Scalar mass2Inv = body2.Mass.MassInv;
+            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
+            Scalar inertia2Inv = body2.Mass.MomentofInertiaInv;
 
             // Pre-compute anchors, mass matrix, and bias.
             Matrix2x2 matrix1 = body1.Shape.Matrix.NormalMatrix;
@@ -260,10 +260,10 @@ namespace Physics2DDotNet
         void Solvers.ISequentialImpulsesJoint.ApplyPositionImpulse()
         {
 
-            float mass1Inv = body1.Mass.MassInv;
-            float mass2Inv = body2.Mass.MassInv;
-            float inertia1Inv = body1.Mass.MomentofInertiaInv;
-            float inertia2Inv = body2.Mass.MomentofInertiaInv;
+            Scalar mass1Inv = body1.Mass.MassInv;
+            Scalar mass2Inv = body2.Mass.MassInv;
+            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
+            Scalar inertia2Inv = body2.Mass.MomentofInertiaInv;
             
             // Compute split impulse
             Vector2D dv;

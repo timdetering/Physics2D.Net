@@ -38,14 +38,18 @@ using Scalar = System.Single;
 namespace Physics2DDotNet
 {
     /// <summary>
-    /// A Circle 
+    /// A Circle
     /// </summary>
     [Serializable]
     public sealed class Circle : Shape
     {
         private static Vector2D Zero = Vector2D.Zero;
+        #region fields
         private Scalar radius;
-        private Vector2D position;
+        private Vector2D position; 
+        #endregion
+        #region constructors
+
         /// <summary>
         /// Creates a Instance of Circle
         /// </summary>
@@ -57,8 +61,8 @@ namespace Physics2DDotNet
         public Circle(Scalar radius, int vertexCount, Scalar momentOfInertiaMultiplier)
             : base(CreateCircle(radius, vertexCount))
         {
-            if (radius <= 0) { throw new ArgumentOutOfRangeException("radius","must be larger then zero"); }
-            if (momentOfInertiaMultiplier < 0) { throw new ArgumentOutOfRangeException("momentofInertiaMultiplier","must be larger then zero"); }
+            if (radius <= 0) { throw new ArgumentOutOfRangeException("radius", "must be larger then zero"); }
+            if (momentOfInertiaMultiplier < 0) { throw new ArgumentOutOfRangeException("momentofInertiaMultiplier", "must be larger then zero"); }
             this.radius = radius;
             this.inertiaMultiplier = momentOfInertiaMultiplier;
         }
@@ -67,15 +71,29 @@ namespace Physics2DDotNet
         {
             this.position = copy.position;
             this.radius = copy.radius;
-        }
+        } 
+        #endregion
+        #region properties
+        /// <summary>
+        /// the distance from the position where the circle ends.
+        /// </summary>
         public Scalar Radius
         {
             get { return radius; }
         }
+        /// <summary>
+        /// the cenrter of the circle.
+        /// </summary>
         public Vector2D Position
         {
             get { return position; }
         }
+        public override bool CanGetIntersection
+        {
+            get { return true; }
+        }
+        #endregion
+        #region methods
         public override void CalcBoundingBox2D()
         {
             boundingBox = new BoundingBox2D(
@@ -89,10 +107,6 @@ namespace Physics2DDotNet
             Circle other = shape as Circle;
             if (other == null) { throw new ArgumentException("the parameter must be a shape", "shape"); }
             this.position = other.position;
-        }
-        public override bool CanGetIntersection
-        {
-            get { return true; }
         }
         public override Scalar GetDistance(Vector2D vector)
         {
@@ -124,6 +138,7 @@ namespace Physics2DDotNet
         public override Shape Duplicate()
         {
             return new Circle(this);
-        }
+        } 
+        #endregion
     }
 }

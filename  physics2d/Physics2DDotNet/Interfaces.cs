@@ -52,4 +52,11 @@ namespace Physics2DDotNet
         PhysicsEngine Engine { get;}
         Lifespan Lifetime { get; set;}
     }
+    public interface IContactInfo
+    {
+        Vector2D Position { get;}
+        Vector2D Normal { get;}
+        Scalar Distance { get;}
+    }
+
 }

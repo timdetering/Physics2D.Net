@@ -91,8 +91,8 @@ namespace Physics2DDotNet
         public event EventHandler<CollisionEventArgs> Collided;
         #endregion
         #region fields
-        PhysicsState state;
         Shape shape;
+        PhysicsState state;
         MassInfo massInfo;
         Coefficients coefficients;
         Lifespan lifetime;
@@ -127,7 +127,7 @@ namespace Physics2DDotNet
             Lifespan lifetime)
             : this(
                 state, shape,
-                GetMassInfo(mass,shape),
+                GetMassInfo(mass, shape),
                 coefficients, lifetime) { }
 
         public Body(
@@ -497,9 +497,12 @@ namespace Physics2DDotNet
             return new Body(this);
         }
 
-        internal void OnCollision(Body other)
+        internal void OnCollision(Body other, Solvers.ICollisionInfo collisionInfo)
         {
-            if (Collided != null) { Collided(this, new CollisionEventArgs(other)); }
+            if (Collided != null)
+            {
+                Collided(this, new CollisionEventArgs(other, (collisionInfo == null) ? (null) : (collisionInfo.Contacts)));
+            }
         }
         internal void OnStateChanged()
         {

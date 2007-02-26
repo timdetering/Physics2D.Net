@@ -447,7 +447,7 @@ namespace Physics2DDemo
             float Xspacing = 1f;
 
             float xmin = 200;
-            float xmax = 900;
+            float xmax = 800;
             float ymin = 50;
             float ymax = 720 - size / 2;
             float step = (size + spacing + Xspacing) / 2;
@@ -555,20 +555,29 @@ namespace Physics2DDemo
 
             for (int index = 0; index < count;++index )
             {
-                Body f = new Body(
+                Body particle = new Body(
                     new PhysicsState(new ALVector2D(0, position)),
                     new Particle(), 
                     1,
                     new Coefficients(.2f, .2f, friction),
                     new Lifespan(2));
-
-                f.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble()-.5f )* angle);
-                //f.State.Velocity.Linear = new Vector2D(rand.Next(-1000, 1001), rand.Next(-1000, 1001));
-                particles[index] = f;
+                particle.Collided +=OnParticleCollided;
+                particle.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble()-.5f )* angle);
+                particles[index] = particle;
 
             }
             AddGlObjectRange(particles);
             engine.AddBodyRange(particles);
+        }
+
+        void OnParticleCollided(object sender, CollisionEventArgs e)
+        {
+            Body b1 = (Body)sender;
+            Body b2 = (Body)e.Other;
+            if ((b1.State.Velocity.Linear - b2.State.Velocity.Linear).MagnitudeSq < 1)
+            {
+                b1.Lifetime.IsExpired = true;
+            }
         }
         void AddTower2()
         {
@@ -767,6 +776,7 @@ namespace Physics2DDemo
             {
                 updated = false;
                 AddParticles(sparkPoint, 60);
+                Gl.glPointSize(3);
             }
 
             if (!started)

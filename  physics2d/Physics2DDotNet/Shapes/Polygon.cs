@@ -42,21 +42,42 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class Polygon : Shape
     {
+        #region static methods
+        /// <summary>
+        /// creates vertexes that describe a Rectangle.
+        /// </summary>
+        /// <param name="length">The length of the Rectangle</param>
+        /// <param name="width"></param>
+        /// <returns>array of vectors the describe a rectangle</returns>
         public static Vector2D[] CreateRectangle(Scalar length, Scalar width)
         {
             Scalar Ld2 = length / 2;
             Scalar Wd2 = width / 2;
-            Vector2D[] vertices = new Vector2D[4];
-            vertices[0] = new Vector2D(Wd2, Ld2);
-            vertices[1] = new Vector2D(-Wd2, Ld2);
-            vertices[2] = new Vector2D(-Wd2, -Ld2);
-            vertices[3] = new Vector2D(Wd2, -Ld2);
-            return vertices;
+            return new Vector2D[4]
+            {
+                new Vector2D(Wd2, Ld2),
+                new Vector2D(-Wd2, Ld2),
+                new Vector2D(-Wd2, -Ld2),
+                new Vector2D(Wd2, -Ld2)
+            };
         }
+        /// <summary>
+        /// makes sure the distance between 2 vertexes is under the length passed, by adding vertexes between them.
+        /// </summary>
+        /// <param name="vertexes">the original vertexes.</param>
+        /// <param name="maxLength">the maximum distance allowed between 2 vertexes</param>
+        /// <returns>The new vertexes.</returns>
         public static Vector2D[] Subdivide(Vector2D[] vertexes, Scalar maxLength)
         {
             return Subdivide(vertexes, maxLength, true);
         }
+        /// <summary>
+        /// makes sure the distance between 2 vertexes is under the length passed, by adding vertexes between them.
+        /// </summary>
+        /// <param name="vertexes">the original vertexes.</param>
+        /// <param name="maxLength">the maximum distance allowed between 2 vertexes</param>
+        /// <param name="loop">if it should check the distance between the first and last vertex.</param>
+        /// <returns>The new vertexes.</returns>
         public static Vector2D[] Subdivide(Vector2D[] vertexes, Scalar maxLength, bool loop)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
@@ -98,7 +119,6 @@ namespace Physics2DDotNet
             list.CopyTo(result, 0);
             return result;
         }
-
         /// <summary>
         /// Calculates the area of a polygon.
         /// </summary>
@@ -164,10 +184,12 @@ namespace Physics2DDotNet
                 returnvalue += (vertices[pos1] - vertices[pos2]).Magnitude;
             }
             return returnvalue;
-        }
-
-
-        private DistanceGrid grid;
+        } 
+        #endregion
+        #region fields
+        private DistanceGrid grid; 
+        #endregion
+        #region constructors
         public Polygon(Vector2D[] vertexes, Scalar gridSpacing)
             : this(vertexes, gridSpacing, InertiaOfPolygon(vertexes)) { }
         public Polygon(Vector2D[] vertexes, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
@@ -185,17 +207,19 @@ namespace Physics2DDotNet
         {
             this.grid = copy.grid;
         }
-
+        
+        #endregion
+        #region properties
         public override bool CanGetIntersection
         {
             get { return true; }
-        }
-
+        } 
+        #endregion
+        #region methods
         public override void CalcBoundingBox2D()
         {
             BoundingBox2D.FromVectors(vertexes, out boundingBox);
         }
-
         public override Scalar GetDistance(Vector2D vector)
         {
             Scalar resultAbs = Scalar.MaxValue;
@@ -230,6 +254,7 @@ namespace Physics2DDotNet
         public override Shape Duplicate()
         {
             return new Polygon(this);
-        }
+        } 
+        #endregion
     }
 }

@@ -36,37 +36,40 @@ using System.Threading;
 using AdvanceMath;
 using Physics2DDotNet.Math2D;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Solvers
 {
+    public interface ICollisionInfo
+    {
+        bool Collided { get;}
+        IContactInfo[] Contacts { get;}
+    }
     [Serializable]
-    public abstract class BroadPhaseCollisionDetector
+    public abstract class CollisionSolver
     {
         protected static void SetTag(Body body, object tag)
         {
             if (body == null) { throw new ArgumentNullException("body"); }
-            body.DetectorTag = tag;
+            body.SolverTag = tag;
         }
 
         PhysicsEngine engine;
+
+        protected List<Joint> Joints { get { return engine.joints; } }
+        protected List<Body> Bodies { get { return engine.bodies; } }
+        /// <summary>
+        /// The engine this solver is in.
+        /// </summary>
         public PhysicsEngine Engine
         {
             get { return engine; }
         }
-        protected List<Body> Bodies
-        {
-            get
-            {
-                return engine.bodies;
-            }
-        }
 
-        public abstract void Detect(Scalar dt);
+        protected internal abstract ICollisionInfo HandleCollision(Scalar dt, Body first, Body second);
+        protected internal abstract void Solve(Scalar dt);
+
         internal void OnAddedInternal(PhysicsEngine engine)
         {
-            if (this.engine != null)
-            {
-                throw new InvalidOperationException("A broadphsed Detector cannot be added to more then one engine.");
-            }
+            if (this.engine != null) { throw new InvalidOperationException(); }
             this.engine = engine;
             OnAdded();
             this.AddBodyRange(engine.bodies);
@@ -80,14 +83,20 @@ namespace Physics2DDotNet
         protected virtual void OnAdded() { }
         protected virtual void OnRemoved() { }
 
-        protected internal virtual void AddBodyRange(List<Body> collection) { }
-        protected internal virtual void RemoveExpiredBodies() { }
 
         protected internal virtual void Clear() { }
-        protected void OnCollision(Scalar dt, Body first, Body second)
+
+        protected internal virtual void AddBodyRange(List<Body> collection) { }
+        protected internal virtual void AddJointRange(List<Joint> collection) { }
+
+        protected internal virtual void RemoveExpiredBodies() { }
+        protected internal virtual void RemoveExpiredJoints() { }
+        protected void Detect(Scalar dt)
         {
-            this.engine.HandleCollision(dt, first, second);
+            engine.BroadPhase.Detect(dt);
         }
+
+        protected internal abstract void CheckJoint(Joint joint);
     }
 
 }

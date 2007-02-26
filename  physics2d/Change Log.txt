@@ -4,6 +4,11 @@ Changed: made the Joints Implement an interface specific to the solver.
 Changed: Implemented the Solver from Super Split Box2D. This changed the joints quite a bit but basically left everything else alone.
 Changed: Made it so a joint will be removed when one of the bodies it is attached to is removed.
 Added: JointCount property to Body.
+Changed: Cleaned up some code in the Sequential Impulse Solver.
+Added: IContact and ICollisionInfo for use with CollisionEventArgs
+Changed: the solvers and all classes involved to added contact info to the collided event.
+Moved: BroadPhasedCollisionDetector into the Detectors namespace.
+Moved: CollsionSolver into the Solvers namespace.
 
 
 
