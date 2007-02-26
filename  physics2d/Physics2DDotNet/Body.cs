@@ -112,13 +112,13 @@ namespace Physics2DDotNet
         #endregion
         #region constructors
         /// <summary>
-        /// 
+        /// Creates a new Body Instance.
         /// </summary>
-        /// <param name="state"></param>
-        /// <param name="shape"></param>
+        /// <param name="state">The State of the Body.</param>
+        /// <param name="shape">The Shape of the Body.</param>
         /// <param name="mass">The mass of the Body The inertia will be aquired from the Shape.</param>
-        /// <param name="coefficients"></param>
-        /// <param name="lifeTime"></param>
+        /// <param name="coefficients">A object containing coefficients.</param>
+        /// <param name="lifeTime">A object Describing how long the object will be in the engine.</param>
         public Body(
             PhysicsState state,
             Shape shape,
@@ -129,7 +129,14 @@ namespace Physics2DDotNet
                 state, shape,
                 GetMassInfo(mass, shape),
                 coefficients, lifetime) { }
-
+        /// <summary>
+        /// Creates a new Body Instance.
+        /// </summary>
+        /// <param name="state">The State of the Body.</param>
+        /// <param name="shape">The Shape of the Body.</param>
+        /// <param name="massInfo">A object describing the mass and inertia of the Body.</param>
+        /// <param name="coefficients">A object containing coefficients.</param>
+        /// <param name="lifeTime">A object Describing how long the object will be in the engine.</param>
         public Body(
             PhysicsState state,
             Shape shape,

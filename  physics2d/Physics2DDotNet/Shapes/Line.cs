@@ -44,9 +44,33 @@ namespace Physics2DDotNet
         Scalar thicknessHalf;
         Scalar thickness;
         DistanceGrid grid;
+        /// <summary>
+        /// Creates a new Line Instance.
+        /// </summary>
+        /// <param name="vertexes">the vertexes that make up the shape of the Line</param>
+        /// <param name="thickness">How thick the Line is.</param>
+        /// <param name="gridSpacing">
+        /// How large a grid cell is. Usualy you will want at least 2 cells between major vertexes.
+        /// The smaller this is the better precision you get, but higher cost in memory. 
+        /// The larger the less precision and if it's to high collision detection may fail completely.
+        /// </param>
         public Line(Vector2D[] vertexes, Scalar thickness, Scalar gridSpacing)
             : this(vertexes, thickness, gridSpacing, 1)
         { }
+        /// <summary>
+        /// Creates a new Line Instance.
+        /// </summary>
+        /// <param name="vertexes">the vertexes that make up the shape of the Line</param>
+        /// <param name="thickness">How thick the Line is.</param>
+        /// <param name="gridSpacing">
+        /// How large a grid cell is. Usualy you will want at least 2 cells between major vertexes.
+        /// The smaller this is the better precision you get, but higher cost in memory. 
+        /// The larger the less precision and if it's to high collision detection may fail completely.
+        /// </param>
+        /// <param name="momentOfInertiaMultiplier">
+        /// How hard it is to turn the shape. Depending on the construtor in the 
+        /// Body this will be multiplied with the mass to determine the moment of inertia.
+        /// </param>
         public Line(Vector2D[] vertexes, Scalar thickness, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
             : base(vertexes)
         {

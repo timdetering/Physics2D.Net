@@ -43,175 +43,77 @@ using System.Diagnostics;
 namespace Physics2DDemo
 {
 
-    class GlDrawObject
-    {
-        float[] matrix = new float[16];
-        Body entity;
-        int list = -1;
-        bool removed;
-        public bool Removed
-        {
-            get { return removed; }
-        }
 
-        public GlDrawObject(Body entity)
-        {
-            this.entity = entity;
-            this.entity.StateChanged += entity_NewState;
-            this.entity.Removed += entity_Removed;
-        }
-
-        void entity_Removed(object sender, EventArgs e)
-        {
-            this.entity.StateChanged -= entity_NewState;
-            this.entity.Removed -= entity_Removed;
-            this.removed = true;
-        }
-
-        public void Remove()
-        {
-            if (Gl.glIsList(list) != 0)
-            {
-                Gl.glDeleteLists(list, 1);
-            }
-            list = -1;
-        }
-        void entity_NewState(object sender, EventArgs e)
-        {
-            Matrix3x3 mat = entity.Shape.Matrix.VertexMatrix;
-            Matrix3x3.Copy2DToOpenGlMatrix(ref mat, matrix);
-        }
-
-        public Body Entity
-        {
-            get { return entity; }
-        }
-
-        void DrawInternal()
-        {
-            if (entity.Shape is Physics2DDotNet.Particle)
-            {
-                Gl.glBegin(Gl.GL_POINTS);
-                Gl.glColor3f(0, 1, 0);
-                foreach (Vector2D vector in entity.Shape.OriginalVertices)
-                {
-                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
-                }
-                Gl.glEnd();
-            }
-            else if (entity.Shape is Physics2DDotNet.Line)
-            {
-                Physics2DDotNet.Line line = (Physics2DDotNet.Line)entity.Shape;
-                Gl.glLineWidth((float)line.Thickness);
-                Gl.glColor3f(0, 0, 1);
-                Gl.glBegin(Gl.GL_LINE_STRIP);
-                foreach (Vector2D vector in entity.Shape.OriginalVertices)
-                {
-                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
-                }
-                Gl.glEnd();
-            }
-            else
-            {
-                Gl.glBegin(Gl.GL_POLYGON);
-                bool first = true;
-                bool second = true;
-                foreach (Vector2D vector in entity.Shape.OriginalVertices)
-                {
-                    if (first)
-                    {
-                        Gl.glColor3f(1, 0, 0);
-                        first = false;
-                    }
-                    else if (second)
-                    {
-                        Gl.glColor3f(1, 1, 1);
-                        second = false;
-                    }
-                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
-                }
-                Gl.glEnd();
-            }
-        }
-
-        public void Draw()
-        {
-            if (entity.Lifetime.IsExpired)
-            {
-                return;
-            }
-            if (Gl.glIsList(list) == 0)
-            {
-                Gl.glPushMatrix();
-                Gl.glLoadIdentity();
-                list = Gl.glGenLists(1);
-                Gl.glNewList(list, Gl.GL_COMPILE);
-                DrawInternal();
-                Gl.glEndList();
-                Gl.glPopMatrix();
-            }
-            Gl.glPushMatrix();
-            Gl.glMultMatrixf(matrix);
-            Gl.glCallList(list);
-            Gl.glPopMatrix();
-        }
-    }
-    
+    /// <summary>
+    /// this is not the best tutorial 
+    /// </summary>
     class Demo
     {
         static Random rand = new Random();
+        #region fields
         ManualResetEvent waitHandle;
         PhysicsEngine engine;
         int count = 0;
         Stopwatch watch;
         List<GlDrawObject> objects;
+
         Body bomb;
-        Body avatar;
         Vector2D bombTarget;
+
         float friction = .3f;
+
+        Vector2D sparkPoint;
+        bool sparkle;
+
+        Body avatar;
+        float forceMag = 5000;
+        Vector2D force;
+
+        bool isSlow;
+        bool isFast;
+        bool started;
+        bool updated; 
+        #endregion
+        #region constructors
         public Demo()
         {
             Events.MouseButtonDown += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonDown);
-            Events.MouseButtonUp +=new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonUp); 
+            Events.MouseButtonUp += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonUp);
             Events.KeyboardDown += new EventHandler<SdlDotNet.Input.KeyboardEventArgs>(Events_KeyboardDown);
             Events.KeyboardUp += new EventHandler<SdlDotNet.Input.KeyboardEventArgs>(Events_KeyboardUp);
             Events.MouseMotion += new EventHandler<SdlDotNet.Input.MouseMotionEventArgs>(Events_MouseMotion);
             waitHandle = new ManualResetEvent(true);
             watch = new Stopwatch();
-            engine = new PhysicsEngine();
             objects = new List<GlDrawObject>();
-            engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-            Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
-            solver.Iterations = 13;
-            solver.SplitImpulse = true;
-            solver.BiasFactor = .7f;
-            solver.AllowedPenetration = .01f;
-            engine.Solver = solver;
 
-            bomb = new Body(new PhysicsState(),
-                new Physics2DDotNet.Circle(20, 20),
-                120,
-                 new Coefficients(.2f, .2f, friction),
-                 new Lifespan());
+            InitializePhysicsEngine();
+            CreateBomb();
             CreateAvatar();
             Demo1();
-
-            Console.WriteLine(count);
         }
+        
+        #endregion
+        #region methods
 
-        void Events_MouseMotion(object sender, SdlDotNet.Input.MouseMotionEventArgs e)
+        #region initialization
+        void InitializePhysicsEngine()
         {
-            if (sparkle)
-            {
-                sparkPoint = new Vector2D(e.X, e.Y);
-            }
+            //create a new PhysicsEngine.
+            engine = new PhysicsEngine();
+
+            //set its broad phase to SweepAndPrune.
+            engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
+
+            //create a new solver.
+            Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            //optionaly set its options.
+            solver.SplitImpulse = true;
+            solver.Iterations = 13;
+            solver.BiasFactor = .7f;
+            solver.AllowedPenetration = .01f;
+            //set the engines solver to it.
+            engine.Solver = solver;
         }
-
-
-
-
-        float forceMag = 5000;
-        Vector2D force;
         void CreateAvatar()
         {
             float Ld2 = 30 / 2;
@@ -233,137 +135,26 @@ namespace Physics2DDemo
                 new MassInfo(5, float.PositiveInfinity),
                 new Coefficients(.2f, .2f, friction),
                 new Lifespan());
-            avatar.Updated += new EventHandler<UpdatedEventArgs>(avatar_Updated);
+            avatar.Updated += new EventHandler<UpdatedEventArgs>(OnAvatarUpdated);
         }
-        void AddAvatar()
+        void CreateBomb()
         {
-            avatar.State.Position.Linear = new Vector2D(200, 200);
-            avatar.State.Velocity.Linear =  Vector2D.Zero;
-            avatar.ApplyMatrix();
-            count++;
-            AddGlObject(avatar);
-            engine.AddBody(avatar);
-        }
-        void avatar_Updated(object sender, UpdatedEventArgs e)
-        {
-            avatar.State.ForceAccumulator.Linear += force;
-        }
-
-
-
-        void Events_KeyboardDown(object sender, SdlDotNet.Input.KeyboardEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case SdlDotNet.Input.Key.One:
-                    Demo1();
-                    break;
-                case SdlDotNet.Input.Key.Two:
-                    Demo2();
-                    break;
-                case SdlDotNet.Input.Key.Three:
-                    Demo3();
-                    break;
-                case SdlDotNet.Input.Key.Four:
-                    Demo4();
-                    break;
-                case SdlDotNet.Input.Key.Five:
-                    Demo5();
-                    break;
-                case SdlDotNet.Input.Key.Six:
-                    Demo6();
-                    break;
-                case SdlDotNet.Input.Key.Seven:
-                    Demo7();
-                    break;
-                case SdlDotNet.Input.Key.Eight:
-                    Demo8();
-                    break;
-                case SdlDotNet.Input.Key.Nine:
-                    Demo9();
-                    break;
-                case SdlDotNet.Input.Key.LeftArrow :
-                    force += new Vector2D(-forceMag, 0);
-                    break;
-                case SdlDotNet.Input.Key.RightArrow:
-                    force += new Vector2D(forceMag, 0);
-                    break;
-                case SdlDotNet.Input.Key.UpArrow:
-                    avatar.IgnoresGravity = true;
-                    force += new Vector2D(0, -forceMag);
-                    break;
-                case SdlDotNet.Input.Key.DownArrow:
-                    force += new Vector2D(0, forceMag);
-                    break;
-            }
-        }
-        void Events_KeyboardUp(object sender, SdlDotNet.Input.KeyboardEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case SdlDotNet.Input.Key.LeftArrow:
-                    force -= new Vector2D(-forceMag, 0);
-                    break;
-                case SdlDotNet.Input.Key.RightArrow:
-                    force -= new Vector2D(forceMag, 0);
-                    break;
-                case SdlDotNet.Input.Key.UpArrow:
-                    avatar.IgnoresGravity = false;
-                    force -= new Vector2D(0, -forceMag);
-                    break;
-                case SdlDotNet.Input.Key.DownArrow:
-                    force -= new Vector2D(0, forceMag);
-                    break;
-            }
-        }
-        Vector2D sparkPoint;
-        void Events_MouseButtonDown(object sender, SdlDotNet.Input.MouseButtonEventArgs e)
-        {
-            if (e.Button == SdlDotNet.Input.MouseButton.PrimaryButton)
-            {
-                bombTarget = new Vector2D(e.X, e.Y);
-                bomb.Lifetime.IsExpired = true;
-            }
-            else if (e.Button == SdlDotNet.Input.MouseButton.SecondaryButton)
-            {
-                sparkPoint = new Vector2D(e.X, e.Y);
-                sparkle = true;
-               /* waitHandle.Reset();
-                AddParticles(new Vector2D(e.X, e.Y), 50);
-                waitHandle.Set();*/
-            }
-        }
-        void Events_MouseButtonUp(object sender, SdlDotNet.Input.MouseButtonEventArgs e)
-        {
-            if (e.Button == SdlDotNet.Input.MouseButton.SecondaryButton)
-            {
-                sparkle = false;
-            }
-        }
-        bool sparkle;
-
-        void bomb_Removed(object sender, EventArgs e)
-        {
-            Vector2D position = new Vector2D(rand.Next(0, 1400), 0);
-            float velocityMag = rand.Next(1000, 2000);
-            // Vector2D target = new Vector2D(rand.Next(400, 900), rand.Next(200, 700));
-            Vector2D velocity = Vector2D.SetMagnitude(bombTarget - position, velocityMag);
-
-            bomb.Lifetime = new Lifespan();
-            bomb.State.Position.Linear = position;
-            bomb.State.Velocity.Linear = velocity;
-            engine.AddBody(bomb);
-            AddGlObject(bomb);
-        }
+            bomb = new Body(new PhysicsState(),
+                    new Physics2DDotNet.Circle(20, 20),
+                    120,
+                    new Coefficients(.2f, .2f, friction),
+                    new Lifespan());
+        } 
+        #endregion
 
         void AddGlObject(Body obj)
         {
             lock (objects)
             {
-                objects.Add(new  GlDrawObject(obj));
+                objects.Add(new GlDrawObject(obj));
             }
         }
-        void AddGlObjectRange(IList< Body> collection)
+        void AddGlObjectRange(IList<Body> collection)
         {
             GlDrawObject[] arr = new GlDrawObject[collection.Count];
             for (int index = 0; index < arr.Length; ++index)
@@ -375,12 +166,21 @@ namespace Physics2DDemo
                 objects.AddRange(arr);
             }
         }
+
+        void AddAvatar()
+        {
+            avatar.State.Position.Linear = new Vector2D(200, 200);
+            avatar.State.Velocity.Linear = Vector2D.Zero;
+            avatar.ApplyMatrix();
+            count++;
+            AddGlObject(avatar);
+            engine.AddBody(avatar);
+        }
         void AddBomb()
         {
-            AddAvatar();
             count++;
             AddGlObject(bomb);
-            bomb.Removed += new EventHandler(bomb_Removed);
+            bomb.Removed += new EventHandler(OnBombRemoved);
             engine.AddBody(bomb);
         }
         void AddFloor(ALVector2D position)
@@ -407,11 +207,9 @@ namespace Physics2DDemo
                 new Vector2D(-length/2,0),
                 new Vector2D(length/2,0)
             };
-
-
             Body body = new Body(
                 new PhysicsState(new ALVector2D(angle, avg)),
-                new Physics2DDotNet.Line(vertexes, thickness, thickness/2),
+                new Physics2DDotNet.Line(vertexes, thickness, thickness / 2),
                 new MassInfo(float.PositiveInfinity, float.PositiveInfinity),
                 new Coefficients(.2f, .2f, friction),
                 new Lifespan());
@@ -447,7 +245,7 @@ namespace Physics2DDemo
             float Xspacing = 1f;
 
             float xmin = 200;
-            float xmax = 800;
+            float xmax = 700;
             float ymin = 50;
             float ymax = 720 - size / 2;
             float step = (size + spacing + Xspacing) / 2;
@@ -521,15 +319,7 @@ namespace Physics2DDemo
         }
         void RemoveBombEvents()
         {
-            bomb.Removed -= bomb_Removed;
-        }
-        void Clear()
-        {
-            RemoveBombEvents();
-            engine.Clear();
-            objects.Clear();
-            count = 0;
-            GC.Collect();
+            bomb.Removed -= OnBombRemoved;
         }
         void AddTower()
         {
@@ -537,7 +327,7 @@ namespace Physics2DDemo
             float x = 500;
             float spacing = size + 2;
 
-            float minY = 300;
+            float minY = 400;
             float maxY = 720 - size / 2;
             for (float y = maxY; y > minY; y -= spacing)
             {
@@ -548,36 +338,26 @@ namespace Physics2DDemo
         {
             engine.AddLogic(new GravityField(new Vector2D(0, 960f), new Lifespan()));
         }
-        void AddParticles(Vector2D position,int count)
+        void AddParticles(Vector2D position, int count)
         {
             Body[] particles = new Body[count];
             float angle = MathHelper.TWO_PI / count;
 
-            for (int index = 0; index < count;++index )
+            for (int index = 0; index < count; ++index)
             {
                 Body particle = new Body(
                     new PhysicsState(new ALVector2D(0, position)),
-                    new Particle(), 
+                    new Particle(),
                     1,
                     new Coefficients(.2f, .2f, friction),
                     new Lifespan(2));
-                particle.Collided +=OnParticleCollided;
-                particle.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble()-.5f )* angle);
+                particle.Collided += OnParticleCollided;
+                particle.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble() - .5f) * angle);
                 particles[index] = particle;
 
             }
             AddGlObjectRange(particles);
             engine.AddBodyRange(particles);
-        }
-
-        void OnParticleCollided(object sender, CollisionEventArgs e)
-        {
-            Body b1 = (Body)sender;
-            Body b2 = (Body)e.Other;
-            if ((b1.State.Velocity.Linear - b2.State.Velocity.Linear).MagnitudeSq < 1)
-            {
-                b1.Lifetime.IsExpired = true;
-            }
         }
         void AddTower2()
         {
@@ -592,14 +372,27 @@ namespace Physics2DDemo
                 AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + rand.Next(-3, 4) * .1f, y)));
             }
         }
+        void Clear()
+        {
+            RemoveBombEvents();
+            engine.Clear();
+            objects.Clear();
+            count = 0;
+            GC.Collect();
+        }
+        void Reset()
+        {
+            Clear();
+            AddAvatar();
+            AddBomb();
+        }
 
         void Demo1()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            AddBomb();
             AddRectangle(40, 40, 20, new ALVector2D(0, new Vector2D(600, 300)));
             Console.WriteLine(count);
             waitHandle.Set();
@@ -607,10 +400,9 @@ namespace Physics2DDemo
         void Demo2()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            AddBomb();
             AddTower();
             Console.WriteLine(count);
             waitHandle.Set();
@@ -618,10 +410,9 @@ namespace Physics2DDemo
         void Demo3()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
             AddFloor(new ALVector2D(.1f, new Vector2D(600, 760)));
-            AddBomb();
             AddTower();
             Console.WriteLine(count);
             waitHandle.Set();
@@ -629,10 +420,9 @@ namespace Physics2DDemo
         void Demo4()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            AddBomb();
             AddPyramid();
             Console.WriteLine(count);
             waitHandle.Set();
@@ -640,10 +430,9 @@ namespace Physics2DDemo
         void Demo5()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            AddBomb();
             AddTowers();
             Console.WriteLine(count);
             waitHandle.Set();
@@ -651,10 +440,8 @@ namespace Physics2DDemo
         void Demo6()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
-            // AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            AddBomb();
 
             List<Body> chain = AddChain(new Vector2D(400, 50), 100, 30, 200, 10, 800);
             Vector2D point = new Vector2D(300, 50);
@@ -669,9 +456,8 @@ namespace Physics2DDemo
         void Demo7()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
-            AddBomb();
             AddTowers();
             Console.WriteLine(count);
             waitHandle.Set();
@@ -679,10 +465,8 @@ namespace Physics2DDemo
         void Demo8()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
-            // AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            AddBomb();
 
             float boxlength = 50;
             float spacing = 4;
@@ -717,10 +501,8 @@ namespace Physics2DDemo
         void Demo9()
         {
             waitHandle.Reset();
-            Clear();
+            Reset();
             AddGravityField();
-            AddBomb();
-
 
             AddLine(new Vector2D(0, 700), new Vector2D(300, 700), 30);
             AddLine(new Vector2D(300, 700), new Vector2D(400, 650), 30);
@@ -732,16 +514,22 @@ namespace Physics2DDemo
             waitHandle.Set();
         }
 
-        bool isSlow;
-        bool isFast;
+
+        /// <summary>
+        /// I put this in a seperate thread becuase of issues with openGl being too slow calling the draw method.
+        /// And I have a dual core machine.
+        /// </summary>
         public void PhysicsProcess()
         {
+            //starts the stopwatch to give the change in time.
             watch.Start();
             while (true)
             {
+                //change in time in seconds.
                 float dt = watch.ElapsedMilliseconds / 1000f;
                 if (dt < .001f)
                 {
+                    //if its too little wait a while.
                     //GC.Collect();
                     isFast = true;
                     Thread.Sleep(6);
@@ -752,6 +540,7 @@ namespace Physics2DDemo
                     isFast = false;
                     if (dt > .020f)
                     {
+                        //if its too high lower it. 
                         isSlow = true;
                         dt = .020f;
                     }
@@ -761,22 +550,23 @@ namespace Physics2DDemo
                     }
                     watch.Reset();
                     watch.Start();
+                    //calls the engine.
                     engine.Update(dt);
                     updated = true;
                 }
+                //pauses this thread while a demoe is loading. 
                 waitHandle.WaitOne();
             }
         }
 
-        bool started = false;
-        bool updated;
+
         public void Draw(int width, int height)
         {
+            Gl.glPointSize(3);
             if (sparkle && updated)
             {
                 updated = false;
                 AddParticles(sparkPoint, 60);
-                Gl.glPointSize(3);
             }
 
             if (!started)
@@ -786,11 +576,14 @@ namespace Physics2DDemo
                 t.IsBackground = true;
                 t.Start();
             }
+            //orients the screen so that it has the same cordinate system as windows forms.
             Gl.glTranslatef(width / 2, height / 2, 0);
             Gl.glRotatef(180, 0, 0, 1);
             Gl.glRotatef(180, 0, 1, 0);
             Gl.glTranslatef(-width / 2, -height / 2, 0);
-            if (isSlow|| isFast)
+
+            //draws the box indicating speed. (not important)
+            if (isSlow || isFast)
             {
                 Gl.glBegin(Gl.GL_QUADS);
                 if (isSlow)
@@ -807,14 +600,281 @@ namespace Physics2DDemo
                 Gl.glVertex2f(0, 10);
                 Gl.glEnd();
             }
+            //draws all the items to screen.
             lock (objects)
             {
-                objects.RemoveAll(delegate(GlDrawObject o) { if (o.Removed) { o.Remove(); return true; } return false; });
+                //removes the ones belonging to bodies that have been removed.
+                objects.RemoveAll(delegate(GlDrawObject o) { if (o.Removed) { o.Dispose(); return true; } return false; });
+                //actauly draws them.
                 foreach (GlDrawObject obj in objects)
                 {
                     obj.Draw();
                 }
             }
+        }
+
+
+        #region event handlers
+        void Events_KeyboardDown(object sender, SdlDotNet.Input.KeyboardEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case SdlDotNet.Input.Key.One:
+                    Demo1();
+                    break;
+                case SdlDotNet.Input.Key.Two:
+                    Demo2();
+                    break;
+                case SdlDotNet.Input.Key.Three:
+                    Demo3();
+                    break;
+                case SdlDotNet.Input.Key.Four:
+                    Demo4();
+                    break;
+                case SdlDotNet.Input.Key.Five:
+                    Demo5();
+                    break;
+                case SdlDotNet.Input.Key.Six:
+                    Demo6();
+                    break;
+                case SdlDotNet.Input.Key.Seven:
+                    Demo7();
+                    break;
+                case SdlDotNet.Input.Key.Eight:
+                    Demo8();
+                    break;
+                case SdlDotNet.Input.Key.Nine:
+                    Demo9();
+                    break;
+                case SdlDotNet.Input.Key.LeftArrow:
+                    force += new Vector2D(-forceMag, 0);
+                    break;
+                case SdlDotNet.Input.Key.RightArrow:
+                    force += new Vector2D(forceMag, 0);
+                    break;
+                case SdlDotNet.Input.Key.UpArrow:
+                    avatar.IgnoresGravity = true;
+                    force += new Vector2D(0, -forceMag);
+                    break;
+                case SdlDotNet.Input.Key.DownArrow:
+                    force += new Vector2D(0, forceMag);
+                    break;
+            }
+        }
+        void Events_KeyboardUp(object sender, SdlDotNet.Input.KeyboardEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case SdlDotNet.Input.Key.LeftArrow:
+                    force -= new Vector2D(-forceMag, 0);
+                    break;
+                case SdlDotNet.Input.Key.RightArrow:
+                    force -= new Vector2D(forceMag, 0);
+                    break;
+                case SdlDotNet.Input.Key.UpArrow:
+                    avatar.IgnoresGravity = false;
+                    force -= new Vector2D(0, -forceMag);
+                    break;
+                case SdlDotNet.Input.Key.DownArrow:
+                    force -= new Vector2D(0, forceMag);
+                    break;
+            }
+        }
+        void Events_MouseButtonDown(object sender, SdlDotNet.Input.MouseButtonEventArgs e)
+        {
+            if (e.Button == SdlDotNet.Input.MouseButton.PrimaryButton)
+            {
+                bombTarget = new Vector2D(e.X, e.Y);
+                bomb.Lifetime.IsExpired = true;
+            }
+            else if (e.Button == SdlDotNet.Input.MouseButton.SecondaryButton)
+            {
+                sparkPoint = new Vector2D(e.X, e.Y);
+                sparkle = true;
+                /* waitHandle.Reset();
+                 AddParticles(new Vector2D(e.X, e.Y), 50);
+                 waitHandle.Set();*/
+            }
+        }
+        void Events_MouseButtonUp(object sender, SdlDotNet.Input.MouseButtonEventArgs e)
+        {
+            if (e.Button == SdlDotNet.Input.MouseButton.SecondaryButton)
+            {
+                sparkle = false;
+            }
+        }
+        void Events_MouseMotion(object sender, SdlDotNet.Input.MouseMotionEventArgs e)
+        {
+            if (sparkle)
+            {
+                sparkPoint = new Vector2D(e.X, e.Y);
+            }
+        }
+
+        void OnBombRemoved(object sender, EventArgs e)
+        {
+            Vector2D position = new Vector2D(rand.Next(0, 1400), 0);
+            float velocityMag = rand.Next(1000, 2000);
+            // Vector2D target = new Vector2D(rand.Next(400, 900), rand.Next(200, 700));
+            Vector2D velocity = Vector2D.SetMagnitude(bombTarget - position, velocityMag);
+
+            bomb.Lifetime = new Lifespan();
+            bomb.State.Position.Linear = position;
+            bomb.State.Velocity.Linear = velocity;
+            engine.AddBody(bomb);
+            AddGlObject(bomb);
+        }
+        void OnParticleCollided(object sender, CollisionEventArgs e)
+        {
+            Body b1 = (Body)sender;
+            Body b2 = (Body)e.Other;
+            if ((b1.State.Velocity.Linear - b2.State.Velocity.Linear).MagnitudeSq < 1)
+            {
+                b1.Lifetime.IsExpired = true;
+            }
+        }
+        void OnAvatarUpdated(object sender, UpdatedEventArgs e)
+        {
+            avatar.State.ForceAccumulator.Linear += force;
+        }
+        #endregion
+
+        #endregion
+    }
+
+    /// <summary>
+    /// a simple class to draw the bodies.
+    /// it puts everything into display list to speed things up on the drawing side.
+    /// </summary>
+    class GlDrawObject : IDisposable
+    {
+        float[] matrix = new float[16];
+        Body body;
+        int list = -1;
+        bool removed;
+
+        public GlDrawObject(Body entity)
+        {
+            this.body = entity;
+            this.body.StateChanged += OnBodyStateChanged;
+            this.body.Removed += OnBodyRemoved;
+        }
+        public bool Removed
+        {
+            get { return removed; }
+        }
+        public Body Entity
+        {
+            get { return body; }
+        }
+
+        /// <summary>
+        /// when the body has a new state it updates the matrix to transform the list.
+        /// </summary>
+        void OnBodyStateChanged(object sender, EventArgs e)
+        {
+
+            Matrix3x3 mat = body.Shape.Matrix.VertexMatrix;
+            Matrix3x3.Copy2DToOpenGlMatrix(ref mat, matrix);
+        }
+
+        /// <summary>
+        /// when the body is removed it cleans up the list and marks it ready to be removed.
+        /// </summary>
+        void OnBodyRemoved(object sender, EventArgs e)
+        {
+            this.body.StateChanged -= OnBodyStateChanged;
+            this.body.Removed -= OnBodyRemoved;
+            this.removed = true;
+        }
+        /// <summary>
+        /// draws for the list.
+        /// </summary>
+        void DrawInternal()
+        {
+            if (body.Shape is Physics2DDotNet.Particle)
+            {
+                Gl.glBegin(Gl.GL_POINTS);
+                Gl.glColor3f(0, 1, 0);
+                foreach (Vector2D vector in body.Shape.OriginalVertices)
+                {
+                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
+                }
+                Gl.glEnd();
+            }
+            else if (body.Shape is Physics2DDotNet.Line)
+            {
+                Physics2DDotNet.Line line = (Physics2DDotNet.Line)body.Shape;
+                Gl.glLineWidth((float)line.Thickness);
+                Gl.glColor3f(0, 0, 1);
+                Gl.glBegin(Gl.GL_LINE_STRIP);
+                foreach (Vector2D vector in body.Shape.OriginalVertices)
+                {
+                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
+                }
+                Gl.glEnd();
+            }
+            else
+            {
+                Gl.glBegin(Gl.GL_POLYGON);
+                bool first = true;
+                bool second = true;
+                foreach (Vector2D vector in body.Shape.OriginalVertices)
+                {
+                    if (first)
+                    {
+                        Gl.glColor3f(1, 0, 0);
+                        first = false;
+                    }
+                    else if (second)
+                    {
+                        Gl.glColor3f(1, 1, 1);
+                        second = false;
+                    }
+                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
+                }
+                Gl.glEnd();
+            }
+        }
+        /// <summary>
+        /// draws the object.
+        /// </summary>
+        public void Draw()
+        {
+            if (body.Lifetime.IsExpired)
+            {
+                removed = true;
+                return;
+            }
+            //if its not in a list
+            if (Gl.glIsList(list) == 0)
+            {
+                //then make  a list for it.
+                Gl.glPushMatrix();
+                Gl.glLoadIdentity();
+                list = Gl.glGenLists(1);
+                Gl.glNewList(list, Gl.GL_COMPILE);
+                DrawInternal();
+                Gl.glEndList();
+                Gl.glPopMatrix();
+            }
+            //draw if via the list.
+            Gl.glPushMatrix();
+            Gl.glMultMatrixf(matrix);
+            Gl.glCallList(list);
+            Gl.glPopMatrix();
+        }
+
+        /// <summary>
+        /// cleans up the class.
+        /// </summary>
+        public void Dispose()
+        {
+            if (Gl.glIsList(list) != 0)
+            {
+                Gl.glDeleteLists(list, 1);
+            }
+            list = -1;
         }
     }
 }

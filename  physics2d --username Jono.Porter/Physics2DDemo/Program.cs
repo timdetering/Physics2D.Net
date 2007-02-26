@@ -44,6 +44,7 @@ namespace Physics2DDemo
             Console.WriteLine("In the upper left corner a small colored box will appear.");
             Console.WriteLine("If it is green then the engine has too little to do and is skipping a timestep");
             Console.WriteLine("If it is red then the engine has too much to do.");
+            Console.WriteLine("After each demo loads it prints to the console how many objects are in the demo.");
             Console.WriteLine("Press Enter To Start");
             Console.ReadLine();
             Demo demo = new Demo();

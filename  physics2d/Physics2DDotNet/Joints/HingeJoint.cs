@@ -57,7 +57,13 @@ namespace Physics2DDotNet
         Scalar positionError;
         bool splitImpulse;
 
-
+        /// <summary>
+        /// Creates a new HingeJoint Instance.
+        /// </summary>
+        /// <param name="body1">One of the bodies to be Jointed.</param>
+        /// <param name="body2">One of the bodies to be Jointed.</param>
+        /// <param name="anchor">The location of the Hinge.</param>
+        /// <param name="lifeTime">A object Describing how long the object will be in the engine.</param>
         public HingeJoint(Body body1, Body body2, Vector2D anchor, Lifespan lifetime)
             : base(lifetime)
         {

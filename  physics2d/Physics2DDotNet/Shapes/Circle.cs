@@ -51,13 +51,28 @@ namespace Physics2DDotNet
         #region constructors
 
         /// <summary>
-        /// Creates a Instance of Circle
+        /// Creates a new Circle Instance.
         /// </summary>
-        /// <param name="radius">the radius of circle</param>
-        /// <param name="vertexCount">the number of vertexes along the perimiter. This is for collision detection.</param>
+        /// <param name="radius">how large the circle is.</param>
+        /// <param name="vertexCount">
+        /// The number or vertex that will be generated along the perimeter of the circle. 
+        /// This is for collision detection.
+        /// </param>
         public Circle(Scalar radius, int vertexCount)
             : this(radius, vertexCount, InertiaOfSolidCylinder(radius))
         { }
+        /// <summary>
+        /// Creates a new Circle Instance.
+        /// </summary>
+        /// <param name="radius">how large the circle is.</param>
+        /// <param name="vertexCount">
+        /// The number or vertex that will be generated along the perimeter of the circle. 
+        /// This is for collision detection.
+        /// </param>
+        /// <param name="momentOfInertiaMultiplier">
+        /// How hard it is to turn the shape. Depending on the construtor in the 
+        /// Body this will be multiplied with the mass to determine the moment of inertia.
+        /// </param>
         public Circle(Scalar radius, int vertexCount, Scalar momentOfInertiaMultiplier)
             : base(CreateCircle(radius, vertexCount))
         {

@@ -46,11 +46,21 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class Particle : Shape
     {
+        /// <summary>
+        /// Creates a new Particle Instance.
+        /// </summary>
         public Particle()
             : this(1)
         {
 
         }
+        /// <summary>
+        /// Creates a new Particle Instance.
+        /// </summary>
+        /// <param name="momentOfInertiaMultiplier">
+        /// How hard it is to turn the shape. Depending on the construtor in the 
+        /// Body this will be multiplied with the mass to determine the moment of inertia.
+        /// </param>
         public Particle(Scalar momentOfInertiaMultiplier)
             : base(new Vector2D[] { Vector2D.Zero })
         {

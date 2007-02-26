@@ -9,7 +9,7 @@ Added: IContact and ICollisionInfo for use with CollisionEventArgs
 Changed: the solvers and all classes involved to added contact info to the collided event.
 Moved: BroadPhasedCollisionDetector into the Detectors namespace.
 Moved: CollsionSolver into the Solvers namespace.
-
+Changed: Made the Lifespan class impliment IDuplicateable
 
 
 AdvanceMath:

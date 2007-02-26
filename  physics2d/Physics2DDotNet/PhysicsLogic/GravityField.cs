@@ -35,10 +35,18 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+    /// <summary>
+    /// A Gravity Field that apply gravity pulling in one direction regardless of the Body's position.
+    /// </summary>
     [Serializable]
     public sealed class GravityField : PhysicsLogic
     {
         Vector2D gravity;
+        /// <summary>
+        /// Creates a new GravityField Instance.
+        /// </summary>
+        /// <param name="gravity">The direction and magnitude of the gravity.</param>
+        /// <param name="lifeTime">A object Describing how long the object will be in the engine.</param>
         public GravityField(Vector2D gravity, Lifespan lifetime)
             : base(lifetime)
         {
