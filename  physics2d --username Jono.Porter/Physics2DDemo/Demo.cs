@@ -183,7 +183,7 @@ namespace Physics2DDemo
             engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
             solver.Iterations = 13;
-            solver.BiasPreservesMomentum = true;
+            solver.SplitImpulse = true;
             solver.BiasFactor = .7f;
             solver.AllowedPenetration = .01f;
             engine.Solver = solver;
@@ -431,7 +431,7 @@ namespace Physics2DDemo
                 {
                     Vector2D anchor = (current.State.Position.Linear + last.State.Position.Linear) * .5f;
                     HingeJoint joint = new HingeJoint(last, current, anchor, new Lifespan());
-                    joint.Relaxation = 0.5f;
+                    joint.SplitImpulse = true;
                     this.engine.AddJoint(joint);
                 }
                 last = current;
@@ -560,7 +560,7 @@ namespace Physics2DDemo
                     new Particle(), 
                     1,
                     new Coefficients(.2f, .2f, friction),
-                    new Lifespan(.5f));
+                    new Lifespan(2));
 
                 f.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble()-.5f )* angle);
                 //f.State.Velocity.Linear = new Vector2D(rand.Next(-1000, 1001), rand.Next(-1000, 1001));
@@ -685,15 +685,15 @@ namespace Physics2DDemo
             Body end2 = AddRectangle(anchorLenght, anchorLenght, float.PositiveInfinity, new ALVector2D(0, point2));
             end2.IgnoresGravity = true;
             HingeJoint joint2 = new HingeJoint(chain[chain.Count - 1], end2, point2, new Lifespan());
+            joint2.SplitImpulse = true;
             engine.AddJoint(joint2);
 
             Vector2D point1 = new Vector2D(chain[0].State.Position.Linear.X - anchorGap, 500);
             Body end1 = AddRectangle(anchorLenght, anchorLenght, float.PositiveInfinity, new ALVector2D(0, point1));
             end1.IgnoresGravity = true;
             HingeJoint joint1 = new HingeJoint(chain[0], end1, point1, new Lifespan());
+            joint1.SplitImpulse = true;
             engine.AddJoint(joint1);
-            joint1.Relaxation = 0.01f;
-            joint2.Relaxation = 0.01f;
             end2.State.Position.Linear.X -= 10;
             end1.State.Position.Linear.X += 10;
             end2.ApplyMatrix();
@@ -766,7 +766,7 @@ namespace Physics2DDemo
             if (sparkle && updated)
             {
                 updated = false;
-                AddParticles(sparkPoint, 50);
+                AddParticles(sparkPoint, 60);
             }
 
             if (!started)

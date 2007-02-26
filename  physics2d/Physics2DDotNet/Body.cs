@@ -104,6 +104,8 @@ namespace Physics2DDotNet
         bool ignoresGravity;
         bool ignoresCollisionResponce;
         bool broadPhaseDetectionOnly;
+        internal int jointCount;
+
 
 
         PhysicsEngine engine;
@@ -293,7 +295,13 @@ namespace Physics2DDotNet
             get { return detectorTag; }
             internal set { detectorTag = value; }
         }
-
+        /// <summary>
+        /// the number of Joints attached to this body.
+        /// </summary>
+        public int JointCount
+        {
+            get { return jointCount; }
+        }
         /// <summary>
         /// Gets and Sets if the Body will ignore Gravity.
         /// </summary>

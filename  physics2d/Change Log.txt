@@ -1,3 +1,12 @@
+Physics2D.Net
+NEXT VERSION
+Changed: made the Joints Implement an interface specific to the solver.
+Changed: Implemented the Solver from Super Split Box2D. This changed the joints quite a bit but basically left everything else alone.
+Changed: Made it so a joint will be removed when one of the bodies it is attached to is removed.
+Added: JointCount property to Body.
+
+
+
 AdvanceMath:
 1.5.0.0: 
 Added: Lerp to the matrix structs.

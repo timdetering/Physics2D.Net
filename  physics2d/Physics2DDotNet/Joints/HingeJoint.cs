@@ -45,15 +45,18 @@ namespace Physics2DDotNet
 {
     public sealed class HingeJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
+        Body body1;
+        Body body2;
         Matrix2x2 M;
         Vector2D localAnchor1, localAnchor2;
         Vector2D r1, r2;
         Vector2D bias;
         Vector2D accumulatedImpulse;
-        Body body1;
-        Body body2;
-        Scalar relaxation;
         Scalar biasFactor;
+        Scalar softness;
+        Scalar positionError;
+        bool splitImpulse;
+
 
         public HingeJoint(Body body1, Body body2, Vector2D anchor, Lifespan lifetime)
             : base(lifetime)
@@ -70,22 +73,29 @@ namespace Physics2DDotNet
             Vector2D.Transform(ref matrix1, ref anchor, out localAnchor1);
             Vector2D.Transform(ref matrix2, ref anchor, out localAnchor2);
 
-            relaxation = 1.0f;
             biasFactor = .1f;
         }
-
-        public Scalar Relaxation
+        public bool SplitImpulse
         {
-            get { return relaxation; }
-            set { relaxation = value; }
+            get { return splitImpulse; }
+            set { splitImpulse = value; }
         }
         public Scalar BiasFactor
         {
             get { return biasFactor; }
             set { biasFactor = value; }
         }
+        public Scalar Softness
+        {
+            get { return softness; }
+            set { softness = value; }
+        }
+        public override Body[] Bodies
+        {
+            get { return new Body[2] { body1, body2 }; }
+        }
 
-        void Solvers.ISequentialImpulsesJoint.PreApply(Scalar dtInv)
+        void Solvers.ISequentialImpulsesJoint.PreStep(Scalar dtInv)
         {
 
             float mass1Inv = body1.Mass.MassInv;
@@ -99,9 +109,7 @@ namespace Physics2DDotNet
 
 
             Vector2D.Transform(ref matrix1, ref localAnchor1, out r1);
-            //r1 = Rot1 * localAnchor1;
             Vector2D.Transform(ref matrix2, ref localAnchor2, out r2);
-            //r2 = Rot2 * localAnchor2;
 
             // deltaV = deltaV0 + K * impulse
             // invM = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
@@ -110,8 +118,6 @@ namespace Physics2DDotNet
 
             Matrix2x2 K;
             K.m00 = mass1Inv + mass2Inv;
-            //K.m01 = 0.0f;
-            //K.m10 = 0.0f;
             K.m11 = mass1Inv + mass2Inv;
 
             K.m00 += inertia1Inv * r1.Y * r1.Y;
@@ -123,6 +129,10 @@ namespace Physics2DDotNet
             K.m01 -= inertia2Inv * r2.X * r2.Y;
             K.m10 -= inertia2Inv * r2.X * r2.Y;
             K.m11 += inertia2Inv * r2.X * r2.X;
+
+
+            K.m00 += softness;
+            K.m11 += softness;
             Matrix2x2.Invert(ref K, out M);
 
 
@@ -131,25 +141,29 @@ namespace Physics2DDotNet
             Vector2D.Add(ref body2.State.Position.Linear, ref r2, out vect2);
             Vector2D.Subtract(ref vect2, ref vect1, out dp);
 
+            Vector2D.GetMagnitude(ref dp, out positionError);
 
-            Scalar flt = -biasFactor * dtInv;
-            Vector2D.Multiply(ref dp, ref flt, out bias);
-            //bias = -0.1f * dtInv * dp;
+            if (splitImpulse)
+            {
+                bias = Vector2D.Zero;
+            }
+            else
+            {
+                //bias = -0.1f * dtInv * dp;
+                Scalar flt = -biasFactor * dtInv;
+                Vector2D.Multiply(ref dp, ref flt, out bias);
+            }
 
-
-            // Apply accumulated impulse.
-            Vector2D.Multiply(ref accumulatedImpulse, ref relaxation, out accumulatedImpulse);
 
             PhysicsHelper.SubtractImpulse(
-                ref body1.State.Velocity, ref accumulatedImpulse, 
+                ref body1.State.Velocity, ref accumulatedImpulse,
                 ref r1, ref mass1Inv, ref inertia1Inv);
 
             PhysicsHelper.AddImpulse(
                 ref body2.State.Velocity, ref accumulatedImpulse,
                 ref r2, ref mass2Inv, ref inertia2Inv);
         }
-
-        void Solvers.ISequentialImpulsesJoint.Apply()
+        void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
         {
 
             float mass1Inv = body1.Mass.MassInv;
@@ -163,10 +177,17 @@ namespace Physics2DDotNet
                 ref body1.State.Velocity, ref body2.State.Velocity,
                 ref r1, ref r2, out dv);
 
+
+
             Vector2D impulse;
+            Vector2D vect1;
+            Vector2D.Multiply(ref softness, ref accumulatedImpulse, out vect1);
             Vector2D.Subtract(ref bias, ref dv, out impulse);
+            Vector2D.Subtract(ref impulse, ref vect1, out impulse);
             Vector2D.Transform(ref  M, ref impulse, out impulse);
 
+
+            //impulse = M * (bias - dv - softness * P);
 
             PhysicsHelper.SubtractImpulse(
                 ref body1.State.Velocity, ref impulse,
@@ -177,6 +198,93 @@ namespace Physics2DDotNet
                 ref r2, ref mass2Inv, ref inertia2Inv);
 
             Vector2D.Add(ref accumulatedImpulse, ref impulse, out accumulatedImpulse);
+        }
+        void Solvers.ISequentialImpulsesJoint.PrePositionStep()
+        {
+            float mass1Inv = body1.Mass.MassInv;
+            float mass2Inv = body2.Mass.MassInv;
+            float inertia1Inv = body1.Mass.MomentofInertiaInv;
+            float inertia2Inv = body2.Mass.MomentofInertiaInv;
+
+            // Pre-compute anchors, mass matrix, and bias.
+            Matrix2x2 matrix1 = body1.Shape.Matrix.NormalMatrix;
+            Matrix2x2 matrix2 = body2.Shape.Matrix.NormalMatrix;
+
+
+            Vector2D.Transform(ref matrix1, ref localAnchor1, out r1);
+            Vector2D.Transform(ref matrix2, ref localAnchor2, out r2);
+
+
+            // deltaV = deltaV0 + K * impulse
+            // invM = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
+            //      = [1/m1+1/m2     0    ] + invI1 * [r1.Y*r1.Y -r1.X*r1.Y] + invI2 * [r1.Y*r1.Y -r1.X*r1.Y]
+            //        [    0     1/m1+1/m2]           [-r1.X*r1.Y r1.X*r1.X]           [-r1.X*r1.Y r1.X*r1.X]
+
+
+            Matrix2x2 K;
+            K.m00 = mass1Inv + mass2Inv;
+            K.m11 = mass1Inv + mass2Inv;
+
+            K.m00 += inertia1Inv * r1.Y * r1.Y;
+            K.m01 = -inertia1Inv * r1.X * r1.Y;
+            K.m10 = -inertia1Inv * r1.X * r1.Y;
+            K.m11 += inertia1Inv * r1.X * r1.X;
+
+            K.m00 += inertia2Inv * r2.Y * r2.Y;
+            K.m01 -= inertia2Inv * r2.X * r2.Y;
+            K.m10 -= inertia2Inv * r2.X * r2.Y;
+            K.m11 += inertia2Inv * r2.X * r2.X;
+
+
+            K.m00 += softness;
+            K.m11 += softness;
+            Matrix2x2.Invert(ref K, out M);
+
+
+          /*  Vector2D p1 = body1.State.Position.Linear + r1;
+            Vector2D p2 = body2.State.Position.Linear + r2;
+            Vector2D dp = p2 - p1;*/
+
+            Vector2D dp, vect1, vect2;
+            Vector2D.Add(ref body1.State.Position.Linear, ref r1, out vect1);
+            Vector2D.Add(ref body2.State.Position.Linear, ref r2, out vect2);
+            Vector2D.Subtract(ref vect2, ref vect1, out dp);
+
+
+            Vector2D.GetMagnitude(ref dp, out positionError);
+
+            Scalar biasFactor2 = -biasFactor;
+            Vector2D.Multiply(ref biasFactor2, ref dp, out bias);
+          //  bias = -biasFactor * dp;
+        }
+        void Solvers.ISequentialImpulsesJoint.ApplyPositionImpulse()
+        {
+
+            float mass1Inv = body1.Mass.MassInv;
+            float mass2Inv = body2.Mass.MassInv;
+            float inertia1Inv = body1.Mass.MomentofInertiaInv;
+            float inertia2Inv = body2.Mass.MomentofInertiaInv;
+            
+            // Compute split impulse
+            Vector2D dv;
+            PhysicsHelper.GetRelativeVelocity(
+                ref body1.State.SolverVelocity, ref body2.State.SolverVelocity,
+                ref r1, ref r2, out dv);
+
+           // Vector2D impulse = M * (bias - dv);
+            Vector2D impulse;
+            Vector2D.Subtract(ref bias, ref dv, out impulse);
+            Vector2D.Transform(ref  M, ref impulse, out impulse);
+
+
+            PhysicsHelper.SubtractImpulse(
+                ref body1.State.SolverVelocity, ref impulse,
+                ref r1, ref mass1Inv, ref inertia1Inv);
+
+            PhysicsHelper.AddImpulse(
+                ref body2.State.SolverVelocity, ref impulse,
+                ref r2, ref mass2Inv, ref inertia2Inv);
+
         }
     }
 }

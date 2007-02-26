@@ -78,23 +78,34 @@ namespace Physics2DDotNet
         {
             get { return engine; }
         }
+        public abstract Body[] Bodies { get;}
 
-      /*  public abstract void PreApply(Scalar dtInv);
-        public abstract void Apply();*/
 
         protected internal virtual void UpdateTime(Scalar dt) { }
         internal void OnAddedInternal(PhysicsEngine engine)
         {
             if (this.engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
             this.engine = engine;
+            foreach (Body b in Bodies)
+            {
+                b.Removed += OnBodyRemoved;
+            }
             OnAdded();
             if (Added != null) { Added(this, EventArgs.Empty); }
         }
         internal void OnRemovedInternal()
         {
             engine = null;
+            foreach (Body b in Bodies)
+            {
+                b.Removed -= OnBodyRemoved;
+            }
             OnRemoved();
             if (Removed != null) { Removed(this, EventArgs.Empty); }
+        }
+        void OnBodyRemoved(object sender, EventArgs e)
+        {
+            this.lifetime.IsExpired = true;
         }
         protected virtual void OnAdded() { }
         protected virtual void OnRemoved() { }

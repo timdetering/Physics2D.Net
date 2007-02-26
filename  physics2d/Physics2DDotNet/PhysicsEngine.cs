@@ -61,6 +61,10 @@ namespace Physics2DDotNet
         {
             if (joint.Lifetime.IsExpired)
             {
+                foreach (Body body in joint.Bodies)
+                {
+                    body.jointCount--;
+                }
                 joint.OnRemovedInternal();
                 return true;
             }
@@ -424,6 +428,10 @@ namespace Physics2DDotNet
                 foreach (Joint item in pendingJoints)
                 {
                     item.OnAddedInternal(this);
+                    foreach (Body body in item.Bodies)
+                    {
+                        body.jointCount++;
+                    }
                 }
                 joints.AddRange(pendingJoints);
                 solver.AddJointRange(pendingJoints);

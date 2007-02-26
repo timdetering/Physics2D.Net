@@ -286,7 +286,7 @@ namespace Physics2DDotNet.Solvers
                     }
                     else
                     {
-                        dPn = c.massNormal * (-vn + c.bias) ;
+                        dPn = c.massNormal * (-vn + c.bias);
                     }
 
                     // Clamp the accumulated impulse
@@ -407,10 +407,12 @@ namespace Physics2DDotNet.Solvers
 
         Dictionary<long, Arbiter> arbiters;
         List<ISequentialImpulsesJoint> siJoints;
-        bool biasPreservesMomentum = true;
+        bool splitImpulse = true;
         Scalar biasFactor = 0.8f;
         Scalar allowedPenetration = 0.01f;
         int iterations = 10;
+        int superDuperPositionCorrectionIterations = 5;
+
 
         public SequentialImpulsesSolver()
         {
@@ -419,10 +421,10 @@ namespace Physics2DDotNet.Solvers
         }
 
 
-        public bool BiasPreservesMomentum
+        public bool SplitImpulse
         {
-            get { return biasPreservesMomentum; }
-            set { biasPreservesMomentum = value; }
+            get { return splitImpulse; }
+            set { splitImpulse = value; }
         }
         public Scalar BiasFactor
         {
@@ -438,6 +440,11 @@ namespace Physics2DDotNet.Solvers
         {
             get { return iterations; }
             set { iterations = value; }
+        }
+        public int SuperDuperPositionCorrectionIterations
+        {
+            get { return superDuperPositionCorrectionIterations; }
+            set { superDuperPositionCorrectionIterations = value; }
         }
 
         protected internal override bool HandleCollision(Scalar dt, Body first, Body second)
@@ -457,7 +464,7 @@ namespace Physics2DDotNet.Solvers
             }
             else
             {
-                arbiter = new Arbiter(entity1, entity2, biasPreservesMomentum, biasFactor, allowedPenetration);
+                arbiter = new Arbiter(entity1, entity2, splitImpulse, biasFactor, allowedPenetration);
                 arbiter.Update();
                 if (!entity1.IgnoresCollisionResponse &&
                     !entity2.IgnoresCollisionResponse &&
@@ -502,6 +509,7 @@ namespace Physics2DDotNet.Solvers
             this.Engine.RunLogic(dt);
             foreach (Body item in this.Bodies)
             {
+                item.State.SolverVelocity = ALVector2D.Zero;
                 item.UpdateVelocity(dt);
             }
 
@@ -514,7 +522,7 @@ namespace Physics2DDotNet.Solvers
             }
             foreach (ISequentialImpulsesJoint joint in siJoints)
             {
-                joint.PreApply(dtInv);
+                joint.PreStep(dtInv);
             }
             for (int i = 0; i < iterations; ++i)
             {
@@ -524,15 +532,14 @@ namespace Physics2DDotNet.Solvers
                 }
                 foreach (ISequentialImpulsesJoint joint in siJoints)
                 {
-                    joint.Apply();
+                    joint.ApplyImpulse();
                 }
             }
             foreach (Body item in this.Bodies)
             {
-                if (biasPreservesMomentum)
+                if (splitImpulse)
                 {
                     item.UpdatePosition(dt, ref item.State.SolverVelocity);
-                    item.State.SolverVelocity = ALVector2D.Zero;
                 }
                 else
                 {
@@ -540,6 +547,48 @@ namespace Physics2DDotNet.Solvers
                 }
                 item.ClearForces();
                 ((SITag)item.SolverTag).CollisionCount = 0;
+            }
+
+            if (siJoints.Count == 0) { return; }
+
+            // Super-duper position correction.
+            for (int outerIter = 0; outerIter < superDuperPositionCorrectionIterations; ++outerIter)
+            {
+                foreach (Body b in this.Bodies)
+                {
+                    if (b.JointCount > 0)
+                    {
+                        b.State.SolverVelocity = ALVector2D.Zero;
+                    }
+                }
+
+                foreach (ISequentialImpulsesJoint joint in siJoints)
+                {
+                    if (joint.SplitImpulse)
+                    {
+                        joint.PrePositionStep();
+                    }
+                }
+
+                for (int i = 0; i < iterations; ++i)
+                {
+                    foreach (ISequentialImpulsesJoint joint in siJoints)
+                    {
+                        if (joint.SplitImpulse)
+                        {
+                            joint.ApplyPositionImpulse();
+                        }
+                    }
+                }
+
+                foreach (Body b in this.Bodies)
+                {
+                    if (b.JointCount > 0)
+                    {
+                        ALVector2D.Add(ref b.State.Position, ref b.State.SolverVelocity, out b.State.Position);
+                        b.ApplyMatrix();
+                    }
+                }
             }
         }
         protected internal override void AddBodyRange(List<Body> collection)

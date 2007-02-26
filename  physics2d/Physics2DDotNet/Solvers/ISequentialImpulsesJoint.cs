@@ -33,7 +33,10 @@ namespace Physics2DDotNet.Solvers
 {
     public interface ISequentialImpulsesJoint : IPhysicsEntity
     {
-        void PreApply(Scalar dtInv);
-        void Apply();
+        bool SplitImpulse { get;set;}
+        void PreStep(Scalar dtInv);
+        void ApplyImpulse();
+        void PrePositionStep();
+        void ApplyPositionImpulse();
     }
 }
