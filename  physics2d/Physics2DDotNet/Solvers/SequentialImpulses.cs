@@ -31,6 +31,7 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 
 using AdvanceMath;
@@ -426,16 +427,12 @@ namespace Physics2DDotNet.Solvers
             {
                 get { return contacts.Count > 0; }
             }
-            IContactInfo[] ICollisionInfo.Contacts
+            ReadOnlyCollection<IContactInfo> ICollisionInfo.Contacts
             {
                 get
                 {
-                    IContactInfo[] result = new IContactInfo[contacts.Count];
-                    for (int index = 0; index < result.Length; ++index)
-                    {
-                        result[index] = contacts[index];
-                    }
-                    return result;
+                    return new ReadOnlyCollection<IContactInfo>(
+                        new Physics2DDotNet.Collections.ImplicitCastCollection<IContactInfo, Contact>(contacts));
                 }
             }
         }

@@ -43,6 +43,7 @@ using Physics2DDotNet.Collections;
 
 namespace Physics2DDotNet
 {
+
     /// <summary>
     /// The Engine that will Apply Physics to object added to it.
     /// </summary>
@@ -50,41 +51,37 @@ namespace Physics2DDotNet
     public sealed class PhysicsEngine
     {
         #region static methods
-        private static bool IsBodyExpired(Body collider)
-        {
-            if (collider.Lifetime.IsExpired)
-            {
-                collider.OnRemoved();
-                return true;
-            }
-            return false;
-        }
-        private static bool IsJointExpired(Joint joint)
-        {
-            if (joint.Lifetime.IsExpired)
-            {
-                foreach (Body body in joint.Bodies)
-                {
-                    body.jointCount--;
-                }
-                joint.OnRemovedInternal();
-                return true;
-            }
-            return false;
-        }
-        private static bool IsLogicExpired(PhysicsLogic logic)
-        {
-            if (logic.Lifetime.IsExpired)
-            {
-                logic.OnRemovedInternal();
-                return true;
-            }
-            return false;
-        }
         private static void CheckChild(IPhysicsEntity child)
         {
             if (child.Engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
         }
+        #endregion
+        #region events
+        /// <summary>
+        /// Generated when Bodies are truly added to the Engine.
+        /// </summary>
+        public event EventHandler<CollectionEventArgs<Body>> BodiesAdded;
+        /// <summary>
+        /// Generated when Joints are truly added to the Engine.
+        /// </summary>
+        public event EventHandler<CollectionEventArgs<Joint>> JointsAdded;
+        /// <summary>
+        /// Generated when PhysicsLogics are truly added to the Engine.
+        /// </summary>
+        public event EventHandler<CollectionEventArgs<PhysicsLogic>> LogicsAdded;
+
+        /// <summary>
+        /// Generated when a Bodies are removed to the Engine.
+        /// </summary>
+        public event EventHandler<CollectionEventArgs<Body>> BodiesRemoved;
+        /// <summary>
+        /// Generated when a Joints are removed to the Engine.
+        /// </summary>
+        public event EventHandler<CollectionEventArgs<Joint>> JointsRemoved;
+        /// <summary>
+        /// Generated when a PhysicsLogics are removed to the Engine.
+        /// </summary>
+        public event EventHandler<CollectionEventArgs<PhysicsLogic>> LogicsRemoved; 
         #endregion
         #region fields
         private int nextBodyID;
@@ -102,12 +99,15 @@ namespace Physics2DDotNet
         private List<Joint> pendingJoints;
         private List<Body> pendingBodies;
 
+        private List<PhysicsLogic> removedLogics;
+        private List<Joint> removedJoints;
+        private List<Body> removedBodies;
+
         private CollisionSolver solver;
         private BroadPhaseCollisionDetector broadPhase;
 
         #endregion
         #region constructors
-
         public PhysicsEngine()
         {
             this.rwLock = new AdvReaderWriterLock();
@@ -119,6 +119,10 @@ namespace Physics2DDotNet
             this.pendingBodies = new List<Body>();
             this.pendingJoints = new List<Joint>();
             this.pendingLogics = new List<PhysicsLogic>();
+
+            this.removedBodies = new List<Body>();
+            this.removedJoints = new List<Joint>();
+            this.removedLogics = new List<PhysicsLogic>();
         }
         #endregion
         #region properties
@@ -210,8 +214,6 @@ namespace Physics2DDotNet
         }
         #endregion
         #region methods
-
-
         /// <summary>
         /// Adds a Body to the pending queue and will be truly added on a call to Update.
         /// </summary>
@@ -239,7 +241,6 @@ namespace Physics2DDotNet
                 pendingBodies.AddRange(collection);
             }
         }
-
 
         /// <summary>
         /// Adds a Joint to the pending queue and will be truly added on a call to Update.
@@ -349,10 +350,21 @@ namespace Physics2DDotNet
                 {
                     logic.OnRemovedInternal();
                 }
+                if (BodiesRemoved != null && bodies.Count>0)
+                {
+                    BodiesRemoved(this, new CollectionEventArgs<Body>(bodies.AsReadOnly()));
+                }
+                if (JointsRemoved != null && joints.Count > 0)
+                {
+                    JointsRemoved(this, new CollectionEventArgs<Joint>(joints.AsReadOnly()));
+                }
+                if (LogicsRemoved != null && logics.Count > 0)
+                {
+                    LogicsRemoved(this, new CollectionEventArgs<PhysicsLogic>(logics.AsReadOnly()));
+                }
                 bodies.Clear();
                 joints.Clear();
                 logics.Clear();
-
                 lock (pendingBodies)
                 {
                     pendingBodies.Clear();
@@ -368,39 +380,96 @@ namespace Physics2DDotNet
             }
         }
 
-
         private void UpdateTime(Scalar dt)
         {
-            foreach (Body item in bodies)
+            int count = bodies.Count;
+            for (int index = 0; index < count; ++index)
             {
-                item.UpdateTime(dt);
+                bodies[index].UpdateTime(dt);
             }
-            foreach (Joint item in joints)
+            count = joints.Count;
+            for (int index = 0; index < count; ++index)
             {
-                item.UpdateTime(dt);
+                joints[index].UpdateTime(dt);
             }
-            foreach (PhysicsLogic item in logics)
+            count = logics.Count;
+            for (int index = 0; index < count; ++index)
             {
-                item.UpdateTime(dt);
+                logics[index].UpdateTime(dt);
             }
         }
         private void OnStateChanged()
         {
-            foreach (Body item in bodies)
+            int count = bodies.Count;
+            for (int index = 0; index < count; ++index)
             {
-                item.OnStateChanged();
+                bodies[index].OnStateChanged();
             }
         }
 
         private void RemoveExpired()
         {
-            bodies.RemoveAll(IsBodyExpired);
+            RemoveExpiredBodies();
+            RemoveExpiredJoints();
+            RemoveExpiredLogics();
+        }
+        private void RemoveExpiredBodies()
+        {
+            if (bodies.RemoveAll(IsBodyExpired) == 0) { return; }
             solver.RemoveExpiredBodies();
             broadPhase.RemoveExpiredBodies();
-            joints.RemoveAll(IsJointExpired);
-            solver.RemoveExpiredJoints();
-            logics.RemoveAll(IsLogicExpired);
+            if (BodiesRemoved != null)
+            {
+                BodiesRemoved(this, new CollectionEventArgs<Body>(removedBodies.AsReadOnly()));
+                removedBodies.Clear();
+            }
         }
+        private void RemoveExpiredJoints()
+        {
+            if (joints.RemoveAll(IsJointExpired) == 0) { return; }
+            solver.RemoveExpiredJoints();
+            if (JointsRemoved != null)
+            {
+                JointsRemoved(this, new CollectionEventArgs<Joint>(removedJoints.AsReadOnly()));
+                removedJoints.Clear();
+            }
+        }
+        private void RemoveExpiredLogics()
+        {
+            if (logics.RemoveAll(IsLogicExpired) == 0) { return; }
+            if (LogicsRemoved != null)
+            {
+                LogicsRemoved(this, new CollectionEventArgs<PhysicsLogic>(removedLogics.AsReadOnly()));
+                removedLogics.Clear();
+            }
+        }
+
+        private bool IsBodyExpired(Body body)
+        {
+            if (!body.Lifetime.IsExpired) { return false; }
+            if (BodiesRemoved != null) { removedBodies.Add(body); }
+            body.OnRemoved();
+            return true;
+        }
+        private bool IsJointExpired(Joint joint)
+        {
+            if (!joint.Lifetime.IsExpired) { return false; }
+            if (JointsRemoved != null) { removedJoints.Add(joint); }
+            foreach (Body body in joint.Bodies)
+            {
+                body.jointCount--;
+            }
+            joint.OnRemovedInternal();
+            return true;
+        }
+        private bool IsLogicExpired(PhysicsLogic logic)
+        {
+            if (!logic.Lifetime.IsExpired) { return false; }
+            if (LogicsRemoved != null) { removedLogics.Add(logic); }
+            logic.OnRemovedInternal();
+            return true;
+        }
+
         private void AddPending()
         {
             AddPendingBodies();
@@ -411,8 +480,11 @@ namespace Physics2DDotNet
         {
             lock (this.pendingBodies)
             {
-                foreach (Body item in pendingBodies)
+                if (pendingBodies.Count == 0) { return; }
+                int count = pendingBodies.Count;
+                for (int index = 0; index < count; ++index)
                 {
+                    Body item = pendingBodies[index];
                     item.ID = nextBodyID++;
                     item.ApplyMatrix();
                     item.OnAdded(this);
@@ -420,6 +492,7 @@ namespace Physics2DDotNet
                 bodies.AddRange(pendingBodies);
                 solver.AddBodyRange(pendingBodies);
                 broadPhase.AddBodyRange(pendingBodies);
+                if (BodiesAdded != null) { BodiesAdded(this, new CollectionEventArgs<Body>(pendingBodies.AsReadOnly())); }
                 pendingBodies.Clear();
             }
         }
@@ -427,8 +500,11 @@ namespace Physics2DDotNet
         {
             lock (this.pendingJoints)
             {
-                foreach (Joint item in pendingJoints)
+                if (pendingJoints.Count == 0) { return; }
+                int count = pendingJoints.Count;
+                for (int index = 0; index < count; ++index)
                 {
+                    Joint item = pendingJoints[index];
                     item.OnAddedInternal(this);
                     foreach (Body body in item.Bodies)
                     {
@@ -437,6 +513,7 @@ namespace Physics2DDotNet
                 }
                 joints.AddRange(pendingJoints);
                 solver.AddJointRange(pendingJoints);
+                if (JointsAdded != null) { JointsAdded(this, new CollectionEventArgs<Joint>(pendingJoints.AsReadOnly())); }
                 pendingJoints.Clear();
             }
         }
@@ -444,11 +521,14 @@ namespace Physics2DDotNet
         {
             lock (this.pendingLogics)
             {
-                for (int index = 0; index < pendingLogics.Count; ++index)
+                if (pendingLogics.Count == 0) { return; }
+                int count = pendingLogics.Count;
+                for (int index = 0; index < count; ++index)
                 {
                     pendingLogics[index].OnAddedInternal(this);
                 }
                 logics.AddRange(pendingLogics);
+                if (LogicsAdded != null) { LogicsAdded(this, new CollectionEventArgs<PhysicsLogic>(pendingLogics.AsReadOnly())); }
                 pendingLogics.Clear();
             }
         }
@@ -461,9 +541,10 @@ namespace Physics2DDotNet
 
         internal void RunLogic(Scalar dt)
         {
-            foreach (PhysicsLogic logic in logics)
+            int count = logics.Count;
+            for (int index = 0; index < count; ++index)
             {
-                logic.RunLogic(dt);
+                logics[index].RunLogic(dt);
             }
         }
         internal void HandleCollision(Scalar dt, Body first, Body second)

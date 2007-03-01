@@ -83,7 +83,6 @@ namespace Physics2DDotNet
                 inertia2Inv * ((point2.X * point2.X + point2.Y * point2.Y) - rn2 * rn2));
         }
 
-
         public static Vector2D GetRelativeVelocity(
             ALVector2D velocity1, ALVector2D velocity2, 
             Vector2D point1, Vector2D point2)

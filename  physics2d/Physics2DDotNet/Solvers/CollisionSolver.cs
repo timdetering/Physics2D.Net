@@ -41,7 +41,7 @@ namespace Physics2DDotNet.Solvers
     public interface ICollisionInfo
     {
         bool Collided { get;}
-        IContactInfo[] Contacts { get;}
+        ReadOnlyCollection<IContactInfo> Contacts { get;}
     }
     [Serializable]
     public abstract class CollisionSolver

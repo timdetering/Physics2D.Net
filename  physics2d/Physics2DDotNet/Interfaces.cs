@@ -52,11 +52,22 @@ namespace Physics2DDotNet
         PhysicsEngine Engine { get;}
         Lifespan Lifetime { get; set;}
     }
+    /// <summary>
+    /// Describes a Contact in a collision.
+    /// </summary>
     public interface IContactInfo
     {
+        /// <summary>
+        /// The world coordinates of the contact.
+        /// </summary>
         Vector2D Position { get;}
+        /// <summary>
+        /// Gets a Direction Vector Pointing away from the Edge.
+        /// </summary>
         Vector2D Normal { get;}
+        /// <summary>
+        /// The distance the contact is inside the other object.
+        /// </summary>
         Scalar Distance { get;}
     }
-
 }

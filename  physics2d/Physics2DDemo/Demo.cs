@@ -50,7 +50,6 @@ namespace Physics2DDemo
         static Random rand = new Random();
         ManualResetEvent waitHandle;
         PhysicsEngine engine;
-        int count = 0;
         Stopwatch watch;
         List<GlDrawObject> objects;
         Body bomb;
@@ -91,6 +90,14 @@ namespace Physics2DDemo
         #region methods
 
         #region event handlers
+        void engine_BodiesRemoved(object sender, CollectionEventArgs<Body> e)
+        {
+            Console.WriteLine("BodiesRemoved: {0}", e.Collection.Count);
+        }
+        void engine_BodiesAdded(object sender, CollectionEventArgs<Body> e)
+        {
+            Console.WriteLine("BodiesAdded: {0}", e.Collection.Count);
+        }
         void Events_MouseMotion(object sender, SdlDotNet.Input.MouseMotionEventArgs e)
         {
             if (sparkle)
@@ -203,6 +210,20 @@ namespace Physics2DDemo
         {
             avatar.State.ForceAccumulator.Linear += force;
         }
+        void particle_Collided(object sender, CollisionEventArgs e)
+        {
+            Body b1 = (Body)sender;
+            Body b2 = e.Other;
+            Vector2D p = e.Contacts[0].Position;
+            Vector2D p1, p2, rv;
+            Vector2D.Subtract(ref p, ref b1.State.Position.Linear, out p1);
+            Vector2D.Subtract(ref p, ref b2.State.Position.Linear, out p2);
+            PhysicsHelper.GetRelativeVelocity(ref b1.State.Velocity, ref b2.State.Velocity, ref p1, ref p2, out rv);
+            if (rv.Magnitude < 1)
+            {
+                b1.Lifetime.IsExpired = true;
+            }
+        }
         #endregion
 
         /// <summary>
@@ -223,7 +244,12 @@ namespace Physics2DDemo
             solver.BiasFactor = .7f;
             solver.AllowedPenetration = .1f;
             engine.Solver = solver;
+
+            engine.BodiesAdded += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesAdded);
+            engine.BodiesRemoved += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesRemoved);
         }
+
+
         void CreateBomb()
         {
             bomb = new Body(new PhysicsState(),
@@ -258,7 +284,6 @@ namespace Physics2DDemo
 
         void AddBomb()
         {
-            count++;
             AddGlObject(bomb);
             bomb.Removed += new EventHandler(bomb_Removed);
             engine.AddBody(bomb);
@@ -268,7 +293,6 @@ namespace Physics2DDemo
             avatar.State.Position.Linear = new Vector2D(200, 200);
             avatar.State.Velocity.Linear = Vector2D.Zero;
             avatar.ApplyMatrix();
-            count++;
             AddGlObject(avatar);
             engine.AddBody(avatar);
         }
@@ -277,7 +301,6 @@ namespace Physics2DDemo
             RemoveBombEvents();
             engine.Clear();
             objects.Clear();
-            count = 0;
             GC.Collect();
         }
         void Reset()
@@ -308,7 +331,6 @@ namespace Physics2DDemo
         }
         void AddFloor(ALVector2D position)
         {
-            count++;
             Body line = new Body(
                 new PhysicsState(position),
                 new Physics2DDotNet.Polygon(Physics2DDotNet.Polygon.CreateRectangle(60, 2000), 40),
@@ -408,7 +430,6 @@ namespace Physics2DDemo
         {
             width += rand.Next(-4, 5) * .01f;
             length += rand.Next(-4, 5) * .01f;
-            count++;
             Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(length, width);
             vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (length + width) / 4);
 
@@ -427,7 +448,6 @@ namespace Physics2DDemo
         }
         Body AddCircle(float radius, int vertexCount, float mass, ALVector2D position)
         {
-            count++;
 
             Shape circleShape = new Physics2DDotNet.Circle(radius, vertexCount); ;
             Body e =
@@ -470,21 +490,22 @@ namespace Physics2DDemo
 
             for (int index = 0; index < count; ++index)
             {
-                Body f = new Body(
+                Body particle = new Body(
                     new PhysicsState(new ALVector2D(0, position)),
                     new Particle(),
                     1,
                     new Coefficients(.2f, .2f, friction),
                     new Lifespan(.5f));
 
-                f.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble() - .5f) * angle);
-                //f.State.Velocity.Linear = new Vector2D(rand.Next(-1000, 1001), rand.Next(-1000, 1001));
-                particles[index] = f;
+                particle.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble() - .5f) * angle);
+                particles[index] = particle;
+                particle.Collided += new EventHandler<CollisionEventArgs>(particle_Collided);
 
             }
             AddGlObjectRange(particles);
             engine.AddBodyRange(particles);
         }
+
         void AddTower2()
         {
             float size = 30;
@@ -506,7 +527,6 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddRectangle(40, 40, 20, new ALVector2D(0, new Vector2D(600, 300)));
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo2()
@@ -516,7 +536,6 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddTower();
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo3()
@@ -526,7 +545,6 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(.1f, new Vector2D(600, 760)));
             AddTower();
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo4()
@@ -536,7 +554,6 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddPyramid();
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo5()
@@ -546,7 +563,6 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddTowers();
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo6()
@@ -562,7 +578,6 @@ namespace Physics2DDemo
             Anchor.IgnoresGravity = true;
             HingeJoint joint = new HingeJoint(chain[0], Anchor, point, new Lifespan());
             engine.AddJoint(joint);
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo7()
@@ -571,7 +586,6 @@ namespace Physics2DDemo
             Reset();
             engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
             AddTowers();
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo8()
@@ -607,7 +621,6 @@ namespace Physics2DDemo
             AddTower2();
 
 
-            Console.WriteLine(count);
             waitHandle.Set();
         }
         void Demo9()

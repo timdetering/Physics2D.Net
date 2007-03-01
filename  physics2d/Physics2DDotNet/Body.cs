@@ -504,7 +504,7 @@ namespace Physics2DDotNet
             return new Body(this);
         }
 
-        internal void OnCollision(Body other, Solvers.ICollisionInfo collisionInfo)
+        internal void OnCollision(Body other,  Solvers.ICollisionInfo collisionInfo)
         {
             if (Collided != null)
             {

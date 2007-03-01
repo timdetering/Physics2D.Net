@@ -10,6 +10,12 @@ Changed: the solvers and all classes involved to added contact info to the colli
 Moved: BroadPhasedCollisionDetector into the Detectors namespace.
 Moved: CollsionSolver into the Solvers namespace.
 Changed: Made the Lifespan class impliment IDuplicateable
+Added: ImplicitCastCollection to be used by the Solver to convert Contacts to IContact without making a copy of the contacts.
+Changed: CollisionEventArgs and ICollisionInfo to return a ReadOnlyCollection of Contacts not an array.
+Added: CollectionEventArgs class.
+Added: events to PhysicsEngine for when objects are added to or removed from it.
+Changed: the logic of removing and adding so they will “short circuit” so to not add empty lists. 
+
 
 
 AdvanceMath:

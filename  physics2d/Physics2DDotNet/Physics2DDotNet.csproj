@@ -33,6 +33,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ImplicitCastCollection.cs" />
+    <Compile Include="DataTypes\CollectionEventArgs.cs" />
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Joints\HingeJoint.cs" />
     <Compile Include="Math2D\ALVector2D.cs" />

@@ -40,24 +40,23 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-    [Serializable]
-    public class CollisionEventArgs : EventArgs
+    /// <summary>
+    /// a generic EventArgs for read only collections.
+    /// </summary>
+    /// <typeparam name="T">The type of the items on the collection. </typeparam>
+    public class CollectionEventArgs<T> : EventArgs
     {
-        ReadOnlyCollection<IContactInfo> contacts;
-        Body other;
-        public CollisionEventArgs(Body other, ReadOnlyCollection<IContactInfo> contacts)
+        ReadOnlyCollection<T> collection;
+        public CollectionEventArgs(ReadOnlyCollection<T> collection)
         {
-            this.other = other;
-            this.contacts = contacts;
+            this.collection = collection;
         }
-        public Body Other
+        /// <summary>
+        /// The readonly collection of items.
+        /// </summary>
+        public ReadOnlyCollection<T> Collection
         {
-            get { return other; }
-        }
-        public ReadOnlyCollection<IContactInfo> Contacts
-        {
-            get { return contacts; }
+            get { return collection; }
         }
     }
-
 }
