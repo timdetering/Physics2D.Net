@@ -369,8 +369,8 @@ namespace Physics2DDemo
             float spacing = .01f;
             float Xspacing = 1f;
 
-            float xmin = 200;
-            float xmax = 900;
+            float xmin = 300;
+            float xmax = 800;
             float ymin = 50;
             float ymax = 720 - size / 2;
             float step = (size + spacing + Xspacing) / 2;
@@ -665,6 +665,7 @@ namespace Physics2DDemo
 
         public void Draw(int width, int height)
         {
+            Gl.glPointSize(3);
             if (sparkle && updated)
             {
                 updated = false;
