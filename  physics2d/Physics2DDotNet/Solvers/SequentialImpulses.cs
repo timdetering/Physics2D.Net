@@ -145,6 +145,7 @@ namespace Physics2DDotNet.Solvers
             Scalar allowedPenetration;
             Scalar friction;
             bool updated = false;
+
             public Arbiter(Body entity1, Body entity2, bool biasPreservesMomentum, Scalar biasFactor, Scalar allowedPenetration)
             {
                 if (entity1.ID < entity2.ID)
@@ -448,7 +449,7 @@ namespace Physics2DDotNet.Solvers
         List<ISequentialImpulsesJoint> siJoints;
         bool splitImpulse = true;
         Scalar biasFactor = 0.8f;
-        Scalar allowedPenetration = 0.01f;
+        Scalar allowedPenetration = 0.1f;
         int iterations = 10;
         int superDuperPositionCorrectionIterations = 5;
 

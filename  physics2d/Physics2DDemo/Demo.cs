@@ -221,7 +221,7 @@ namespace Physics2DDemo
             solver.Iterations = 13;
             solver.SplitImpulse = true;
             solver.BiasFactor = .7f;
-            solver.AllowedPenetration = .01f;
+            solver.AllowedPenetration = .1f;
             engine.Solver = solver;
         }
         void CreateBomb()
@@ -645,10 +645,10 @@ namespace Physics2DDemo
                 {
 
                     isFast = false;
-                    if (dt > .020f)
+                    if (dt > .015f)
                     {
                         isSlow = true;
-                        dt = .020f;
+                        dt = .015f;
                     }
                     else
                     {
