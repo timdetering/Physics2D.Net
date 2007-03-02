@@ -50,6 +50,7 @@ namespace Physics2DDotNet
         event EventHandler LifetimeChanged;
         event EventHandler Removed;
         PhysicsEngine Engine { get;}
+        bool IsPending { get;}
         Lifespan Lifetime { get; set;}
     }
     /// <summary>

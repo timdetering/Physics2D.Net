@@ -368,7 +368,7 @@ namespace AdvanceMath
         {
             Scalar X = source.X;
             Scalar inverseZ = 1.0f / (source.X * matrix.m20 + source.Y * matrix.m21 + matrix.m22);
-            result.X = (source.X * matrix.m00 + source.Y * matrix.m01 + matrix.m02) * inverseZ;
+            result.X = (X * matrix.m00 + source.Y * matrix.m01 + matrix.m02) * inverseZ;
             result.Y = (X * matrix.m10 + source.Y * matrix.m11 + matrix.m12) * inverseZ;
         }
         /// <summary>

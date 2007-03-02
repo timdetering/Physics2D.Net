@@ -169,7 +169,7 @@ namespace Physics2DDotNet
             if (vertices == null) { throw new ArgumentNullException("vertices"); }
             if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
             Vector2D centroid = CalcCentroid(vertices);
-            return OperationHelper.ArrayRefOp<Vector2D, Vector2D, Vector2D>(ref centroid, vertices, Vector2D.Add);
+            return OperationHelper.ArrayRefOp<Vector2D, Vector2D, Vector2D>(vertices, ref centroid, Vector2D.Subtract);
         }
         public static Scalar CalcPerimeter(Vector2D[] vertices)
         {

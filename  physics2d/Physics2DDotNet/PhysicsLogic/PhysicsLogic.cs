@@ -51,12 +51,20 @@ namespace Physics2DDotNet
         Lifespan lifetime;
         PhysicsEngine engine;
         object tag;
+        internal bool isPending;
 
         protected PhysicsLogic(Lifespan lifetime)
         {
             this.Lifetime = lifetime;
         }
 
+        /// <summary>
+        /// Gets if it has been added the the Engine's PendingQueue, but not yet added to the engine.
+        /// </summary>
+        public bool IsPending
+        {
+            get { return isPending; }
+        }
         public PhysicsEngine Engine
         {
             get { return engine; }
@@ -94,6 +102,7 @@ namespace Physics2DDotNet
         internal void OnAddedInternal(PhysicsEngine engine)
         {
             if (this.engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
+            this.isPending = false;
             this.engine = engine;
             OnAdded();
             if (Added != null) { Added(this, EventArgs.Empty); }

@@ -105,9 +105,7 @@ namespace Physics2DDotNet
         bool ignoresCollisionResponce;
         bool broadPhaseDetectionOnly;
         internal int jointCount;
-
-
-
+        internal bool isPending;
         PhysicsEngine engine;
         #endregion
         #region constructors
@@ -179,6 +177,13 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+        /// <summary>
+        /// Gets if it has been added the the Engine's PendingQueue, but not yet added to the engine.
+        /// </summary>
+        public bool IsPending
+        {
+            get { return isPending; }
+        }
         /// <summary>
         /// Unique ID of a PhysicsEntity in the PhysicsEngine
         /// Assigned on being Added.
@@ -473,11 +478,8 @@ namespace Physics2DDotNet
         [CLSCompliant(false)]
         public void ApplyMatrix(ref Matrix2D matrix)
         {
-            Vector2D Temp = Vector2D.Zero;
-            Vector2D.Transform(ref matrix.VertexMatrix, ref Temp, out state.Position.Linear);
-            Vector2D.Transform(ref matrix.NormalMatrix, ref Temp, out Temp);
-            Vector2D.GetAngle(ref Temp, out state.Position.Angular);
-            ApplyMatrixInternal(ref matrix);
+            ALVector2D.Transform(ref matrix, ref state.Position, out state.Position);
+            ApplyMatrix();
         }
         private void ApplyMatrixInternal(ref Matrix2D matrix)
         {
@@ -518,6 +520,7 @@ namespace Physics2DDotNet
         internal void OnAdded(PhysicsEngine engine)
         {
             if (this.engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
+            this.isPending = false;
             this.engine = engine;
             if (Added != null) { Added(this, EventArgs.Empty); }
         }
@@ -529,5 +532,9 @@ namespace Physics2DDotNet
         }
 
         #endregion
+
+
+
+
     }
 }

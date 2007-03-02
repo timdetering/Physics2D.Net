@@ -36,11 +36,6 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-    public static class PhysicsConstants
-    {
-        public const Scalar GravitationalConstant = 6.67e-11f;
-    }
-
 
     /// <summary>
     /// This class Stores mass information and Moment of Inertia Together since they are very closly related.
@@ -126,7 +121,7 @@ namespace Physics2DDotNet
             {
                 this.mass = value;
                 this.massInv = 1 / value;
-                this.accelerationDueToGravity = value * PhysicsConstants.GravitationalConstant;
+                this.accelerationDueToGravity = value * PhysicsHelper.GravitationalConstant;
             }
         }
 
@@ -172,7 +167,7 @@ namespace Physics2DDotNet
         {
             this.massInv = 1 / this.mass;
             this.momentofInertiaInv = 1 / this.momentofInertia;
-            this.accelerationDueToGravity = this.mass * PhysicsConstants.GravitationalConstant;
+            this.accelerationDueToGravity = this.mass * PhysicsHelper.GravitationalConstant;
         }
         #endregion
     }

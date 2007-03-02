@@ -15,8 +15,14 @@ Changed: CollisionEventArgs and ICollisionInfo to return a ReadOnlyCollection of
 Added: CollectionEventArgs class.
 Added: events to PhysicsEngine for when objects are added to or removed from it.
 Changed: the logic of removing and adding so they will “short circuit” so to not add empty lists. 
-
-
+Removed: the PhysicsConstants class and moved its contents to PhysicsHelper.
+Added: a IsPending property to IPhysicsEntity,
+changed: Made it so it will throw an error in the add method if a object is added more then once. 
+Added: A Transform Method to ALVector2D.
+Changed: Made the Body.ApplyMatrix transform the Position ALVector2D,then recreate the matrix to apply to the shape.
+Fixed: MakeCentroidOrigin.
+Added: BoundingBox2DShape.
+Changed: Made the distance grid use Jagged arrays.
 
 AdvanceMath:
 1.5.0.0: 

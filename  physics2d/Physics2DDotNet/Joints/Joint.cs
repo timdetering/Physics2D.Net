@@ -50,12 +50,20 @@ namespace Physics2DDotNet
         object tag;
         PhysicsEngine engine;
         Lifespan lifetime;
+        internal bool isPending;
 
         protected Joint(Lifespan lifetime)
         {
             Lifetime = lifetime;
         }
 
+        /// <summary>
+        /// Gets if it has been added the the Engine's PendingQueue, but not yet added to the engine.
+        /// </summary>
+        public bool IsPending
+        {
+            get { return isPending; }
+        }
         public object Tag
         {
             get { return tag; }
@@ -85,6 +93,7 @@ namespace Physics2DDotNet
         internal void OnAddedInternal(PhysicsEngine engine)
         {
             if (this.engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
+            this.isPending = false;
             this.engine = engine;
             foreach (Body b in Bodies)
             {

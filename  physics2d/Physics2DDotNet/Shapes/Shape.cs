@@ -244,4 +244,36 @@ namespace Physics2DDotNet
         } 
         #endregion
     }
+    [Serializable]
+    public sealed class BoundingBox2DShape : Shape
+    {
+        public void SetBoundingBox(BoundingBox2D boundingBox)
+        {
+            this.boundingBox = boundingBox;
+        }
+        public override bool CanGetIntersection
+        {
+            get { return false; }
+        }
+        public BoundingBox2DShape()
+            : base(new Vector2D[0])
+        {
+
+        }
+        public override void ApplyMatrix(ref Matrix2D matrix){}
+        public override void CalcBoundingBox2D() {}
+        public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        {
+            throw new NotSupportedException();
+        }
+        public override float GetDistance(Vector2D vector)
+        {
+            throw new NotSupportedException();
+        }
+        public override Shape Duplicate()
+        {
+            return new BoundingBox2DShape();
+        }
+    }
+
 }

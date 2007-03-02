@@ -54,6 +54,8 @@ namespace Physics2DDemo
         List<GlDrawObject> objects;
         Body bomb;
         Body avatar;
+        Body clipper;
+        BoundingBox2DShape clippersShape;
         Vector2D bombTarget;
         float friction = .3f;
 
@@ -84,6 +86,7 @@ namespace Physics2DDemo
             CreateEngine();
             CreateBomb();
             CreateAvatar();
+            CreateClipper();
             Demo1();
         }
         #endregion
@@ -135,6 +138,9 @@ namespace Physics2DDemo
                     break;
                 case SdlDotNet.Input.Key.Nine:
                     Demo9();
+                    break;
+                case SdlDotNet.Input.Key.Zero:
+                    Demo0();
                     break;
                 case SdlDotNet.Input.Key.LeftArrow:
                     force += new Vector2D(-forceMag, 0);
@@ -224,6 +230,24 @@ namespace Physics2DDemo
                 b1.Lifetime.IsExpired = true;
             }
         }
+        void clipper_Collided(object sender, CollisionEventArgs e)
+        {
+            GlDrawObject o = (GlDrawObject)e.Other.Tag;
+            o.collided = true;
+        }
+        void clipper_Updated(object sender, UpdatedEventArgs e)
+        {
+            try
+            {
+                for (int index = 0; index < objects.Count; ++index)
+                {
+                    GlDrawObject o = objects[index];
+                    o.shouldDraw = o.collided;
+                    o.collided = false;
+                }
+            }
+            catch { }
+        }
         #endregion
 
         /// <summary>
@@ -248,6 +272,18 @@ namespace Physics2DDemo
             engine.BodiesAdded += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesAdded);
             engine.BodiesRemoved += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesRemoved);
         }
+
+        void CreateClipper()
+        {
+            clippersShape = new BoundingBox2DShape();
+            clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0,0,0), new Lifespan());
+            clipper.IgnoresGravity = true;
+            clipper.BroadPhaseDetectionOnly = true;
+            clipper.Collided += new EventHandler<CollisionEventArgs>(clipper_Collided);
+            clipper.Updated += new EventHandler<UpdatedEventArgs>(clipper_Updated);
+        }
+
+
 
 
         void CreateBomb()
@@ -296,6 +332,10 @@ namespace Physics2DDemo
             AddGlObject(avatar);
             engine.AddBody(avatar);
         }
+        void AddClipper()
+        {
+            engine.AddBody(clipper);
+        }
         void Clear()
         {
             RemoveBombEvents();
@@ -306,6 +346,7 @@ namespace Physics2DDemo
         void Reset()
         {
             Clear();
+            AddClipper();
             AddBomb();
             AddAvatar();
         }
@@ -314,7 +355,9 @@ namespace Physics2DDemo
         {
             lock (objects)
             {
-                objects.Add(new GlDrawObject(obj));
+                GlDrawObject o = new GlDrawObject(obj);
+                obj.Tag = o;
+                objects.Add(o);
             }
         }
         void AddGlObjectRange(IList<Body> collection)
@@ -323,6 +366,7 @@ namespace Physics2DDemo
             for (int index = 0; index < arr.Length; ++index)
             {
                 arr[index] = new GlDrawObject(collection[index]);
+                collection[index].Tag = arr[index];
             }
             lock (objects)
             {
@@ -426,6 +470,20 @@ namespace Physics2DDemo
                 }
             }
         }
+        Body AddShape(Shape shape, float mass, ALVector2D position)
+        {
+            Body e =
+                new Body(
+                     new PhysicsState(position),
+                     shape,
+                     mass,
+                     new Coefficients(.2f, .2f, friction),
+                     new Lifespan());
+            AddGlObject(e);
+            engine.AddBody(e);
+            return e;
+
+        }
         Body AddRectangle(float length, float width, float mass, ALVector2D position)
         {
             width += rand.Next(-4, 5) * .01f;
@@ -506,6 +564,20 @@ namespace Physics2DDemo
             engine.AddBodyRange(particles);
         }
 
+        void ApplyMatrix( ALVector2D vector, IList<Body> collection)
+        {
+            Matrix2D matrix;
+            Matrix2D.FromALVector2D(ref vector, out matrix);
+            ApplyMatrix( matrix, collection);
+        }
+        void ApplyMatrix( Matrix2D matrix, IList<Body> collection)
+        {
+            foreach (Body b in collection)
+            {
+                b.ApplyMatrix(ref matrix);
+            }
+        }
+
         void AddTower2()
         {
             float size = 30;
@@ -519,6 +591,93 @@ namespace Physics2DDemo
                 AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + rand.Next(-3, 4) * .1f, y)));
             }
         }
+        List<Body> AddRagDoll(Vector2D location)
+        {
+            List<Body> result = new List<Body>();
+            float mass = 10;
+            Body head = AddCircle(12, 9, mass, new ALVector2D(0, location + new Vector2D(0, 0)));
+
+            float Ld2 = 50 / 2;
+            float Wd2 = 25 / 2;
+            Vector2D[] vertexes = new Vector2D[]
+            {
+                new Vector2D(Wd2, 0),
+                new Vector2D(Wd2, Ld2),
+                new Vector2D(5, Ld2+7),
+                new Vector2D(-5, Ld2+7),
+                new Vector2D(-Wd2, Ld2),
+                new Vector2D(-Wd2, 0),
+                new Vector2D(-(Wd2+4), -Ld2/2+6),
+                new Vector2D(-Wd2+2, -Ld2),
+                new Vector2D(0, -Ld2),
+                new Vector2D(Wd2-2, -Ld2),
+                new Vector2D(Wd2+4, -Ld2/2+6),
+            };
+            Shape shape = new Polygon(vertexes, 5);
+
+            Body torso = AddShape(shape, mass * 4, new ALVector2D(0, location + new Vector2D(0, 40)));
+
+            Body ltarm = AddRectangle(10, 30, mass, new ALVector2D(0, location + new Vector2D(-30, 20)));
+            Body lbarm = AddRectangle(10, 30, mass, new ALVector2D(0, location + new Vector2D(-65, 20)));
+
+            Body rtarm = AddRectangle(10, 30, mass, new ALVector2D(0, location + new Vector2D(30, 20)));
+            Body rbarm = AddRectangle(10, 30, mass, new ALVector2D(0, location + new Vector2D(65, 20)));
+
+            Body ltleg = AddRectangle(40, 15, mass * 2, new ALVector2D(.06f, location + new Vector2D(-10, 95)));
+            Body lbleg = AddRectangle(40, 15, mass * 2, new ALVector2D(0, location + new Vector2D(-11, 140)));
+
+            Body rtleg = AddRectangle(40, 15, mass * 1.5f, new ALVector2D(-.06f, location + new Vector2D(10, 95)));
+            Body rbleg = AddRectangle(40, 15, mass * 1.5f, new ALVector2D(0, location + new Vector2D(11, 140)));
+
+            result.Add(head);
+            result.Add(torso);
+
+            result.Add(ltarm);
+            result.Add(lbarm);
+
+            result.Add(rtarm);
+            result.Add(rbarm);
+
+            result.Add(ltleg);
+            result.Add(lbleg);
+
+            result.Add(rtleg);
+            result.Add(rbleg);
+
+            HingeJoint neck = new HingeJoint(head, torso, location + new Vector2D(0, 15), new Lifespan());
+            
+            HingeJoint lshoulder = new HingeJoint(ltarm, torso, location + new Vector2D(-18, 20), new Lifespan());
+            HingeJoint lelbow = new HingeJoint(ltarm, lbarm, location + new Vector2D(-47, 20), new Lifespan());
+            HingeJoint rshoulder = new HingeJoint(rtarm, torso, location + new Vector2D(18, 20), new Lifespan());
+            HingeJoint relbow = new HingeJoint(rtarm, rbarm, location + new Vector2D(47, 20), new Lifespan());
+         
+            HingeJoint lhip = new HingeJoint(ltleg, torso, location + new Vector2D(-8, 72), new Lifespan());
+            HingeJoint lknee = new HingeJoint(ltleg, lbleg, location + new Vector2D(-11, 115), new Lifespan());
+            HingeJoint rhip = new HingeJoint(rtleg, torso, location + new Vector2D(8, 72), new Lifespan());
+            HingeJoint rknee = new HingeJoint(rtleg, rbleg, location + new Vector2D(11, 115), new Lifespan());
+            List<HingeJoint> joints = new List<HingeJoint>();
+            joints.Add(neck);
+
+            joints.Add(lelbow);
+            joints.Add(rshoulder);
+
+            joints.Add(relbow);
+            joints.Add(lshoulder);
+
+            joints.Add(lhip);
+            joints.Add(lknee);
+
+            joints.Add(rhip);
+            joints.Add(rknee);
+
+            foreach (HingeJoint joint in joints)
+            {
+                joint.SplitImpulse = true;
+            }
+            engine.AddJointRange<HingeJoint>(joints);
+            return result;
+        }
+
 
         void Demo1()
         {
@@ -553,6 +712,7 @@ namespace Physics2DDemo
             Reset();
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
+
             AddPyramid();
             waitHandle.Set();
         }
@@ -586,6 +746,11 @@ namespace Physics2DDemo
             Reset();
             engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
             AddTowers();
+            float y = 0;
+            for (float x = 200; x < 500; x += 100, y -= 100)
+            {
+                AddRagDoll(new Vector2D(x, y));
+            }
             waitHandle.Set();
         }
         void Demo8()
@@ -635,9 +800,76 @@ namespace Physics2DDemo
             AddLine(new Vector2D(500, 650), new Vector2D(500, 500), 30);
             AddLine(new Vector2D(500, 500), new Vector2D(900, 550), 30);
             AddLine(new Vector2D(400, 400), new Vector2D(600, 300), 30);
+            AddRagDoll(new Vector2D(200, 400));
+            AddRagDoll(new Vector2D(300, 300));
+            ApplyMatrix(new ALVector2D(MathHelper.PI, 400, 200), AddRagDoll(new Vector2D(0, 0)));
+            AddRagDoll(new Vector2D(500, 100));
+            AddRagDoll(new Vector2D(600, 0));
+            AddRagDoll(new Vector2D(700, -100));
 
             waitHandle.Set();
         }
+        //stress test
+        void Demo0()
+        {
+            waitHandle.Reset();
+            Reset();
+           // Clear();
+           // AddClipper();
+
+            Vector2D gravityCenter = new Vector2D(500, 500);
+            float gravityPower = 200;
+            engine.AddLogic(new GravityPointField(gravityCenter, gravityPower, new Lifespan()));
+            AddRagDoll(gravityCenter+ new Vector2D(0,-20));
+            float length = 41;
+            float size = 4
+                ;
+            bool reverse = false;
+            for (float distance = 180; distance < 500; length += 10, size+=10, distance += 60 + length)
+            {
+
+                float da = MathHelper.TWO_PI / size;// ((MathHelper.TWO_PI * distance) / size);
+                float l2 = length / 2;
+                Vector2D[] vertexes = new Vector2D[]
+                {
+                     Vector2D.FromLengthAndAngle(distance-l2,da/2),
+                     Vector2D.FromLengthAndAngle(distance-l2,-da/2),
+                     Vector2D.FromLengthAndAngle(distance+l2,-da/2),
+                     Vector2D.FromLengthAndAngle(distance+l2,da/2),
+                };
+                Vector2D[] vertexes2 = Polygon.MakeCentroidOrigin(vertexes);
+                vertexes = Polygon.Subdivide(vertexes2, 5);
+                
+                Polygon shape = new Polygon(vertexes, 1.5f);
+                for (float angle = 0; angle < MathHelper.TWO_PI; angle += da)
+                {
+                    
+                    Vector2D position = Vector2D.FromLengthAndAngle(distance, angle) + gravityCenter;
+                    Body body = AddShape(shape, size * length, new ALVector2D(angle, position));
+                   // body.State.Velocity.Linear = GetOrbitVelocity(gravityCenter, Vector2D.FromLengthAndAngle(distance - length, angle) + gravityCenter, gravityPower);
+                    if (reverse)
+                    {
+                       // body.State.Velocity.Linear = -body.State.Velocity.Linear;
+                    }
+                    //body.State.Velocity.Angular = -(MathHelper.TWO_PI * distance) / (body.State.Velocity.Linear.Magnitude) * (1 / MathHelper.TWO_PI);
+                }
+                reverse = !reverse;
+            }
+            waitHandle.Set();
+        }
+        public static Vector2D GetOrbitVelocity(Vector2D PosOfAccelPoint, Vector2D PosofShip, float AccelDoToGravity)
+        {
+            float MyOrbitConstant = 0.63661977236758134307553505349036f; //(area under 1/4 of a sin wave)/(PI/2)
+
+            Vector2D distance = PosOfAccelPoint - PosofShip;
+            float distanceMag = distance.Magnitude;
+            Vector2D distanceNorm = distance * (1 / distanceMag);
+
+            float VelocityForOrbit = MathHelper.Sqrt(2 * MyOrbitConstant * AccelDoToGravity * distanceMag);
+            Vector2D orbitvelocity = distanceNorm.RightHandNormal * VelocityForOrbit;
+            return orbitvelocity;
+        }
+
 
         /// <summary>
         /// created this to run the physics update in becuase opengl was taking up to much CPU.
@@ -675,7 +907,6 @@ namespace Physics2DDemo
                 waitHandle.WaitOne();
             }
         }
-
         public void Draw(int width, int height)
         {
             Gl.glPointSize(3);
@@ -684,6 +915,8 @@ namespace Physics2DDemo
                 updated = false;
                 AddParticles(sparkPoint, 50);
             }
+
+            clippersShape.SetBoundingBox(new BoundingBox2D(width, height, 0, 0));
 
             if (!started)
             {
@@ -727,6 +960,8 @@ namespace Physics2DDemo
 
     class GlDrawObject : IDisposable
     {
+        public bool collided = true;
+        public bool shouldDraw = true;
         float[] matrix = new float[16];
         Body entity;
         int list = -1;
@@ -761,7 +996,7 @@ namespace Physics2DDemo
             if (entity.Shape is Physics2DDotNet.Particle)
             {
                 Gl.glBegin(Gl.GL_POINTS);
-                Gl.glColor3f(0, 1, 0);
+                Gl.glColor3f(1, 0, 0);
                 foreach (Vector2D vector in entity.Shape.OriginalVertices)
                 {
                     Gl.glVertex2f((float)vector.X, (float)vector.Y);
@@ -789,7 +1024,7 @@ namespace Physics2DDemo
                 {
                     if (first)
                     {
-                        Gl.glColor3f(1, 0, 0);
+                        Gl.glColor3f(1, .5f, 0);
                         first = false;
                     }
                     else if (second)
@@ -805,7 +1040,7 @@ namespace Physics2DDemo
 
         public void Draw()
         {
-            if (entity.Lifetime.IsExpired)
+            if (entity.Lifetime.IsExpired || !shouldDraw)
             {
                 return;
             }

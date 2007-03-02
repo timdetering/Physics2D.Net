@@ -220,6 +220,26 @@ namespace Physics2DDotNet.Math2D
             result.Linear.X = source.Linear.X * scalar;
             result.Linear.Y = source.Linear.Y * scalar;
         }
+
+        public static ALVector2D Transform(Matrix2D matrix, ALVector2D source)
+        {
+            ALVector2D result;
+            Transform(ref matrix,ref source,out result);
+            return result;
+        }
+        public static void Transform(ref Matrix2D matrix, ref ALVector2D source, out ALVector2D result)
+        {
+            Scalar dAngle;
+            Vector2D angular = Vector2D.XAxis;
+            Vector2D.Transform(ref matrix.VertexMatrix, ref source.Linear, out result.Linear);
+            Vector2D.Transform(ref matrix.NormalMatrix, ref angular, out angular);
+            Vector2D.GetAngle(ref angular, out dAngle);
+            result.Angular = source.Angular + dAngle;
+        }
+        
+        
+        
+        
         public static bool operator ==(ALVector2D left, ALVector2D right)
         {
             return left.Angular == right.Angular &&

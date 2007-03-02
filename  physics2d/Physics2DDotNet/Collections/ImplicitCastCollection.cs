@@ -32,7 +32,7 @@ namespace Physics2DDotNet.Collections
     public class ImplicitCastCollection<TBase, TParent> : IList<TBase>
         where TParent : TBase
     {
-        private sealed class ImplicitCastEnumerator : IEnumerator<TBase>
+        private struct ImplicitCastEnumerator : IEnumerator<TBase>
         {
             IEnumerator<TParent> self;
             public ImplicitCastEnumerator(IList<TParent> parent)

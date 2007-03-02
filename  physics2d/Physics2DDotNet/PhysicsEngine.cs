@@ -43,7 +43,6 @@ using Physics2DDotNet.Collections;
 
 namespace Physics2DDotNet
 {
-
     /// <summary>
     /// The Engine that will Apply Physics to object added to it.
     /// </summary>
@@ -53,7 +52,7 @@ namespace Physics2DDotNet
         #region static methods
         private static void CheckChild(IPhysicsEntity child)
         {
-            if (child.Engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
+            if (child.Engine != null || child.IsPending) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
         }
         #endregion
         #region events
@@ -221,6 +220,7 @@ namespace Physics2DDotNet
         public void AddBody(Body item)
         {
             CheckChild(item);
+            item.isPending = true;
             lock (pendingBodies)
             {
                 pendingBodies.Add(item);
@@ -232,9 +232,11 @@ namespace Physics2DDotNet
         /// <param name="collection">The collection to be Added</param>
         public void AddBodyRange(ICollection<Body> collection)
         {
+            if (collection == null) { throw new ArgumentNullException("collection"); }
             foreach (Body item in collection)
             {
                 CheckChild(item);
+                item.isPending = true;
             }
             lock (pendingBodies)
             {
@@ -250,6 +252,7 @@ namespace Physics2DDotNet
         {
             CheckChild(item);
             solver.CheckJoint(item);
+            item.isPending = true;
             lock (pendingJoints)
             {
                 pendingJoints.Add(item);
@@ -261,15 +264,41 @@ namespace Physics2DDotNet
         /// <param name="collection">The collection to be Added</param>
         public void AddJointRange(ICollection<Joint> collection)
         {
+            if (collection == null) { throw new ArgumentNullException("collection"); }
             CheckState();
             foreach (Joint item in collection)
             {
                 CheckChild(item);
                 solver.CheckJoint(item);
+                item.isPending = true;
             }
             lock (pendingJoints)
             {
                 pendingJoints.AddRange(collection);
+            }
+        }
+        /// <summary>
+        /// Adds a collection of Joints to the pending queue and will be truly added on a call to Update.
+        /// </summary>
+        /// <param name="collection">The collection to be Added</param>
+        /// <typeparam name="T">A Type inherited from Joint</typeparam>
+        public void AddJointRange<T>(ICollection<T> collection)
+            where T : Joint
+        {
+            if (collection == null) { throw new ArgumentNullException("collection"); }
+            CheckState();
+            Joint[] array = new Joint[collection.Count];
+            int index = 0;
+            foreach (Joint item in collection)
+            {
+                CheckChild(item);
+                solver.CheckJoint(item);
+                item.isPending = true;
+                array[index++] = item;
+            }
+            lock (pendingJoints)
+            {
+                pendingJoints.AddRange(array);
             }
         }
 
@@ -280,6 +309,7 @@ namespace Physics2DDotNet
         public void AddLogic(PhysicsLogic item)
         {
             CheckChild(item);
+            item.isPending = true;
             lock (pendingLogics)
             {
                 pendingLogics.Add(item);
@@ -291,13 +321,37 @@ namespace Physics2DDotNet
         /// <param name="collection">The collection to be Added</param>
         public void AddLogicRange(ICollection<PhysicsLogic> collection)
         {
+            if (collection == null) { throw new ArgumentNullException("collection"); }
             foreach (PhysicsLogic item in collection)
             {
                 CheckChild(item);
+                item.isPending = true;
             }
             lock (pendingLogics)
             {
                 pendingLogics.AddRange(collection);
+            }
+        }
+        /// <summary>
+        /// Adds a collection of PhysicsLogics to the pending queue and will be truly added on a call to Update.
+        /// </summary>
+        /// <param name="collection">The collection to be Added</param>
+        /// <typeparam name="T">A Type inherited from PhysicsLogic</typeparam>
+        public void AddLogicRange<T>(ICollection<T> collection)
+            where T : PhysicsLogic
+        {
+            if (collection == null) { throw new ArgumentNullException("collection"); }
+            PhysicsLogic[] array = new PhysicsLogic[collection.Count];
+            int index = 0;
+            foreach (PhysicsLogic item in collection)
+            {
+                CheckChild(item);
+                item.isPending = true;
+                array[index++] = item;
+            }
+            lock (pendingLogics)
+            {
+                pendingLogics.AddRange(array);
             }
         }
 
@@ -367,14 +421,26 @@ namespace Physics2DDotNet
                 logics.Clear();
                 lock (pendingBodies)
                 {
+                    foreach (Body body in pendingBodies)
+                    {
+                        body.isPending = false;
+                    }
                     pendingBodies.Clear();
                 }
                 lock (pendingJoints)
                 {
+                    foreach (Joint joint in pendingJoints)
+                    {
+                        joint.isPending = false;
+                    }
                     pendingJoints.Clear();
                 }
                 lock (pendingLogics)
                 {
+                    foreach (PhysicsLogic logic in pendingLogics)
+                    {
+                        logic.isPending = false;
+                    }
                     pendingLogics.Clear();
                 }
             }
@@ -382,18 +448,15 @@ namespace Physics2DDotNet
 
         private void UpdateTime(Scalar dt)
         {
-            int count = bodies.Count;
-            for (int index = 0; index < count; ++index)
+            for (int index = 0; index < bodies.Count; ++index)
             {
                 bodies[index].UpdateTime(dt);
             }
-            count = joints.Count;
-            for (int index = 0; index < count; ++index)
+            for (int index = 0; index < joints.Count; ++index)
             {
                 joints[index].UpdateTime(dt);
             }
-            count = logics.Count;
-            for (int index = 0; index < count; ++index)
+            for (int index = 0; index < logics.Count; ++index)
             {
                 logics[index].UpdateTime(dt);
             }
@@ -481,8 +544,7 @@ namespace Physics2DDotNet
             lock (this.pendingBodies)
             {
                 if (pendingBodies.Count == 0) { return; }
-                int count = pendingBodies.Count;
-                for (int index = 0; index < count; ++index)
+                for (int index = 0; index < pendingBodies.Count; ++index)
                 {
                     Body item = pendingBodies[index];
                     item.ID = nextBodyID++;
@@ -501,8 +563,7 @@ namespace Physics2DDotNet
             lock (this.pendingJoints)
             {
                 if (pendingJoints.Count == 0) { return; }
-                int count = pendingJoints.Count;
-                for (int index = 0; index < count; ++index)
+                for (int index = 0; index < pendingJoints.Count; ++index)
                 {
                     Joint item = pendingJoints[index];
                     item.OnAddedInternal(this);
@@ -522,9 +583,9 @@ namespace Physics2DDotNet
             lock (this.pendingLogics)
             {
                 if (pendingLogics.Count == 0) { return; }
-                int count = pendingLogics.Count;
-                for (int index = 0; index < count; ++index)
+                for (int index = 0; index < pendingLogics.Count; ++index)
                 {
+
                     pendingLogics[index].OnAddedInternal(this);
                 }
                 logics.AddRange(pendingLogics);
@@ -541,8 +602,7 @@ namespace Physics2DDotNet
 
         internal void RunLogic(Scalar dt)
         {
-            int count = logics.Count;
-            for (int index = 0; index < count; ++index)
+            for (int index = 0; index < logics.Count; ++index)
             {
                 logics[index].RunLogic(dt);
             }

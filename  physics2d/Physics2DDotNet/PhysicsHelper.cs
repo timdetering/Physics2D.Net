@@ -40,6 +40,9 @@ namespace Physics2DDotNet
     /// </summary>
     public static class PhysicsHelper
     {
+        public const Scalar GravitationalConstant = 6.67e-11f;
+
+
         public static Vector2D GetTangent(Vector2D normal)
         {
             Vector2D result;

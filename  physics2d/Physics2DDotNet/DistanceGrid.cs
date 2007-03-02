@@ -47,7 +47,7 @@ namespace Physics2DDotNet
         Scalar gridSpacing;
         Scalar gridSpacingInv;
         BoundingBox2D box;
-        Scalar[,] nodes;
+        Scalar[][] nodes;
         public DistanceGrid(Shape shape, Scalar spacing)
         {
             if (shape == null) { throw new ArgumentNullException("shape"); }
@@ -64,7 +64,11 @@ namespace Physics2DDotNet
             int xSize = (int)Math.Ceiling((box.Upper.X - box.Lower.X) * gridSpacingInv) + 2;
             int ySize = (int)Math.Ceiling((box.Upper.Y - box.Lower.Y) * gridSpacingInv) + 2;
 
-            this.nodes = new Scalar[xSize, ySize];
+            this.nodes = new Scalar[xSize][];//, ySize];
+            for (int index = 0; index < xSize; ++index)
+            {
+                this.nodes[index] = new float[ySize];
+            }
             Vector2D vector;
             vector.X = box.Lower.X;
             for (int x = 0; x < xSize; ++x, vector.X += spacing)
@@ -72,7 +76,7 @@ namespace Physics2DDotNet
                 vector.Y = box.Lower.Y;
                 for (int y = 0; y < ySize; ++y, vector.Y += spacing)
                 {
-                    nodes[x, y] = shape.GetDistance(vector);
+                    nodes[x][ y] = shape.GetDistance(vector);
                 }
             }
             //restore the shape
@@ -86,10 +90,10 @@ namespace Physics2DDotNet
                 int x = (int)Math.Floor((vector.X - box.Lower.X) * gridSpacingInv);
                 int y = (int)Math.Floor((vector.Y - box.Lower.Y) * gridSpacingInv);
 
-                Scalar bottomLeft = nodes[x, y];
-                Scalar bottomRight = nodes[x + 1, y];
-                Scalar topLeft = nodes[x, y + 1];
-                Scalar topRight = nodes[x + 1, y + 1];
+                Scalar bottomLeft = nodes[x][ y];
+                Scalar bottomRight = nodes[x + 1][ y];
+                Scalar topLeft = nodes[x][ y + 1];
+                Scalar topRight = nodes[x + 1][ y + 1];
 
                 if (bottomLeft <= 0 ||
                     bottomRight <= 0 ||
