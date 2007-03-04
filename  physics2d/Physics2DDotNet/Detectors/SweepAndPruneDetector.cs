@@ -92,11 +92,11 @@ namespace Physics2DDotNet.Detectors
         }
         static bool WrapperIsRemoved(Wrapper wrapper)
         {
-            return wrapper.body.Engine == null;
+            return !wrapper.body.IsAdded;
         }
         static bool StubIsRemoved(Stub stub)
         {
-            return stub.wrapper.body.Engine == null;
+            return !stub.wrapper.body.IsAdded;
         }
         static int StubComparison(Stub left, Stub right)
         {
@@ -169,11 +169,9 @@ namespace Physics2DDotNet.Detectors
         }
         protected internal override void RemoveExpiredBodies()
         {
-            if (wrappers.RemoveAll(WrapperIsRemoved) > 0)
-            {
-                xStubs.RemoveAll(StubIsRemoved);
-                yStubs.RemoveAll(StubIsRemoved);
-            }
+            wrappers.RemoveAll(WrapperIsRemoved);
+            xStubs.RemoveAll(StubIsRemoved);
+            yStubs.RemoveAll(StubIsRemoved);
         }
         public override void Detect(Scalar dt)
         {

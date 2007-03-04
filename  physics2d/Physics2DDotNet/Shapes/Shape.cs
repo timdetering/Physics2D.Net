@@ -266,7 +266,7 @@ namespace Physics2DDotNet
         {
             throw new NotSupportedException();
         }
-        public override float GetDistance(Vector2D vector)
+        public override Scalar GetDistance(Vector2D vector)
         {
             throw new NotSupportedException();
         }

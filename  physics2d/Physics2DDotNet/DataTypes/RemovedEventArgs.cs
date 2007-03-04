@@ -38,45 +38,23 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-    public interface IDuplicateable<T>
-        where T : IDuplicateable<T>
+    public class RemovedEventArgs : EventArgs
     {
-        T Duplicate();
-    }
+        bool wasPending;
+        PhysicsEngine engine;
 
-    public interface IPhysicsEntity 
-    {
-        event EventHandler Pending;
-        event EventHandler Added;
-        event EventHandler LifetimeChanged;
-        event EventHandler<RemovedEventArgs> Removed;
-        PhysicsEngine Engine { get;}
-        bool IsPending { get;}
-        bool IsAdded { get;}
-        Lifespan Lifetime { get; set;}
-    }
-
-    public interface IJoint : IPhysicsEntity
-    {
-        Body[] Bodies { get;}
-    }
-
-    /// <summary>
-    /// Describes a Contact in a collision.
-    /// </summary>
-    public interface IContactInfo
-    {
-        /// <summary>
-        /// The world coordinates of the contact.
-        /// </summary>
-        Vector2D Position { get;}
-        /// <summary>
-        /// Gets a Direction Vector Pointing away from the Edge.
-        /// </summary>
-        Vector2D Normal { get;}
-        /// <summary>
-        /// The distance the contact is inside the other object.
-        /// </summary>
-        Scalar Distance { get;}
+        public RemovedEventArgs(PhysicsEngine engine, bool wasPending)
+        {
+            this.wasPending = wasPending;
+            this.engine = engine;
+        }
+        public bool WasPending
+        {
+            get { return wasPending; }
+        }
+        public PhysicsEngine Engine
+        {
+            get { return engine; }
+        }
     }
 }

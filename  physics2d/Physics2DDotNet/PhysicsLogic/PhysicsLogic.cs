@@ -46,13 +46,14 @@ namespace Physics2DDotNet
     {
         public event EventHandler LifetimeChanged;
         public event EventHandler Added;
-        public event EventHandler Removed;
+        public event EventHandler Pending;
+        public event EventHandler<RemovedEventArgs> Removed;
 
         Lifespan lifetime;
         PhysicsEngine engine;
         object tag;
-        internal bool isPending;
-
+        bool isPending;
+        internal bool isChecked;
         protected PhysicsLogic(Lifespan lifetime)
         {
             this.Lifetime = lifetime;
@@ -90,6 +91,16 @@ namespace Physics2DDotNet
                 }
             }
         }
+        /// <summary>
+        /// Gets if the object has been added to the engine.
+        /// </summary>
+        public bool IsAdded
+        {
+            get
+            {
+                return engine != null && !isPending;
+            }
+        }
         protected List<Body> Bodies
         {
             get
@@ -98,23 +109,35 @@ namespace Physics2DDotNet
             }
         }
 
+
         protected internal abstract void RunLogic(Scalar dt);
-        internal void OnAddedInternal(PhysicsEngine engine)
+        internal void OnPendingInternal(PhysicsEngine engine)
         {
-            if (this.engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
-            this.isPending = false;
+            this.isChecked = true;
+            this.isPending = true;
             this.engine = engine;
+            OnPending();
+            if (Pending != null) { Pending(this, EventArgs.Empty); }
+        }
+        protected virtual void OnPending() { }
+        internal void OnAddedInternal()
+        {
+            this.isPending = false;
             OnAdded();
             if (Added != null) { Added(this, EventArgs.Empty); }
         }
         internal void OnRemovedInternal()
         {
-            engine = null;
-            OnRemoved();
-            if (Removed != null) { Removed(this, EventArgs.Empty); }
+            bool wasPending = this.isPending;
+            PhysicsEngine engine = this.engine;
+            this.isPending = false;
+            this.engine = null;
+            OnRemoved(engine, wasPending);
+            if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }
         }
+
         protected virtual void OnAdded() { }
-        protected virtual void OnRemoved() { }
+        protected virtual void OnRemoved(PhysicsEngine engine, bool wasPending) { }
         protected internal virtual void UpdateTime(Scalar dt)
         {
             this.lifetime.Update(dt);

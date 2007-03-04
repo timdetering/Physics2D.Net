@@ -57,10 +57,6 @@ namespace Physics2DDotNet
         /// </remarks>
         public ALVector2D Velocity;
         /// <summary>
-        /// This is a velocity for use by the 
-        /// </summary>
-        public ALVector2D SolverVelocity;
-        /// <summary>
         /// Angular and Linear Acceleration.
         /// </summary>
         /// <remarks>

@@ -81,9 +81,12 @@ namespace Physics2DDotNet
             this.Lifetime = GetLifeSpan(source, this.Lifetime);
             this.source.LifetimeChanged += OnSourceLifetimeChanged;
         }
-        protected override void OnRemoved()
+        protected override void OnRemoved(PhysicsEngine engine, bool wasPending)
         {
-            this.source.LifetimeChanged -= OnSourceLifetimeChanged;
+            if (!wasPending)
+            {
+                this.source.LifetimeChanged -= OnSourceLifetimeChanged;
+            }
         }
     }
 

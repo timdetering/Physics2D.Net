@@ -41,14 +41,21 @@ using Physics2DDotNet.Math2D;
 namespace Physics2DDotNet.Solvers
 {
 
+    sealed class SequentialImpulsesTag
+    {
+        public int splitImpulsesJointsAttached;
+        public ALVector2D biasVelocity;
+        public int collisionCount;
+        public Body body;
+        public SequentialImpulsesTag(Body body)
+        {
+            this.body = body;
+        }
+    }
 
 
     public sealed class SequentialImpulsesSolver : CollisionSolver
     {
-        sealed class SITag
-        {
-            public int CollisionCount;
-        }
         sealed class Contact : IContactInfo
         {
             public int id;
@@ -138,8 +145,8 @@ namespace Physics2DDotNet.Solvers
             List<Contact> contacts;
             Body body1;
             Body body2;
-            SITag tag1;
-            SITag tag2;
+            SequentialImpulsesTag tag1;
+            SequentialImpulsesTag tag2;
 
             bool biasPreservesMomentum;
             Scalar biasFactor;
@@ -153,15 +160,15 @@ namespace Physics2DDotNet.Solvers
                 {
                     this.body1 = entity1;
                     this.body2 = entity2;
-                    this.tag1 = (SITag)entity1.SolverTag;
-                    this.tag2 = (SITag)entity2.SolverTag;
+                    this.tag1 = (SequentialImpulsesTag)entity1.SolverTag;
+                    this.tag2 = (SequentialImpulsesTag)entity2.SolverTag;
                 }
                 else
                 {
                     this.body1 = entity2;
                     this.body2 = entity1;
-                    this.tag1 = (SITag)entity2.SolverTag;
-                    this.tag2 = (SITag)entity1.SolverTag;
+                    this.tag1 = (SequentialImpulsesTag)entity2.SolverTag;
+                    this.tag2 = (SequentialImpulsesTag)entity1.SolverTag;
                 }
                 this.friction = MathHelper.Sqrt(
                     this.body1.Coefficients.DynamicFriction *
@@ -211,15 +218,15 @@ namespace Physics2DDotNet.Solvers
                 }
                 if (contacts.Count > 0)
                 {
-                    tag1.CollisionCount++;
-                    tag2.CollisionCount++;
+                    tag1.collisionCount++;
+                    tag2.collisionCount++;
                 }
             }
             static Random rand = new Random();
             public void PreApply(Scalar dtInv)
             {
 
-                Scalar biasMultiplier = 1 / MathHelper.Pow(Math.Max(Math.Min(tag1.CollisionCount, tag2.CollisionCount) - 1, 1), 2);
+                Scalar biasMultiplier = 1 / MathHelper.Pow(Math.Max(Math.Min(tag1.collisionCount, tag2.collisionCount) - 1, 1), 2);
 
 
                 Scalar mass1Inv = body1.Mass.MassInv;
@@ -342,8 +349,8 @@ namespace Physics2DDotNet.Solvers
                     {
                         // Compute bias impulse
                         PhysicsHelper.GetRelativeVelocity(
-                            ref b1.State.SolverVelocity,
-                            ref b2.State.SolverVelocity,
+                            ref tag1.biasVelocity,
+                            ref tag2.biasVelocity,
                             ref c.r1, ref c.r2, out dv);
 
 
@@ -362,14 +369,14 @@ namespace Physics2DDotNet.Solvers
 
 
                         PhysicsHelper.SubtractImpulse(
-                            ref b1.State.SolverVelocity,
+                            ref tag1.biasVelocity,
                             ref Pb,
                             ref c.r1,
                             ref mass1Inv,
                             ref I1Inv);
 
                         PhysicsHelper.AddImpulse(
-                            ref b2.State.SolverVelocity,
+                            ref tag2.biasVelocity,
                             ref Pb,
                             ref c.r2,
                             ref mass2Inv,
@@ -439,11 +446,16 @@ namespace Physics2DDotNet.Solvers
 
         static bool IsJointRemoved(ISequentialImpulsesJoint joint)
         {
-            return joint.Engine == null;
+            return !joint.IsAdded;
+        }
+        static bool IsTagRemoved(SequentialImpulsesTag tag)
+        {
+            return !tag.body.IsAdded;
         }
 
         Dictionary<long, Arbiter> arbiters;
         List<ISequentialImpulsesJoint> siJoints;
+        List<SequentialImpulsesTag> tags;
         bool splitImpulse = true;
         Scalar biasFactor = 0.8f;
         Scalar allowedPenetration = 0.1f;
@@ -455,6 +467,7 @@ namespace Physics2DDotNet.Solvers
         {
             arbiters = new Dictionary<long, Arbiter>();
             siJoints = new List<ISequentialImpulsesJoint>();
+            tags = new List<SequentialImpulsesTag>();
         }
 
 
@@ -536,10 +549,10 @@ namespace Physics2DDotNet.Solvers
             Detect(dt);
             RemoveEmpty();
             this.Engine.RunLogic(dt);
-            foreach (Body item in this.Bodies)
+            foreach (SequentialImpulsesTag tag in tags)
             {
-                item.State.SolverVelocity = ALVector2D.Zero;
-                item.UpdateVelocity(dt);
+                tag.biasVelocity = ALVector2D.Zero;
+                tag.body.UpdateVelocity(dt);
             }
 
             int ArbCount = arbiters.Count;
@@ -564,18 +577,18 @@ namespace Physics2DDotNet.Solvers
                     joint.ApplyImpulse();
                 }
             }
-            foreach (Body item in this.Bodies)
+            foreach (SequentialImpulsesTag tag in tags)
             {
                 if (splitImpulse)
                 {
-                    item.UpdatePosition(dt, ref item.State.SolverVelocity);
+                    tag.body.UpdatePosition(dt, ref tag.biasVelocity);
                 }
                 else
                 {
-                    item.UpdatePosition(dt);
+                    tag.body.UpdatePosition(dt);
                 }
-                item.ClearForces();
-                ((SITag)item.SolverTag).CollisionCount = 0;
+                tag.body.ClearForces();
+                tag.collisionCount = 0;
             }
 
             if (siJoints.Count == 0) { return; }
@@ -583,13 +596,14 @@ namespace Physics2DDotNet.Solvers
             // Super-duper position correction.
             for (int outerIter = 0; outerIter < superDuperPositionCorrectionIterations; ++outerIter)
             {
-                foreach (Body b in this.Bodies)
+                foreach (SequentialImpulsesTag tag in tags)
                 {
-                    if (b.JointCount > 0)
+                    if (tag.splitImpulsesJointsAttached > 0)
                     {
-                        b.State.SolverVelocity = ALVector2D.Zero;
+                        tag.biasVelocity = ALVector2D.Zero;
                     }
                 }
+
 
                 foreach (ISequentialImpulsesJoint joint in siJoints)
                 {
@@ -609,13 +623,12 @@ namespace Physics2DDotNet.Solvers
                         }
                     }
                 }
-
-                foreach (Body b in this.Bodies)
+                foreach (SequentialImpulsesTag tag in tags)
                 {
-                    if (b.JointCount > 0)
+                    if (tag.splitImpulsesJointsAttached > 0)
                     {
-                        ALVector2D.Add(ref b.State.Position, ref b.State.SolverVelocity, out b.State.Position);
-                        b.ApplyMatrix();
+                        ALVector2D.Add(ref tag.body.State.Position, ref tag.biasVelocity, out tag.body.State.Position);
+                        tag.body.ApplyMatrix();
                     }
                 }
             }
@@ -624,7 +637,16 @@ namespace Physics2DDotNet.Solvers
         {
             foreach (Body item in collection)
             {
-                SetTag(item, new SITag());
+                if (item.SolverTag == null)
+                {
+                    SequentialImpulsesTag tag = new SequentialImpulsesTag(item);
+                    SetTag(item, tag);
+                    tags.Add(tag);
+                }
+                else
+                {
+                    tags.Add((SequentialImpulsesTag)item.SolverTag);
+                }
             }
         }
         protected internal override void AddJointRange(List<Joint> collection)
@@ -640,10 +662,15 @@ namespace Physics2DDotNet.Solvers
         {
             arbiters.Clear();
             siJoints.Clear();
+            tags.Clear();
         }
         protected internal override void RemoveExpiredJoints()
         {
             siJoints.RemoveAll(IsJointRemoved);
+        }
+        protected internal override void RemoveExpiredBodies()
+        {
+            tags.RemoveAll(IsTagRemoved);
         }
         protected internal override void CheckJoint(Joint joint)
         {

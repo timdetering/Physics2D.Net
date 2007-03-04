@@ -64,10 +64,10 @@ namespace Physics2DDotNet
             int xSize = (int)Math.Ceiling((box.Upper.X - box.Lower.X) * gridSpacingInv) + 2;
             int ySize = (int)Math.Ceiling((box.Upper.Y - box.Lower.Y) * gridSpacingInv) + 2;
 
-            this.nodes = new Scalar[xSize][];//, ySize];
+            this.nodes = new Scalar[xSize][];
             for (int index = 0; index < xSize; ++index)
             {
-                this.nodes[index] = new float[ySize];
+                this.nodes[index] = new Scalar[ySize];
             }
             Vector2D vector;
             vector.X = box.Lower.X;

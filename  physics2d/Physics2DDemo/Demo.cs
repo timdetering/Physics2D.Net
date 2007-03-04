@@ -42,8 +42,6 @@ using SdlDotNet.Core;
 using System.Diagnostics;
 namespace Physics2DDemo
 {
-
-    
     class Demo
     {
         #region fields
@@ -69,7 +67,7 @@ namespace Physics2DDemo
         bool updated;
 
         bool sparkle;
-        Vector2D sparkPoint; 
+        Vector2D sparkPoint;
         #endregion
         #region constructor
         public Demo()
@@ -199,7 +197,7 @@ namespace Physics2DDemo
                 sparkle = false;
             }
         }
-        void bomb_Removed(object sender, EventArgs e)
+        void bomb_Removed(object sender, RemovedEventArgs e)
         {
             Vector2D position = new Vector2D(rand.Next(0, 1400), 0);
             float velocityMag = rand.Next(1000, 2000);
@@ -276,7 +274,7 @@ namespace Physics2DDemo
         void CreateClipper()
         {
             clippersShape = new BoundingBox2DShape();
-            clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0,0,0), new Lifespan());
+            clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0, 0, 0), new Lifespan());
             clipper.IgnoresGravity = true;
             clipper.BroadPhaseDetectionOnly = true;
             clipper.Collided += new EventHandler<CollisionEventArgs>(clipper_Collided);
@@ -321,7 +319,7 @@ namespace Physics2DDemo
         void AddBomb()
         {
             AddGlObject(bomb);
-            bomb.Removed += new EventHandler(bomb_Removed);
+            bomb.Removed += bomb_Removed;
             engine.AddBody(bomb);
         }
         void AddAvatar()
@@ -564,13 +562,13 @@ namespace Physics2DDemo
             engine.AddBodyRange(particles);
         }
 
-        void ApplyMatrix( ALVector2D vector, IList<Body> collection)
+        void ApplyMatrix(ALVector2D vector, IList<Body> collection)
         {
             Matrix2D matrix;
             Matrix2D.FromALVector2D(ref vector, out matrix);
-            ApplyMatrix( matrix, collection);
+            ApplyMatrix(matrix, collection);
         }
-        void ApplyMatrix( Matrix2D matrix, IList<Body> collection)
+        void ApplyMatrix(Matrix2D matrix, IList<Body> collection)
         {
             foreach (Body b in collection)
             {
@@ -645,12 +643,12 @@ namespace Physics2DDemo
             result.Add(rbleg);
 
             HingeJoint neck = new HingeJoint(head, torso, location + new Vector2D(0, 15), new Lifespan());
-            
+
             HingeJoint lshoulder = new HingeJoint(ltarm, torso, location + new Vector2D(-18, 20), new Lifespan());
             HingeJoint lelbow = new HingeJoint(ltarm, lbarm, location + new Vector2D(-47, 20), new Lifespan());
             HingeJoint rshoulder = new HingeJoint(rtarm, torso, location + new Vector2D(18, 20), new Lifespan());
             HingeJoint relbow = new HingeJoint(rtarm, rbarm, location + new Vector2D(47, 20), new Lifespan());
-         
+
             HingeJoint lhip = new HingeJoint(ltleg, torso, location + new Vector2D(-8, 72), new Lifespan());
             HingeJoint lknee = new HingeJoint(ltleg, lbleg, location + new Vector2D(-11, 115), new Lifespan());
             HingeJoint rhip = new HingeJoint(rtleg, torso, location + new Vector2D(8, 72), new Lifespan());
@@ -814,18 +812,18 @@ namespace Physics2DDemo
         {
             waitHandle.Reset();
             Reset();
-           // Clear();
-           // AddClipper();
+            // Clear();
+            // AddClipper();
 
             Vector2D gravityCenter = new Vector2D(500, 500);
             float gravityPower = 200;
             engine.AddLogic(new GravityPointField(gravityCenter, gravityPower, new Lifespan()));
-            AddRagDoll(gravityCenter+ new Vector2D(0,-20));
+            AddRagDoll(gravityCenter + new Vector2D(0, -20));
             float length = 41;
             float size = 4
                 ;
             bool reverse = false;
-            for (float distance = 180; distance < 500; length += 10, size+=10, distance += 60 + length)
+            for (float distance = 180; distance < 500; length += 10, size += 10, distance += 60 + length)
             {
 
                 float da = MathHelper.TWO_PI / size;// ((MathHelper.TWO_PI * distance) / size);
@@ -839,17 +837,17 @@ namespace Physics2DDemo
                 };
                 Vector2D[] vertexes2 = Polygon.MakeCentroidOrigin(vertexes);
                 vertexes = Polygon.Subdivide(vertexes2, 5);
-                
+
                 Polygon shape = new Polygon(vertexes, 1.5f);
                 for (float angle = 0; angle < MathHelper.TWO_PI; angle += da)
                 {
-                    
+
                     Vector2D position = Vector2D.FromLengthAndAngle(distance, angle) + gravityCenter;
                     Body body = AddShape(shape, size * length, new ALVector2D(angle, position));
-                   // body.State.Velocity.Linear = GetOrbitVelocity(gravityCenter, Vector2D.FromLengthAndAngle(distance - length, angle) + gravityCenter, gravityPower);
+                    // body.State.Velocity.Linear = GetOrbitVelocity(gravityCenter, Vector2D.FromLengthAndAngle(distance - length, angle) + gravityCenter, gravityPower);
                     if (reverse)
                     {
-                       // body.State.Velocity.Linear = -body.State.Velocity.Linear;
+                        // body.State.Velocity.Linear = -body.State.Velocity.Linear;
                     }
                     //body.State.Velocity.Angular = -(MathHelper.TWO_PI * distance) / (body.State.Velocity.Linear.Magnitude) * (1 / MathHelper.TWO_PI);
                 }
@@ -876,6 +874,7 @@ namespace Physics2DDemo
         /// </summary>
         public void PhysicsProcess()
         {
+
             watch.Start();
             while (true)
             {
@@ -906,6 +905,7 @@ namespace Physics2DDemo
                 }
                 waitHandle.WaitOne();
             }
+
         }
         public void Draw(int width, int height)
         {
@@ -954,7 +954,7 @@ namespace Physics2DDemo
                     obj.Draw();
                 }
             }
-        } 
+        }
         #endregion
     }
 
@@ -977,8 +977,7 @@ namespace Physics2DDemo
             this.entity.StateChanged += entity_NewState;
             this.entity.Removed += entity_Removed;
         }
-
-        void entity_Removed(object sender, EventArgs e)
+        void entity_Removed(object sender, RemovedEventArgs e)
         {
             this.entity.StateChanged -= entity_NewState;
             this.entity.Removed -= entity_Removed;
@@ -989,7 +988,6 @@ namespace Physics2DDemo
             Matrix3x3 mat = entity.Shape.Matrix.VertexMatrix;
             Matrix3x3.Copy2DToOpenGlMatrix(ref mat, matrix);
         }
-
 
         void DrawInternal()
         {

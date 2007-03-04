@@ -46,9 +46,10 @@ namespace Physics2DDemo
             Console.WriteLine("If it is red then the engine has too much to do.");
             Console.WriteLine("Press Enter To Start");
             Console.ReadLine();
+
             Demo demo = new Demo();
-            OpenGlWindow g = new OpenGlWindow(1024,768);
-            g.DrawCallback  = demo.Draw;
+            OpenGlWindow g = new OpenGlWindow(1024, 768);
+            g.DrawCallback = demo.Draw;
             g.Run();
         }
     }

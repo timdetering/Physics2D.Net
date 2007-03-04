@@ -388,7 +388,7 @@ namespace AdvanceMath
         public static void Transform(ref Matrix2x2 matrix, ref Vector2D source, out Vector2D result)
         {
             Scalar X = source.X;
-            result.X = (source.X * matrix.m00 + source.Y * matrix.m01);
+            result.X = (X * matrix.m00 + source.Y * matrix.m01);
             result.Y = (X * matrix.m10 + source.Y * matrix.m11);
         }
         /// <summary>

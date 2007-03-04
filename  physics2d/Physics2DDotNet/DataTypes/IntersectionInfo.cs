@@ -39,18 +39,18 @@ using Physics2DDotNet.Math2D;
 namespace Physics2DDotNet
 {
     [Serializable]
-    public sealed class IntersectionInfo
+    public sealed class IntersectionInfo : IContactInfo
     {
-        internal Vector2D location;
+        internal Vector2D position;
         internal Vector2D normal;
         internal Scalar distance;
-        public IntersectionInfo(Vector2D location, Vector2D normal, Scalar distance)
+        public IntersectionInfo(Vector2D position, Vector2D normal, Scalar distance)
         {
-            this.location = location;
+            this.position = position;
             this.normal = normal;
             this.distance = distance;
         }
-        public Vector2D Location { get { return location; } }
+        public Vector2D Position { get { return position; } }
         public Vector2D Normal { get { return normal; } }
         public Scalar Distance { get { return distance; } }
     }

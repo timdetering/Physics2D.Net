@@ -47,6 +47,8 @@ namespace Physics2DDotNet
     {
         Body body1;
         Body body2;
+        Solvers.SequentialImpulsesTag tag1;
+        Solvers.SequentialImpulsesTag tag2;
         Matrix2x2 M;
         Vector2D localAnchor1, localAnchor2;
         Vector2D r1, r2;
@@ -69,6 +71,7 @@ namespace Physics2DDotNet
         {
             if (body1 == null) { throw new ArgumentNullException("body1"); }
             if (body2 == null) { throw new ArgumentNullException("body2"); }
+            if (body1 == body2) { throw new ArgumentException("You cannot add a joint to a body to itself"); }
             this.body1 = body1;
             this.body2 = body2;
             body1.ApplyMatrix();
@@ -81,10 +84,31 @@ namespace Physics2DDotNet
 
             biasFactor = .1f;
         }
+
+
         public bool SplitImpulse
         {
             get { return splitImpulse; }
-            set { splitImpulse = value; }
+            set 
+            {
+                if (value ^ splitImpulse)
+                {
+                    if (Engine != null&&!IsPending)
+                    {
+                        if (splitImpulse)
+                        {
+                            tag1.splitImpulsesJointsAttached--;
+                            tag2.splitImpulsesJointsAttached--;
+                        }
+                        else
+                        {
+                            tag1.splitImpulsesJointsAttached++;
+                            tag2.splitImpulsesJointsAttached++;
+                        }
+                    }
+                    splitImpulse = value;
+                }
+            }
         }
         public Scalar BiasFactor
         {
@@ -100,9 +124,29 @@ namespace Physics2DDotNet
         {
             get { return new Body[2] { body1, body2 }; }
         }
-
+        protected override void OnAdded()
+        {
+            tag1 = (Solvers.SequentialImpulsesTag)body1.SolverTag;
+            tag2 = (Solvers.SequentialImpulsesTag)body2.SolverTag;
+            if (splitImpulse)
+            {
+                tag1.splitImpulsesJointsAttached ++;
+                tag2.splitImpulsesJointsAttached++;
+            }
+        }
+        protected override void OnRemoved(PhysicsEngine engine, bool wasPending)
+        {
+            if (splitImpulse && !wasPending)
+            {
+                tag1.splitImpulsesJointsAttached--;
+                tag2.splitImpulsesJointsAttached--;
+            }
+            tag1 = null;
+            tag2 = null;
+        }
         void Solvers.ISequentialImpulsesJoint.PreStep(Scalar dtInv)
         {
+
 
             Scalar mass1Inv = body1.Mass.MassInv;
             Scalar mass2Inv = body2.Mass.MassInv;
@@ -274,7 +318,7 @@ namespace Physics2DDotNet
             // Compute split impulse
             Vector2D dv;
             PhysicsHelper.GetRelativeVelocity(
-                ref body1.State.SolverVelocity, ref body2.State.SolverVelocity,
+                ref tag1.biasVelocity, ref tag2.biasVelocity,
                 ref r1, ref r2, out dv);
 
            // Vector2D impulse = M * (bias - dv);
@@ -284,11 +328,11 @@ namespace Physics2DDotNet
 
 
             PhysicsHelper.SubtractImpulse(
-                ref body1.State.SolverVelocity, ref impulse,
+                ref tag1.biasVelocity, ref impulse,
                 ref r1, ref mass1Inv, ref inertia1Inv);
 
             PhysicsHelper.AddImpulse(
-                ref body2.State.SolverVelocity, ref impulse,
+                ref tag2.biasVelocity, ref impulse,
                 ref r2, ref mass2Inv, ref inertia2Inv);
 
         }

@@ -50,7 +50,7 @@ using Physics2DDotNet;
 namespace ConsoleDriver
 {
 
-   
+
 
 
     public class TimeTester
@@ -59,17 +59,21 @@ namespace ConsoleDriver
         int loops;
         ThreadStart method1;
         ThreadStart method2;
+        ThreadStart reset;
         TimeSpan looptime;
         TimeSpan time1;
         TimeSpan time2;
 
 
-
         public TimeTester(int loops, ThreadStart method1, ThreadStart method2)
+            : this(loops, method1, method2, null)
+        { }
+        public TimeTester(int loops, ThreadStart method1, ThreadStart method2, ThreadStart reset)
         {
             this.loops = loops;
             this.method1 = method1;
             this.method2 = method2;
+            this.reset = reset;
         }
 
         public TimeSpan EmptyLoop1
@@ -87,14 +91,19 @@ namespace ConsoleDriver
 
         public void Run()
         {
+            GC.Collect();
             looptime = RunLoop(EmptyLoop);
+            GC.Collect();
             time1 = RunLoop(method1);
+            if (reset != null) { reset(); }
+            GC.Collect();
             time2 = RunLoop(method2);
         }
 
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
+            builder.AppendFormat("LoopCount: {0}\n", loops);
             builder.AppendFormat("Empty Loop: {0}\n", looptime);
             builder.AppendFormat("Method1: {0}\n", time1);
             builder.AppendFormat("Method2: {0}\n", time2);
@@ -114,8 +123,9 @@ namespace ConsoleDriver
         }
 
         private void EmptyLoop() { }
-        private  TimeSpan RunLoop(ThreadStart method)
+        private TimeSpan RunLoop(ThreadStart method)
         {
+            method();
             stopwatch.Reset();
             stopwatch.Start();
             for (int loop = 0; loop < loops; ++loop)
@@ -131,18 +141,32 @@ namespace ConsoleDriver
     static class Driver
     {
 
-        static Vector2D testv = new Vector2D();
-        static Vector2D testr = new Vector2D();
-        static float scal = 2;
+        static Matrix4x4 testm = Matrix4x4.Identity;
+
+        static int[] sourcearray = new int[100];
+        static int[] destarray = new int[100];
         static void TEST1()
         {
-            testr = Vector2D.Multiply(testv, scal);
-        }
-        static void TEST2()
-        {
-            //testr = Vector2D.Multiply2(testv, scal);
+            unsafe
+            {
+                fixed (int* sourcePtr = &sourcearray[0], destPtr = &destarray[0])
+                {
+                    int* sp = sourcePtr;
+                    int* dp = destPtr;
+
+                    for (int index = 0; index < sourcearray.Length; ++index)
+                    {
+                        *(dp++) = *(sp++);
+                    }
+                }
+            }
         }
 
+
+        static void TEST2()
+        {
+            Array.Copy(sourcearray, destarray, destarray.Length);
+        }
 
 
         static Random rand = new Random();
@@ -154,107 +178,11 @@ namespace ConsoleDriver
         [STAThread]
         static void Main(string[] args)
         {
-            float x = 2;
-            float y = 2;
-            float z = +x * +y;
-            Console.WriteLine(z);
 
-
-
-
-
-
-            Vector2D[] loc = new Vector2D[] { new Vector2D(0, 0), new Vector2D(10, 0) };
-            Vector2D[] loc2 = Polygon.Subdivide(loc, 2);
-
-
-            ALVector2D alv = new ALVector2D(MathHelper.PI / 2, new Vector2D(50, 100));
-            Matrix2D matrix;
-            Matrix2D.FromALVector2D(ref alv, out matrix);
-
-            Vector2D vector = new Vector2D(0,10);
-            Console.WriteLine(vector);
-            Vector2D r1 = matrix.NormalMatrix * vector;
-            Vector2D r2 = matrix.VertexMatrix * vector;
-            Console.WriteLine(r1);
-            Console.WriteLine(r2);
-            Matrix2D matrixInv;
-            Matrix2D.Invert(ref matrix, out matrixInv);
-            Console.WriteLine(matrixInv.NormalMatrix * r1);
-            Console.WriteLine(matrixInv.VertexMatrix * r2);
-
-
-            Polygon polygon = new Polygon(Polygon.CreateRectangle(20, 20), 2);
-            Circle circle = new Circle(10,8);
-            IntersectionInfo info;
-            if (circle.TryGetIntersection(new Vector2D(0,10), out info) || info != null)
-            {
-                Console.WriteLine("circle");
-                Console.WriteLine(info.Normal);
-                Console.WriteLine(info.Distance);
-            }
-            if (polygon.TryGetIntersection(new Vector2D(3, 5), out info) || info != null)
-            {
-                Console.WriteLine("polygon");
-                Console.WriteLine(info.Normal);
-                Console.WriteLine(info.Distance);
-            }
-
-            Console.ReadLine();
-
-
-/*
-            int[,,] arr = new int[,,] 
-{ 
-{ { 1, 2 }, { 3, 4 } }, 
-{ { 5, 6}, { 7,8 } }
-};
-
-            int[,,] arr3 = new int[2, 2,3];
-            Array.Copy(arr, arr3, 4);
-            //Functions.ArrayCopy(arr, new int[] { 0, 0,0 }, arr3, new int[] { 0, 0,0 }, new int[] { 2, 2,2 });
-            int[,,] arr2 = (int[,,])Functions.ArrayRemoveRange(arr, 0, 1, 0);
-
-
-            return;*/
-
-
-          /*  Form1 gggg = new Form1();
-            gggg.propertyGrid1.SelectedObject = new TESTObj();
-            Application.Run(gggg);
-            return;
-            TimeTester test = new TimeTester(100000000, TEST1, TEST2);
+            TimeTester test = new TimeTester(10000000, TEST1, TEST2);
             test.Run();
             Console.WriteLine(test);
 
-            Polygon firstOld, firstNew, secondOld, secondNew;
-
-            Vector2D[] shape = new Vector2D[]{new Vector2D(1,1),new Vector2D(1,-1),new Vector2D(-1,-1),new Vector2D(-1,1)};
-            //Array.Reverse(shape);
-            firstOld = new Polygon(shape);
-            firstNew = (Polygon)firstOld.Clone();
-
-            secondOld = new Polygon(shape);
-            secondNew = (Polygon)secondOld.Clone();
-
-            ALVector2D pos = new ALVector2D();
-
-            pos.Linear = new Vector2D(20, 0);
-            firstOld.ApplyMatrix(pos.ToMatrix2D());
-           // pos.Angular = .01f;
-            secondNew.ApplyMatrix(pos.ToMatrix2D());
-            pos.Linear = new Vector2D(-20, 0);
-            firstNew.ApplyMatrix(pos.ToMatrix2D());
-            //pos.Angular = .02f;
-            secondOld.ApplyMatrix(pos.ToMatrix2D());
-            HorrableNarrowPhase phase = new HorrableNarrowPhase();
-            Matrix2D g = pos.ToMatrix2D();
-            Vector2D tt = new Vector2D();
-            Vector2D.Multiply(ref g.VertexMatrix, ref tt, out tt);
-
-            CollisionInfo info = phase.TestCollision(1, firstOld, firstNew, secondOld, secondNew);
-            nothering(info);
-            nothering(tt);*/
             Console.WriteLine("Finished");
             Console.ReadLine();
         }

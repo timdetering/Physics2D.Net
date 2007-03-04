@@ -31,12 +31,13 @@ using System;
 
 namespace Physics2DDotNet.Solvers
 {
-    public interface ISequentialImpulsesJoint : IPhysicsEntity
+    public interface ISequentialImpulsesJoint : IJoint
     {
         bool SplitImpulse { get;set;}
         void PreStep(Scalar dtInv);
         void ApplyImpulse();
         void PrePositionStep();
         void ApplyPositionImpulse();
+        
     }
 }

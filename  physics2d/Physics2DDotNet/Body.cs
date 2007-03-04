@@ -75,7 +75,11 @@ namespace Physics2DDotNet
         /// <summary>
         /// Raised when the object is Removed from a Physics Engine. 
         /// </summary>
-        public event EventHandler Removed;
+        public event EventHandler<RemovedEventArgs> Removed;
+        /// <summary>
+        /// Raised when the object is Added to the engine but is not yet part of the update process.
+        /// </summary>
+        public event EventHandler Pending;
         /// <summary>
         /// Raised when the State has been Changed.
         /// Raised by either the Solver or a call to ApplyMatrix.
@@ -105,7 +109,8 @@ namespace Physics2DDotNet
         bool ignoresCollisionResponce;
         bool broadPhaseDetectionOnly;
         internal int jointCount;
-        internal bool isPending;
+        internal bool isChecked;
+        bool isPending;
         PhysicsEngine engine;
         #endregion
         #region constructors
@@ -341,6 +346,16 @@ namespace Physics2DDotNet
             get { return broadPhaseDetectionOnly; }
             set { broadPhaseDetectionOnly = value; }
         }
+        /// <summary>
+        /// Gets if the object has been added to the engine.
+        /// </summary>
+        public bool IsAdded
+        {
+            get
+            {
+                return engine != null && !isPending;
+            }
+        }
         #endregion
         #region methods
         public void UpdatePosition(Scalar dt)
@@ -506,7 +521,7 @@ namespace Physics2DDotNet
             return new Body(this);
         }
 
-        internal void OnCollision(Body other,  Solvers.ICollisionInfo collisionInfo)
+        internal void OnCollision(Body other, Solvers.ICollisionInfo collisionInfo)
         {
             if (Collided != null)
             {
@@ -517,24 +532,27 @@ namespace Physics2DDotNet
         {
             if (StateChanged != null) { StateChanged(this, EventArgs.Empty); }
         }
-        internal void OnAdded(PhysicsEngine engine)
+        internal void OnPending(PhysicsEngine engine)
         {
-            if (this.engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
-            this.isPending = false;
+            this.isChecked = false;
+            this.isPending = true;
             this.engine = engine;
+            if (Pending != null) { Pending(this, EventArgs.Empty); }
+        }
+        internal void OnAdded()
+        {
+            this.isPending = false;
             if (Added != null) { Added(this, EventArgs.Empty); }
         }
         internal void OnRemoved()
         {
+            bool wasPending = this.isPending;
+            PhysicsEngine engine = this.engine;
             this.engine = null;
             this.id = -1;
-            if (Removed != null) { Removed(this, EventArgs.Empty); }
+            this.isPending = false;
+            if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }
         }
-
         #endregion
-
-
-
-
     }
 }

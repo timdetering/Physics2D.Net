@@ -38,19 +38,24 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+
+
+
     /// <summary>
     /// Describes a Connection between 2 objects. 
     /// </summary>
     [Serializable]
-    public abstract class Joint : IPhysicsEntity
+    public abstract class Joint : IJoint
     {
         public event EventHandler LifetimeChanged;
         public event EventHandler Added;
-        public event EventHandler Removed;
+        public event EventHandler Pending;
+        public event EventHandler<RemovedEventArgs> Removed;
         object tag;
         PhysicsEngine engine;
         Lifespan lifetime;
-        internal bool isPending;
+        bool isPending;
+        internal bool isChecked;
 
         protected Joint(Lifespan lifetime)
         {
@@ -86,37 +91,67 @@ namespace Physics2DDotNet
         {
             get { return engine; }
         }
+        /// <summary>
+        /// Gets if the object has been added to the engine.
+        /// </summary>
+        public bool IsAdded
+        {
+            get
+            {
+                return engine != null && !isPending;
+            }
+        }
+        /// <summary>
+        /// Gets the bodies the Joint effects.
+        /// </summary>
         public abstract Body[] Bodies { get;}
 
 
         protected internal virtual void UpdateTime(Scalar dt) { }
+        internal void OnPendingInternal(PhysicsEngine engine)
+        {
+            this.isChecked = false;
+            this.isPending = true;
+            this.engine = engine;
+            OnPending();
+            if (Pending != null) { Pending(this, EventArgs.Empty); }
+        }
         internal void OnAddedInternal(PhysicsEngine engine)
         {
-            if (this.engine != null) { throw new InvalidOperationException("The IPhysicsEntity cannot be added to more then one engine or added twice."); }
             this.isPending = false;
             this.engine = engine;
             foreach (Body b in Bodies)
             {
                 b.Removed += OnBodyRemoved;
+                b.jointCount++;
             }
             OnAdded();
             if (Added != null) { Added(this, EventArgs.Empty); }
         }
         internal void OnRemovedInternal()
         {
-            engine = null;
             foreach (Body b in Bodies)
             {
+                if (!isPending)
+                {
+                    b.jointCount--;
+                }
                 b.Removed -= OnBodyRemoved;
             }
-            OnRemoved();
-            if (Removed != null) { Removed(this, EventArgs.Empty); }
+
+            PhysicsEngine engine = this.engine;
+            bool wasPending = this.isPending;
+            this.isPending = false;
+            this.engine = null;
+            OnRemoved(engine,wasPending);
+            if (Removed != null) { Removed(this, new RemovedEventArgs(engine,wasPending)); }
         }
         void OnBodyRemoved(object sender, EventArgs e)
         {
             this.lifetime.IsExpired = true;
         }
+        protected virtual void OnPending() { }
         protected virtual void OnAdded() { }
-        protected virtual void OnRemoved() { }
+        protected virtual void OnRemoved(PhysicsEngine engine,bool wasPending) { }
     }
 }

@@ -393,10 +393,8 @@ namespace AdvanceMath
         }
         public static void Multiply(ref Quaternion quat, ref Vector3D vector,out Vector3D result)
         {
-            // nVidia SDK implementation
             Vector3D uv, uuv;
-            Vector3D qvec;// = new Vector3D(quat.X, quat.Y, quat.Z);
-
+            Vector3D qvec;
             qvec.X = quat.X;
             qvec.Y = quat.Y;
             qvec.Z = quat.Z;
@@ -407,19 +405,7 @@ namespace AdvanceMath
             Vector3D.Add(ref uv, ref uuv, out uv);
             Vector3D.Multiply(ref uv, ref MathHelper.Two, out uv);
             Vector3D.Add(ref vector, ref uv, out result);
-
-            //uv = qvec ^ vector;
-            //uuv = qvec ^ uv;
-            //uv *= (2.0f * quat.W);
-            //uuv *= 2.0f;
-
-            //return vector + uv + uuv;
-
-            // get the rotation matriX of the Quaternion and multiplY it times the vector
-            //return quat.ToRotationMatrix() * vector;
         }
-
-
         /// <summary>
         /// Does a Dot Operation Also know as an Inner Product.
         /// </summary>
@@ -552,7 +538,6 @@ namespace AdvanceMath
         {
             Negate(ref source, out source);
         }
-         
         public static void Negate(ref Vector3D source, out Vector3D result)
         {
             result.X = -source.X;

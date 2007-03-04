@@ -23,6 +23,18 @@ Changed: Made the Body.ApplyMatrix transform the Position ALVector2D,then recrea
 Fixed: MakeCentroidOrigin.
 Added: BoundingBox2DShape.
 Changed: Made the distance grid use Jagged arrays.
+Renamed: SITag to SequentialImpulsesTag
+Moved: the SequentialImpulsesTag outside of the SequentialImpulsesSolver
+Removed: SolverVelocity from PhysicsState.
+Added: biasImpulse to SequentialImpulsesTag.
+Added: tag1 and tag2 to HidgeJoint.
+Added: Pending Event to IPhysicsEntity
+fixed: a bug that trying to add an item to the engine in a AddRange method that has already been added would corrupt the state.
+fixed: a few problems that made the PhysicsEngine class not threadsafe.
+Added: IsAdded property to IPhysicsEntity.
+changed: made it so the bodies effected by a joint must be added to the engine before the joint.
+Changed: made it so it throws ArgumentNullExceptions when you pass a null object to the Add or AddRange methods in PhysicsEngine.
+Added: IJoint interface.
 
 AdvanceMath:
 1.5.0.0: 
