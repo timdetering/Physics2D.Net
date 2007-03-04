@@ -141,6 +141,20 @@ namespace ConsoleDriver
     static class Driver
     {
 
+        static long RoundUpToPowerOfTwo(long value)
+        {
+            long result = 1;
+            while (result < value) { value <<= 1; }
+            return result;
+        }
+        static int RoundUpToPowerOfTwo(int value)
+        {
+            int result = 1;
+            while (result < value) { value <<= 1; }
+            return result;
+        }
+
+
         static Matrix4x4 testm = Matrix4x4.Identity;
 
         static int[] sourcearray = new int[100];
@@ -178,10 +192,13 @@ namespace ConsoleDriver
         [STAThread]
         static void Main(string[] args)
         {
+            long value = 878493000;
+            Console.WriteLine(RoundUpToPowerOfTwo(value));
 
-            TimeTester test = new TimeTester(10000000, TEST1, TEST2);
-            test.Run();
-            Console.WriteLine(test);
+
+           // TimeTester test = new TimeTester(10000000, TEST1, TEST2);
+           // test.Run();
+            //Console.WriteLine(test);
 
             Console.WriteLine("Finished");
             Console.ReadLine();

@@ -1,5 +1,5 @@
 Physics2D.Net
-NEXT VERSION
+1.2.0.0:
 Changed: made the Joints Implement an interface specific to the solver.
 Changed: Implemented the Solver from Super Split Box2D. This changed the joints quite a bit but basically left everything else alone.
 Changed: Made it so a joint will be removed when one of the bodies it is attached to is removed.
@@ -35,6 +35,7 @@ Added: IsAdded property to IPhysicsEntity.
 changed: made it so the bodies effected by a joint must be added to the engine before the joint.
 Changed: made it so it throws ArgumentNullExceptions when you pass a null object to the Add or AddRange methods in PhysicsEngine.
 Added: IJoint interface.
+Added: RemovedEventArgs.
 
 AdvanceMath:
 1.5.0.0: 

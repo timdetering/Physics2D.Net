@@ -175,8 +175,7 @@ namespace Physics2DDotNet.Detectors
         }
         public override void Detect(Scalar dt)
         {
-            int Count = wrappers.Count;
-            for (int index = 0; index < Count; ++index)
+            for (int index = 0; index < wrappers.Count; ++index)
             {
                 wrappers[index].Update();
             }
@@ -185,8 +184,7 @@ namespace Physics2DDotNet.Detectors
             Dictionary<long, object> colliders = new Dictionary<long, object>(lastXCount + extraCapacity);
 
             LinkedList<Body> currentBodies = new LinkedList<Body>();
-            Count = xStubs.Count;
-            for (int index = 0; index < Count; ++index)
+            for (int index = 0; index < xStubs.Count; ++index)
             {
                 Stub stub = xStubs[index];
                 if (stub.begin)
@@ -194,10 +192,10 @@ namespace Physics2DDotNet.Detectors
                     Body body1 = stub.wrapper.body;
                     foreach (Body body2 in currentBodies)
                     {
+                        if (body1.Mass.MassInv == 0 && body2.Mass.MassInv == 0) { continue; }
                         if (Body.CanCollide(body1, body2))
                         {
-                            long id = PairID.GetId(body1.ID, body2.ID);
-                            colliders.Add(id, null);
+                            colliders.Add(PairID.GetId(body1.ID, body2.ID), null);
                         }
                     }
                     stub.wrapper.node = currentBodies.AddLast(body1);
@@ -212,7 +210,7 @@ namespace Physics2DDotNet.Detectors
             {
                 throw new InvalidOperationException("The Detector is Corrupt!");
             }
-            for (int index = 0; index < Count; ++index)
+            for (int index = 0; index < yStubs.Count; ++index)
             {
                 Stub stub = yStubs[index];
                 if (stub.begin)

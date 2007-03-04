@@ -44,6 +44,7 @@ namespace Physics2DDemo
 {
     class Demo
     {
+
         #region fields
         static Random rand = new Random();
         ManualResetEvent waitHandle;
@@ -72,6 +73,7 @@ namespace Physics2DDemo
         #region constructor
         public Demo()
         {
+
             Events.MouseButtonDown += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonDown);
             Events.MouseButtonUp += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonUp);
             Events.KeyboardDown += new EventHandler<SdlDotNet.Input.KeyboardEventArgs>(Events_KeyboardDown);
@@ -80,6 +82,10 @@ namespace Physics2DDemo
             waitHandle = new ManualResetEvent(true);
             watch = new Stopwatch();
             objects = new List<GlDrawObject>();
+
+
+
+
 
             CreateEngine();
             CreateBomb();
@@ -1056,6 +1062,7 @@ namespace Physics2DDemo
             Gl.glMultMatrixf(matrix);
             Gl.glCallList(list);
             Gl.glPopMatrix();
+            
         }
 
         public void Dispose()

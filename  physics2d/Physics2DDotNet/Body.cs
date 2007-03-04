@@ -61,7 +61,7 @@ namespace Physics2DDotNet
         #endregion
         #region events
         /// <summary>
-        /// Raised when the Lifetime of the Body has been Changed.
+        /// Raised when the Lifetime property has been Changed.
         /// </summary>
         public event EventHandler LifetimeChanged;
         /// <summary>
@@ -95,23 +95,23 @@ namespace Physics2DDotNet
         public event EventHandler<CollisionEventArgs> Collided;
         #endregion
         #region fields
+        PhysicsEngine engine;
         Shape shape;
         PhysicsState state;
         MassInfo massInfo;
         Coefficients coefficients;
         Lifespan lifetime;
         CollisionIgnorer ignorer;
-        object tag;
         int id = -1;
-        object solverTag;
-        object detectorTag;
+        internal int jointCount;
+        internal bool isChecked;
         bool ignoresGravity;
         bool ignoresCollisionResponce;
         bool broadPhaseDetectionOnly;
-        internal int jointCount;
-        internal bool isChecked;
         bool isPending;
-        PhysicsEngine engine;
+        object tag;
+        object solverTag;
+        object detectorTag;
         #endregion
         #region constructors
         /// <summary>
@@ -199,7 +199,7 @@ namespace Physics2DDotNet
             internal set { id = value; }
         }
         /// <summary>
-        /// Gets The Engine the Body is currently in. Null if it is in none.
+        /// Gets The PhysicsEngine the object is currently in. Null if it is in none.
         /// </summary>
         public PhysicsEngine Engine
         {
@@ -264,7 +264,7 @@ namespace Physics2DDotNet
             }
         }
         /// <summary>
-        /// Gets and Sets the LifeTime of the Object. The Body will be removed from the engine when it is Expired.
+        /// Gets and Sets the LifeTime of the object. The object will be removed from the engine when it is Expired.
         /// </summary>
         public Lifespan Lifetime
         {
@@ -283,7 +283,7 @@ namespace Physics2DDotNet
             }
         }
         /// <summary>
-        /// Gets and Sets A User defined object.
+        /// Gets and Sets a User defined object.
         /// </summary>
         public object Tag
         {

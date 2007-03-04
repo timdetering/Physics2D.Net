@@ -44,9 +44,21 @@ namespace Physics2DDotNet
     [Serializable]
     public abstract class PhysicsLogic : IPhysicsEntity
     {
+        /// <summary>
+        /// Raised when the Lifetime property has been Changed.
+        /// </summary>
         public event EventHandler LifetimeChanged;
+        /// <summary>
+        /// Raised when the object is added to a Physics Engine.
+        /// </summary>
         public event EventHandler Added;
+        /// <summary>
+        /// Raised when the object is Added to the engine but is not yet part of the update process.
+        /// </summary>
         public event EventHandler Pending;
+        /// <summary>
+        /// Raised when the object is Removed from a Physics Engine. 
+        /// </summary>
         public event EventHandler<RemovedEventArgs> Removed;
 
         Lifespan lifetime;
@@ -66,15 +78,24 @@ namespace Physics2DDotNet
         {
             get { return isPending; }
         }
+        /// <summary>
+        /// Gets The PhysicsEngine the object is currently in. Null if it is in none.
+        /// </summary>
         public PhysicsEngine Engine
         {
             get { return engine; }
         }
+        /// <summary>
+        /// Gets and Sets a User defined object.
+        /// </summary>
         public object Tag
         {
             get { return tag; }
             set { tag = value; }
         }
+        /// <summary>
+        /// Gets and Sets the LifeTime of the object. The object will be removed from the engine when it is Expired.
+        /// </summary>
         public Lifespan Lifetime
         {
             get

@@ -2,6 +2,24 @@ Release Notes fo Physics2D.Net
 
 Since God Created me and Jesus Saved me All glory goes to God.
 
+
+1.2.0.0
+The largest noticeable changes are that I’ve implemented split impulses for the joints. I changed how a few events get generated and added some more events. 
+
+Here are a few others:
+fixed possible errors with the AddRange methods in the PhysicsEngine. 
+removed things specific to the solver and put them in classes used only by the solver.
+added more parameter checking. 
+Added a RemovedEventArg holding the engine and if the object was pending.
+Changed the removed event to be generated when the engine was cleared and the object was pending. 
+Added a Pending event for when a object was just added to the engine, but not yet in the updated loop.
+Changed how the ApplyMatrix affects the Body when a parameter is passed.
+
+For everything else check the changelog. 
+
+In the end it was mainly a bugfix/refactoring release. 
+
+
 1.1.0.0
 Mostly this has been an optimization and bug fix release. The only major change was the update of the sequential impulses to used split impulses like the more recent version of Box2D. 
 

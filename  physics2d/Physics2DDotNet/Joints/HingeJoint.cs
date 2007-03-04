@@ -93,7 +93,7 @@ namespace Physics2DDotNet
             {
                 if (value ^ splitImpulse)
                 {
-                    if (Engine != null&&!IsPending)
+                    if (IsAdded)
                     {
                         if (splitImpulse)
                         {
