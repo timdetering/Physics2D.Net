@@ -35,18 +35,20 @@ using System.Runtime.InteropServices;
 
 namespace AdvanceMath
 {
-    public interface IAdvanceValueType 
+    public interface IAdvanceValueType
     {
         /// <summary>
         /// Gets a 32-bit integer that represents the total number of elements in all the dimensions of IAdvanceValueType. 
         /// </summary>
         int Count { get;}
+#if UNSAFE
         /// <summary>
         /// Gets or sets the <see cref="Scalar"/>  at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index of the <see cref="Scalar"/> to get or set.</param>
         /// <returns>The <see cref="Scalar"/> at the specified index.</returns>
         Scalar this[int index] { get;set;}
+#endif
         /// <summary>
         /// Copies the elements of the IAdvanceValueType to a new array of <see cref="Scalar"/> . 
         /// </summary>
@@ -100,6 +102,7 @@ namespace AdvanceMath
         /// Gets a 32-bit integer that represents the total number of Columns in the IMatrix. 
         /// </summary>
         int ColumnCount { get;}
+#if UNSAFE
         /// <summary>
         /// Gets or sets the <see cref="Scalar"/>  at the specified row and column.
         /// </summary>
@@ -107,6 +110,7 @@ namespace AdvanceMath
         /// <param name="column">The zero-based index of the Column to get or set.</param>
         /// <returns>The <see cref="Scalar"/> at the specified index.</returns>
         Scalar this[int row, int column] { get;set;}
+#endif
         /// <summary>
         /// Copies the elements of the IMatrix to a new 2-dimensional array of <see cref="Scalar"/>s. 
         /// </summary>

@@ -141,10 +141,10 @@ namespace AdvanceMath
         }
 
 
-        public static Vector4D Lerp( Vector4D left,  Vector4D right,  Scalar amount)
+        public static Vector4D Lerp(Vector4D left, Vector4D right, Scalar amount)
         {
             Vector4D result;
-            Lerp(ref left,ref right,ref amount,out result);
+            Lerp(ref left, ref right, ref amount, out result);
             return result;
         }
         public static void Lerp(ref Vector4D left, ref Vector4D right, ref Scalar amount, out Vector4D result)
@@ -226,8 +226,8 @@ namespace AdvanceMath
         {
             result.X = left.X + right.X;
             result.Y = left.Y + right.Y;
-            result.Z =  right.Z;
-            result.W =  right.W;
+            result.Z = right.Z;
+            result.W = right.W;
         }
         public static Vector4D Add(Vector4D left, Vector3D right)
         {
@@ -240,7 +240,7 @@ namespace AdvanceMath
             result.X = left.X + right.X;
             result.Y = left.Y + right.Y;
             result.Z = left.Z + right.Z;
-            result.W = left.W ;
+            result.W = left.W;
         }
         public static Vector4D Add(Vector4D left, Vector2D right)
         {
@@ -627,6 +627,7 @@ namespace AdvanceMath
         }
         #endregion
         #region indexers
+#if UNSAFE
         /// <summary>
         ///		Allows the Vector to be accessed linearly (v[0] -> v[Count-1]).  
         /// </summary>
@@ -659,6 +660,7 @@ namespace AdvanceMath
                 }
             }
         }
+#endif
         #endregion
         #region public properties
 
@@ -1006,7 +1008,7 @@ namespace AdvanceMath
         }
         public bool Equals(Vector4D other)
         {
-            return Equals(ref this,ref other);
+            return Equals(ref this, ref other);
         }
         public static bool Equals(Vector4D left, Vector4D right)
         {
@@ -1017,7 +1019,7 @@ namespace AdvanceMath
                 left.W == right.W;
         }
         [CLSCompliant(false)]
-        public static bool Equals(ref Vector4D left,ref Vector4D right)
+        public static bool Equals(ref Vector4D left, ref Vector4D right)
         {
             return
                 left.X == right.X &&

@@ -236,8 +236,7 @@ namespace Physics2DDotNet.Math2D
             Vector2D.GetAngle(ref angular, out dAngle);
             result.Angular = source.Angular + dAngle;
         }
-        
-        
+
         
         
         public static bool operator ==(ALVector2D left, ALVector2D right)

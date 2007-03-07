@@ -159,8 +159,16 @@ namespace ConsoleDriver
 
         static int[] sourcearray = new int[100];
         static int[] destarray = new int[100];
+        static PhysicsEngine e = new PhysicsEngine();
         static void TEST1()
         {
+            unsafe
+            {
+                for (int index = 0; index < sourcearray.Length; ++index)
+                {
+                    destarray[index] = sourcearray[index];
+                }
+            }
             unsafe
             {
                 fixed (int* sourcePtr = &sourcearray[0], destPtr = &destarray[0])
@@ -175,11 +183,23 @@ namespace ConsoleDriver
                 }
             }
         }
+        static unsafe void TTT() { 
+            int* t;
+            int g = 9;
+            t = &g;
+            nothering(*t);
+        } 
 
 
         static void TEST2()
         {
-            Array.Copy(sourcearray, destarray, destarray.Length);
+
+            for (int index = 0; index < sourcearray.Length; ++index)
+            {
+                destarray[index] = sourcearray[index];
+            }
+
+            //Array.Copy(sourcearray, destarray, destarray.Length);
         }
 
 

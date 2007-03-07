@@ -199,7 +199,7 @@ namespace AdvanceMath
         {
             result.X = left.X + right.X;
             result.Y = left.Y + right.Y;
-            result.Z =  right.Z;
+            result.Z = right.Z;
         }
         public static Vector3D Add(Vector3D left, Vector2D right)
         {
@@ -391,7 +391,7 @@ namespace AdvanceMath
             // get the rotation matriX of the Quaternion and multiplY it times the vector
             //return quat.ToRotationMatrix() * vector;
         }
-        public static void Multiply(ref Quaternion quat, ref Vector3D vector,out Vector3D result)
+        public static void Multiply(ref Quaternion quat, ref Vector3D vector, out Vector3D result)
         {
             Vector3D uv, uuv;
             Vector3D qvec;
@@ -417,7 +417,7 @@ namespace AdvanceMath
         {
             return left.Y * right.Y + left.X * right.X + left.Z * right.Z;
         }
-        public static void Dot(ref Vector3D left,ref Vector3D right,out Scalar result)
+        public static void Dot(ref Vector3D left, ref Vector3D right, out Scalar result)
         {
             result = left.Y * right.Y + left.X * right.X + left.Z * right.Z;
         }
@@ -438,7 +438,7 @@ namespace AdvanceMath
         }
         public static void Cross(ref Vector3D left, ref Vector3D right, out Vector3D result)
         {
-            Scalar X = left.Y * right.Z - left.Z * right.Y; 
+            Scalar X = left.Y * right.Z - left.Z * right.Y;
             Scalar Y = left.Z * right.X - left.X * right.Z;
             result.Z = left.X * right.Y - left.Y * right.X;
 
@@ -470,7 +470,7 @@ namespace AdvanceMath
         }
         public static void GetMagnitude(ref Vector3D source, out Scalar result)
         {
-            result= MathHelper.Sqrt(source.X * source.X + source.Y * source.Y + source.Z * source.Z);
+            result = MathHelper.Sqrt(source.X * source.X + source.Y * source.Y + source.Z * source.Z);
         }
         /// <summary>
         /// Sets the <see cref="Magnitude"/> of a Vector3D.
@@ -498,7 +498,7 @@ namespace AdvanceMath
                 result = Zero;
             }
         }
-        
+
         /// <summary>
         /// This returns the Normalized Vector3D that is passed. This is also known as a Unit Vector.
         /// </summary>
@@ -608,7 +608,7 @@ namespace AdvanceMath
             this.Y = Y;
             this.Z = Z;
         }
-        public Vector3D(Scalar[] vals): this(vals,0){}
+        public Vector3D(Scalar[] vals) : this(vals, 0) { }
         public Vector3D(Scalar[] vals, int index)
         {
             Copy(vals, index, out this);
@@ -616,6 +616,7 @@ namespace AdvanceMath
 
         #endregion
         #region indexers
+#if UNSAFE
         /// <summary>
         ///		Allows the Vector to be accessed linearly (v[0] -> v[Count-1]).  
         /// </summary>
@@ -648,6 +649,7 @@ namespace AdvanceMath
                 }
             }
         }
+#endif
         #endregion
         #region public properties
         /// <summary>

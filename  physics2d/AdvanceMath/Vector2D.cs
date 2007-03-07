@@ -189,7 +189,7 @@ namespace AdvanceMath
             result.Y = length * MathHelper.Sin(radianAngle);
             return result;
         }
-        public static void FromLengthAndAngle(ref Scalar length,ref  Scalar radianAngle,out Vector2D result)
+        public static void FromLengthAndAngle(ref Scalar length, ref  Scalar radianAngle, out Vector2D result)
         {
             result.X = length * MathHelper.Cos(radianAngle);
             result.Y = length * MathHelper.Sin(radianAngle);
@@ -234,7 +234,7 @@ namespace AdvanceMath
             result.Y = magnitude * sin;
             return result;
         }
-        public static void SetAngle(ref Vector2D source,ref Scalar radianAngle, out Vector2D result)
+        public static void SetAngle(ref Vector2D source, ref Scalar radianAngle, out Vector2D result)
         {
             Scalar magnitude = GetMagnitude(source);
             result.X = magnitude * MathHelper.Cos(radianAngle);
@@ -631,7 +631,7 @@ namespace AdvanceMath
         public static Vector2D Normalize(Vector2D source, out Scalar magnitude)
         {
             Vector2D result;
-            Normalize(ref source,out magnitude, out result);
+            Normalize(ref source, out magnitude, out result);
             return result;
         }
         public static void Normalize(ref Vector2D source, out Scalar magnitude, out Vector2D result)
@@ -761,7 +761,7 @@ namespace AdvanceMath
         /// </summary>
         /// <param name="X">The X value.</param>
         /// <param name="Y">The Y value.</param>
-        [InstanceConstructor ("X,Y")]
+        [InstanceConstructor("X,Y")]
         public Vector2D(Scalar X, Scalar Y)
         {
             this.X = X;
@@ -774,6 +774,7 @@ namespace AdvanceMath
         }
         #endregion
         #region indexers
+#if UNSAFE
         /// <summary>
         ///		Allows the Vector to be accessed linearly (v[0] -> v[Count-1]).  
         /// </summary>
@@ -806,6 +807,7 @@ namespace AdvanceMath
                 }
             }
         }
+#endif
         #endregion
         #region public properties
         /// <summary>

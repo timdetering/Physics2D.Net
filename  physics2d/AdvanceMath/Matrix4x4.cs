@@ -212,7 +212,7 @@ namespace AdvanceMath
             dest.m11 = source.m11;
         }
 
-        public static Matrix4x4 Lerp(Matrix4x4 left,Matrix4x4 right,Scalar amount)
+        public static Matrix4x4 Lerp(Matrix4x4 left, Matrix4x4 right, Scalar amount)
         {
             Matrix4x4 result;
             Lerp(ref left, ref right, ref amount, out result);
@@ -1882,6 +1882,7 @@ namespace AdvanceMath
 
         #endregion
         #region indexers
+#if UNSAFE
         /// <summary>
         /// Allows the Matrix to be accessed like a 2d array (i.e. matrix[2,3])
         /// </summary>
@@ -1948,6 +1949,7 @@ namespace AdvanceMath
                 }
             }
         }
+#endif
         #endregion
         #region Operators
 

@@ -69,6 +69,7 @@ namespace Physics2DDemo
 
         bool sparkle;
         Vector2D sparkPoint;
+        float targetDt = .010f;
         #endregion
         #region constructor
         public Demo()
@@ -207,7 +208,6 @@ namespace Physics2DDemo
         {
             Vector2D position = new Vector2D(rand.Next(0, 1400), 0);
             float velocityMag = rand.Next(1000, 2000);
-            // Vector2D target = new Vector2D(rand.Next(400, 900), rand.Next(200, 700));
             Vector2D velocity = Vector2D.SetMagnitude(bombTarget - position, velocityMag);
 
             bomb.Lifetime = new Lifespan();
@@ -543,7 +543,7 @@ namespace Physics2DDemo
         }
         void AddGravityField()
         {
-            engine.AddLogic(new GravityField(new Vector2D(0, 960f), new Lifespan()));
+            engine.AddLogic(new GravityField(new Vector2D(0, 500f), new Lifespan()));
         }
         void AddParticles(Vector2D position, int count)
         {
@@ -813,7 +813,6 @@ namespace Physics2DDemo
 
             waitHandle.Set();
         }
-        //stress test
         void Demo0()
         {
             waitHandle.Reset();
@@ -826,14 +825,15 @@ namespace Physics2DDemo
             engine.AddLogic(new GravityPointField(gravityCenter, gravityPower, new Lifespan()));
             AddRagDoll(gravityCenter + new Vector2D(0, -20));
             float length = 41;
-            float size = 4
+            float size = 8
                 ;
             bool reverse = false;
-            for (float distance = 180; distance < 500; length += 10, size += 10, distance += 60 + length)
+            for (float distance = 250; distance < 650; length += 10, size *= 2, distance += 60 + length)
             {
 
                 float da = MathHelper.TWO_PI / size;// ((MathHelper.TWO_PI * distance) / size);
                 float l2 = length / 2;
+                // da /= 2;
                 Vector2D[] vertexes = new Vector2D[]
                 {
                      Vector2D.FromLengthAndAngle(distance-l2,da/2),
@@ -841,21 +841,23 @@ namespace Physics2DDemo
                      Vector2D.FromLengthAndAngle(distance+l2,-da/2),
                      Vector2D.FromLengthAndAngle(distance+l2,da/2),
                 };
+                //da *= 2;
                 Vector2D[] vertexes2 = Polygon.MakeCentroidOrigin(vertexes);
                 vertexes = Polygon.Subdivide(vertexes2, 5);
 
                 Polygon shape = new Polygon(vertexes, 1.5f);
                 for (float angle = 0; angle < MathHelper.TWO_PI; angle += da)
                 {
-
                     Vector2D position = Vector2D.FromLengthAndAngle(distance, angle) + gravityCenter;
-                    Body body = AddShape(shape, size * length, new ALVector2D(angle, position));
-                    // body.State.Velocity.Linear = GetOrbitVelocity(gravityCenter, Vector2D.FromLengthAndAngle(distance - length, angle) + gravityCenter, gravityPower);
+                    Body body = AddShape(shape, (size * length) / 10, new ALVector2D(angle, position));
+                    body.State.Velocity.Linear = GetOrbitVelocity(gravityCenter, Vector2D.FromLengthAndAngle(distance - length, angle) + gravityCenter, gravityPower);
+                    body.State.Velocity.Linear *= .5f;
+                    body.State.Velocity.Angular = -(body.State.Velocity.Linear.Magnitude) / (distance);// *(1 / MathHelper.TWO_PI);
                     if (reverse)
                     {
-                        // body.State.Velocity.Linear = -body.State.Velocity.Linear;
+                        body.State.Velocity.Linear = -body.State.Velocity.Linear;
+                        body.State.Velocity.Angular = -body.State.Velocity.Angular;
                     }
-                    //body.State.Velocity.Angular = -(MathHelper.TWO_PI * distance) / (body.State.Velocity.Linear.Magnitude) * (1 / MathHelper.TWO_PI);
                 }
                 reverse = !reverse;
             }
@@ -880,25 +882,29 @@ namespace Physics2DDemo
         /// </summary>
         public void PhysicsProcess()
         {
-
+            float extraDt = 0;
             watch.Start();
             while (true)
             {
                 float dt = watch.ElapsedMilliseconds / 1000f;
-                if (dt < .001f)
+                extraDt += dt;
+
+                if (extraDt < targetDt)
                 {
                     //GC.Collect();
                     isFast = true;
-                    Thread.Sleep(6);
+                    int sleep = (int)((targetDt - (extraDt + dt)) * 900);
+                    if (sleep < 0) { sleep = 0; }
+                    Thread.Sleep(sleep);
                 }
                 else
                 {
-
                     isFast = false;
-                    if (dt > .015f)
+                    extraDt -= targetDt;
+                    if (extraDt > targetDt)
                     {
+                        extraDt = targetDt;
                         isSlow = true;
-                        dt = .015f;
                     }
                     else
                     {
@@ -906,7 +912,7 @@ namespace Physics2DDemo
                     }
                     watch.Reset();
                     watch.Start();
-                    engine.Update(dt);
+                    engine.Update(targetDt);
                     updated = true;
                 }
                 waitHandle.WaitOne();
@@ -919,7 +925,7 @@ namespace Physics2DDemo
             if (sparkle && updated)
             {
                 updated = false;
-                AddParticles(sparkPoint, 50);
+                AddParticles(sparkPoint, 20);
             }
 
             clippersShape.SetBoundingBox(new BoundingBox2D(width, height, 0, 0));
@@ -1062,7 +1068,7 @@ namespace Physics2DDemo
             Gl.glMultMatrixf(matrix);
             Gl.glCallList(list);
             Gl.glPopMatrix();
-            
+
         }
 
         public void Dispose()

@@ -604,7 +604,7 @@ namespace AdvanceMath
             ZAxis.Y = rotation.m12;
             ZAxis.Z = rotation.m22;
         }
-
+#if UNSAFE
         /// <summary>
         /// 
         /// </summary>
@@ -662,10 +662,13 @@ namespace AdvanceMath
 
                 int i = 0;
                 if (matriX.m11 > matriX.m00)
+                {
                     i = 1;
+                }
                 if (matriX.m22 > matriX[i, i])
+                {
                     i = 2;
-
+                }
                 int j = next[i];
                 int k = next[j];
 
@@ -686,7 +689,7 @@ namespace AdvanceMath
                 }
             }
         }
-
+#endif
         /// <summary>
         ///		Calculates the logarithm of a Quaternion.
         /// </summary>

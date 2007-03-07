@@ -757,7 +757,7 @@ namespace AdvanceMath
         }
         #endregion
         #region Indexors
-
+#if UNSAFE
         /// <summary>
         ///    Allows the Matrix to be accessed like a 2d array (i.e. matrix[2,3])
         /// </summary>
@@ -814,6 +814,7 @@ namespace AdvanceMath
             }
             set
             {
+              //  System.Runtime.InteropServices.
                 ThrowHelper.CheckIndex("index", index, Count);
                 unsafe
                 {
@@ -824,6 +825,7 @@ namespace AdvanceMath
                 }
             }
         }
+#endif
         #endregion
         #region Operator overloads
         /// <summary>

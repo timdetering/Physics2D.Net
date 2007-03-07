@@ -1148,7 +1148,7 @@ namespace AdvanceMath
                 left.m20 == right.m20 && left.m21 == right.m21 && left.m22 == right.m22;
         }
         [CLSCompliant(false)]
-        public static bool Equals(ref Matrix3x3 left,ref Matrix3x3 right)
+        public static bool Equals(ref Matrix3x3 left, ref Matrix3x3 right)
         {
             return
                 left.m00 == right.m00 && left.m01 == right.m01 && left.m02 == right.m02 &&
@@ -1501,11 +1501,12 @@ namespace AdvanceMath
         }
         public bool Equals(Matrix3x3 other)
         {
-            return Equals(ref this,ref other);
+            return Equals(ref this, ref other);
         }
 
         #endregion
         #region Indexors
+#if UNSAFE
         /// <summary>
         /// Allows the Matrix to be accessed like a 2d array (i.e. matrix[2,3])
         /// </summary>
@@ -1572,6 +1573,7 @@ namespace AdvanceMath
                 }
             }
         }
+#endif
         #endregion
         #region Operator overloads
         /// <summary>

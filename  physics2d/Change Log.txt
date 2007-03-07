@@ -1,4 +1,13 @@
 Physics2D.Net
+NEXT VERSION:
+changed: inlined code in the Body.UpdateVelocity method.
+
+AdvanceMath
+NEXT VERSION:
+Added: a new define: UNSAFE
+Changed: made it so all code that has or uses unsafe code blocks is inside "#if UNSAFE #endif" statements. 
+
+Physics2D.Net
 1.2.0.0:
 Changed: made the Joints Implement an interface specific to the solver.
 Changed: Implemented the Solver from Super Split Box2D. This changed the joints quite a bit but basically left everything else alone.

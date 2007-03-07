@@ -380,21 +380,20 @@ namespace Physics2DDotNet
         }
         public void UpdateVelocity(Scalar dt)
         {
-            ALVector2D temp;
-            if (massInfo.MassInv != 0)
+            float massInv = massInfo.MassInv;
+            if (massInv != 0)
             {
-                temp.Angular = massInfo.MassInv;
-                Vector2D.Multiply(ref state.ForceAccumulator.Linear, ref temp.Angular, out temp.Linear);
-                Vector2D.Add(ref state.Acceleration.Linear, ref temp.Linear, out state.Acceleration.Linear);
+                state.Acceleration.Linear.X += state.ForceAccumulator.Linear.X * massInv;
+                state.Acceleration.Linear.Y += state.ForceAccumulator.Linear.Y * massInv;
                 state.Acceleration.Angular += state.ForceAccumulator.Angular * massInfo.MomentofInertiaInv;
             }
-            ALVector2D.Multiply(ref state.Acceleration, ref dt, out temp);
-            ALVector2D.Add(ref state.Velocity, ref temp, out state.Velocity);
-
+            state.Velocity.Linear.X += state.Acceleration.Linear.X * dt;
+            state.Velocity.Linear.Y += state.Acceleration.Linear.Y * dt;
+            state.Velocity.Angular += state.Acceleration.Angular * dt;
         }
         internal void UpdateTime(Scalar dt)
         {
-            Lifetime.Update(dt);
+            lifetime.Update(dt);
             shape.UpdateTime(dt);
             if (ignorer != null) { ignorer.UpdateTime(dt); }
             if (Updated != null) { Updated(this, new UpdatedEventArgs(dt)); }
