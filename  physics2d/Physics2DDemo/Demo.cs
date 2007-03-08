@@ -58,7 +58,7 @@ namespace Physics2DDemo
         Vector2D bombTarget;
         float friction = .3f;
 
-        float forceMag = 5000;
+        float forceMag = 10000;
         Vector2D force;
 
         bool isSlow;
@@ -271,6 +271,7 @@ namespace Physics2DDemo
             solver.SplitImpulse = true;
             solver.BiasFactor = .7f;
             solver.AllowedPenetration = .1f;
+            //solver.MaxContactCount = 6;
             engine.Solver = solver;
 
             engine.BodiesAdded += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesAdded);
@@ -316,7 +317,7 @@ namespace Physics2DDemo
 
             avatar = new Body(new PhysicsState(new ALVector2D(0, 0, 60)),
                 new Polygon(vertexes, 4),
-                new MassInfo(5, float.PositiveInfinity),
+                new MassInfo(20, float.PositiveInfinity),
                 new Coefficients(.2f, .2f, friction),
                 new Lifespan());
             avatar.Updated += new EventHandler<UpdatedEventArgs>(avatar_Updated);
@@ -463,14 +464,16 @@ namespace Physics2DDemo
             float ymax = 700;
 
             float size = 25;
-            float spacing = 20;
-            float Xspacing = -1;
-
+            float spacing = 1;
+            float Xspacing = 20;
+            float offset = .9f;
             for (float x = xmin; x < xmax; x += spacing + Xspacing + size)
             {
                 for (float y = ymax; y > ymin; y -= spacing + size)
                 {
-                    AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + rand.Next(-1, 1) * .1f, y + rand.Next(-1, 1) * .1f)));
+
+                    AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
+                    offset = -offset;
                 }
             }
         }
@@ -490,8 +493,8 @@ namespace Physics2DDemo
         }
         Body AddRectangle(float length, float width, float mass, ALVector2D position)
         {
-            width += rand.Next(-4, 5) * .01f;
-            length += rand.Next(-4, 5) * .01f;
+          //  width += rand.Next(-4, 5) * .01f;
+         //   length += rand.Next(-4, 5) * .01f;
             Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(length, width);
             vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (length + width) / 4);
 
@@ -536,9 +539,11 @@ namespace Physics2DDemo
 
             float minY = 300;
             float maxY = 720 - size / 2;
+            float offset = .7f;
             for (float y = maxY; y > minY; y -= spacing)
             {
-                AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + rand.Next(-3, 4) * .1f, y)));
+                AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
+                offset = -offset;
             }
         }
         void AddGravityField()
@@ -706,7 +711,7 @@ namespace Physics2DDemo
             waitHandle.Reset();
             Reset();
             AddGravityField();
-            AddFloor(new ALVector2D(.1f, new Vector2D(600, 760)));
+            AddFloor(new ALVector2D(.1f, new Vector2D(600, 770)));
             AddTower();
             waitHandle.Set();
         }

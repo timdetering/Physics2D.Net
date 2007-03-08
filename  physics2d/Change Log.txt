@@ -1,11 +1,20 @@
 Physics2D.Net
 NEXT VERSION:
 changed: inlined code in the Body.UpdateVelocity method.
+changed: ApplyMatrix to use MathHelper.ClampAngle instead of its own logic.
+Removed: The BiasMultiplier from the PreApply method in Arbiter.
+changed: The SequentialImpulsesSolver.Arbiter to have a reference to the SequentialImpulsesSolver containing it.
+changed: The SequentialImpulsesSolver.Arbiter to use the values in the SequentialImpulsesSolver instead of having the values passed to it.
 
 AdvanceMath
 NEXT VERSION:
 Added: a new define: UNSAFE
 Changed: made it so all code that has or uses unsafe code blocks is inside "#if UNSAFE #endif" statements. 
+Renamed: RadianMin to ClampAngle
+Changed: ClampAngle's logic to not use loops.
+renamed: GetAngleDifference to AngleSubtract.
+Changed: AngleSubtract's logic to be better.
+
 
 Physics2D.Net
 1.2.0.0:

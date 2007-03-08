@@ -40,6 +40,7 @@ namespace AdvanceMath
         public const Scalar E = (Scalar)System.Math.E;
         public const Scalar PI = (Scalar)System.Math.PI;
         public const Scalar TWO_PI = (Scalar)(System.Math.PI * 2);
+        public const Scalar TWO_PI_INV = (Scalar)(1 / (System.Math.PI * 2));
         public const Scalar HALF_PI = (Scalar)(System.Math.PI / 2);
         public const Scalar HALF_THREE_PI = (Scalar)((2 * System.Math.PI) / 3);
         public const Scalar RADIANS_PER_DEGREE = (Scalar)(PI / 180.0);
@@ -66,41 +67,37 @@ namespace AdvanceMath
         {
             return (value < lower) ? (lower) : ((value > upper) ? (upper) : (value));
         }
-        public static void Clamp(ref Scalar value, ref Scalar lower, ref Scalar upper,out Scalar result)
+        public static void Clamp(ref Scalar value, ref Scalar lower, ref Scalar upper, out Scalar result)
         {
             result = (value < lower) ? (lower) : ((value > upper) ? (upper) : (value));
         }
 
-        public static Scalar RadianMin(Scalar radianAngle)
+
+        public static Scalar ClampAngle(Scalar radianAngle)
         {
-            if (Math.Abs(radianAngle) > TWO_PI)
-            {
-                while (Math.Abs(radianAngle) > PI)
-                {
-                    radianAngle -= Math.Sign(radianAngle) * TWO_PI;
-                }
-            }
-            else if (Math.Abs(radianAngle) > PI)
-            {
-                radianAngle -= Math.Sign(radianAngle) * TWO_PI;
-                if (Math.Abs(radianAngle) > PI)
-                {
-                    radianAngle -= Math.Sign(radianAngle) * TWO_PI;
-                }
-            }
-            return radianAngle;
+            if (Math.Abs(radianAngle) <= PI) { return radianAngle; }
+            return radianAngle - (Scalar)(Math.Truncate(radianAngle * TWO_PI_INV) + ((radianAngle < 0) ? (-1) : (1))) * TWO_PI;
+        }
+        [CLSCompliant(false)]
+        public static void ClampAngle(ref Scalar radianAngle)
+        {
+            if (Math.Abs(radianAngle) <= PI) { return; }
+            radianAngle -= (Scalar)(Math.Truncate(radianAngle * TWO_PI_INV) + ((radianAngle < 0) ? (-1) : (1))) * TWO_PI;
+        }
+        public static void ClampAngle(ref Scalar radianAngle, out Scalar result)
+        {
+            if (Math.Abs(radianAngle) <= PI) { result = radianAngle; return; }
+            result = radianAngle - (Scalar)(Math.Truncate(radianAngle * TWO_PI_INV) + ((radianAngle < 0) ? (-1) : (1))) * TWO_PI;
         }
 
-        public static Scalar GetAngleDifference(Scalar radianAngle1, Scalar radianAngle2)
+        public static Scalar AngleSubtract(Scalar radianAngle1, Scalar radianAngle2)
         {
-            radianAngle1 = RadianMin(radianAngle1);
-            radianAngle2 = RadianMin(radianAngle2);
-            Scalar returnvalue = radianAngle1 - radianAngle2;
-            if (Math.Abs(returnvalue) > Math.PI)
-            {
-                returnvalue -= (Scalar)(2 * Math.Sign(returnvalue) * Math.PI);
-            }
-            return returnvalue;
+            return ClampAngle(radianAngle1 - radianAngle2);
+        }
+        public static void AngleSubtract(ref Scalar radianAngle1,ref  Scalar radianAngle2,out Scalar result)
+        {
+            result = radianAngle1 - radianAngle2;
+            ClampAngle(ref result);
         }
 
         /// <summary>
@@ -145,14 +142,8 @@ namespace AdvanceMath
 
         public static Scalar Max(params Scalar[] vals)
         {
-            if (vals == null)
-            {
-                throw new ArgumentNullException("vals");
-            }
-            if (vals.Length == 0)
-            {
-                throw new ArgumentException("There must be at least one value to compare", "vals");
-            }
+            if (vals == null) { throw new ArgumentNullException("vals"); }
+            if (vals.Length == 0) { throw new ArgumentException("There must be at least one value to compare", "vals"); }
             Scalar max = vals[0];
             if (Scalar.IsNaN(max)) { return max; }
             for (int i = 1; i < vals.Length; i++)
@@ -189,14 +180,6 @@ namespace AdvanceMath
             bool bClockwise = (((b - a) ^ (p - b)) >= 0);
             return !(((((c - b) ^ (p - c)) >= 0) ^ bClockwise) && ((((a - c) ^ (p - a)) >= 0) ^ bClockwise));
         }
-
-        /// <summary>
-        ///		Empty private constructor.  This class has nothing but static methods/properties, so a public default
-        ///		constructor should not be created by the compiler.  This prevents instance of this class from being
-        ///		created.
-        /// </summary>
-
-
         /// <summary>
         ///		Converts degrees to radians.
         /// </summary>
@@ -217,7 +200,10 @@ namespace AdvanceMath
         }
 
         #region System.Math Methods
-        public static Scalar Abs(Scalar value) { return Math.Abs(value); }
+        public static Scalar Abs(Scalar value) 
+        {
+            return Math.Abs(value); 
+        }
         public static int Sign(Scalar value) { return Math.Sign(value); }
         public static Scalar Max(Scalar val1, Scalar val2)
         {
@@ -257,7 +243,7 @@ namespace AdvanceMath
         public static Scalar Truncate(Scalar d) { return (Scalar)Math.Truncate(d); }
         #endregion
 
-        
+
         #endregion
     }
 }

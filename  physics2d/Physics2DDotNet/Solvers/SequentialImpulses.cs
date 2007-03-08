@@ -45,7 +45,6 @@ namespace Physics2DDotNet.Solvers
     {
         public int splitImpulsesJointsAttached;
         public ALVector2D biasVelocity;
-        public int collisionCount;
         public Body body;
         public SequentialImpulsesTag(Body body)
         {
@@ -141,20 +140,21 @@ namespace Physics2DDotNet.Solvers
                 }
             }
 
-
+            static int CompareContacts(Contact c1,Contact c2)
+            {
+                return c1.distance.CompareTo(c2.distance);
+            }
             List<Contact> contacts;
             Body body1;
             Body body2;
             SequentialImpulsesTag tag1;
             SequentialImpulsesTag tag2;
 
-            bool biasPreservesMomentum;
-            Scalar biasFactor;
-            Scalar allowedPenetration;
+            SequentialImpulsesSolver parent;
+
             Scalar friction;
             bool updated = false;
-
-            public Arbiter(Body entity1, Body entity2, bool biasPreservesMomentum, Scalar biasFactor, Scalar allowedPenetration)
+            public Arbiter(SequentialImpulsesSolver parent,Body entity1, Body entity2)
             {
                 if (entity1.ID < entity2.ID)
                 {
@@ -173,10 +173,7 @@ namespace Physics2DDotNet.Solvers
                 this.friction = MathHelper.Sqrt(
                     this.body1.Coefficients.DynamicFriction *
                     this.body2.Coefficients.DynamicFriction);
-
-                this.biasPreservesMomentum = biasPreservesMomentum;
-                this.biasFactor = biasFactor;
-                this.allowedPenetration = allowedPenetration;
+                this.parent = parent;
             }
             public bool Updated
             {
@@ -216,17 +213,17 @@ namespace Physics2DDotNet.Solvers
                         contacts = mergedContacts;
                     }
                 }
-                if (contacts.Count > 0)
+                if (contacts.Count > 0 &&
+                    parent.maxContactCount > 0 &&
+                    contacts.Count > parent.maxContactCount)
                 {
-                    tag1.collisionCount++;
-                    tag2.collisionCount++;
+                    contacts.Sort(CompareContacts);
+                    contacts.RemoveRange(parent.maxContactCount, contacts.Count - parent.maxContactCount);
                 }
             }
             static Random rand = new Random();
             public void PreApply(Scalar dtInv)
             {
-
-                Scalar biasMultiplier = 1 / MathHelper.Pow(Math.Max(Math.Min(tag1.collisionCount, tag2.collisionCount) - 1, 1), 2);
 
 
                 Scalar mass1Inv = body1.Mass.MassInv;
@@ -234,8 +231,9 @@ namespace Physics2DDotNet.Solvers
                 Scalar mass2Inv = body2.Mass.MassInv;
                 Scalar I2Inv = body2.Mass.MomentofInertiaInv;
 
-                foreach (Contact c in contacts)
+                for(int index = 0;index < contacts.Count;++index)
                 {
+                    Contact c = contacts[index];
                     Vector2D.Subtract(ref c.position, ref body1.State.Position.Linear, out c.r1);
                     Vector2D.Subtract(ref c.position, ref body2.State.Position.Linear, out c.r2);
 
@@ -257,7 +255,7 @@ namespace Physics2DDotNet.Solvers
                         ref mass2Inv, ref I2Inv,
                         out c.massTangent);
 
-                    c.bias = -(biasFactor * biasMultiplier) * dtInv * MathHelper.Min(0.0f, c.distance + allowedPenetration);
+                    c.bias = -parent.biasFactor * dtInv * MathHelper.Min(0.0f, c.distance + parent.allowedPenetration);
 
 
                     // Apply normal + friction impulse
@@ -294,8 +292,9 @@ namespace Physics2DDotNet.Solvers
                 Scalar mass2Inv = b2.Mass.MassInv;
                 Scalar I2Inv = b2.Mass.MomentofInertiaInv;
 
-                foreach (Contact c in contacts)
+                for (int index = 0; index < contacts.Count; ++index)
                 {
+                    Contact c = contacts[index];
 
                     // Relative velocity at contact
                     Vector2D dv;
@@ -310,7 +309,7 @@ namespace Physics2DDotNet.Solvers
                     //Scalar vn = Vector2D.Dot(dv, c.normal);
 
                     Scalar dPn;
-                    if (biasPreservesMomentum)
+                    if (parent.splitImpulse)
                     {
                         dPn = c.massNormal * (-vn);
                     }
@@ -345,7 +344,7 @@ namespace Physics2DDotNet.Solvers
                         ref I2Inv);
 
 
-                    if (biasPreservesMomentum)
+                    if (parent.splitImpulse)
                     {
                         // Compute bias impulse
                         PhysicsHelper.GetRelativeVelocity(
@@ -428,8 +427,6 @@ namespace Physics2DDotNet.Solvers
                         ref I2Inv);
                 }
             }
-
-
             public bool Collided
             {
                 get { return contacts.Count > 0; }
@@ -461,6 +458,9 @@ namespace Physics2DDotNet.Solvers
         Scalar allowedPenetration = 0.1f;
         int iterations = 10;
         int superDuperPositionCorrectionIterations = 5;
+        int maxContactCount = -1;
+
+
 
 
         public SequentialImpulsesSolver()
@@ -496,6 +496,11 @@ namespace Physics2DDotNet.Solvers
             get { return superDuperPositionCorrectionIterations; }
             set { superDuperPositionCorrectionIterations = value; }
         }
+        public int MaxContactCount
+        {
+            get { return maxContactCount; }
+            set { maxContactCount = value; }
+        }
 
         protected internal override ICollisionInfo HandleCollision(Scalar dt, Body first, Body second)
         {
@@ -511,7 +516,7 @@ namespace Physics2DDotNet.Solvers
             }
             else
             {
-                arbiter = new Arbiter(first, second, splitImpulse, biasFactor, allowedPenetration);
+                arbiter = new Arbiter(this,first, second);
                 arbiter.Update();
                 if (!first.IgnoresCollisionResponse &&
                     !second.IgnoresCollisionResponse &&
@@ -588,7 +593,6 @@ namespace Physics2DDotNet.Solvers
                     tag.body.UpdatePosition(dt);
                 }
                 tag.body.ClearForces();
-                tag.collisionCount = 0;
             }
 
             if (siJoints.Count == 0) { return; }

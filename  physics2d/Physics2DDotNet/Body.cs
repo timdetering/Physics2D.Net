@@ -465,15 +465,8 @@ namespace Physics2DDotNet
         /// </summary>
         public void ApplyMatrix()
         {
-            if (state.Position.Angular > MathHelper.TWO_PI)
-            {
-                state.Position.Angular -= MathHelper.Floor((state.Position.Angular / MathHelper.TWO_PI)) * MathHelper.TWO_PI;
-            }
-            else if (-state.Position.Angular < -MathHelper.TWO_PI)
-            {
-                state.Position.Angular += MathHelper.Ceiling((state.Position.Angular / MathHelper.TWO_PI)) * MathHelper.TWO_PI;
-            }
             Matrix2D matrix;
+            MathHelper.ClampAngle(ref state.Position.Angular);
             Matrix2D.FromALVector2D(ref state.Position, out matrix);
             ApplyMatrixInternal(ref matrix);
         }

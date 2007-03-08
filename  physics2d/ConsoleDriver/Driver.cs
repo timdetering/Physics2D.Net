@@ -49,10 +49,6 @@ using AdvanceMath.Design;
 using Physics2DDotNet;
 namespace ConsoleDriver
 {
-
-
-
-
     public class TimeTester
     {
         Stopwatch stopwatch = new Stopwatch();
@@ -91,12 +87,18 @@ namespace ConsoleDriver
 
         public void Run()
         {
+            method1();
+            method2();
+            if (reset != null) { reset(); }
             GC.Collect();
+            Thread.Sleep(15);
             looptime = RunLoop(EmptyLoop);
             GC.Collect();
+            Thread.Sleep(15);
             time1 = RunLoop(method1);
             if (reset != null) { reset(); }
             GC.Collect();
+            Thread.Sleep(15);
             time2 = RunLoop(method2);
         }
 
@@ -137,69 +139,19 @@ namespace ConsoleDriver
         }
     }
 
-
     static class Driver
     {
-
         static long RoundUpToPowerOfTwo(long value)
         {
             long result = 1;
-            while (result < value) { value <<= 1; }
+            while (result < value) { result <<= 1; }
             return result;
         }
         static int RoundUpToPowerOfTwo(int value)
         {
             int result = 1;
-            while (result < value) { value <<= 1; }
+            while (result < value) { result <<= 1; }
             return result;
-        }
-
-
-        static Matrix4x4 testm = Matrix4x4.Identity;
-
-        static int[] sourcearray = new int[100];
-        static int[] destarray = new int[100];
-        static PhysicsEngine e = new PhysicsEngine();
-        static void TEST1()
-        {
-            unsafe
-            {
-                for (int index = 0; index < sourcearray.Length; ++index)
-                {
-                    destarray[index] = sourcearray[index];
-                }
-            }
-            unsafe
-            {
-                fixed (int* sourcePtr = &sourcearray[0], destPtr = &destarray[0])
-                {
-                    int* sp = sourcePtr;
-                    int* dp = destPtr;
-
-                    for (int index = 0; index < sourcearray.Length; ++index)
-                    {
-                        *(dp++) = *(sp++);
-                    }
-                }
-            }
-        }
-        static unsafe void TTT() { 
-            int* t;
-            int g = 9;
-            t = &g;
-            nothering(*t);
-        } 
-
-
-        static void TEST2()
-        {
-
-            for (int index = 0; index < sourcearray.Length; ++index)
-            {
-                destarray[index] = sourcearray[index];
-            }
-
-            //Array.Copy(sourcearray, destarray, destarray.Length);
         }
 
 
@@ -207,23 +159,34 @@ namespace ConsoleDriver
         static Stopwatch stopwatch = new Stopwatch();
 
         static void nothering(object obj) { }
-
-        /// </summary>
         [STAThread]
         static void Main(string[] args)
         {
-            long value = 878493000;
-            Console.WriteLine(RoundUpToPowerOfTwo(value));
 
 
-           // TimeTester test = new TimeTester(10000000, TEST1, TEST2);
-           // test.Run();
-            //Console.WriteLine(test);
+            //Console.WriteLine(Math.Floor(1.1));
+
+            float angle = -MathHelper.PI *3;
+            angle = MathHelper.ClampAngle(angle);
+            Console.WriteLine(angle / MathHelper.TWO_PI);
+
+
+             angle = MathHelper.AngleSubtract(MathHelper.PI, 0);
+
+           // Console.WriteLine(angle / MathHelper.TWO_PI);
+
+
+
+            //int value = 87000;
+            //Console.WriteLine(RoundUpToPowerOfTwo(value));
+
+
+           /* TimeTester test = new TimeTester(30000000, TEST1, TEST2);
+            test.Run();
+            Console.WriteLine(test);*/
 
             Console.WriteLine("Finished");
             Console.ReadLine();
         }
-
-
     }
 }
