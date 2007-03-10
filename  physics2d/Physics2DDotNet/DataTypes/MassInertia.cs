@@ -84,7 +84,7 @@ namespace Physics2DDotNet
                 Vector2D.Dot(ref P0, ref P0, out c);
                 a += b + c;
                 Vector2D.ZCross(ref P0, ref P1, out b);
-                b = MathHelper.Abs(b);
+                b = Math.Abs(b);
                 denom += (b * a);
                 numer += b;
             }

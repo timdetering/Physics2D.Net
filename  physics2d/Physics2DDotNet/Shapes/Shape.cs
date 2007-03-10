@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
@@ -85,7 +86,7 @@ namespace Physics2DDotNet
                 Vector2D.Dot(ref P0, ref P0, out c);
                 a += b + c;
                 Vector2D.ZCross(ref P0, ref P1, out b);
-                b = MathHelper.Abs(b);
+                b = Math.Abs(b);
                 denom += (b * a);
                 numer += b;
             }
@@ -104,45 +105,12 @@ namespace Physics2DDotNet
             }
             return result;
         }
-        protected static void GetDistanceEdge(ref Vector2D vector, ref Vector2D point1, ref Vector2D point2, out Scalar distance)
-        {
-            Scalar edgeLength, nProj, tProj;
-            Vector2D tangent, normal, local;
-
-            Vector2D.Subtract(ref vector, ref point2, out local);
-            Vector2D.Subtract(ref point1, ref point2, out tangent);
-            Vector2D.Normalize(ref tangent, out edgeLength, out tangent);
-            Vector2D.GetRightHandNormal(ref tangent, out normal);
-            Vector2D.Dot(ref local, ref normal, out nProj);
-            Vector2D.Dot(ref local, ref tangent, out tProj);
-            if (tProj < 0)
-            {
-                distance = MathHelper.Sqrt(tProj * tProj + nProj * nProj);
-                if (nProj < 0)
-                {
-                    distance = -distance;
-                }
-            }
-            else if (tProj > edgeLength)
-            {
-                tProj -= edgeLength;
-                distance = MathHelper.Sqrt(tProj * tProj + nProj * nProj);
-                if (nProj < 0)
-                {
-                    distance = -distance;
-                }
-            }
-            else
-            {
-                distance = nProj;
-            }
-        }
         #endregion
         #region fields
         object tag;
         protected Matrix2D matrix2D;
         protected Matrix2D matrix2DInv;
-        protected BoundingBox2D boundingBox;
+        protected BoundingRectangle rect;
         protected Scalar inertiaMultiplier;
         protected Vector2D[] originalVertexes;
         protected Vector2D[] vertexes;
@@ -162,7 +130,7 @@ namespace Physics2DDotNet
             this.matrix2D = copy.matrix2D;
             this.matrix2DInv = copy.matrix2DInv;
             this.inertiaMultiplier = copy.inertiaMultiplier;
-            this.boundingBox = copy.boundingBox;
+            this.rect = copy.rect;
             if (copy.tag is ICloneable)
             {
                 this.tag = ((ICloneable)copy.tag).Clone();
@@ -185,9 +153,9 @@ namespace Physics2DDotNet
             get { return inertiaMultiplier; }
         }
         public abstract bool CanGetIntersection { get;}
-        public BoundingBox2D BoundingBox2D
+        public BoundingRectangle Rectangle
         {
-            get { return boundingBox; }
+            get { return rect; }
         }
         public object Tag
         {
@@ -212,7 +180,7 @@ namespace Physics2DDotNet
         } 
         #endregion
         #region methods
-        public abstract void CalcBoundingBox2D();
+        public abstract void CalcBoundingRectangle();
         public virtual void ApplyMatrix(ref Matrix2D matrix)
         {
             this.matrix2D = matrix;
@@ -230,7 +198,7 @@ namespace Physics2DDotNet
             other.vertexes.CopyTo(this.vertexes, 0);
         }
         public abstract bool TryGetIntersection(Vector2D vector, out IntersectionInfo info);
-        public abstract Scalar GetDistance(Vector2D vector);
+        public abstract void GetDistance(ref Vector2D vector,out Scalar result);
         public abstract Shape Duplicate();
 
         internal void OnAdded(Body parent)
@@ -244,35 +212,37 @@ namespace Physics2DDotNet
         } 
         #endregion
     }
+
     [Serializable]
-    public sealed class BoundingBox2DShape : Shape
+    public sealed class RectangleShape : Shape
     {
-        public void SetBoundingBox(BoundingBox2D boundingBox)
-        {
-            this.boundingBox = boundingBox;
-        }
+
         public override bool CanGetIntersection
         {
             get { return false; }
         }
-        public BoundingBox2DShape()
+        public RectangleShape()
             : base(new Vector2D[0])
         {
 
         }
+        public void SetRectangle(BoundingRectangle rectangle)
+        {
+            this.rect = rectangle;
+        }
         public override void ApplyMatrix(ref Matrix2D matrix){}
-        public override void CalcBoundingBox2D() {}
+        public override void CalcBoundingRectangle() {}
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {
             throw new NotSupportedException();
         }
-        public override Scalar GetDistance(Vector2D vector)
+        public override void GetDistance(ref Vector2D point,out Scalar result)
         {
             throw new NotSupportedException();
         }
         public override Shape Duplicate()
         {
-            return new BoundingBox2DShape();
+            return new RectangleShape();
         }
     }
 

@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet.Detectors
@@ -66,13 +67,13 @@ namespace Physics2DDotNet.Detectors
             }
             public void Update()
             {
-                body.Shape.CalcBoundingBox2D();
-                BoundingBox2D box = body.Shape.BoundingBox2D;
-                stubs[0].value = box.Lower.X;
-                stubs[1].value = box.Upper.X;
+                body.Shape.CalcBoundingRectangle();
+                BoundingRectangle rect= body.Shape.Rectangle;
+                stubs[0].value = rect.Min.X;
+                stubs[1].value = rect.Max.X;
 
-                stubs[2].value = box.Lower.Y;
-                stubs[3].value = box.Upper.Y;
+                stubs[2].value = rect.Min.Y;
+                stubs[3].value = rect.Max.Y;
             }
         }
         sealed class Stub

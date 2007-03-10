@@ -35,6 +35,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 
 
@@ -90,14 +91,14 @@ namespace Physics2DDotNet.Solvers
         {
             static void Collide(List<Contact> contacts, Body entity1, Body entity2)
             {
-                BoundingBox2D bb1 = entity1.Shape.BoundingBox2D;
-                BoundingBox2D bb2 = entity2.Shape.BoundingBox2D;
-                BoundingBox2D targetArea;
-                BoundingBox2D.FromIntersection(ref bb1, ref bb2, out targetArea);
+                BoundingRectangle bb1 = entity1.Shape.Rectangle;
+                BoundingRectangle bb2 = entity2.Shape.Rectangle;
+                BoundingRectangle targetArea;
+                BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
                 Collide(contacts, entity1, entity2, ref targetArea);
                 Collide(contacts, entity2, entity1, ref targetArea);
             }
-            static void Collide(List<Contact> contacts, Body entity1, Body entity2, ref BoundingBox2D targetArea)
+            static void Collide(List<Contact> contacts, Body entity1, Body entity2, ref BoundingRectangle targetArea)
             {
                 if (!entity1.Shape.CanGetIntersection)
                 {
@@ -110,7 +111,9 @@ namespace Physics2DDotNet.Solvers
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
                     Vector2D vector = vertexes[index];
-                    if (BoundingBox2D.TestIntersection(ref targetArea, ref vector))
+                    bool contains;
+                    targetArea.Contains(ref vector, out contains);
+                    if (contains)
                     {
                         IntersectionInfo info;
                         if (entity1.Shape.TryGetIntersection(vector, out info))

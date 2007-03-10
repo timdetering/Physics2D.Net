@@ -39,7 +39,6 @@
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Joints\HingeJoint.cs" />
     <Compile Include="Math2D\ALVector2D.cs" />
-    <Compile Include="Math2D\BoundingBox2D.cs" />
     <Compile Include="DataTypes\Coefficients.cs" />
     <Compile Include="DataTypes\CollisionEventArgs.cs" />
     <Compile Include="CollisionIgnorer.cs" />

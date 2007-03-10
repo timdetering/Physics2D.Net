@@ -109,13 +109,12 @@ namespace Physics2DDotNet
         }
         #endregion
         #region methods
-        public override void CalcBoundingBox2D()
+        public override void CalcBoundingRectangle()
         {
-            boundingBox = new BoundingBox2D(
-                position.X + radius,
-                position.Y + radius,
-                position.X - radius,
-                position.Y - radius);
+            rect.Max.X = position.X + radius;
+            rect.Max.Y = position.Y + radius;
+            rect.Min.X = position.X - radius;
+            rect.Min.Y = position.Y - radius;
         }
         public override void Set(Shape shape)
         {
@@ -123,12 +122,12 @@ namespace Physics2DDotNet
             if (other == null) { throw new ArgumentException("the parameter must be a shape", "shape"); }
             this.position = other.position;
         }
-        public override Scalar GetDistance(Vector2D vector)
+        public override void GetDistance(ref Vector2D point,out Scalar result)
         {
-            Vector2D.Subtract(ref vector, ref position, out vector);
-            Scalar result;
-            Vector2D.GetMagnitude(ref vector, out result);
-            return result - radius;
+            Vector2D temp;
+            Vector2D.Subtract(ref point, ref position, out temp);
+            Vector2D.GetMagnitude(ref temp, out result);
+            result -= radius;
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {

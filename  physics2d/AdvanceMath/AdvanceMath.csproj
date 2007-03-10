@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +45,12 @@
     <Compile Include="Design\AdvBrowsableOrderAttribute.cs" />
     <Compile Include="Design\InstanceConstructorAttribute.cs" />
     <Compile Include="Design\ParseMethodAttribute.cs" />
+    <Compile Include="Geometry2D\BoundingCircle.cs" />
+    <Compile Include="Geometry2D\BoundingPolygon.cs" />
+    <Compile Include="Geometry2D\BoundingRectangle.cs" />
+    <Compile Include="Geometry2D\Line.cs" />
+    <Compile Include="Geometry2D\LineSegment.cs" />
+    <Compile Include="Geometry2D\Ray.cs" />
     <Compile Include="IO\MathReader.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="IO\MathWriter.cs" />

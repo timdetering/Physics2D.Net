@@ -34,6 +34,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
@@ -98,13 +99,13 @@ namespace Physics2DDotNet
         {
             get { return grid != null; }
         }
-        public override void CalcBoundingBox2D()
+        public override void CalcBoundingRectangle()
         {
-            BoundingBox2D.FromVectors(vertexes, out boundingBox);
-            boundingBox.Upper.X += thicknessHalf;
-            boundingBox.Upper.Y += thicknessHalf;
-            boundingBox.Lower.X -= thicknessHalf;
-            boundingBox.Lower.Y -= thicknessHalf;
+            BoundingRectangle.FromVectors(vertexes, out rect);
+            rect.Max.X += thicknessHalf;
+            rect.Max.Y += thicknessHalf;
+            rect.Min.X -= thicknessHalf;
+            rect.Min.Y -= thicknessHalf;
         }
 
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
@@ -123,20 +124,20 @@ namespace Physics2DDotNet
             }
             return false;
         }
-        public override Scalar GetDistance(Vector2D vector)
+        public override void GetDistance(ref Vector2D point, out Scalar result)
         {
-            Scalar result = Scalar.MaxValue;
+            result = Scalar.MaxValue;
             Scalar other;
             for (int index = 0; index < vertexes.Length - 1; ++index)
             {
-                GetDistanceEdge(ref vector, ref vertexes[index], ref vertexes[index + 1], out other);
-                other = MathHelper.Abs(other);
+                LineSegment.GetDistance(ref vertexes[index], ref vertexes[index + 1], ref point, out other);
+                other = Math.Abs(other);
                 if (other < result)
                 {
                     result = other;
                 }
             }
-            return result - thicknessHalf;
+            result -= thicknessHalf;
         }
         public override Shape Duplicate()
         {

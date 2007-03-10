@@ -158,16 +158,6 @@ namespace AdvanceMath
             result.Y = (right.Y - left.Y) * amount.Y + left.Y;
         }
 
-        public static Vector2D FromArray(Scalar[] array)
-        {
-            return FromArray(array, 0);
-        }
-        public static Vector2D FromArray(Scalar[] array, int index)
-        {
-            Vector2D result;
-            Copy(array, index, out result);
-            return result;
-        }
         /// <summary>
         /// Creates a Vector2D With the given length (<see cref="Magnitude"/>) and the given <see cref="Angle"/>.
         /// </summary>
@@ -226,17 +216,17 @@ namespace AdvanceMath
         /// <returns>A Vector2D with a new Angle.</returns>
         public static Vector2D SetAngle(Vector2D source, Scalar radianAngle)
         {
-            Scalar magnitude = GetMagnitude(source);
-            Scalar cos = MathHelper.Cos(radianAngle);
-            Scalar sin = MathHelper.Sin(radianAngle);
+            Scalar magnitude;
+            GetMagnitude(ref source, out magnitude);
             Vector2D result;
-            result.X = magnitude * cos;
-            result.Y = magnitude * sin;
+            result.X = magnitude * MathHelper.Cos(radianAngle);
+            result.Y = magnitude * MathHelper.Sin(radianAngle);
             return result;
         }
         public static void SetAngle(ref Vector2D source, ref Scalar radianAngle, out Vector2D result)
         {
-            Scalar magnitude = GetMagnitude(source);
+            Scalar magnitude;
+            GetMagnitude(ref source, out magnitude);
             result.X = magnitude * MathHelper.Cos(radianAngle);
             result.Y = magnitude * MathHelper.Sin(radianAngle);
         }
@@ -566,17 +556,12 @@ namespace AdvanceMath
         }
         public static void SetMagnitude(ref Vector2D source, ref Scalar magnitude, out Vector2D result)
         {
-            Scalar oldmagnitude;
-            GetMagnitude(ref source, out oldmagnitude);
-            if (oldmagnitude > 0 && magnitude != 0)
-            {
-                oldmagnitude = (magnitude / oldmagnitude);
-                Multiply(ref source, ref oldmagnitude, out result);
-            }
-            else
-            {
-                result = Zero;
-            }
+            if (magnitude == 0) { result = Zero; return; }
+            Scalar oldmagnitude = MathHelper.Sqrt(source.X * source.X + source.Y * source.Y);
+            if (oldmagnitude == 0) { result = Zero; return; }
+            oldmagnitude = (magnitude / oldmagnitude);
+            result.X = source.X * oldmagnitude;
+            result.Y = source.Y * oldmagnitude;
         }
         /// <summary>
         /// Negates a Vector2D.
@@ -708,35 +693,65 @@ namespace AdvanceMath
             result.Y = -sourceX;
         }
 
-
-
-        internal static void HermiteHelper(Scalar weightingFactor, out Scalar h1, out Scalar h2, out Scalar h3, out Scalar h4)
+        public static Vector2D Hermite(Vector2D value1, Vector2D tangent1, Vector2D value2, Vector2D tangent2,Scalar amount)
         {
-            Scalar wf2 = weightingFactor * weightingFactor;
-            Scalar wf3 = wf2 * weightingFactor;
-            Scalar wf3t2 = 2 * wf3;
-            Scalar wf2t3 = 3 * wf2;
-            h1 = wf3t2 - wf2t3 + 1;
-            h2 = -wf3t2 + wf2t3;
-            h3 = wf3 - 2 * wf2 + weightingFactor;
-            h4 = wf3 - wf2;
+            Vector2D result;
+            Hermite(ref value1, ref tangent1, ref value2, ref tangent2, amount, out result);
+            return result;
         }
-        public static Vector2D HermiteSpline(Vector2D position, Vector2D tangent, Vector2D position2, Vector2D tangent2, Scalar weightingFactor)
+        public static void Hermite(ref  Vector2D value1, ref Vector2D tangent1, ref Vector2D value2, ref Vector2D tangent2, Scalar amount, out Vector2D result)
         {
             Scalar h1, h2, h3, h4;
-            HermiteHelper(weightingFactor, out h1, out h2, out h3, out h4);
-            Vector2D p = h1 * position + h2 * position2 + h3 * tangent + h4 * tangent2;
-            return p;
-        }
-        public static Vector2D CatmullRomSpline(Vector2D position1, Vector2D position2, Vector2D position3, Vector2D position4, Scalar weightingFactor)
-        {
-            return HermiteSpline(position2, position3, (position3 - position1) * .5f, (position4 - position2) * .5f, weightingFactor);
-        }
-        public static Vector2D LinearInterpolation(Vector2D left, Vector2D right, Scalar interpolater)
-        {
-            return left + interpolater * (right - left);
+            MathHelper.HermiteHelper(amount, out h1, out h2, out h3, out h4);
+            result.X = h1 * value1.X + h2 * value2.X + h3 * tangent1.X + h4 * tangent2.X;
+            result.Y = h1 * value1.Y + h2 * value2.Y + h3 * tangent1.Y + h4 * tangent2.Y;
         }
 
+        public static Vector2D CatmullRom(Vector2D value1, Vector2D value2, Vector2D value3, Vector2D value4, Scalar amount)
+        {
+            Vector2D result;
+            CatmullRom(ref value1, ref value2, ref value3, ref value4, amount, out result);
+            return result;
+        }
+        public static void CatmullRom(ref Vector2D value1, ref Vector2D value2, ref Vector2D value3, ref Vector2D value4, Scalar amount, out Vector2D result)
+        {
+            Scalar amountSq = amount * amount;
+            Scalar amountCu = amountSq * amount;
+            result.X =
+                0.5f * ((2 * value2.X) +
+                (-value1.X + value3.X) * amount +
+                (2 * value1.X - 5 * value2.X + 4 * value3.X - value4.X) * amountSq +
+                (-value1.X + 3 * value2.X - 3 * value3.X + value4.X) * amountCu);
+            result.Y =
+                0.5f * ((2 * value2.Y) +
+                (-value1.Y + value3.Y) * amount +
+                (2 * value1.Y - 5 * value2.Y + 4 * value3.Y - value4.Y) * amountSq +
+                (-value1.Y + 3 * value2.Y - 3 * value3.Y + value4.Y) * amountCu);
+        }
+
+        public static Vector2D Max(Vector2D value1, Vector2D value2)
+        {
+            Vector2D result;
+            Max(ref value1, ref value2, out result);
+            return result;
+        }
+        public static void Max(ref Vector2D value1, ref Vector2D value2, out Vector2D result)
+        {
+            result.X = (value1.X < value2.X) ? (value2.X) : (value1.X);
+            result.Y = (value1.Y < value2.Y) ? (value2.Y) : (value1.Y);
+        }
+
+        public static Vector2D Min(Vector2D value1, Vector2D value2)
+        {
+            Vector2D result;
+            Min(ref value1, ref value2, out result);
+            return result;
+        }
+        public static void Min(ref Vector2D value1, ref Vector2D value2, out Vector2D result)
+        {
+            result.X = (value1.X > value2.X) ? (value2.X) : (value1.X);
+            result.Y = (value1.Y > value2.Y) ? (value2.Y) : (value1.Y);
+        }
 
         #endregion
         #region fields
@@ -845,7 +860,7 @@ namespace AdvanceMath
             }
             set
             {
-                this = SetMagnitude(this, value);
+                SetMagnitude(ref this, ref value, out this);
             }
         }
         /// <summary>
@@ -870,11 +885,13 @@ namespace AdvanceMath
         {
             get
             {
-                return GetAngle(this);
+                Scalar result;
+                GetAngle(ref this, out result);
+                return result;
             }
             set
             {
-                this = SetAngle(this, value);
+                SetAngle(ref this, ref value, out this);
             }
         }
         /// <summary>

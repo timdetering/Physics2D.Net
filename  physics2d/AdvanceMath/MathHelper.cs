@@ -72,7 +72,6 @@ namespace AdvanceMath
             result = (value < lower) ? (lower) : ((value > upper) ? (upper) : (value));
         }
 
-
         public static Scalar ClampAngle(Scalar radianAngle)
         {
             if (Math.Abs(radianAngle) <= PI) { return radianAngle; }
@@ -133,7 +132,51 @@ namespace AdvanceMath
         }
 
 
+        public static Scalar CatmullRom(Scalar value1, Scalar value2, Scalar value3, Scalar value4, Scalar amount)
+        {
+            Scalar amountSq = amount * amount;
+            Scalar amountCu = amountSq * amount;
+            return
+                0.5f * ((2 * value2) +
+                (-value1 + value3) * amount +
+                (2 * value1 - 5 * value2 + 4 * value3 - value4) * amountSq +
+                (-value1 + 3 * value2 - 3 * value3 + value4) * amountCu);
+        }
+        public static void CatmullRom(ref Scalar value1,ref Scalar value2,ref Scalar value3,ref Scalar value4, Scalar amount,out Scalar result)
+        {
+            Scalar amountSq = amount * amount;
+            Scalar amountCu = amountSq * amount;
+            result =
+                0.5f *((2 * value2) +
+                (-value1 + value3) * amount +
+                (2 * value1 - 5 * value2 + 4 * value3 - value4) * amountSq +
+                (-value1 + 3 * value2 - 3 * value3 + value4) * amountCu);
+        }
 
+
+        internal static void HermiteHelper(Scalar amount, out Scalar h1, out Scalar h2, out Scalar h3, out Scalar h4)
+        {
+            Scalar wf2 = amount * amount;
+            Scalar wf3 = wf2 * amount;
+            Scalar wf3t2 = 2 * wf3;
+            Scalar wf2t3 = 3 * wf2;
+            h1 = wf3t2 - wf2t3 + 1;
+            h2 = wf2t3 - wf3t2;
+            h3 = wf3 - 2 * wf2 + amount;
+            h4 = wf3 - wf2;
+        }
+        public static Scalar Hermite(Scalar value1, Scalar tangent1, Scalar value2, Scalar tangent2, Scalar amount)
+        {
+            Scalar result;
+            Hermite(ref value1, ref tangent1, ref value2, ref tangent2, amount, out result);
+            return result;
+        }
+        public static void Hermite(ref  Scalar value1, ref Scalar tangent1, ref Scalar value2, ref Scalar tangent2, Scalar amount, out Scalar result)
+        {
+            Scalar h1, h2, h3, h4;
+            MathHelper.HermiteHelper(amount, out h1, out h2, out h3, out h4);
+            result = h1 * value1 + h2 * value2 + h3 * tangent1 + h4 * tangent2;
+        }
 
         public static Scalar InvSqrt(Scalar number)
         {
@@ -185,7 +228,7 @@ namespace AdvanceMath
         /// </summary>
         /// <param name="degrees"></param>
         /// <returns></returns>
-        public static Scalar DegreesToRadians(Scalar degrees)
+        public static Scalar ToRadians(Scalar degrees)
         {
             return degrees * RADIANS_PER_DEGREE;
         }
@@ -194,29 +237,13 @@ namespace AdvanceMath
         /// </summary>
         /// <param name="radians"></param>
         /// <returns></returns>
-        public static Scalar RadiansToDegrees(Scalar radians)
+        public static Scalar ToDegrees(Scalar radians)
         {
             return radians * DEGREES_PER_RADIAN;
         }
 
         #region System.Math Methods
-        public static Scalar Abs(Scalar value) 
-        {
-            return Math.Abs(value); 
-        }
         public static int Sign(Scalar value) { return Math.Sign(value); }
-        public static Scalar Max(Scalar val1, Scalar val2)
-        {
-            if (val1 > val2) { return val1; }
-            if (Scalar.IsNaN(val1)) { return val1; }
-            return val2;
-        }
-        public static Scalar Min(Scalar val1, Scalar val2)
-        {
-            if (val1 < val2) { return val1; }
-            if (Scalar.IsNaN(val1)) { return val1; }
-            return val2;
-        }
         public static Scalar Acos(Scalar d) { return (Scalar)Math.Acos(d); }
         public static Scalar Asin(Scalar d) { return (Scalar)Math.Asin(d); }
         public static Scalar Atan(Scalar d) { return (Scalar)Math.Atan(d); }

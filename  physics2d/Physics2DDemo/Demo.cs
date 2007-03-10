@@ -35,6 +35,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Physics2DDotNet;
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 using System.Media;
 using Tao.OpenGl;
@@ -54,7 +55,7 @@ namespace Physics2DDemo
         Body bomb;
         Body avatar;
         Body clipper;
-        BoundingBox2DShape clippersShape;
+        RectangleShape clippersShape;
         Vector2D bombTarget;
         float friction = .3f;
 
@@ -271,7 +272,7 @@ namespace Physics2DDemo
             solver.SplitImpulse = true;
             solver.BiasFactor = .7f;
             solver.AllowedPenetration = .1f;
-            //solver.MaxContactCount = 6;
+            //solver.MaxContactCount =8;
             engine.Solver = solver;
 
             engine.BodiesAdded += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesAdded);
@@ -280,7 +281,7 @@ namespace Physics2DDemo
 
         void CreateClipper()
         {
-            clippersShape = new BoundingBox2DShape();
+            clippersShape = new RectangleShape();
             clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0, 0, 0), new Lifespan());
             clipper.IgnoresGravity = true;
             clipper.BroadPhaseDetectionOnly = true;
@@ -460,7 +461,7 @@ namespace Physics2DDemo
         {
             float xmin = 200;
             float xmax = 800;
-            float ymin = 400;
+            float ymin = 500;
             float ymax = 700;
 
             float size = 25;
@@ -489,7 +490,6 @@ namespace Physics2DDemo
             AddGlObject(e);
             engine.AddBody(e);
             return e;
-
         }
         Body AddRectangle(float length, float width, float mass, ALVector2D position)
         {
@@ -933,7 +933,7 @@ namespace Physics2DDemo
                 AddParticles(sparkPoint, 20);
             }
 
-            clippersShape.SetBoundingBox(new BoundingBox2D(width, height, 0, 0));
+            clippersShape.SetRectangle(new BoundingRectangle(width, height, 0, 0));
 
             if (!started)
             {

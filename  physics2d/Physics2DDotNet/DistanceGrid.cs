@@ -34,6 +34,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
@@ -46,7 +47,7 @@ namespace Physics2DDotNet
     {
         Scalar gridSpacing;
         Scalar gridSpacingInv;
-        BoundingBox2D box;
+        BoundingRectangle rect;
         Scalar[][] nodes;
         public DistanceGrid(Shape shape, Scalar spacing)
         {
@@ -56,13 +57,13 @@ namespace Physics2DDotNet
             Matrix2D old = shape.Matrix;
             Matrix2D ident = Matrix2D.Identity;
             shape.ApplyMatrix(ref ident);
-            shape.CalcBoundingBox2D();
+            shape.CalcBoundingRectangle();
 
-            this.box = shape.BoundingBox2D; 
+            this.rect = shape.Rectangle;
             this.gridSpacing = spacing;
             this.gridSpacingInv = 1 / spacing;
-            int xSize = (int)Math.Ceiling((box.Upper.X - box.Lower.X) * gridSpacingInv) + 2;
-            int ySize = (int)Math.Ceiling((box.Upper.Y - box.Lower.Y) * gridSpacingInv) + 2;
+            int xSize = (int)Math.Ceiling((rect.Max.X - rect.Min.X) * gridSpacingInv) + 2;
+            int ySize = (int)Math.Ceiling((rect.Max.Y - rect.Min.Y) * gridSpacingInv) + 2;
 
             this.nodes = new Scalar[xSize][];
             for (int index = 0; index < xSize; ++index)
@@ -70,38 +71,40 @@ namespace Physics2DDotNet
                 this.nodes[index] = new Scalar[ySize];
             }
             Vector2D vector;
-            vector.X = box.Lower.X;
+            vector.X = rect.Min.X;
             for (int x = 0; x < xSize; ++x, vector.X += spacing)
             {
-                vector.Y = box.Lower.Y;
+                vector.Y = rect.Min.Y;
                 for (int y = 0; y < ySize; ++y, vector.Y += spacing)
                 {
-                    nodes[x][ y] = shape.GetDistance(vector);
+                    shape.GetDistance(ref vector, out nodes[x][y]);
                 }
             }
             //restore the shape
             shape.ApplyMatrix(ref old);
-            shape.CalcBoundingBox2D();
+            shape.CalcBoundingRectangle();
         }
         public bool TryGetIntersection(Vector2D vector, out IntersectionInfo result)
         {
-            if (BoundingBox2D.TestIntersection(ref box, ref vector))
+            bool contains;
+            rect.Contains(ref vector,out contains);
+            if (contains)
             {
-                int x = (int)Math.Floor((vector.X - box.Lower.X) * gridSpacingInv);
-                int y = (int)Math.Floor((vector.Y - box.Lower.Y) * gridSpacingInv);
+                int x = (int)Math.Floor((vector.X - rect.Min.X) * gridSpacingInv);
+                int y = (int)Math.Floor((vector.Y - rect.Min.Y) * gridSpacingInv);
 
-                Scalar bottomLeft = nodes[x][ y];
-                Scalar bottomRight = nodes[x + 1][ y];
-                Scalar topLeft = nodes[x][ y + 1];
-                Scalar topRight = nodes[x + 1][ y + 1];
+                Scalar bottomLeft = nodes[x][y];
+                Scalar bottomRight = nodes[x + 1][y];
+                Scalar topLeft = nodes[x][y + 1];
+                Scalar topRight = nodes[x + 1][y + 1];
 
                 if (bottomLeft <= 0 ||
                     bottomRight <= 0 ||
                     topLeft <= 0 ||
                     topRight <= 0)
                 {
-                    Scalar xPercent = (vector.X - (gridSpacing * x + box.Lower.X)) * gridSpacingInv;
-                    Scalar yPercent = (vector.Y - (gridSpacing * y + box.Lower.Y)) * gridSpacingInv;
+                    Scalar xPercent = (vector.X - (gridSpacing * x + rect.Min.X)) * gridSpacingInv;
+                    Scalar yPercent = (vector.Y - (gridSpacing * y + rect.Min.Y)) * gridSpacingInv;
 
                     Scalar top, bottom, distance;
 

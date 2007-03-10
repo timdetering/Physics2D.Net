@@ -108,7 +108,7 @@ namespace AdvanceMath
 
             Scalar angle = MathHelper.Acos(cos);
 
-            if (MathHelper.Abs(angle) < MathHelper.EPSILON)
+            if (Math.Abs(angle) < MathHelper.EPSILON)
             {
                 return quatA;
             }
@@ -311,11 +311,11 @@ namespace AdvanceMath
             }
         }
         [XmlIgnore, SoapIgnore]
-        public Scalar PitchInDegrees { get { return MathHelper.RadiansToDegrees(Pitch); } set { Pitch = MathHelper.DegreesToRadians(value); } }
+        public Scalar PitchInDegrees { get { return MathHelper.ToDegrees(Pitch); } set { Pitch = MathHelper.ToRadians(value); } }
         [XmlIgnore, SoapIgnore]
-        public Scalar YawInDegrees { get { return MathHelper.RadiansToDegrees(Yaw); } set { Yaw = MathHelper.DegreesToRadians(value); } }
+        public Scalar YawInDegrees { get { return MathHelper.ToDegrees(Yaw); } set { Yaw = MathHelper.ToRadians(value); } }
         [XmlIgnore, SoapIgnore]
-        public Scalar RollInDegrees { get { return MathHelper.RadiansToDegrees(Roll); } set { Roll = MathHelper.DegreesToRadians(value); } }
+        public Scalar RollInDegrees { get { return MathHelper.ToDegrees(Roll); } set { Roll = MathHelper.ToRadians(value); } }
 
         [XmlIgnore, SoapIgnore]
         public Scalar Pitch
@@ -381,7 +381,7 @@ namespace AdvanceMath
         {
             Scalar pitch, Yaw, roll;
             ToEulerAngles(out pitch, out Yaw, out roll);
-            return new Vector3D(MathHelper.RadiansToDegrees(pitch), MathHelper.RadiansToDegrees(Yaw), MathHelper.RadiansToDegrees(roll));
+            return new Vector3D(MathHelper.ToDegrees(pitch), MathHelper.ToDegrees(Yaw), MathHelper.ToDegrees(roll));
         }
         public Vector3D ToEulerAngles()
         {
@@ -392,9 +392,9 @@ namespace AdvanceMath
         public void ToEulerAnglesInDegrees(out Scalar pitch, out Scalar Yaw, out Scalar roll)
         {
             ToEulerAngles(out pitch, out Yaw, out roll);
-            pitch = MathHelper.RadiansToDegrees(pitch);
-            Yaw = MathHelper.RadiansToDegrees(Yaw);
-            roll = MathHelper.RadiansToDegrees(roll);
+            pitch = MathHelper.ToDegrees(pitch);
+            Yaw = MathHelper.ToDegrees(Yaw);
+            roll = MathHelper.ToDegrees(roll);
         }
         public void ToEulerAngles(out Scalar pitch, out Scalar Yaw, out Scalar roll)
         {
@@ -432,7 +432,7 @@ namespace AdvanceMath
         }
         public static Quaternion FromEulerAnglesInDegrees(Scalar pitch, Scalar Yaw, Scalar roll)
         {
-            return FromEulerAngles(MathHelper.DegreesToRadians(pitch), MathHelper.DegreesToRadians(Yaw), MathHelper.DegreesToRadians(roll));
+            return FromEulerAngles(MathHelper.ToRadians(pitch), MathHelper.ToRadians(Yaw), MathHelper.ToRadians(roll));
         }
 
         /// <summary>
@@ -704,12 +704,12 @@ namespace AdvanceMath
             // start off With a Zero quat
             Quaternion returnvalue = Quaternion.Zero;
 
-            if (MathHelper.Abs(W) < 1.0f)
+            if (Math.Abs(W) < 1.0f)
             {
                 Scalar angle = MathHelper.Acos(W);
                 Scalar sin = MathHelper.Sin(angle);
 
-                if (MathHelper.Abs(sin) >= MathHelper.EPSILON)
+                if (Math.Abs(sin) >= MathHelper.EPSILON)
                 {
                     Scalar coeff = angle / sin;
                     returnvalue.X = coeff * X;
@@ -745,7 +745,7 @@ namespace AdvanceMath
 
             returnvalue.W = MathHelper.Cos(angle);
 
-            if (MathHelper.Abs(sin) >= MathHelper.EPSILON)
+            if (Math.Abs(sin) >= MathHelper.EPSILON)
             {
                 Scalar coeff = sin / angle;
 

@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
@@ -114,10 +115,34 @@ namespace Physics2DDotNet
                 node = node.Next;
             }
             Vector2D[] result = new Vector2D[list.Count];
-
-
             list.CopyTo(result, 0);
             return result;
+        }
+        /// <summary>
+        /// Reduces a Polygon to the minumum number or vertexes need to represent it.  Does the opposite of Subdivide. 
+        /// </summary>
+        /// <param name="vertexes">The bloated vertex array.</param>
+        /// <param name="minAngle">The minimum allowed angle anything less then or equal will be removed. </param>
+        /// <returns>The reduced vertexes.</returns>
+        public static Vector2D[] Reduce(Vector2D[] vertexes, Scalar minAngle)
+        {
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 2) { throw new ArgumentOutOfRangeException("vertexes"); }
+            if (minAngle < 0) { throw new ArgumentOutOfRangeException("minAngle"); }
+
+            List<Vector2D> list = new List<Vector2D>(vertexes.Length);
+            Scalar lastAngle = (vertexes[0] - vertexes[vertexes.Length-1]).Angle;
+            for (int index = 0; index < vertexes.Length; ++index)
+            {
+                int index2 = (index + 1) % vertexes.Length;
+                Scalar angle = (vertexes[index2] - vertexes[index]).Angle;
+                if (Math.Abs(lastAngle - angle) > minAngle)
+                {
+                    list.Add(vertexes[index]);
+                }
+                lastAngle = angle;
+            }
+            return list.ToArray();
         }
         /// <summary>
         /// Calculates the area of a polygon.
@@ -135,7 +160,7 @@ namespace Physics2DDotNet
                 int pos2 = (pos1 + 1) % length;
                 returnvalue += vertices[pos1] ^ vertices[pos2];
             }
-            return MathHelper.Abs(returnvalue * .5f);
+            return Math.Abs(returnvalue * .5f);
         }
         /// <summary>
         /// Calculates the Centroid of a polygon.
@@ -237,28 +262,26 @@ namespace Physics2DDotNet
         } 
         #endregion
         #region methods
-        public override void CalcBoundingBox2D()
+        public override void CalcBoundingRectangle()
         {
-            BoundingBox2D.FromVectors(vertexes, out boundingBox);
+            BoundingRectangle.FromVectors(vertexes, out rect);
         }
-        public override Scalar GetDistance(Vector2D vector)
+        public override void GetDistance(ref Vector2D point,out Scalar result)
         {
+            result = Scalar.MaxValue;
             Scalar resultAbs = Scalar.MaxValue;
-            Scalar result = Scalar.MaxValue;
             Scalar other, otherABS;
-
             for (int index = 0; index < vertexes.Length; ++index)
             {
                 int index2 = (index + 1) % vertexes.Length;
-                GetDistanceEdge(ref vector, ref vertexes[index], ref vertexes[index2], out other);
-                otherABS = MathHelper.Abs(other);
+                LineSegment.GetDistance(ref vertexes[index], ref vertexes[index2], ref point, out other);
+                otherABS = Math.Abs(other);
                 if (otherABS < resultAbs)
                 {
                     result = other;
                     resultAbs = otherABS;
                 }
             }
-            return result;
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {

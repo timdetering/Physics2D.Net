@@ -163,6 +163,11 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
+            float g = MathHelper.CatmullRom(1, 0, 0, 0, 0);
+
+
+
+
 
             //Console.WriteLine(Math.Floor(1.1));
 

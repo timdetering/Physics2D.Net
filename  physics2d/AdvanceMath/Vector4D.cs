@@ -168,17 +168,6 @@ namespace AdvanceMath
             result.W = (right.W - left.W) * amount.W + left.W;
         }
 
-
-        public static Vector4D FromArray(Scalar[] array)
-        {
-            return FromArray(array, 0);
-        }
-        public static Vector4D FromArray(Scalar[] array, int index)
-        {
-            Vector4D result;
-            Copy(array, index, out result);
-            return result;
-        }
         /// <summary>
         /// Adds 2 Vectors2Ds.
         /// </summary>
@@ -571,6 +560,81 @@ namespace AdvanceMath
             return result;
         }
 
+        public static Vector4D CatmullRom( Vector4D value1,  Vector4D value2,  Vector4D value3,  Vector4D value4, Scalar amount)
+        {
+            Vector4D result;
+            CatmullRom(ref value1, ref value2, ref value3, ref value4, amount, out result);
+            return result;
+        }
+        public static void CatmullRom(ref Vector4D value1, ref Vector4D value2, ref Vector4D value3, ref Vector4D value4, Scalar amount, out Vector4D result)
+        {
+            Scalar amountSq = amount * amount;
+            Scalar amountCu = amountSq * amount;
+            result.X =
+                0.5f * ((2 * value2.X) +
+                (-value1.X + value3.X) * amount +
+                (2 * value1.X - 5 * value2.X + 4 * value3.X - value4.X) * amountSq +
+                (-value1.X + 3 * value2.X - 3 * value3.X + value4.X) * amountCu);
+            result.Y =
+                0.5f * ((2 * value2.Y) +
+                (-value1.Y + value3.Y) * amount +
+                (2 * value1.Y - 5 * value2.Y + 4 * value3.Y - value4.Y) * amountSq +
+                (-value1.Y + 3 * value2.Y - 3 * value3.Y + value4.Y) * amountCu);
+            result.Z =
+                0.5f * ((2 * value2.Z) +
+                (-value1.Z + value3.Z) * amount +
+                (2 * value1.Z - 5 * value2.Z + 4 * value3.Z - value4.Z) * amountSq +
+                (-value1.Z + 3 * value2.Z - 3 * value3.Z + value4.Z) * amountCu);
+            result.W =
+                0.5f * ((2 * value2.W) +
+                (-value1.W + value3.W) * amount +
+                (2 * value1.W - 5 * value2.W + 4 * value3.W - value4.W) * amountSq +
+                (-value1.W + 3 * value2.W - 3 * value3.W + value4.W) * amountCu);
+        }
+
+        public static Vector4D Max(Vector4D value1, Vector4D value2)
+        {
+            Vector4D result;
+            Max(ref value1, ref value2, out result);
+            return result;
+        }
+        public static void Max(ref Vector4D value1,ref Vector4D value2,out Vector4D result)
+        {
+            result.X = (value1.X < value2.X) ? (value2.X) : (value1.X);
+            result.Y = (value1.Y < value2.Y) ? (value2.Y) : (value1.Y);
+            result.Z = (value1.Z < value2.Z) ? (value2.Z) : (value1.Z);
+            result.W = (value1.W < value2.W) ? (value2.W) : (value1.W);
+        }
+
+        public static Vector4D Min(Vector4D value1, Vector4D value2)
+        {
+            Vector4D result;
+            Min(ref value1, ref value2, out result);
+            return result;
+        }
+        public static void Min(ref Vector4D value1, ref Vector4D value2, out Vector4D result)
+        {
+            result.X = (value1.X > value2.X) ? (value2.X) : (value1.X);
+            result.Y = (value1.Y > value2.Y) ? (value2.Y) : (value1.Y);
+            result.Z = (value1.Z > value2.Z) ? (value2.Z) : (value1.Z);
+            result.W = (value1.W > value2.W) ? (value2.W) : (value1.W);
+        }
+
+        public static Vector4D Hermite(Vector4D value1, Vector4D tangent1, Vector4D value2, Vector4D tangent2, Scalar amount)
+        {
+            Vector4D result;
+            Hermite(ref value1, ref tangent1, ref value2, ref tangent2, amount, out result);
+            return result;
+        }
+        public static void Hermite(ref  Vector4D value1, ref Vector4D tangent1, ref Vector4D value2, ref Vector4D tangent2, Scalar amount, out Vector4D result)
+        {
+            Scalar h1, h2, h3, h4;
+            MathHelper.HermiteHelper(amount, out h1, out h2, out h3, out h4);
+            result.X = h1 * value1.X + h2 * value2.X + h3 * tangent1.X + h4 * tangent2.X;
+            result.Y = h1 * value1.Y + h2 * value2.Y + h3 * tangent1.Y + h4 * tangent2.Y;
+            result.Z = h1 * value1.Z + h2 * value2.Z + h3 * tangent1.Z + h4 * tangent2.Z;
+            result.W = h1 * value1.W + h2 * value2.W + h3 * tangent1.W + h4 * tangent2.W;
+        }
 
         #endregion
         #region fields

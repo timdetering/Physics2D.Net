@@ -5,6 +5,8 @@ changed: ApplyMatrix to use MathHelper.ClampAngle instead of its own logic.
 Removed: The BiasMultiplier from the PreApply method in Arbiter.
 changed: The SequentialImpulsesSolver.Arbiter to have a reference to the SequentialImpulsesSolver containing it.
 changed: The SequentialImpulsesSolver.Arbiter to use the values in the SequentialImpulsesSolver instead of having the values passed to it.
+Added: Reduce Method to Polygon.
+renamed: BoundingBox2D to BoundingRectangle and moved it to the AdvanceMath.Geometry2D namespace.
 
 AdvanceMath
 NEXT VERSION:
@@ -14,7 +16,14 @@ Renamed: RadianMin to ClampAngle
 Changed: ClampAngle's logic to not use loops.
 renamed: GetAngleDifference to AngleSubtract.
 Changed: AngleSubtract's logic to be better.
-
+renamed: RadainsToDegrees to ToDegrees
+renamed: DegreesToRadains to ToRadains
+changed: Vector2D angle methods/properties to use pass by reference versions.
+added: Hermite and catmullRom to all the vector classes using the code in Vector2D.
+added: Max and Min to all vector classes.
+Removed: FromArray methods from all the Vector Classes since they were redundent.
+removed: some unneeded wrapper methods from MathHelper.
+Added: Geometry2D namespace and contained classes.
 
 Physics2D.Net
 1.2.0.0:

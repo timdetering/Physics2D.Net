@@ -75,21 +75,20 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-        public override void CalcBoundingBox2D()
+        public override void CalcBoundingRectangle()
         {
-            boundingBox.Upper = vertexes[0];
-            boundingBox.Lower = vertexes[0];
+            rect.Max = vertexes[0];
+            rect.Min = vertexes[0];
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {
             throw new NotSupportedException();
         }
-        public override Scalar GetDistance(Vector2D vector)
+        public override void GetDistance(ref Vector2D point,out Scalar result)
         {
-            Vector2D.Subtract(ref vector, ref vertexes[0], out vector);
-            Scalar result;
-            Vector2D.GetMagnitude(ref vector, out result);
-            return result;
+            Vector2D temp;
+            Vector2D.Subtract(ref point, ref vertexes[0], out temp);
+            Vector2D.GetMagnitude(ref temp, out result);
         }
         public override Shape Duplicate()
         {
