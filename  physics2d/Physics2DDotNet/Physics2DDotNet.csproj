@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="Collections\ImplicitCastCollection.cs" />
     <Compile Include="DataTypes\CollectionEventArgs.cs" />
+    <Compile Include="DataTypes\MassInfo.cs" />
     <Compile Include="DataTypes\RemovedEventArgs.cs" />
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Joints\HingeJoint.cs" />
@@ -54,7 +55,6 @@
     <Compile Include="DataTypes\IntersectionInfo.cs" />
     <Compile Include="Joints\Joint.cs" />
     <Compile Include="Lifespan.cs" />
-    <Compile Include="DataTypes\MassInertia.cs" />
     <Compile Include="DataTypes\PairID.cs" />
     <Compile Include="PhysicsEngine.cs" />
     <Compile Include="Body.cs" />
