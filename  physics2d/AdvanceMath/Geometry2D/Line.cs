@@ -30,17 +30,21 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
-    [Serializable]
-    public struct Line
+    [StructLayout(LayoutKind.Sequential, Size = Line.Size, Pack = 0), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Line>))]
+    [AdvBrowsableOrder("Normal,D")]
+    public struct Line : IEquatable<Line>
     {
+        public const int Size = sizeof(Scalar) + Vector2D.Size;
+        [AdvBrowsable]
         public Vector2D Normal;
+        [AdvBrowsable]
         public Scalar D;
+        [InstanceConstructor("Normal,D")]
         public Line(Vector2D normal, Scalar d)
         {
             this.Normal = normal;
@@ -136,6 +140,42 @@ namespace AdvanceMath.Geometry2D
                     break;
                 }
             }
+        }
+
+
+        public override string ToString()
+        {
+            return string.Format("N: {0} D: {1}", Normal, D);
+        }
+        public override int GetHashCode()
+        {
+            return Normal.GetHashCode() ^ D.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            return obj is Line && Equals((Line)obj);
+        }
+        public bool Equals(Line other)
+        {
+            return Equals(ref this, ref other);
+        }
+        public static bool Equals(Line line1, Line line2)
+        {
+            return Equals(ref line1, ref line2);
+        }
+        [CLSCompliant(false)]
+        public static bool Equals(ref Line line1, ref Line line2)
+        {
+            return Vector2D.Equals(ref line1.Normal, ref line2.Normal) && line1.D == line2.D;
+        }
+
+        public static bool operator ==(Line line1, Line line2)
+        {
+            return Equals(ref line1, ref line2);
+        }
+        public static bool operator !=(Line line1, Line line2)
+        {
+            return !Equals(ref line1, ref line2);
         }
     }
 }

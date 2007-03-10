@@ -31,9 +31,7 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {

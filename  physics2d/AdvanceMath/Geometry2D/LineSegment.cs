@@ -30,15 +30,17 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
-    [Serializable]
-    public struct LineSegment
+    [StructLayout(LayoutKind.Sequential, Size = LineSegment.Size, Pack = 0), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<LineSegment>))]
+    [AdvBrowsableOrder("Vertex1,Vertex2")]
+    public struct LineSegment : IEquatable<LineSegment>
     {
+        public const int Size =  Vector2D.Size*2;
+
         public static void Intersects(ref Vector2D vertex1, ref Vector2D vertex2, ref Ray ray, out Scalar result)
         {
             Vector2D tanget, normal;
@@ -100,9 +102,12 @@ namespace AdvanceMath.Geometry2D
             }
         }
 
+        [AdvBrowsable]
         public Vector2D Vertex1;
+        [AdvBrowsable]
         public Vector2D Vertex2;
 
+        [InstanceConstructor("Vertex1,Vertex2")]
         public LineSegment(Vector2D vertex1, Vector2D vertex2)
         {
             this.Vertex1 = vertex1;
@@ -123,6 +128,43 @@ namespace AdvanceMath.Geometry2D
         public void Intersects(ref Ray ray, out Scalar result)
         {
             Intersects(ref Vertex1, ref Vertex2, ref ray, out result);
+        }
+
+
+
+        public override string ToString()
+        {
+            return string.Format("V1: {0} V2: {1}", Vertex1, Vertex2);
+        }
+        public override int GetHashCode()
+        {
+            return Vertex1.GetHashCode() ^ Vertex2.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            return obj is LineSegment && Equals((LineSegment)obj);
+        }
+        public bool Equals(LineSegment other)
+        {
+            return Equals(ref this, ref other);
+        }
+        public static bool Equals(LineSegment line1, LineSegment line2)
+        {
+            return Equals(ref line1, ref line2);
+        }
+        [CLSCompliant(false)]
+        public static bool Equals(ref LineSegment line1, ref LineSegment line2)
+        {
+            return Vector2D.Equals(ref line1.Vertex1, ref line2.Vertex1) && Vector2D.Equals(ref line1.Vertex2, ref line2.Vertex2);
+        }
+
+        public static bool operator ==(LineSegment line1, LineSegment line2)
+        {
+            return Equals(ref line1, ref line2);
+        }
+        public static bool operator !=(LineSegment line1, LineSegment line2)
+        {
+            return !Equals(ref line1, ref line2);
         }
     }
 }
