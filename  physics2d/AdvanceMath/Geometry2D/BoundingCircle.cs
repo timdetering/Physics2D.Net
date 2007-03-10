@@ -43,6 +43,22 @@ namespace AdvanceMath.Geometry2D
     {
         public const int Size = Vector2D.Size + sizeof(Scalar);
 
+        public static BoundingCircle FromRectangle(BoundingRectangle rect)
+        {
+            BoundingCircle result;
+            FromRectangle(ref rect, out result);
+            return result;
+        }
+        public static void FromRectangle(ref BoundingRectangle rect, out BoundingCircle result)
+        {
+            result.Position.X = (rect.Min.X + rect.Max.X) * .5f;
+            result.Position.Y = (rect.Min.Y + rect.Max.Y) * .5f;
+            Scalar xRadius = (rect.Max.X - rect.Min.X) * .5f;
+            Scalar yRadius = (rect.Max.Y - rect.Min.Y) * .5f;
+            result.Radius = MathHelper.Sqrt(xRadius * xRadius + yRadius * yRadius);
+        }
+
+
         [AdvBrowsable]
         public Vector2D Position;
         [AdvBrowsable]

@@ -32,6 +32,7 @@ using Scalar = System.Single;
 using System;
 using System.Runtime.Serialization;
 using AdvanceMath;
+using AdvanceMath.Design;
 using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
@@ -41,8 +42,11 @@ namespace Physics2DDotNet
     /// This class Stores mass information and Moment of Inertia Together since they are very closly related.
     /// </summary>
     [Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>))]
+    [AdvBrowsableOrder("Mass,MomentofInertia")]
     public sealed class MassInfo : IDeserializationCallback
     {
+
         #region static methods
         public static MassInfo FromCylindricalShell(Scalar mass, Scalar radius)
         {
@@ -104,6 +108,7 @@ namespace Physics2DDotNet
         #endregion
         #region constructors
         public MassInfo() { }
+        [InstanceConstructor("Mass,MomentofInertia")]
         public MassInfo(Scalar mass, Scalar momentOfInertia)
         {
             this.MomentofInertia = momentOfInertia;
@@ -111,6 +116,7 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+        [AdvBrowsable]
         public Scalar Mass
         {
             get
@@ -124,7 +130,7 @@ namespace Physics2DDotNet
                 this.accelerationDueToGravity = value * PhysicsHelper.GravitationalConstant;
             }
         }
-
+        [AdvBrowsable]
         public Scalar MomentofInertia
         {
             get
@@ -137,7 +143,6 @@ namespace Physics2DDotNet
                 this.momentofInertiaInv = 1 / value;
             }
         }
-        [System.ComponentModel.Browsable(false)]
         public Scalar MassInv
         {
             get
@@ -145,7 +150,6 @@ namespace Physics2DDotNet
                 return massInv;
             }
         }
-        [System.ComponentModel.Browsable(false)]
         public Scalar MomentofInertiaInv
         {
             get
@@ -153,7 +157,6 @@ namespace Physics2DDotNet
                 return momentofInertiaInv;
             }
         }
-        [System.ComponentModel.Browsable(false)]
         public Scalar AccelerationDueToGravity
         {
             get

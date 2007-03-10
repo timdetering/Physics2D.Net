@@ -7,6 +7,7 @@ changed: The SequentialImpulsesSolver.Arbiter to have a reference to the Sequent
 changed: The SequentialImpulsesSolver.Arbiter to use the values in the SequentialImpulsesSolver instead of having the values passed to it.
 Added: Reduce Method to Polygon.
 renamed: BoundingBox2D to BoundingRectangle and moved it to the AdvanceMath.Geometry2D namespace.
+added: TypeConverter attribuites to PhysicsState and MassInfo
 
 AdvanceMath
 NEXT VERSION:
@@ -24,6 +25,7 @@ added: Max and Min to all vector classes.
 Removed: FromArray methods from all the Vector Classes since they were redundent.
 removed: some unneeded wrapper methods from MathHelper.
 Added: Geometry2D namespace and contained classes.
+
 
 Physics2D.Net
 1.2.0.0:

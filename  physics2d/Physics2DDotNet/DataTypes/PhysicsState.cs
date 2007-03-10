@@ -31,6 +31,7 @@ using Scalar = System.Single;
 #endif
 using Physics2DDotNet.Math2D;
 using AdvanceMath;
+using AdvanceMath.Design;
 using System;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
@@ -39,15 +40,19 @@ namespace Physics2DDotNet
     /// <summary>
     /// This class holds the variables usually changed mulitple times  each update like the postion of an object.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential), Serializable]
+    [StructLayout(LayoutKind.Sequential, Size = PhysicsState.Size, Pack = 0), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<PhysicsState>))]
+    [AdvBrowsableOrder("Position,Velocity,Acceleration,ForceAccumulator")]
     public sealed class PhysicsState
     {
+        public const int Size = ALVector2D.Size * 4;
         /// <summary>
         /// This is Position and Orientation.
         /// </summary>
         /// <remarks>
         /// <seealso href="http://en.wikipedia.org/wiki/Position"/>
         /// </remarks>
+        [AdvBrowsable]
         public ALVector2D Position;
         /// <summary>
         /// Angular and Linear Velocity.
@@ -55,6 +60,7 @@ namespace Physics2DDotNet
         /// <remarks>
         /// <seealso href="http://en.wikipedia.org/wiki/Velocity"/>
         /// </remarks>
+        [AdvBrowsable]
         public ALVector2D Velocity;
         /// <summary>
         /// Angular and Linear Acceleration.
@@ -63,6 +69,7 @@ namespace Physics2DDotNet
         /// <seealso href="http://en.wikipedia.org/wiki/Acceleration"/>
         /// </remarks>
         [NonSerialized]
+        [AdvBrowsable]
         public ALVector2D Acceleration;
         /// <summary>
         /// Torque and Force
@@ -72,6 +79,7 @@ namespace Physics2DDotNet
         /// <seealso href="http://en.wikipedia.org/wiki/Force"/>
         /// </remarks>
         [NonSerialized]
+        [AdvBrowsable]
         public ALVector2D ForceAccumulator;
         public PhysicsState()
         {

@@ -183,6 +183,19 @@ namespace AdvanceMath.Geometry2D
             result.Min.Y = MathHelper.Max(first.Min.Y, second.Min.Y);
         }
 
+        public static BoundingRectangle FromCircle(BoundingCircle circle)
+        {
+            BoundingRectangle result;
+            FromCircle(ref circle, out result);
+            return result;
+        }
+        public static void FromCircle(ref BoundingCircle circle,out BoundingRectangle result)
+        {
+            result.Max.X = circle.Position.X + circle.Radius;
+            result.Max.Y = circle.Position.Y + circle.Radius;
+            result.Min.X = circle.Position.X - circle.Radius;
+            result.Min.Y = circle.Position.Y - circle.Radius;
+        }
 
         [AdvBrowsable]
         public Vector2D Max;
