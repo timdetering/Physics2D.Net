@@ -112,12 +112,11 @@ namespace AdvanceMath.Geometry2D
         {
             if (vectors == null) { throw new ArgumentNullException("vectors"); }
             if (vectors.Length == 0) { throw new ArgumentOutOfRangeException("vectors"); }
-            int length = vectors.Length;
             result.Max = vectors[0];
             result.Min = vectors[0];
-            for (int pos = 1; pos < length; ++pos)
+            for (int index = 1; index < vectors.Length; ++index)
             {
-                Vector2D current = vectors[pos];
+                Vector2D current = vectors[index];
                 if (current.X > result.Max.X)
                 {
                     result.Max.X = current.X;
@@ -130,7 +129,7 @@ namespace AdvanceMath.Geometry2D
                 {
                     result.Max.Y = current.Y;
                 }
-                else if (vectors[pos].Y < result.Min.Y)
+                else if (current.Y < result.Min.Y)
                 {
                     result.Min.Y = current.Y;
                 }
@@ -145,18 +144,14 @@ namespace AdvanceMath.Geometry2D
         public static BoundingRectangle FromUnion(BoundingRectangle first, BoundingRectangle second)
         {
             BoundingRectangle result;
-            result.Max.X = MathHelper.Max(first.Max.X, second.Max.X);
-            result.Max.Y = MathHelper.Max(first.Max.Y, second.Max.Y);
-            result.Min.X = MathHelper.Min(first.Min.X, second.Min.X);
-            result.Min.Y = MathHelper.Min(first.Min.Y, second.Min.Y);
+            Vector2D.Max(ref first.Max, ref second.Max, out result.Max);
+            Vector2D.Min(ref first.Min, ref second.Min, out result.Min);
             return result;
         }
         public static void FromUnion(ref BoundingRectangle first, ref BoundingRectangle second, out BoundingRectangle result)
         {
-            result.Max.X = MathHelper.Max(first.Max.X, second.Max.X);
-            result.Max.Y = MathHelper.Max(first.Max.Y, second.Max.Y);
-            result.Min.X = MathHelper.Min(first.Min.X, second.Min.X);
-            result.Min.Y = MathHelper.Min(first.Min.Y, second.Min.Y);
+            Vector2D.Max(ref first.Max, ref second.Max, out result.Max);
+            Vector2D.Min(ref first.Min, ref second.Min, out result.Min);
         }
         /// <summary>
         /// Makes a BoundingRectangle that contains the area where the BoundingRectangles Intersect.
@@ -167,18 +162,14 @@ namespace AdvanceMath.Geometry2D
         public static BoundingRectangle FromIntersection(BoundingRectangle first, BoundingRectangle second)
         {
             BoundingRectangle result;
-            result.Max.X = MathHelper.Min(first.Max.X, second.Max.X);
-            result.Max.Y = MathHelper.Min(first.Max.Y, second.Max.Y);
-            result.Min.X = MathHelper.Max(first.Min.X, second.Min.X);
-            result.Min.Y = MathHelper.Max(first.Min.Y, second.Min.Y);
+            Vector2D.Min(ref first.Max, ref second.Max, out result.Max);
+            Vector2D.Max(ref first.Min, ref second.Min, out result.Min);
             return result;
         }
         public static void FromIntersection(ref BoundingRectangle first, ref BoundingRectangle second, out BoundingRectangle result)
         {
-            result.Max.X = MathHelper.Min(first.Max.X, second.Max.X);
-            result.Max.Y = MathHelper.Min(first.Max.Y, second.Max.Y);
-            result.Min.X = MathHelper.Max(first.Min.X, second.Min.X);
-            result.Min.Y = MathHelper.Max(first.Min.Y, second.Min.Y);
+            Vector2D.Min(ref first.Max, ref second.Max, out result.Max);
+            Vector2D.Max(ref first.Min, ref second.Min, out result.Min);
         }
 
         public static BoundingRectangle FromCircle(BoundingCircle circle)
@@ -290,6 +281,7 @@ namespace AdvanceMath.Geometry2D
         }
         public bool Intersects(BoundingPolygon polygon)
         {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
             bool result;
             polygon.Intersects(ref this, out result);
             return result;
@@ -372,6 +364,7 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingPolygon polygon, out bool result)
         {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
             polygon.Intersects(ref this, out result);
         }
         public void Intersects(ref Line line, out bool result)

@@ -124,6 +124,7 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingPolygon polygon, out bool result)
         {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
             Vector2D[] vertexes = polygon.Vertexes;
             Scalar distance;
             GetDistance(ref  vertexes[0], out distance);

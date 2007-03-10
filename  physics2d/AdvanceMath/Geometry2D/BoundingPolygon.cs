@@ -64,6 +64,8 @@ namespace AdvanceMath.Geometry2D
         Vector2D[] vertexes;
         public BoundingPolygon(Vector2D[] vertexes)
         {
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
             this.vertexes = vertexes;
         }
         public Vector2D[] Vertexes
@@ -163,6 +165,7 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingPolygon polygon, out bool result)
         {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
             result = Intersects(polygon.vertexes, vertexes) || Intersects(vertexes, polygon.vertexes);
         }
     }

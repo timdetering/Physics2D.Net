@@ -80,10 +80,12 @@ namespace AdvanceMath.Geometry2D
         }
         public Scalar Intersects(BoundingPolygon polygon)
         {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
             Scalar result;
             polygon.Intersects(ref this, out result);
             return result;
         }
+
         public void Intersects(ref BoundingRectangle rect, out Scalar result)
         {
             rect.Intersects(ref this, out result);
@@ -102,10 +104,9 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingPolygon polygon, out Scalar result)
         {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
             polygon.Intersects(ref this, out result);
         }
-
-
 
         public override string ToString()
         {
