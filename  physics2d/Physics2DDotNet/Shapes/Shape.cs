@@ -213,18 +213,20 @@ namespace Physics2DDotNet
         #endregion
     }
 
+    /// <summary>
+    /// A shape whose BoundingRectangle is manualy Set and will not change, unless manualy changed.
+    /// </summary>
     [Serializable]
     public sealed class RectangleShape : Shape
     {
-
-        public override bool CanGetIntersection
-        {
-            get { return false; }
-        }
         public RectangleShape()
             : base(new Vector2D[0])
         {
-
+            this.inertiaMultiplier = Scalar.PositiveInfinity;
+        }
+        public override bool CanGetIntersection
+        {
+            get { return false; }
         }
         public void SetRectangle(BoundingRectangle rectangle)
         {
@@ -238,7 +240,7 @@ namespace Physics2DDotNet
         }
         public override void GetDistance(ref Vector2D point,out Scalar result)
         {
-            throw new NotSupportedException();
+            rect.GetDistance(ref point, out result);
         }
         public override Shape Duplicate()
         {

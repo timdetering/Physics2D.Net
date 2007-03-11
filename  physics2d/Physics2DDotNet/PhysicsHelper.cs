@@ -101,11 +101,11 @@ namespace Physics2DDotNet
             out Vector2D result)
         {
             result.X =
-                (-velocity2.Angular * point2.Y + velocity2.Linear.X) -
-                (-velocity1.Angular * point1.Y + velocity1.Linear.X);
+                (velocity2.Linear.X - velocity2.Angular * point2.Y) -
+                (velocity1.Linear.X - velocity1.Angular * point1.Y);
             result.Y =
-                (velocity2.Angular * point2.X + velocity2.Linear.Y) -
-                (velocity1.Angular * point1.X + velocity1.Linear.Y);
+                (velocity2.Linear.Y + velocity2.Angular * point2.X) -
+                (velocity1.Linear.Y + velocity1.Angular * point1.X);
         }
 
 

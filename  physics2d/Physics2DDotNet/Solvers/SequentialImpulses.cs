@@ -541,9 +541,9 @@ namespace Physics2DDotNet.Solvers
                     empty.Add(pair.Key);
                 }
             }
-            foreach (long key in empty)
+            for (int index = 0; index < empty.Count; ++index)
             {
-                arbiters.Remove(key);
+                arbiters.Remove(empty[index]);
             }
         }
 
@@ -557,36 +557,37 @@ namespace Physics2DDotNet.Solvers
             Detect(dt);
             RemoveEmpty();
             this.Engine.RunLogic(dt);
-            foreach (SequentialImpulsesTag tag in tags)
+            for (int index = 0; index < tags.Count; ++index)
             {
+                SequentialImpulsesTag tag = tags[index];
                 tag.biasVelocity = ALVector2D.Zero;
                 tag.body.UpdateVelocity(dt);
             }
 
-            int ArbCount = arbiters.Count;
-            Arbiter[] arbs = new Arbiter[ArbCount];
+            Arbiter[] arbs = new Arbiter[arbiters.Count];
             arbiters.Values.CopyTo(arbs, 0);
-            for (int index = 0; index < ArbCount; ++index)
+            for (int index = 0; index < arbs.Length; ++index)
             {
                 arbs[index].PreApply(dtInv);
             }
-            foreach (ISequentialImpulsesJoint joint in siJoints)
+            for (int index = 0; index < siJoints.Count; ++index)
             {
-                joint.PreStep(dtInv);
+                siJoints[index].PreStep(dtInv);
             }
             for (int i = 0; i < iterations; ++i)
             {
-                for (int index = 0; index < ArbCount; ++index)
+                for (int index = 0; index < arbs.Length; ++index)
                 {
                     arbs[index].Apply();
                 }
-                foreach (ISequentialImpulsesJoint joint in siJoints)
+                for (int index = 0; index < siJoints.Count; ++index)
                 {
-                    joint.ApplyImpulse();
+                    siJoints[index].ApplyImpulse();
                 }
             }
-            foreach (SequentialImpulsesTag tag in tags)
+            for (int index = 0; index < tags.Count; ++index)
             {
+                SequentialImpulsesTag tag = tags[index];
                 if (splitImpulse)
                 {
                     tag.body.UpdatePosition(dt, ref tag.biasVelocity);
@@ -603,17 +604,18 @@ namespace Physics2DDotNet.Solvers
             // Super-duper position correction.
             for (int outerIter = 0; outerIter < superDuperPositionCorrectionIterations; ++outerIter)
             {
-                foreach (SequentialImpulsesTag tag in tags)
+                for (int index = 0; index < tags.Count; ++index)
                 {
+                    SequentialImpulsesTag tag = tags[index];
                     if (tag.splitImpulsesJointsAttached > 0)
                     {
                         tag.biasVelocity = ALVector2D.Zero;
                     }
                 }
 
-
-                foreach (ISequentialImpulsesJoint joint in siJoints)
+                for (int index = 0; index < siJoints.Count; ++index)
                 {
+                    ISequentialImpulsesJoint joint = siJoints[index];
                     if (joint.SplitImpulse)
                     {
                         joint.PrePositionStep();
@@ -622,16 +624,18 @@ namespace Physics2DDotNet.Solvers
 
                 for (int i = 0; i < iterations; ++i)
                 {
-                    foreach (ISequentialImpulsesJoint joint in siJoints)
+                    for (int index = 0; index < siJoints.Count; ++index)
                     {
+                        ISequentialImpulsesJoint joint = siJoints[index];
                         if (joint.SplitImpulse)
                         {
                             joint.ApplyPositionImpulse();
                         }
                     }
                 }
-                foreach (SequentialImpulsesTag tag in tags)
+                for (int index = 0; index < tags.Count; ++index)
                 {
+                    SequentialImpulsesTag tag = tags[index];
                     if (tag.splitImpulsesJointsAttached > 0)
                     {
                         ALVector2D.Add(ref tag.body.State.Position, ref tag.biasVelocity, out tag.body.State.Position);

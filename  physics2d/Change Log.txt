@@ -9,6 +9,7 @@ Added: Reduce Method to Polygon.
 renamed: BoundingBox2D to BoundingRectangle and moved it to the AdvanceMath.Geometry2D namespace.
 added: TypeConverter attribuites to PhysicsState and MassInfo
 removed: System.Data from reference list.
+replaced: most of the foreach loops in SequentialImpulsesSolver.Solve with normal for loops
 
 AdvanceMath
 NEXT VERSION:
