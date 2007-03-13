@@ -266,7 +266,7 @@ namespace Physics2DDotNet.Solvers
 
                     if (parent.positionCorrection)
                     {
-                        c.bias = -parent.biasFactor * dtInv * MathHelper.Min(0.0f, c.distance + parent.allowedPenetration);
+                        c.bias = -parent.biasFactor * dtInv * Math.Min(0.0f, c.distance + parent.allowedPenetration);
                     }
                     else
                     {
@@ -296,15 +296,21 @@ namespace Physics2DDotNet.Solvers
                     }
                     // Initialize bias impulse to zero.
                     c.Pnb = 0;
-
-                    // sets up the restitution
-                    Scalar vn;
-                    Vector2D rv;
-                    PhysicsHelper.GetRelativeVelocity(
-                        ref body1.State.Velocity, ref body2.State.Velocity,
-                        ref c.r1, ref c.r2, out rv);
-                    Vector2D.Dot(ref c.normal, ref rv, out vn);
-                    c.restitution = -vn * this.restitution;
+                    if (this.restitution == 0)
+                    {
+                        c.restitution = 0;
+                    }
+                    else
+                    {
+                        // sets up the restitution
+                        Scalar vn;
+                        Vector2D rv;
+                        PhysicsHelper.GetRelativeVelocity(
+                            ref body1.State.Velocity, ref body2.State.Velocity,
+                            ref c.r1, ref c.r2, out rv);
+                        Vector2D.Dot(ref c.normal, ref rv, out vn);
+                        c.restitution = -vn * this.restitution;
+                    }
                 }
             }
             public void Apply()
@@ -392,7 +398,7 @@ namespace Physics2DDotNet.Solvers
 
                         Scalar dPnb = c.massNormal * (-vnb + c.bias);
                         Scalar Pnb0 = c.Pnb;
-                        c.Pnb = MathHelper.Max(Pnb0 + dPnb, 0.0f);
+                        c.Pnb = Math.Max(Pnb0 + dPnb, 0.0f);
                         dPnb = c.Pnb - Pnb0;
 
                         Vector2D Pb;

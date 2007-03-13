@@ -286,9 +286,6 @@ namespace Physics2DDemo
             clipper.Updated += new EventHandler<UpdatedEventArgs>(clipper_Updated);
         }
 
-
-
-
         void CreateBomb()
         {
             bomb = new Body(new PhysicsState(),
@@ -499,7 +496,7 @@ namespace Physics2DDemo
             Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(length, width);
             vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (length + width) / 4);
 
-            Shape boxShape = new Physics2DDotNet.Polygon(vertices, MathHelper.Min(length, width) / 2);
+            Shape boxShape = new Physics2DDotNet.Polygon(vertices, Math.Min(length, width) / 2);
             Body e =
                 new Body(
                      new PhysicsState(position),
