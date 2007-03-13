@@ -44,7 +44,6 @@ namespace Physics2DDotNet.Solvers
 
     sealed class SequentialImpulsesTag
     {
-        public int splitImpulsesJointsAttached;
         public ALVector2D biasVelocity;
         public Body body;
         public SequentialImpulsesTag(Body body)
@@ -68,6 +67,7 @@ namespace Physics2DDotNet.Solvers
             public Scalar massNormal;
             public Scalar massTangent;
             public Scalar bias;
+            public Scalar restitution;
 
 
             public Vector2D r1;
@@ -143,7 +143,7 @@ namespace Physics2DDotNet.Solvers
                 }
             }
 
-            static int CompareContacts(Contact c1,Contact c2)
+            static int CompareContacts(Contact c1, Contact c2)
             {
                 return c1.distance.CompareTo(c2.distance);
             }
@@ -154,28 +154,30 @@ namespace Physics2DDotNet.Solvers
             SequentialImpulsesTag tag2;
 
             SequentialImpulsesSolver parent;
+            Scalar restitution;
 
             Scalar friction;
             bool updated = false;
-            public Arbiter(SequentialImpulsesSolver parent,Body entity1, Body entity2)
+            public Arbiter(SequentialImpulsesSolver parent, Body body1, Body body2)
             {
-                if (entity1.ID < entity2.ID)
+                if (body1.ID < body2.ID)
                 {
-                    this.body1 = entity1;
-                    this.body2 = entity2;
-                    this.tag1 = (SequentialImpulsesTag)entity1.SolverTag;
-                    this.tag2 = (SequentialImpulsesTag)entity2.SolverTag;
+                    this.body1 = body1;
+                    this.body2 = body2;
+                    this.tag1 = (SequentialImpulsesTag)body1.SolverTag;
+                    this.tag2 = (SequentialImpulsesTag)body2.SolverTag;
                 }
                 else
                 {
-                    this.body1 = entity2;
-                    this.body2 = entity1;
-                    this.tag1 = (SequentialImpulsesTag)entity2.SolverTag;
-                    this.tag2 = (SequentialImpulsesTag)entity1.SolverTag;
+                    this.body1 = body2;
+                    this.body2 = body1;
+                    this.tag1 = (SequentialImpulsesTag)body2.SolverTag;
+                    this.tag2 = (SequentialImpulsesTag)body1.SolverTag;
                 }
                 this.friction = MathHelper.Sqrt(
                     this.body1.Coefficients.DynamicFriction *
                     this.body2.Coefficients.DynamicFriction);
+                this.restitution = body1.Coefficients.Restitution * body2.Coefficients.Restitution;
                 this.parent = parent;
             }
             public bool Updated
@@ -207,8 +209,12 @@ namespace Physics2DDotNet.Solvers
                             Contact oldcontact = contacts.Find(delegate(Contact old) { return old.id == contact.id; });
                             if (oldcontact != null)
                             {
-                                contact.Pn = oldcontact.Pn;
-                                contact.Pt = oldcontact.Pt;
+                                if (parent.warmStarting)
+                                {
+                                    contact.Pn = oldcontact.Pn;
+                                    contact.Pt = oldcontact.Pt;
+                                    contact.Pnb = oldcontact.Pnb;
+                                }
                             }
                             mergedContacts.Add(contact);
                         }
@@ -234,7 +240,7 @@ namespace Physics2DDotNet.Solvers
                 Scalar mass2Inv = body2.Mass.MassInv;
                 Scalar I2Inv = body2.Mass.MomentofInertiaInv;
 
-                for(int index = 0;index < contacts.Count;++index)
+                for (int index = 0; index < contacts.Count; ++index)
                 {
                     Contact c = contacts[index];
                     Vector2D.Subtract(ref c.position, ref body1.State.Position.Linear, out c.r1);
@@ -258,31 +264,47 @@ namespace Physics2DDotNet.Solvers
                         ref mass2Inv, ref I2Inv,
                         out c.massTangent);
 
-                    c.bias = -parent.biasFactor * dtInv * MathHelper.Min(0.0f, c.distance + parent.allowedPenetration);
+                    if (parent.positionCorrection)
+                    {
+                        c.bias = -parent.biasFactor * dtInv * MathHelper.Min(0.0f, c.distance + parent.allowedPenetration);
+                    }
+                    else
+                    {
+                        c.bias = 0;
+                    }
+                    if (parent.accumulateImpulses)
+                    {
+                        // Apply normal + friction impulse
+                        Vector2D vect1, vect2, P;
+                        Vector2D.Multiply(ref c.normal, ref c.Pn, out vect1);
+                        Vector2D.Multiply(ref tangent, ref c.Pt, out vect2);
+                        Vector2D.Add(ref vect1, ref vect2, out P);
 
+                        PhysicsHelper.SubtractImpulse(
+                            ref body1.State.Velocity,
+                            ref P,
+                            ref c.r1,
+                            ref mass1Inv,
+                            ref I1Inv);
 
-                    // Apply normal + friction impulse
-                    Vector2D vect1, vect2, P;
-                    Vector2D.Multiply(ref c.normal, ref c.Pn, out vect1);
-                    Vector2D.Multiply(ref tangent, ref c.Pt, out vect2);
-                    Vector2D.Add(ref vect1, ref vect2, out P);
-
-                    PhysicsHelper.SubtractImpulse(
-                        ref body1.State.Velocity,
-                        ref P,
-                        ref c.r1,
-                        ref mass1Inv,
-                        ref I1Inv);
-
-                    PhysicsHelper.AddImpulse(
-                        ref body2.State.Velocity,
-                        ref P,
-                        ref c.r2,
-                        ref mass2Inv,
-                        ref I2Inv);
-
+                        PhysicsHelper.AddImpulse(
+                            ref body2.State.Velocity,
+                            ref P,
+                            ref c.r2,
+                            ref mass2Inv,
+                            ref I2Inv);
+                    }
                     // Initialize bias impulse to zero.
                     c.Pnb = 0;
+
+                    // sets up the restitution
+                    Scalar vn;
+                    Vector2D rv;
+                    PhysicsHelper.GetRelativeVelocity(
+                        ref body1.State.Velocity, ref body2.State.Velocity,
+                        ref c.r1, ref c.r2, out rv);
+                    Vector2D.Dot(ref c.normal, ref rv, out vn);
+                    c.restitution = -vn * this.restitution;
                 }
             }
             public void Apply()
@@ -314,23 +336,30 @@ namespace Physics2DDotNet.Solvers
                     Scalar dPn;
                     if (parent.splitImpulse)
                     {
-                        dPn = c.massNormal * (-vn);
+                        dPn = c.massNormal * (c.restitution - vn);
                     }
                     else
                     {
-                        dPn = c.massNormal * (-vn + c.bias);
+                        dPn = c.massNormal * (c.restitution - vn + c.bias);
                     }
 
-                    // Clamp the accumulated impulse
-                    Scalar Pn0 = c.Pn;
-                    c.Pn = MathHelper.Max(Pn0 + dPn, 0.0f);
-                    dPn = c.Pn - Pn0;
+
+                    if (parent.accumulateImpulses)
+                    {
+                        // Clamp the accumulated impulse
+                        Scalar Pn0 = c.Pn;
+                        c.Pn = Math.Max(Pn0 + dPn, 0.0f);
+                        dPn = c.Pn - Pn0;
+                    }
+                    else
+                    {
+                        dPn = Math.Max(dPn, 0.0f);
+                    }
 
                     // Apply contact impulse
                     Vector2D Pn;
                     Vector2D.Multiply(ref  c.normal, ref dPn, out Pn);
                     //Vector2D Pn = dPn * c.normal;
-
 
                     PhysicsHelper.SubtractImpulse(
                         ref b1.State.Velocity,
@@ -354,6 +383,7 @@ namespace Physics2DDotNet.Solvers
                             ref tag1.biasVelocity,
                             ref tag2.biasVelocity,
                             ref c.r1, ref c.r2, out dv);
+
 
 
                         Scalar vnb;
@@ -393,9 +423,6 @@ namespace Physics2DDotNet.Solvers
                         ref c.r1, ref c.r2, out dv);
 
 
-
-                    // Compute friction impulse
-                    Scalar maxPt = friction * c.Pn;
                     Vector2D tangent;
                     PhysicsHelper.GetTangent(ref c.normal, out tangent);
 
@@ -404,10 +431,24 @@ namespace Physics2DDotNet.Solvers
                     //Scalar vt = Vector2D.Dot(dv, tangent);
                     Scalar dPt = c.massTangent * (-vt);
 
-                    // Clamp friction
-                    Scalar oldTangentImpulse = c.Pt;
-                    c.Pt = MathHelper.Clamp(oldTangentImpulse + dPt, -maxPt, maxPt);
-                    dPt = c.Pt - oldTangentImpulse;
+
+                    if (parent.accumulateImpulses)
+                    {
+                        // Compute friction impulse
+                        Scalar maxPt = friction * c.Pn;
+
+
+                        // Clamp friction
+                        Scalar oldTangentImpulse = c.Pt;
+                        c.Pt = MathHelper.Clamp(oldTangentImpulse + dPt, -maxPt, maxPt);
+                        dPt = c.Pt - oldTangentImpulse;
+                    }
+                    else
+                    {
+                        Scalar maxPt = friction * dPn;
+                        dPt =   MathHelper.Clamp(dPt, -maxPt, maxPt);
+                    }
+
 
                     // Apply contact impulse
                     Vector2D Pt;
@@ -453,14 +494,24 @@ namespace Physics2DDotNet.Solvers
             return !tag.body.IsAdded;
         }
 
+
+
+
+
         Dictionary<long, Arbiter> arbiters;
         List<ISequentialImpulsesJoint> siJoints;
         List<SequentialImpulsesTag> tags;
         bool splitImpulse = true;
+        bool accumulateImpulses = true;
+        bool warmStarting = true;
+        bool positionCorrection = true;
+
+
+
+
         Scalar biasFactor = 0.8f;
         Scalar allowedPenetration = 0.1f;
         int iterations = 10;
-        int superDuperPositionCorrectionIterations = 5;
         int maxContactCount = -1;
 
 
@@ -473,11 +524,25 @@ namespace Physics2DDotNet.Solvers
             tags = new List<SequentialImpulsesTag>();
         }
 
-
+        public bool PositionCorrection
+        {
+            get { return positionCorrection; }
+            set { positionCorrection = value; }
+        }
+        public bool AccumulateImpulses
+        {
+            get { return accumulateImpulses; }
+            set { accumulateImpulses = value; }
+        }
         public bool SplitImpulse
         {
             get { return splitImpulse; }
             set { splitImpulse = value; }
+        }
+        public bool WarmStarting
+        {
+            get { return warmStarting; }
+            set { warmStarting = value; }
         }
         public Scalar BiasFactor
         {
@@ -493,11 +558,6 @@ namespace Physics2DDotNet.Solvers
         {
             get { return iterations; }
             set { iterations = value; }
-        }
-        public int SuperDuperPositionCorrectionIterations
-        {
-            get { return superDuperPositionCorrectionIterations; }
-            set { superDuperPositionCorrectionIterations = value; }
         }
         public int MaxContactCount
         {
@@ -519,7 +579,7 @@ namespace Physics2DDotNet.Solvers
             }
             else
             {
-                arbiter = new Arbiter(this,first, second);
+                arbiter = new Arbiter(this, first, second);
                 arbiter.Update();
                 if (!first.IgnoresCollisionResponse &&
                     !second.IgnoresCollisionResponse &&
@@ -597,51 +657,6 @@ namespace Physics2DDotNet.Solvers
                     tag.body.UpdatePosition(dt);
                 }
                 tag.body.ClearForces();
-            }
-
-            if (siJoints.Count == 0) { return; }
-
-            // Super-duper position correction.
-            for (int outerIter = 0; outerIter < superDuperPositionCorrectionIterations; ++outerIter)
-            {
-                for (int index = 0; index < tags.Count; ++index)
-                {
-                    SequentialImpulsesTag tag = tags[index];
-                    if (tag.splitImpulsesJointsAttached > 0)
-                    {
-                        tag.biasVelocity = ALVector2D.Zero;
-                    }
-                }
-
-                for (int index = 0; index < siJoints.Count; ++index)
-                {
-                    ISequentialImpulsesJoint joint = siJoints[index];
-                    if (joint.SplitImpulse)
-                    {
-                        joint.PrePositionStep();
-                    }
-                }
-
-                for (int i = 0; i < iterations; ++i)
-                {
-                    for (int index = 0; index < siJoints.Count; ++index)
-                    {
-                        ISequentialImpulsesJoint joint = siJoints[index];
-                        if (joint.SplitImpulse)
-                        {
-                            joint.ApplyPositionImpulse();
-                        }
-                    }
-                }
-                for (int index = 0; index < tags.Count; ++index)
-                {
-                    SequentialImpulsesTag tag = tags[index];
-                    if (tag.splitImpulsesJointsAttached > 0)
-                    {
-                        ALVector2D.Add(ref tag.body.State.Position, ref tag.biasVelocity, out tag.body.State.Position);
-                        tag.body.ApplyMatrix();
-                    }
-                }
             }
         }
         protected internal override void AddBodyRange(List<Body> collection)

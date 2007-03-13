@@ -210,6 +210,10 @@ namespace Physics2DDotNet
         {
             return new Lifespan(this.age, this.maxAge, this.master);
         }
+        public object Clone()
+        {
+            return Duplicate();
+        }
         #endregion
     }
 }

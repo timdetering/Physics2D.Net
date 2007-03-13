@@ -200,6 +200,10 @@ namespace Physics2DDotNet
         public abstract bool TryGetIntersection(Vector2D vector, out IntersectionInfo info);
         public abstract void GetDistance(ref Vector2D vector,out Scalar result);
         public abstract Shape Duplicate();
+        public object Clone()
+        {
+            return Duplicate();
+        }
 
         internal void OnAdded(Body parent)
         {
@@ -211,6 +215,9 @@ namespace Physics2DDotNet
             this.parent = null;
         } 
         #endregion
+
+
+
     }
 
     /// <summary>

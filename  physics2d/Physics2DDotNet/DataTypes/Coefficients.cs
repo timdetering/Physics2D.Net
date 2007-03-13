@@ -36,7 +36,7 @@ namespace Physics2DDotNet
     /// Describes the Coefficients of a surface.
     /// </summary>
     [Serializable]
-    public sealed class Coefficients
+    public sealed class Coefficients : IDuplicateable<Coefficients>
     {
         private Scalar restitution;
         private Scalar staticFriction;
@@ -48,9 +48,7 @@ namespace Physics2DDotNet
             this.dynamicFriction = dynamicFriction;
         }
         /// <summary>
-        /// (NOT USED)
         /// AKA Bounciness. This is how much energy is kept as kinetic energy after a collision.
-        /// 
         /// </summary>
         public Scalar Restitution
         {
@@ -74,5 +72,17 @@ namespace Physics2DDotNet
             get { return dynamicFriction; }
             set { dynamicFriction = value; }
         }
+
+
+
+        public Coefficients Duplicate()
+        {
+            return new Coefficients(restitution, staticFriction, dynamicFriction);
+        }
+        public object Clone()
+        {
+            return Duplicate();
+        }
+
     }
 }

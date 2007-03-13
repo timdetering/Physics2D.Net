@@ -10,6 +10,9 @@ renamed: BoundingBox2D to BoundingRectangle and moved it to the AdvanceMath.Geom
 added: TypeConverter attribuites to PhysicsState and MassInfo
 removed: System.Data from reference list.
 replaced: most of the foreach loops in SequentialImpulsesSolver.Solve with normal for loops
+Changed: IDuplicateable to also impliment IClone
+Changed: Implimented all the math from the Box2D GCD 2007.
+Added: math to handle Restitution.
 
 AdvanceMath
 NEXT VERSION:

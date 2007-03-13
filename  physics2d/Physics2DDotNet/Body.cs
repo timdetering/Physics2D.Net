@@ -356,6 +356,19 @@ namespace Physics2DDotNet
                 return engine != null && !isPending;
             }
         }
+
+        public Scalar KineticEnergy
+        {
+            get
+            {
+                Scalar velocityMag;
+                Vector2D.GetMagnitude(ref state.Velocity.Linear,out velocityMag);
+                return
+                    .5f * (velocityMag * velocityMag * massInfo.Mass +
+                    state.Velocity.Angular * state.Velocity.Angular * massInfo.MomentofInertia);
+
+            }
+        }
         #endregion
         #region methods
         public void UpdatePosition(Scalar dt)
@@ -511,6 +524,10 @@ namespace Physics2DDotNet
         public Body Duplicate()
         {
             return new Body(this);
+        }
+        public object Clone()
+        {
+            return Duplicate();
         }
 
         internal void OnCollision(Body other, Solvers.ICollisionInfo collisionInfo)

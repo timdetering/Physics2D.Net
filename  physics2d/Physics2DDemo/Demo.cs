@@ -57,7 +57,7 @@ namespace Physics2DDemo
         Body clipper;
         RectangleShape clippersShape;
         Vector2D bombTarget;
-        float friction = .3f;
+        Coefficients coefficients;
 
         float forceMag = 10000;
         Vector2D force;
@@ -84,10 +84,7 @@ namespace Physics2DDemo
             waitHandle = new ManualResetEvent(true);
             watch = new Stopwatch();
             objects = new List<GlDrawObject>();
-
-
-
-
+            this.coefficients = new Coefficients(0, 0, .2f);
 
             CreateEngine();
             CreateBomb();
@@ -272,7 +269,7 @@ namespace Physics2DDemo
             solver.SplitImpulse = true;
             solver.BiasFactor = .7f;
             solver.AllowedPenetration = .1f;
-            //solver.MaxContactCount =8;
+           // solver.MaxContactCount =1;
             engine.Solver = solver;
 
             engine.BodiesAdded += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesAdded);
@@ -297,7 +294,7 @@ namespace Physics2DDemo
             bomb = new Body(new PhysicsState(),
                     new Physics2DDotNet.Circle(20, 20),
                     120,
-                    new Coefficients(.2f, .2f, friction),
+                    coefficients.Duplicate(),
                     new Lifespan());
         }
         void CreateAvatar()
@@ -319,7 +316,7 @@ namespace Physics2DDemo
             avatar = new Body(new PhysicsState(new ALVector2D(0, 0, 60)),
                 new Polygon(vertexes, 4),
                 new MassInfo(20, float.PositiveInfinity),
-                new Coefficients(.2f, .2f, friction),
+                coefficients.Duplicate(),
                 new Lifespan());
             avatar.Updated += new EventHandler<UpdatedEventArgs>(avatar_Updated);
         }
@@ -385,7 +382,7 @@ namespace Physics2DDemo
                 new PhysicsState(position),
                 new Physics2DDotNet.Polygon(Physics2DDotNet.Polygon.CreateRectangle(60, 2000), 40),
                 new MassInfo(float.PositiveInfinity, float.PositiveInfinity),
-                new Coefficients(.2f, .2f, friction),
+                coefficients.Duplicate(),
                 new Lifespan());
             line.IgnoresGravity = true;
             AddGlObject(line);
@@ -408,7 +405,7 @@ namespace Physics2DDemo
                 new PhysicsState(new ALVector2D(angle, avg)),
                 new Physics2DDotNet.Line(vertexes, thickness, thickness / 2),
                 new MassInfo(float.PositiveInfinity, float.PositiveInfinity),
-                new Coefficients(.2f, .2f, friction),
+                coefficients.Duplicate(),
                 new Lifespan());
             body.IgnoresGravity = true;
             AddGlObject(body);
@@ -426,7 +423,6 @@ namespace Physics2DDemo
                 {
                     Vector2D anchor = (current.State.Position.Linear + last.State.Position.Linear) * .5f;
                     HingeJoint joint = new HingeJoint(last, current, anchor, new Lifespan());
-                    joint.SplitImpulse = true;
                     this.engine.AddJoint(joint);
                 }
                 last = current;
@@ -448,11 +444,16 @@ namespace Physics2DDemo
             float step = (size + spacing + Xspacing) / 2;
             float currentStep = 0;
 
+
+           Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(size, size);
+            vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (size + size) / 4);
+            Polygon shape = new Polygon(vertices, size / 2);
+
             for (float y = ymax; y >= ymin; y -= (spacing + size))
             {
                 for (float x = xmin + currentStep; x < (xmax - currentStep); x += spacing + Xspacing + size)
                 {
-                    AddRectangle(size, size, 20, new ALVector2D(.01f, new Vector2D(x, y)));
+                    AddShape(shape, 20, new ALVector2D(.01f, new Vector2D(x, y)));
                 }
                 currentStep += step;
             }
@@ -485,7 +486,7 @@ namespace Physics2DDemo
                      new PhysicsState(position),
                      shape,
                      mass,
-                     new Coefficients(.2f, .2f, friction),
+                     coefficients.Duplicate(),
                      new Lifespan());
             AddGlObject(e);
             engine.AddBody(e);
@@ -504,7 +505,7 @@ namespace Physics2DDemo
                      new PhysicsState(position),
                      boxShape,
                      mass,
-                     new Coefficients(.2f, .2f, friction),
+                     coefficients.Duplicate(),
                      new Lifespan());
             AddGlObject(e);
             engine.AddBody(e);
@@ -520,7 +521,7 @@ namespace Physics2DDemo
                      new PhysicsState(position),
                      circleShape,
                      mass,
-                     new Coefficients(.2f, .2f, friction),
+                     coefficients.Duplicate(),
                      new Lifespan());
             AddGlObject(e);
             engine.AddBody(e);
@@ -548,7 +549,7 @@ namespace Physics2DDemo
         }
         void AddGravityField()
         {
-            engine.AddLogic(new GravityField(new Vector2D(0, 500f), new Lifespan()));
+            engine.AddLogic(new GravityField(new Vector2D(0, 500), new Lifespan()));
         }
         void AddParticles(Vector2D position, int count)
         {
@@ -561,7 +562,7 @@ namespace Physics2DDemo
                     new PhysicsState(new ALVector2D(0, position)),
                     new Particle(),
                     1,
-                    new Coefficients(.2f, .2f, friction),
+                    coefficients.Duplicate(),
                     new Lifespan(.5f));
 
                 particle.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble() - .5f) * angle);
@@ -679,10 +680,6 @@ namespace Physics2DDemo
             joints.Add(rhip);
             joints.Add(rknee);
 
-            foreach (HingeJoint joint in joints)
-            {
-                joint.SplitImpulse = true;
-            }
             engine.AddJointRange<HingeJoint>(joints);
             return result;
         }
@@ -743,7 +740,7 @@ namespace Physics2DDemo
             List<Body> chain = AddChain(new Vector2D(400, 50), 100, 30, 200, 10, 800);
             Vector2D point = new Vector2D(300, 50);
 
-            Body Anchor = AddRectangle(60, 60, float.PositiveInfinity, new ALVector2D(0, point));
+            Body Anchor = AddCircle(30, 18, float.PositiveInfinity, new ALVector2D(0, point));
             Anchor.IgnoresGravity = true;
             HingeJoint joint = new HingeJoint(chain[0], Anchor, point, new Lifespan());
             engine.AddJoint(joint);
@@ -775,18 +772,16 @@ namespace Physics2DDemo
             List<Body> chain = AddChain(new Vector2D(200, 500), boxlength, 20, 200, spacing, 600);
 
             Vector2D point2 = new Vector2D(chain[chain.Count - 1].State.Position.Linear.X + anchorGap, 500);
-            Body end2 = AddRectangle(anchorLenght, anchorLenght, float.PositiveInfinity, new ALVector2D(0, point2));
+            Body end2 = AddCircle(anchorLenght / 2, 14, float.PositiveInfinity, new ALVector2D(0, point2));
             end2.IgnoresGravity = true;
             HingeJoint joint2 = new HingeJoint(chain[chain.Count - 1], end2, point2, new Lifespan());
             engine.AddJoint(joint2);
 
             Vector2D point1 = new Vector2D(chain[0].State.Position.Linear.X - anchorGap, 500);
-            Body end1 = AddRectangle(anchorLenght, anchorLenght, float.PositiveInfinity, new ALVector2D(0, point1));
+            Body end1 = AddCircle(anchorLenght/2, 14, float.PositiveInfinity, new ALVector2D(0, point1));
             end1.IgnoresGravity = true;
             HingeJoint joint1 = new HingeJoint(chain[0], end1, point1, new Lifespan());
             engine.AddJoint(joint1);
-            joint1.SplitImpulse = true;
-            joint2.SplitImpulse = true;
             end2.State.Position.Linear.X -= 10;
             end1.State.Position.Linear.X += 10;
             end2.ApplyMatrix();
@@ -819,6 +814,19 @@ namespace Physics2DDemo
             waitHandle.Set();
         }
         void Demo0()
+        {
+            waitHandle.Reset();
+            Reset();
+            Circle shape = new Circle(10,20);
+            coefficients.Restitution = 1;
+            AddShape(shape, 20, new ALVector2D(0, 300, 300)).State.Velocity.Linear.X = 50;
+            AddShape(shape, 20, new ALVector2D(0, 400, 300)).State.Velocity.Linear.X = -50;
+            AddShape(shape, 20, new ALVector2D(0, 500, 300));
+            AddShape(shape, 20, new ALVector2D(0, 600, 300));
+            coefficients.Restitution = 0;
+            waitHandle.Set();
+        }
+        void Demo11()
         {
             waitHandle.Reset();
             Reset();

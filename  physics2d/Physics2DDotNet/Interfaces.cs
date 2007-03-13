@@ -38,7 +38,7 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-    public interface IDuplicateable<T>
+    public interface IDuplicateable<T> : ICloneable
         where T : IDuplicateable<T>
     {
         T Duplicate();
