@@ -47,6 +47,7 @@ namespace Physics2DDemo
     {
 
         #region fields
+
         static Random rand = new Random();
         ManualResetEvent waitHandle;
         PhysicsEngine engine;
@@ -57,7 +58,7 @@ namespace Physics2DDemo
         Body clipper;
         RectangleShape clippersShape;
         Vector2D bombTarget;
-        Coefficients coefficients;
+        Coefficients coefficients = new Coefficients(0, 0, .2f);
 
         float forceMag = 10000;
         Vector2D force;
@@ -71,6 +72,8 @@ namespace Physics2DDemo
         bool sparkle;
         Vector2D sparkPoint;
         float targetDt = .010f;
+
+
         #endregion
         #region constructor
         public Demo()
@@ -84,7 +87,8 @@ namespace Physics2DDemo
             waitHandle = new ManualResetEvent(true);
             watch = new Stopwatch();
             objects = new List<GlDrawObject>();
-            this.coefficients = new Coefficients(0, 0, .2f);
+            
+            
 
             CreateEngine();
             CreateBomb();
@@ -815,12 +819,13 @@ namespace Physics2DDemo
             waitHandle.Reset();
             Reset();
             Circle shape = new Circle(10,20);
+            float t = coefficients.Restitution;
             coefficients.Restitution = 1;
             AddShape(shape, 20, new ALVector2D(0, 300, 300)).State.Velocity.Linear.X = 50;
             AddShape(shape, 20, new ALVector2D(0, 400, 300)).State.Velocity.Linear.X = -50;
             AddShape(shape, 20, new ALVector2D(0, 500, 300));
             AddShape(shape, 20, new ALVector2D(0, 600, 300));
-            coefficients.Restitution = 0;
+            coefficients.Restitution = t;
             waitHandle.Set();
         }
         void Demo11()
