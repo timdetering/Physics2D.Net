@@ -13,6 +13,7 @@ replaced: most of the foreach loops in SequentialImpulsesSolver.Solve with norma
 Changed: IDuplicateable to also impliment IClone
 Changed: Implimented all the math from the Box2D GCD 2007.
 Added: math to handle Restitution.
+changed: the sweep and prunes use of nodes so that it will reuse linked list nodes.
 
 AdvanceMath
 NEXT VERSION:

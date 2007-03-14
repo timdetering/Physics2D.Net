@@ -48,9 +48,10 @@ namespace Physics2DDotNet.Detectors
             public LinkedListNode<Body> node;
             public Body body;
             Stub[] stubs;
-            public Wrapper(Body entity)
+            public Wrapper(Body body)
             {
-                this.body = entity;
+                this.body = body;
+                this.node = new LinkedListNode<Body>(body);
                 stubs = new Stub[4];
                 stubs[0] = new Stub(this, true);  //x
                 stubs[1] = new Stub(this, false); //x
@@ -199,12 +200,11 @@ namespace Physics2DDotNet.Detectors
                             colliders.Add(PairID.GetId(body1.ID, body2.ID), null);
                         }
                     }
-                    stub.wrapper.node = currentBodies.AddLast(body1);
+                    currentBodies.AddLast(stub.wrapper.node);
                 }
                 else
                 {
                     currentBodies.Remove(stub.wrapper.node);
-                    stub.wrapper.node = null;
                 }
             }
             if (currentBodies.Count > 0)
@@ -224,12 +224,11 @@ namespace Physics2DDotNet.Detectors
                             this.OnCollision(dt, body1, body2);
                         }
                     }
-                    stub.wrapper.node = currentBodies.AddLast(body1);
+                    currentBodies.AddLast(stub.wrapper.node);
                 }
                 else
                 {
                     currentBodies.Remove(stub.wrapper.node);
-                    stub.wrapper.node = null;
                 }
             }
             if (currentBodies.Count > 0)
