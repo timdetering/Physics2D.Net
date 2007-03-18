@@ -67,7 +67,19 @@ namespace AdvanceMath.Geometry2D
             this.Position = position;
             this.Radius = radius;
         }
+        public BoundingCircle(Scalar x, Scalar y, Scalar radius)
+        {
+            this.Position.X = x;
+            this.Position.Y = y;
+            this.Radius = radius;
+        }
 
+        public Scalar GetDistance(Vector2D point)
+        {
+            Scalar result;
+            GetDistance( ref point, out result);
+            return result;
+        }
         public void GetDistance(ref Vector2D point, out Scalar result)
         {
             Vector2D diff;
@@ -87,6 +99,53 @@ namespace AdvanceMath.Geometry2D
             Scalar distance;
             GetDistance(ref point, out distance);
             result = distance <= 0;
+        }
+
+        public bool Contains(BoundingCircle circle)
+        {
+            Scalar distance;
+            GetDistance(ref circle.Position, out distance);
+            return distance + circle.Radius <= 0;
+        }
+        public void Contains(ref BoundingCircle circle, out bool result)
+        {
+            Scalar distance;
+            GetDistance(ref circle.Position, out distance);
+            result = distance + circle.Radius <= 0;
+        }
+
+        public bool Contains(BoundingRectangle rect)
+        {
+            bool result;
+            Contains(ref rect, out result);
+            return result;
+        }
+        public void Contains(ref BoundingRectangle rect, out bool result)
+        {
+            Scalar distance;
+            Vector2D maxDistance;
+            maxDistance.X = Math.Max(rect.Max.X - Position.X, Position.X - rect.Min.X);
+            maxDistance.Y = Math.Max(rect.Max.Y - Position.Y, Position.Y - rect.Min.Y);
+            Vector2D.GetMagnitude(ref maxDistance, out distance);
+            result = distance <= Radius;
+        }
+
+        public bool Contains(BoundingPolygon polygon)
+        {
+            bool result;
+            Contains(ref polygon, out result);
+            return result;
+        }
+        public void Contains(ref BoundingPolygon polygon, out bool result)
+        {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
+            Vector2D[] vertexes = polygon.Vertexes;
+            for (int index = 0; index < vertexes.Length; ++index)
+            {
+                Contains(ref vertexes[index], out result);
+                if (!result) { return; }
+            } 
+            result = true;
         }
 
         public Scalar Intersects(Ray ray)
@@ -180,14 +239,10 @@ namespace AdvanceMath.Geometry2D
         public void Intersects(ref BoundingRectangle rect, out bool result)
         {
             result =
-             !(Position.X < rect.Min.X &&
-                rect.Min.X - Position.X > Radius) &&
-             !(Position.X > rect.Max.X &&
-                Position.X - rect.Max.X > Radius) &&
-             !(Position.Y < rect.Min.Y &&
-                rect.Min.Y - Position.Y > Radius) &&
-             !(Position.Y > rect.Max.Y &&
-                Position.Y - rect.Max.Y > Radius);
+             (Position.X >= rect.Min.X || (rect.Min.X - Position.X) <= Radius) &&
+             (Position.X <= rect.Max.X || (Position.X - rect.Max.X) <= Radius) &&
+             (Position.Y >= rect.Min.Y || (rect.Min.Y - Position.Y) <= Radius) &&
+             (Position.Y <= rect.Max.Y || (Position.Y - rect.Max.Y) <= Radius);
         }
         public void Intersects(ref BoundingCircle circle, out bool result)
         {

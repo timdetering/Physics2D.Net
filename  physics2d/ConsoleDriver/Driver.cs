@@ -46,6 +46,7 @@ using System.Reflection;
 using System.Diagnostics;
 
 using AdvanceMath.Design;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
 namespace ConsoleDriver
 {
@@ -141,18 +142,7 @@ namespace ConsoleDriver
 
     static class Driver
     {
-        static long RoundUpToPowerOfTwo(long value)
-        {
-            long result = 1;
-            while (result < value) { result <<= 1; }
-            return result;
-        }
-        static int RoundUpToPowerOfTwo(int value)
-        {
-            int result = 1;
-            while (result < value) { result <<= 1; }
-            return result;
-        }
+
 
 
         static Random rand = new Random();
@@ -163,20 +153,38 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-            float g = MathHelper.CatmullRom(1, 0, 0, 0, 0);
+            /*BoundingRectangle r1 = new BoundingRectangle(3, 3, 0, 0);
 
 
+            BoundingRectangle r2 = new BoundingRectangle(1, 2, 0, 1);
+            BoundingCircle circle = new BoundingCircle(1, 1, 2);
 
 
+          //  Console.WriteLine(circle.Contains(new Vector2D( 1.999f, 0)));
+            Console.WriteLine(circle.Contains(r1));
+            Console.WriteLine(circle.Contains(r2));*/
+
+            BoundingPolygon p = new BoundingPolygon(new Vector2D[] { 
+            new Vector2D(0,0),
+            new Vector2D(2,0),
+            new Vector2D(2,2),
+            new Vector2D(0,2),
+            });
+
+            Vector2D g = new Vector2D(0, 0);
+
+            BoundingPolygon p2 = new BoundingPolygon(new Vector2D[] { 
+            new Vector2D(1,1)+g,
+            new Vector2D(2,1)+g,
+            new Vector2D(2,2)+g,
+            new Vector2D(1,2)+g,
+            });
+            Console.WriteLine(p.Contains(new Vector2D(1,2)));
+            //Console.WriteLine(p.Intersects(p2));
+            Console.WriteLine(p.Contains(p2));
 
             //Console.WriteLine(Math.Floor(1.1));
 
-            float angle = -MathHelper.PI *3;
-            angle = MathHelper.ClampAngle(angle);
-            Console.WriteLine(angle / MathHelper.TWO_PI);
-
-
-             angle = MathHelper.AngleSubtract(MathHelper.PI, 0);
 
            // Console.WriteLine(angle / MathHelper.TWO_PI);
 

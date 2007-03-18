@@ -228,6 +228,12 @@ namespace AdvanceMath.Geometry2D
             };
         }
 
+        public Scalar GetDistance(Vector2D point)
+        {
+            Scalar result;
+            GetDistance(ref point, out result);
+            return result;
+        }
         public void GetDistance(ref Vector2D point, out Scalar result)
         {
             Scalar xDistance = Math.Abs(point.X - ((Max.X + Min.X) * .5f)) - (Max.X - Min.X) * .5f;
@@ -245,14 +251,70 @@ namespace AdvanceMath.Geometry2D
         public bool Contains(Vector2D point)
         {
             return
-                point.X <= Max.X && point.X >= Min.X &&
-                point.Y <= Max.Y && point.Y >= Min.Y;
+                point.X <= Max.X &&
+                point.X >= Min.X &&
+                point.Y <= Max.Y && 
+                point.Y >= Min.Y;
         }
         public void Contains(ref Vector2D point, out bool result)
         {
             result =
-                point.X <= Max.X && point.X >= Min.X &&
-                point.Y <= Max.Y && point.Y >= Min.Y;
+                point.X <= Max.X &&
+                point.X >= Min.X &&
+                point.Y <= Max.Y &&
+                point.Y >= Min.Y;
+        }
+
+        public bool Contains(BoundingRectangle rect)
+        {
+            return
+               this.Min.X <= rect.Min.X &&
+               this.Min.Y <= rect.Min.Y &&
+               this.Max.X >= rect.Max.X &&
+               this.Max.Y >= rect.Max.Y;
+        }
+        public void Contains(ref BoundingRectangle rect, out bool result)
+        {
+            result =
+               this.Min.X <= rect.Min.X &&
+               this.Min.Y <= rect.Min.Y &&
+               this.Max.X >= rect.Max.X &&
+               this.Max.Y >= rect.Max.Y;
+        }
+
+        public bool Contains(BoundingCircle circle)
+        {
+            return
+                (circle.Position.X + circle.Radius) <= Max.X &&
+                (circle.Position.X - circle.Radius) >= Min.X &&
+                (circle.Position.Y + circle.Radius) <= Max.Y &&
+                (circle.Position.Y - circle.Radius) >= Min.Y;
+        }
+        public void Contains(ref BoundingCircle circle, out bool result)
+        {
+            result =
+                (circle.Position.X + circle.Radius) <= Max.X &&
+                (circle.Position.X - circle.Radius) >= Min.X &&
+                (circle.Position.Y + circle.Radius) <= Max.Y &&
+                (circle.Position.Y - circle.Radius) >= Min.Y;
+        }
+
+        public bool Contains(BoundingPolygon polygon)
+        {
+            bool result;
+            Contains(ref polygon, out result);
+            return result;
+        }
+        public void Contains(ref BoundingPolygon polygon, out bool result)
+        {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
+            Vector2D[] vertexes = polygon.Vertexes;
+            for (int index = 0; index < vertexes.Length; ++index)
+            {
+                Contains(ref vertexes[index], out result);
+                if (!result) { return; }
+            }
+            result = true;
         }
 
         public Scalar Intersects(Ray ray)
@@ -263,9 +325,11 @@ namespace AdvanceMath.Geometry2D
         }
         public bool Intersects(BoundingRectangle rect)
         {
-            bool result;
-            Intersects(ref rect, out result);
-            return result;
+            return
+                this.Min.X < rect.Max.X &&
+                this.Max.X > rect.Min.X &&
+                this.Max.Y > rect.Min.Y &&
+                this.Min.Y < rect.Max.Y;
         }
         public bool Intersects(BoundingCircle circle)
         {
@@ -354,9 +418,11 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingRectangle rect, out bool result)
         {
-            result = !
-                ((this.Min.X >= rect.Max.X) || (this.Max.X <= rect.Min.X) ||
-                (rect.Min.Y >= this.Max.Y) || (rect.Max.Y <= this.Min.Y));
+            result =
+                this.Min.X <= rect.Max.X &&
+                this.Max.X >= rect.Min.X &&
+                this.Max.Y >= rect.Min.Y &&
+                this.Min.Y <= rect.Max.Y;
         }
         public void Intersects(ref BoundingCircle circle, out bool result)
         {
@@ -406,6 +472,5 @@ namespace AdvanceMath.Geometry2D
         {
             return !Equals(ref rect1, ref rect2);
         }
-
     }
 }

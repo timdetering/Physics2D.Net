@@ -105,9 +105,6 @@ namespace Physics2DDotNet.Solvers
                     return;
                 }
                 Vector2D[] vertexes = entity2.Shape.Vertices;
-                Array.Resize<Vector2D>(ref vertexes, vertexes.Length + 2);
-                vertexes[vertexes.Length - 2] = Vector2D.Zero;
-                vertexes[vertexes.Length - 1] = Vector2D.XAxis;
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
                     Vector2D vector = vertexes[index];
@@ -118,7 +115,6 @@ namespace Physics2DDotNet.Solvers
                         IntersectionInfo info;
                         if (entity1.Shape.TryGetIntersection(vector, out info))
                         {
-
                             Contact contact = new Contact();
                             contact.normal = info.Normal;
                             if (Scalar.IsNaN(contact.normal.X) ||

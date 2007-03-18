@@ -37,29 +37,95 @@ namespace AdvanceMath.Geometry2D
     [Serializable]
     public sealed class BoundingPolygon
     {
-        private static bool Intersects(Vector2D[] vertexes1, Vector2D[] vertexes2)
+        public static bool ContainsExclusive(Vector2D[] vertexes, Vector2D point)
         {
-            for (int index = 0; index < vertexes1.Length; ++index)
+            bool result;
+            ContainsExclusive(vertexes, ref point, out result);
+            return result;
+        }
+        public static void ContainsExclusive(Vector2D[] vertexes, ref Vector2D point, out bool result)
+        {
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
+            int count = 0; //intersection count
+            Vector2D v1 = vertexes[vertexes.Length - 1];
+            Vector2D v2;
+            Scalar temp;
+            for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
             {
-                bool broke = false;
-                for (int index1 = 0; index1 < vertexes2.Length; ++index1)
+                v2 = vertexes[index];
+                bool t1 = (v1.Y <= point.Y);
+                if (t1 ^ (v2.Y <= point.Y))
                 {
-                    int index2 = (index1 + 1) % vertexes2.Length;
-                    Scalar temp;
-                    LineSegment.GetDistance(ref vertexes2[index], ref vertexes2[index2], ref vertexes1[index], out temp);
-                    if (temp > 0)
-                    {
-                        broke = true;
-                        break;
-                    }
-                }
-                if (!broke)
-                {
-                    return true;
+                    temp = ((point.Y - v1.Y) * (v2.X - v1.X) - (point.X - v1.X) * (v2.Y - v1.Y));
+                    if (t1) { if (temp > 0) { count++; } }
+                    else { if (temp < 0) { count--; } }
                 }
             }
-            return false;
+            result = count != 0;
         }
+        public static bool ContainsInclusive(Vector2D[] vertexes, Vector2D point)
+        {
+            bool result;
+            ContainsInclusive(vertexes, ref point, out result);
+            return result;
+        }
+        public static void ContainsInclusive(Vector2D[] vertexes, ref Vector2D point, out bool result)
+        {
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
+            int count = 0;    // the crossing count
+            Vector2D v1 = vertexes[vertexes.Length - 1];
+            Vector2D v2;
+            for (int index = 0; index < vertexes.Length; index++, v1 = v2)
+            {    
+                v2 = vertexes[index];
+                if (((v1.Y <= point.Y) ^ (v2.Y <= point.Y)) || 
+                    (v1.Y == point.Y) || (v2.Y == point.Y))
+                {
+                    Scalar xIntersection = (v1.X + ((point.Y - v1.Y) / (v2.Y - v1.Y)) * (v2.X - v1.X));
+                    if (point.X < xIntersection) // P.X < intersect
+                    {
+                        ++count;  
+                    }
+                    else if (xIntersection == point.X)
+                    {
+                        result = true;
+                        return;
+                    }
+                }
+            }
+            result = (count & 1) != 0; //true if odd.
+        }
+        
+        public static Scalar GetDistance(Vector2D[] vertexes, Vector2D point)
+        {
+            Scalar result;
+            GetDistance(vertexes, ref point, out result);
+            return result;
+        }
+        public static void GetDistance(Vector2D[] vertexes, ref Vector2D point, out Scalar result)
+        {
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            result = -1;
+            Scalar resultAbs = Scalar.MaxValue;
+            Scalar other, otherABS;
+            Vector2D v1, v2;
+            v1 = vertexes[vertexes.Length - 1];
+            for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
+            {
+                v2 = vertexes[index];
+                int index2 = (index + 1) % vertexes.Length;
+                LineSegment.GetDistance(ref v1, ref v2, ref point, out other);
+                otherABS = Math.Abs(other);
+                if (otherABS < resultAbs)
+                {
+                    result = other;
+                    resultAbs = otherABS;
+                }
+            }
+        }
+
 
         Vector2D[] vertexes;
         public BoundingPolygon(Vector2D[] vertexes)
@@ -73,35 +139,79 @@ namespace AdvanceMath.Geometry2D
             get { return vertexes; }
         }
 
+        public  Scalar GetDistance(Vector2D point)
+        {
+            Scalar result;
+            GetDistance(vertexes, ref point, out result);
+            return result;
+        }
         public void GetDistance(ref Vector2D point, out Scalar result)
         {
-            Scalar resultAbs = Scalar.MaxValue;
-            result = -1;
-            Scalar other, otherABS;
-            for (int index = 0; index < vertexes.Length; ++index)
-            {
-                int index2 = (index + 1) % vertexes.Length;
-                LineSegment.GetDistance(ref vertexes[index], ref vertexes[index2], ref point, out other);
-                otherABS = Math.Abs(other);
-                if (otherABS < resultAbs)
-                {
-                    result = other;
-                    resultAbs = otherABS;
-                }
-            }
+            GetDistance(vertexes, ref point, out result);
         }
 
         public bool Contains(Vector2D point)
         {
-            Scalar distance;
-            GetDistance(ref point, out distance);
-            return distance <= 0;
+            bool result;
+            Contains(ref point, out result);
+            return result;
         }
         public void Contains(ref Vector2D point, out bool result)
         {
+            ContainsInclusive(vertexes,  ref point, out result);
+        }
+       
+        public bool Contains(BoundingCircle circle)
+        {
+            bool result;
+            Contains(ref circle, out result);
+            return result;
+        }
+        public void Contains(ref BoundingCircle circle, out bool result)
+        {
             Scalar distance;
-            GetDistance(ref point, out distance);
-            result = distance <= 0;
+            GetDistance(ref circle.Position, out distance);
+            result = distance + circle.Radius <= 0;
+        }
+
+        public bool Contains(BoundingRectangle rect)
+        {
+            bool result;
+            Contains(ref rect, out result);
+            return result;
+        }
+        public void Contains(ref BoundingRectangle rect, out bool result)
+        {
+            Contains(rect.Corners(), out result);
+        }
+
+        public bool Contains(BoundingPolygon polygon)
+        {
+            bool result;
+            Contains(ref polygon, out result);
+            return result;
+        }
+        public void Contains(ref BoundingPolygon polygon, out bool result)
+        {
+            if (polygon == null) { throw new ArgumentNullException("polygon"); }
+            Contains(polygon.vertexes, out result);
+        }
+        private void Contains(Vector2D[] otherVertexes, out bool result)
+        {
+            for (int index = 0; index < vertexes.Length; ++index)
+            {
+                ContainsExclusive(otherVertexes, ref vertexes[index], out result);
+                if (result) { result = false; return; }
+            }
+            for (int index = 0; index < otherVertexes.Length; ++index)
+            {
+                ContainsInclusive(vertexes, ref otherVertexes[index], out result);
+                if (!result)
+                {
+                    return;
+                }
+            }
+            result = true;
         }
 
         public Scalar Intersects(Ray ray)
@@ -145,8 +255,7 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingRectangle rect, out bool result)
         {
-            Vector2D[] corners = rect.Corners();
-            result = Intersects(corners, vertexes) || Intersects(vertexes, corners);
+            Intersects(rect.Corners(), out result);
         }
         public void Intersects(ref BoundingCircle circle, out bool result)
         {
@@ -166,7 +275,21 @@ namespace AdvanceMath.Geometry2D
         public void Intersects(ref BoundingPolygon polygon, out bool result)
         {
             if (polygon == null) { throw new ArgumentNullException("polygon"); }
-            result = Intersects(polygon.vertexes, vertexes) || Intersects(vertexes, polygon.vertexes);
+            Intersects(polygon.vertexes, out result);
+        }
+        private void Intersects(Vector2D[] otherVertexes, out bool result)
+        {
+            for (int index = 0; index < vertexes.Length; ++index)
+            {
+                ContainsInclusive(otherVertexes,  ref vertexes[index], out result);
+                if (result) { return; }
+            }
+            for (int index = 0; index < otherVertexes.Length; ++index)
+            {
+                ContainsInclusive(vertexes,  ref otherVertexes[index], out result);
+                if (result) { return; }
+            }
+            result = false;
         }
     }
 }

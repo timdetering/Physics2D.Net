@@ -268,20 +268,7 @@ namespace Physics2DDotNet
         }
         public override void GetDistance(ref Vector2D point,out Scalar result)
         {
-            result = Scalar.MaxValue;
-            Scalar resultAbs = Scalar.MaxValue;
-            Scalar other, otherABS;
-            for (int index = 0; index < vertexes.Length; ++index)
-            {
-                int index2 = (index + 1) % vertexes.Length;
-                LineSegment.GetDistance(ref vertexes[index], ref vertexes[index2], ref point, out other);
-                otherABS = Math.Abs(other);
-                if (otherABS < resultAbs)
-                {
-                    result = other;
-                    resultAbs = otherABS;
-                }
-            }
+            BoundingPolygon.GetDistance(vertexes, ref point, out result);
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {
