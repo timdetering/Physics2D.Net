@@ -116,6 +116,12 @@ namespace AdvanceMath.Geometry2D
             this.Vertex2 = vertex2;
         }
 
+        public Scalar GetDistance(Vector2D point)
+        {
+            Scalar result;
+            GetDistance(ref point, out result);
+            return result;
+        }
         public void GetDistance(ref Vector2D point, out Scalar result)
         {
             GetDistance(ref Vertex1, ref Vertex2, ref point, out result);

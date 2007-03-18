@@ -35,6 +35,7 @@ Removed: FromArray methods from all the Vector Classes since they were redundent
 removed: some unneeded wrapper methods from MathHelper.
 Added: Geometry2D namespace and contained classes.(BIG CHANGE)
 removed: System.Data from reference list.
+added: WrapClamp to MathHelper.
 
 Physics2D.Net
 1.2.0.0:

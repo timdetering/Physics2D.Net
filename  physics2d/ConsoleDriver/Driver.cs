@@ -153,6 +153,9 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
+
+            Console.WriteLine(MathHelper.WrapClamp(-1, 1, 4));
+
             /*BoundingRectangle r1 = new BoundingRectangle(3, 3, 0, 0);
 
 

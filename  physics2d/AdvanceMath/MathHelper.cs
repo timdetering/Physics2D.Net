@@ -63,39 +63,137 @@ namespace AdvanceMath
             result = (right - left) * amount + left;
         }
 
-        public static Scalar Clamp(Scalar value, Scalar lower, Scalar upper)
+        public static Scalar CatmullRom(Scalar value1, Scalar value2, Scalar value3, Scalar value4, Scalar amount)
         {
-            return (value < lower) ? (lower) : ((value > upper) ? (upper) : (value));
+            Scalar amountSq = amount * amount;
+            Scalar amountCu = amountSq * amount;
+            return
+                0.5f * ((2 * value2) +
+                (-value1 + value3) * amount +
+                (2 * value1 - 5 * value2 + 4 * value3 - value4) * amountSq +
+                (-value1 + 3 * value2 - 3 * value3 + value4) * amountCu);
         }
-        public static void Clamp(ref Scalar value, ref Scalar lower, ref Scalar upper, out Scalar result)
+        public static void CatmullRom(ref Scalar value1, ref Scalar value2, ref Scalar value3, ref Scalar value4, Scalar amount, out Scalar result)
         {
-            result = (value < lower) ? (lower) : ((value > upper) ? (upper) : (value));
+            Scalar amountSq = amount * amount;
+            Scalar amountCu = amountSq * amount;
+            result =
+                0.5f * ((2 * value2) +
+                (-value1 + value3) * amount +
+                (2 * value1 - 5 * value2 + 4 * value3 - value4) * amountSq +
+                (-value1 + 3 * value2 - 3 * value3 + value4) * amountCu);
         }
 
-        public static Scalar ClampAngle(Scalar radianAngle)
+        internal static void HermiteHelper(Scalar amount, out Scalar h1, out Scalar h2, out Scalar h3, out Scalar h4)
         {
-            if (Math.Abs(radianAngle) <= PI) { return radianAngle; }
-            return radianAngle - (Scalar)(Math.Truncate(radianAngle * TWO_PI_INV) + ((radianAngle < 0) ? (-1) : (1))) * TWO_PI;
+            Scalar wf2 = amount * amount;
+            Scalar wf3 = wf2 * amount;
+            Scalar wf3t2 = 2 * wf3;
+            Scalar wf2t3 = 3 * wf2;
+            h1 = wf3t2 - wf2t3 + 1;
+            h2 = wf2t3 - wf3t2;
+            h3 = wf3 - 2 * wf2 + amount;
+            h4 = wf3 - wf2;
+        }
+        public static Scalar Hermite(Scalar value1, Scalar tangent1, Scalar value2, Scalar tangent2, Scalar amount)
+        {
+            Scalar result;
+            Hermite(ref value1, ref tangent1, ref value2, ref tangent2, amount, out result);
+            return result;
+        }
+        public static void Hermite(ref  Scalar value1, ref Scalar tangent1, ref Scalar value2, ref Scalar tangent2, Scalar amount, out Scalar result)
+        {
+            Scalar h1, h2, h3, h4;
+            MathHelper.HermiteHelper(amount, out h1, out h2, out h3, out h4);
+            result = h1 * value1 + h2 * value2 + h3 * tangent1 + h4 * tangent2;
+        }
+
+
+        public static Scalar Clamp(Scalar value, Scalar min, Scalar max)
+        {
+            return (value < min) ? (min) : ((value > max) ? (max) : (value));
+        }
+        public static void Clamp(ref Scalar value, ref Scalar min, ref Scalar max, out Scalar result)
+        {
+            result = (value < min) ? (min) : ((value > max) ? (max) : (value));
+        }
+
+        /// <summary>
+        /// Clamps a value between 2 values, but wraps the value around. So that one plus max would result in one plus min.
+        /// </summary>
+        /// <param name="value">the value to clamp</param>
+        /// <param name="min">the minimum value</param>
+        /// <param name="max">the maximum value</param>
+        /// <returns>the clamped result</returns>
+        public static Scalar WrapClamp(Scalar value, Scalar min, Scalar max)
+        {
+            Scalar temp;
+            if (value < min)
+            {
+                temp = value - max;
+            }
+            else if (value > max)
+            {
+                temp = value - min;
+            }
+            else
+            {
+                return value;
+            }
+            Scalar range = (max - min);
+            return value - (Scalar)(Math.Truncate(temp / range) * range);
+        }
+        /// <summary>
+        /// Clamps a value between 2 values, but wraps the value around. So that one plus max would result in one plus min.
+        /// </summary>
+        /// <param name="value">the value to clamp</param>
+        /// <param name="min">the minimum value</param>
+        /// <param name="max">the maximum value</param>
+        /// <param name="result">the clamped result</param>
+        public static void WrapClamp(ref Scalar value, ref Scalar min, ref Scalar max, out Scalar result)
+        {
+            Scalar temp;
+            if (value < min)
+            {
+                temp = value - max;
+            }
+            else if (value > max)
+            {
+                temp = value - min;
+            }
+            else
+            {
+                result = value;
+                return;
+            }
+            Scalar range = (max - min);
+            result = value - (Scalar)(Math.Truncate(temp / range) * range);
+        }
+
+        public static Scalar ClampAngle(Scalar angle)
+        {
+            if (Math.Abs(angle) <= PI) { return angle; }
+            return angle - (Scalar)(Math.Truncate(angle * TWO_PI_INV) + ((angle < 0) ? (-1) : (1))) * TWO_PI;
         }
         [CLSCompliant(false)]
-        public static void ClampAngle(ref Scalar radianAngle)
+        public static void ClampAngle(ref Scalar angle)
         {
-            if (Math.Abs(radianAngle) <= PI) { return; }
-            radianAngle -= (Scalar)(Math.Truncate(radianAngle * TWO_PI_INV) + ((radianAngle < 0) ? (-1) : (1))) * TWO_PI;
+            if (Math.Abs(angle) <= PI) { return; }
+            angle -= (Scalar)(Math.Truncate(angle * TWO_PI_INV) + ((angle < 0) ? (-1) : (1))) * TWO_PI;
         }
-        public static void ClampAngle(ref Scalar radianAngle, out Scalar result)
+        public static void ClampAngle(ref Scalar angle, out Scalar result)
         {
-            if (Math.Abs(radianAngle) <= PI) { result = radianAngle; return; }
-            result = radianAngle - (Scalar)(Math.Truncate(radianAngle * TWO_PI_INV) + ((radianAngle < 0) ? (-1) : (1))) * TWO_PI;
+            if (Math.Abs(angle) <= PI) { result = angle; return; }
+            result = angle - (Scalar)(Math.Truncate(angle * TWO_PI_INV) + ((angle < 0) ? (-1) : (1))) * TWO_PI;
         }
 
-        public static Scalar AngleSubtract(Scalar radianAngle1, Scalar radianAngle2)
+        public static Scalar AngleSubtract(Scalar angle1, Scalar angle2)
         {
-            return ClampAngle(radianAngle1 - radianAngle2);
+            return ClampAngle(angle1 - angle2);
         }
-        public static void AngleSubtract(ref Scalar radianAngle1,ref  Scalar radianAngle2,out Scalar result)
+        public static void AngleSubtract(ref Scalar angle1,ref  Scalar angle2,out Scalar result)
         {
-            result = radianAngle1 - radianAngle2;
+            result = angle1 - angle2;
             ClampAngle(ref result);
         }
 
@@ -132,51 +230,6 @@ namespace AdvanceMath
         }
 
 
-        public static Scalar CatmullRom(Scalar value1, Scalar value2, Scalar value3, Scalar value4, Scalar amount)
-        {
-            Scalar amountSq = amount * amount;
-            Scalar amountCu = amountSq * amount;
-            return
-                0.5f * ((2 * value2) +
-                (-value1 + value3) * amount +
-                (2 * value1 - 5 * value2 + 4 * value3 - value4) * amountSq +
-                (-value1 + 3 * value2 - 3 * value3 + value4) * amountCu);
-        }
-        public static void CatmullRom(ref Scalar value1,ref Scalar value2,ref Scalar value3,ref Scalar value4, Scalar amount,out Scalar result)
-        {
-            Scalar amountSq = amount * amount;
-            Scalar amountCu = amountSq * amount;
-            result =
-                0.5f *((2 * value2) +
-                (-value1 + value3) * amount +
-                (2 * value1 - 5 * value2 + 4 * value3 - value4) * amountSq +
-                (-value1 + 3 * value2 - 3 * value3 + value4) * amountCu);
-        }
-
-
-        internal static void HermiteHelper(Scalar amount, out Scalar h1, out Scalar h2, out Scalar h3, out Scalar h4)
-        {
-            Scalar wf2 = amount * amount;
-            Scalar wf3 = wf2 * amount;
-            Scalar wf3t2 = 2 * wf3;
-            Scalar wf2t3 = 3 * wf2;
-            h1 = wf3t2 - wf2t3 + 1;
-            h2 = wf2t3 - wf3t2;
-            h3 = wf3 - 2 * wf2 + amount;
-            h4 = wf3 - wf2;
-        }
-        public static Scalar Hermite(Scalar value1, Scalar tangent1, Scalar value2, Scalar tangent2, Scalar amount)
-        {
-            Scalar result;
-            Hermite(ref value1, ref tangent1, ref value2, ref tangent2, amount, out result);
-            return result;
-        }
-        public static void Hermite(ref  Scalar value1, ref Scalar tangent1, ref Scalar value2, ref Scalar tangent2, Scalar amount, out Scalar result)
-        {
-            Scalar h1, h2, h3, h4;
-            MathHelper.HermiteHelper(amount, out h1, out h2, out h3, out h4);
-            result = h1 * value1 + h2 * value2 + h3 * tangent1 + h4 * tangent2;
-        }
 
         public static Scalar InvSqrt(Scalar number)
         {
@@ -243,7 +296,6 @@ namespace AdvanceMath
         }
 
         #region System.Math Methods
-        public static int Sign(Scalar value) { return Math.Sign(value); }
         public static Scalar Acos(Scalar d) { return (Scalar)Math.Acos(d); }
         public static Scalar Asin(Scalar d) { return (Scalar)Math.Asin(d); }
         public static Scalar Atan(Scalar d) { return (Scalar)Math.Atan(d); }

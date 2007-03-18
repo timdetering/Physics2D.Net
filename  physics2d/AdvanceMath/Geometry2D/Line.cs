@@ -50,7 +50,19 @@ namespace AdvanceMath.Geometry2D
             this.Normal = normal;
             this.D = d;
         }
+        public Line(Scalar nX,Scalar nY, Scalar d)
+        {
+            this.Normal.X = nX;
+            this.Normal.Y = nY;
+            this.D = d;
+        }
 
+        public Scalar GetDistance(Vector2D point)
+        {
+            Scalar result;
+            GetDistance(ref point, out result);
+            return result;
+        }
         public void GetDistance(ref Vector2D point, out Scalar result)
         {
             Vector2D.Dot(ref point, ref Normal, out result);
