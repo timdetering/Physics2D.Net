@@ -36,6 +36,8 @@ removed: some unneeded wrapper methods from MathHelper.
 Added: Geometry2D namespace and contained classes.(BIG CHANGE)
 removed: System.Data from reference list.
 added: WrapClamp to MathHelper.
+changed: optimized a few methods.
+changed: all constants to not be float by default. allow sthe compiler to figure out if they are double or float.
 
 Physics2D.Net
 1.2.0.0:

@@ -43,14 +43,14 @@ namespace AdvanceMath
         public const Scalar TWO_PI_INV = (Scalar)(1 / (System.Math.PI * 2));
         public const Scalar HALF_PI = (Scalar)(System.Math.PI / 2);
         public const Scalar HALF_THREE_PI = (Scalar)((2 * System.Math.PI) / 3);
-        public const Scalar RADIANS_PER_DEGREE = (Scalar)(PI / 180.0);
-        public const Scalar DEGREES_PER_RADIAN = (Scalar)(180.0f / PI);
+        public const Scalar RADIANS_PER_DEGREE = (Scalar)(PI / 180);
+        public const Scalar DEGREES_PER_RADIAN = (Scalar)(180 / PI);
         public const Scalar Tolerance = 0.000000001f;
 
         public const Scalar EPSILON = 1e-03f;
 
         internal static Scalar One = 1;
-        internal static Scalar Two = 1;
+        internal static Scalar Two = 2;
         #endregion
         #region methods
 
@@ -127,21 +127,12 @@ namespace AdvanceMath
         /// <returns>the clamped result</returns>
         public static Scalar WrapClamp(Scalar value, Scalar min, Scalar max)
         {
-            Scalar temp;
-            if (value < min)
-            {
-                temp = value - max;
-            }
-            else if (value > max)
-            {
-                temp = value - min;
-            }
-            else
-            {
-                return value;
-            }
+            Scalar wrapPoint;
+            if (value < min) { wrapPoint = max; }
+            else if (value > max) { wrapPoint = min; }
+            else { return value; }
             Scalar range = (max - min);
-            return value - (Scalar)(Math.Truncate(temp / range) * range);
+            return value - (Scalar)Math.Truncate((value - wrapPoint) / range) * range;
         }
         /// <summary>
         /// Clamps a value between 2 values, but wraps the value around. So that one plus max would result in one plus min.
@@ -152,23 +143,19 @@ namespace AdvanceMath
         /// <param name="result">the clamped result</param>
         public static void WrapClamp(ref Scalar value, ref Scalar min, ref Scalar max, out Scalar result)
         {
-            Scalar temp;
-            if (value < min)
-            {
-                temp = value - max;
-            }
-            else if (value > max)
-            {
-                temp = value - min;
-            }
+            Scalar wrapPoint;
+            if (value < min) { wrapPoint = max; }
+            else if (value > max) { wrapPoint = min; }
             else
             {
                 result = value;
                 return;
             }
             Scalar range = (max - min);
-            result = value - (Scalar)(Math.Truncate(temp / range) * range);
+            result = value - (Scalar)Math.Truncate((value - wrapPoint) / range) * range;
         }
+
+        
 
         public static Scalar ClampAngle(Scalar angle)
         {
@@ -208,7 +195,7 @@ namespace AdvanceMath
         /// <returns><see langword="false" /> if an error would have been thrown; otherwise <see langword="true" />.</returns>
         public static bool TrySolveQuadratic(Scalar a, Scalar b, Scalar c, out Scalar plus, out Scalar minus)
         {
-            if (a == 0)
+            if (0 == a)
             {
                 plus = -c / b;
                 minus = plus;
@@ -228,8 +215,6 @@ namespace AdvanceMath
             minus = 0;
             return false;
         }
-
-
 
         public static Scalar InvSqrt(Scalar number)
         {
@@ -252,14 +237,8 @@ namespace AdvanceMath
         }
         public static Scalar Min(params Scalar[] vals)
         {
-            if (vals == null)
-            {
-                throw new ArgumentNullException("vals");
-            }
-            if (vals.Length == 0)
-            {
-                throw new ArgumentException("There must be at least one value to compare", "vals");
-            }
+            if (vals == null) { throw new ArgumentNullException("vals"); }
+            if (vals.Length == 0) { throw new ArgumentException("There must be at least one value to compare", "vals"); }
             Scalar min = vals[0];
             if (Scalar.IsNaN(min)) { return min; }
             for (int i = 1; i < vals.Length; i++)
@@ -271,10 +250,25 @@ namespace AdvanceMath
             return min;
         }
 
-        public static bool PointInTri2D(Vector2D p, Vector2D a, Vector2D b, Vector2D c)
+        public static bool PointInTri2D(Vector2D point, Vector2D a, Vector2D b, Vector2D c)
         {
-            bool bClockwise = (((b - a) ^ (p - b)) >= 0);
-            return !(((((c - b) ^ (p - c)) >= 0) ^ bClockwise) && ((((a - c) ^ (p - a)) >= 0) ^ bClockwise));
+            Vector2D vect1, vect2;
+            Scalar temp;
+            Vector2D.Subtract(ref b,ref a,out vect1);
+            Vector2D.Subtract(ref point, ref b, out vect2);
+            Vector2D.ZCross(ref vect1, ref vect2, out temp);
+            bool bClockwise = temp >= 0;
+            Vector2D.Subtract(ref c, ref b, out vect1);
+            Vector2D.Subtract(ref point, ref c, out vect2);
+            Vector2D.ZCross(ref vect1, ref vect2, out temp);
+            if (temp < 0 ^ bClockwise) { return true; }
+            Vector2D.Subtract(ref a, ref c, out vect1);
+            Vector2D.Subtract(ref point, ref a, out vect2);
+            Vector2D.ZCross(ref vect1, ref vect2, out temp);
+            return temp < 0 ^ bClockwise;
+
+           /* bool bClockwise = (((b - a) ^ (point - b)) >= 0);
+            return !(((((c - b) ^ (point - c)) >= 0) ^ bClockwise) && ((((a - c) ^ (point - a)) >= 0) ^ bClockwise));*/
         }
         /// <summary>
         ///		Converts degrees to radians.

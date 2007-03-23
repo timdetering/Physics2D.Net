@@ -82,11 +82,11 @@ namespace AdvanceMath
         /// <summary>
         ///    An Identity Quaternion.
         /// </summary>
-        public static readonly Quaternion Identity = new Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
+        public static readonly Quaternion Identity = new Quaternion(1, 0, 0, 0);
         /// <summary>
-        ///    A Quaternion With all elements set to 0.0f;
+        ///    A Quaternion With all elements set to 0;
         /// </summary>
-        public static readonly Quaternion Zero = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+        public static readonly Quaternion Zero = new Quaternion(0, 0, 0, 0);
         private static readonly int[] next = new int[3] { 1, 2, 0 }; 
         #endregion
         #region Static methods
@@ -114,13 +114,13 @@ namespace AdvanceMath
             }
 
             Scalar sin = MathHelper.Sin(angle);
-            Scalar inverseSin = 1.0f / sin;
-            Scalar coeff0 = MathHelper.Sin((1.0f - time) * angle) * inverseSin;
+            Scalar inverseSin = 1 / sin;
+            Scalar coeff0 = MathHelper.Sin((1 - time) * angle) * inverseSin;
             Scalar coeff1 = MathHelper.Sin(time * angle) * inverseSin;
 
             Quaternion returnvalue;
 
-            if (cos < 0.0f && useShortestPath)
+            if (cos < 0 && useShortestPath)
             {
                 coeff0 = -coeff0;
                 // taking the complement requires renormalisation
@@ -170,7 +170,7 @@ namespace AdvanceMath
         /// <returns></returns>
         public static Quaternion Squad(Scalar t, Quaternion p, Quaternion a, Quaternion b, Quaternion q, bool useShortestPath)
         {
-            Scalar slerpT = 2.0f * t * (1.0f - t);
+            Scalar slerpT = 2 * t * (1 - t);
 
             // use spherical linear interpolation
             Quaternion slerpP = Slerp(t, p, q, useShortestPath);
@@ -200,7 +200,7 @@ namespace AdvanceMath
 
         //		public Quaternion()
         //		{
-        //			this.W = 1.0f;
+        //			this.W = 1;
         //		}
 
         /// <summary>
@@ -237,9 +237,9 @@ namespace AdvanceMath
         {
             get
             {
-                Scalar fTX = 2.0f * X;
-                Scalar fTY = 2.0f * Y;
-                Scalar fTZ = 2.0f * Z;
+                Scalar fTX = 2 * X;
+                Scalar fTY = 2 * Y;
+                Scalar fTZ = 2 * Z;
                 Scalar fTWY = fTY * W;
                 Scalar fTWZ = fTZ * W;
                 Scalar fTXY = fTY * X;
@@ -248,12 +248,12 @@ namespace AdvanceMath
                 Scalar fTZZ = fTZ * Z;
 
                 Vector3D result;
-                result.X = 1.0f - (fTYY + fTZZ);
+                result.X = 1 - (fTYY + fTZZ);
                 result.Y = fTXY + fTWZ;
                 result.Z = fTXZ - fTWY;
                 return result;
 
-                //return new Vector3D(1.0f - (fTYY + fTZZ), fTXY + fTWZ, fTXZ - fTWY);
+                //return new Vector3D(1 - (fTYY + fTZZ), fTXY + fTWZ, fTXZ - fTWY);
             }
         }
 
@@ -264,9 +264,9 @@ namespace AdvanceMath
         {
             get
             {
-                Scalar fTX = 2.0f * X;
-                Scalar fTY = 2.0f * Y;
-                Scalar fTZ = 2.0f * Z;
+                Scalar fTX = 2 * X;
+                Scalar fTY = 2 * Y;
+                Scalar fTZ = 2 * Z;
                 Scalar fTWX = fTX * W;
                 Scalar fTWZ = fTZ * W;
                 Scalar fTXX = fTX * X;
@@ -276,11 +276,11 @@ namespace AdvanceMath
 
                 Vector3D result;
                 result.X = fTXY - fTWZ;
-                result.Y = 1.0f - (fTXX + fTZZ);
+                result.Y = 1 - (fTXX + fTZZ);
                 result.Z = fTYZ + fTWX;
                 return result;
 
-                //return new Vector3D(fTXY - fTWZ, 1.0f - (fTXX + fTZZ), fTYZ + fTWX);
+                //return new Vector3D(fTXY - fTWZ, 1 - (fTXX + fTZZ), fTYZ + fTWX);
             }
         }
 
@@ -291,9 +291,9 @@ namespace AdvanceMath
         {
             get
             {
-                Scalar fTX = 2.0f * X;
-                Scalar fTY = 2.0f * Y;
-                Scalar fTZ = 2.0f * Z;
+                Scalar fTX = 2 * X;
+                Scalar fTY = 2 * Y;
+                Scalar fTZ = 2 * Z;
                 Scalar fTWX = fTX * W;
                 Scalar fTWY = fTY * W;
                 Scalar fTXX = fTX * X;
@@ -304,10 +304,10 @@ namespace AdvanceMath
                 Vector3D result;
                 result.X = fTXZ + fTWY;
                 result.Y = fTYZ - fTWX;
-                result.Z = 1.0f - (fTXX + fTYY);
+                result.Z = 1 - (fTXX + fTYY);
                 return result;
 
-                //return new Vector3D(fTXZ + fTWY, fTYZ - fTWX, 1.0f - (fTXX + fTYY));
+                //return new Vector3D(fTXZ + fTWY, fTYZ - fTWX, 1 - (fTXX + fTYY));
             }
         }
         [XmlIgnore, SoapIgnore]
@@ -487,7 +487,7 @@ namespace AdvanceMath
         /// </summary>
         public void Normalize()
         {
-            Scalar factor = 1.0f / MathHelper.Sqrt(this.Norm);
+            Scalar factor = 1 / MathHelper.Sqrt(this.Norm);
 
             W = W * factor;
             X = X * factor;
@@ -508,9 +508,9 @@ namespace AdvanceMath
 
             Scalar sqrLength = X * X + Y * Y + Z * Z;
 
-            if (sqrLength > 0.0f)
+            if (sqrLength > 0)
             {
-                angle = 2.0f * MathHelper.Acos(W);
+                angle = 2 * MathHelper.Acos(W);
                 Scalar invLength = MathHelper.InvSqrt(sqrLength);
                 aXis.X = X * invLength;
                 aXis.Y = Y * invLength;
@@ -518,10 +518,10 @@ namespace AdvanceMath
             }
             else
             {
-                angle = 0.0f;
-                aXis.X = 1.0f;
-                aXis.Y = 0.0f;
-                aXis.Z = 0.0f;
+                angle = 0;
+                aXis.X = 1;
+                aXis.Y = 0;
+                aXis.Z = 0;
             }
         }
 
@@ -533,9 +533,9 @@ namespace AdvanceMath
         {
             Matrix3x3 rotation = new Matrix3x3();
 
-            Scalar tX = 2.0f * this.X;
-            Scalar tY = 2.0f * this.Y;
-            Scalar tZ = 2.0f * this.Z;
+            Scalar tX = 2 * this.X;
+            Scalar tY = 2 * this.Y;
+            Scalar tZ = 2 * this.Z;
             Scalar tWX = tX * this.W;
             Scalar tWY = tY * this.W;
             Scalar tWZ = tZ * this.W;
@@ -546,15 +546,15 @@ namespace AdvanceMath
             Scalar tYZ = tZ * this.Y;
             Scalar tZZ = tZ * this.Z;
 
-            rotation.m00 = 1.0f - (tYY + tZZ);
+            rotation.m00 = 1 - (tYY + tZZ);
             rotation.m01 = tXY - tWZ;
             rotation.m02 = tXZ + tWY;
             rotation.m10 = tXY + tWZ;
-            rotation.m11 = 1.0f - (tXX + tZZ);
+            rotation.m11 = 1 - (tXX + tZZ);
             rotation.m12 = tYZ - tWX;
             rotation.m20 = tXZ - tWY;
             rotation.m21 = tYZ + tWX;
-            rotation.m22 = 1.0f - (tXX + tYY);
+            rotation.m22 = 1 - (tXX + tYY);
 
             return rotation;
         }
@@ -566,9 +566,9 @@ namespace AdvanceMath
         public Quaternion Inverse()
         {
             Scalar norm = this.W * this.W + this.X * this.X + this.Y * this.Y + this.Z * this.Z;
-            if (norm > 0.0f)
+            if (norm > 0)
             {
-                Scalar inverseNorm = 1.0f / norm;
+                Scalar inverseNorm = 1 / norm;
                 return new Quaternion(this.W * inverseNorm, -this.X * inverseNorm, -this.Y * inverseNorm, -this.Z * inverseNorm);
             }
             else
@@ -642,12 +642,12 @@ namespace AdvanceMath
 
             Scalar trace = matriX.m00 + matriX.m11 + matriX.m22;
 
-            Scalar root = 0.0f;
+            Scalar root = 0;
 
-            if (trace > 0.0f)
+            if (trace > 0)
             {
                 // |this.W| > 1/2, maY as Well choose this.W > 1/2
-                root = MathHelper.Sqrt(trace + 1.0f);  // 2W
+                root = MathHelper.Sqrt(trace + 1);  // 2W
                 this.W = 0.5f * root;
 
                 root = 0.5f / root;  // 1/(4W)
@@ -672,7 +672,7 @@ namespace AdvanceMath
                 int j = next[i];
                 int k = next[j];
 
-                root = MathHelper.Sqrt(matriX[i, i] - matriX[j, j] - matriX[k, k] + 1.0f);
+                root = MathHelper.Sqrt(matriX[i, i] - matriX[j, j] - matriX[k, k] + 1);
 
                 unsafe
                 {
@@ -704,7 +704,7 @@ namespace AdvanceMath
             // start off With a Zero quat
             Quaternion returnvalue = Quaternion.Zero;
 
-            if (Math.Abs(W) < 1.0f)
+            if (Math.Abs(W) < 1)
             {
                 Scalar angle = MathHelper.Acos(W);
                 Scalar sin = MathHelper.Sin(angle);

@@ -348,7 +348,7 @@ namespace AdvanceMath
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations"/></remarks>
         public static Vector2D Transform(Matrix3x3 matrix, Vector2D source)
         {
-            Scalar inverseZ = 1.0f / (source.X * matrix.m20 + source.Y * matrix.m21 + matrix.m22);
+            Scalar inverseZ = 1 / (source.X * matrix.m20 + source.Y * matrix.m21 + matrix.m22);
             Vector2D result;
             result.X = (source.X * matrix.m00 + source.Y * matrix.m01 + matrix.m02) * inverseZ;
             result.Y = (source.X * matrix.m10 + source.Y * matrix.m11 + matrix.m12) * inverseZ;
@@ -357,7 +357,7 @@ namespace AdvanceMath
         public static void Transform(ref Matrix3x3 matrix, ref Vector2D source, out Vector2D result)
         {
             Scalar X = source.X;
-            Scalar inverseZ = 1.0f / (source.X * matrix.m20 + source.Y * matrix.m21 + matrix.m22);
+            Scalar inverseZ = 1 / (X * matrix.m20 + source.Y * matrix.m21 + matrix.m22);
             result.X = (X * matrix.m00 + source.Y * matrix.m01 + matrix.m02) * inverseZ;
             result.Y = (X * matrix.m10 + source.Y * matrix.m11 + matrix.m12) * inverseZ;
         }
@@ -1004,7 +1004,7 @@ namespace AdvanceMath
         }
         public static Vector2D operator *(Matrix3x3 matrix, Vector2D source)
         {
-            Scalar inverseZ = 1.0f / (source.X * matrix.m20 + source.Y * matrix.m21 + matrix.m22);
+            Scalar inverseZ = 1 / (source.X * matrix.m20 + source.Y * matrix.m21 + matrix.m22);
             Vector2D result;
             result.X = (source.X * matrix.m00 + source.Y * matrix.m01 + matrix.m02) * inverseZ;
             result.Y = (source.X * matrix.m10 + source.Y * matrix.m11 + matrix.m12) * inverseZ;

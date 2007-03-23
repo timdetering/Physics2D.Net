@@ -336,7 +336,7 @@ namespace AdvanceMath
         {
             Vector3D result;
 
-            Scalar inverseW = 1.0f / (matrix.m30 * vector.X + matrix.m31 * vector.Y + matrix.m32 * vector.Z + matrix.m33);
+            Scalar inverseW = 1 / (matrix.m30 * vector.X + matrix.m31 * vector.Y + matrix.m32 * vector.Z + matrix.m33);
             result.X = ((matrix.m00 * vector.X) + (matrix.m01 * vector.Y) + (matrix.m02 * vector.Z) + matrix.m03) * inverseW;
             result.Y = ((matrix.m10 * vector.X) + (matrix.m11 * vector.Y) + (matrix.m12 * vector.Z) + matrix.m13) * inverseW;
             result.Z = ((matrix.m20 * vector.X) + (matrix.m21 * vector.Y) + (matrix.m22 * vector.Z) + matrix.m23) * inverseW;
@@ -347,7 +347,7 @@ namespace AdvanceMath
         {
             Scalar X = vector.X;
             Scalar Y = vector.Y;
-            Scalar inverseW = 1.0f / (matrix.m30 * vector.X + matrix.m31 * vector.Y + matrix.m32 * vector.Z + matrix.m33);
+            Scalar inverseW = 1 / (matrix.m30 * X + matrix.m31 * Y + matrix.m32 * vector.Z + matrix.m33);
             result.X = ((matrix.m00 * X) + (matrix.m01 * Y) + (matrix.m02 * vector.Z) + matrix.m03) * inverseW;
             result.Y = ((matrix.m10 * X) + (matrix.m11 * Y) + (matrix.m12 * vector.Z) + matrix.m13) * inverseW;
             result.Z = ((matrix.m20 * X) + (matrix.m21 * Y) + (matrix.m22 * vector.Z) + matrix.m23) * inverseW;
@@ -373,8 +373,8 @@ namespace AdvanceMath
 
             //uv = qvec ^ vector;
             //uuv = qvec ^ uv;
-            //uv *= (2.0f * quat.W);
-            //uuv *= 2.0f;
+            //uv *= (2 * quat.W);
+            //uuv *= 2;
 
             //return vector + uv + uuv;
 
@@ -431,10 +431,8 @@ namespace AdvanceMath
             Scalar X = left.Y * right.Z - left.Z * right.Y;
             Scalar Y = left.Z * right.X - left.X * right.Z;
             result.Z = left.X * right.Y - left.Y * right.X;
-
             result.X = X;
             result.Y = Y;
-
         }
         /// <summary>
         /// Gets the Squared <see cref="Magnitude"/> of the Vector3D that is passed.
@@ -878,7 +876,7 @@ namespace AdvanceMath
         {
             Vector3D result;
 
-            Scalar inverseW = 1.0f / (matrix.m30 * vector.X + matrix.m31 * vector.Y + matrix.m32 * vector.Z + matrix.m33);
+            Scalar inverseW = 1 / (matrix.m30 * vector.X + matrix.m31 * vector.Y + matrix.m32 * vector.Z + matrix.m33);
             result.X = ((matrix.m00 * vector.X) + (matrix.m01 * vector.Y) + (matrix.m02 * vector.Z) + matrix.m03) * inverseW;
             result.Y = ((matrix.m10 * vector.X) + (matrix.m11 * vector.Y) + (matrix.m12 * vector.Z) + matrix.m13) * inverseW;
             result.Z = ((matrix.m20 * vector.X) + (matrix.m21 * vector.Y) + (matrix.m22 * vector.Z) + matrix.m23) * inverseW;
@@ -921,8 +919,8 @@ namespace AdvanceMath
 
             //uv = qvec ^ vector;
             //uuv = qvec ^ uv;
-            //uv *= (2.0f * quat.W);
-            //uuv *= 2.0f;
+            //uv *= (2 * quat.W);
+            //uuv *= 2;
 
             //return vector + uv + uuv;
 
