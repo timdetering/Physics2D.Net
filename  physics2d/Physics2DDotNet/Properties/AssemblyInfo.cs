@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Security.Permissions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -7,7 +8,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Physics2D.Net")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A 2D Physics Engine")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Physics2D.Net")]
@@ -15,6 +16,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
+
+[assembly: SecurityPermission(SecurityAction.RequestMinimum, Execution = true)]
+[assembly: PermissionSet(SecurityAction.RequestOptional, Name = "Nothing")]
+
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

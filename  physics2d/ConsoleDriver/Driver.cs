@@ -152,54 +152,11 @@ namespace ConsoleDriver
         [STAThread]
         static void Main(string[] args)
         {
+            Console.WriteLine(-3 % 2);
 
+            Console.WriteLine(MathHelper.WrapClamp(-2, -1, 1));
+            Console.WriteLine(MathHelper.ClampAngle(MathHelper.HALF_THREE_PI));
 
-            Console.WriteLine(MathHelper.WrapClamp(10, -4, 4));
-
-            /*BoundingRectangle r1 = new BoundingRectangle(3, 3, 0, 0);
-
-
-            BoundingRectangle r2 = new BoundingRectangle(1, 2, 0, 1);
-            BoundingCircle circle = new BoundingCircle(1, 1, 2);
-
-
-          //  Console.WriteLine(circle.Contains(new Vector2D( 1.999f, 0)));
-            Console.WriteLine(circle.Contains(r1));
-            Console.WriteLine(circle.Contains(r2));*/
-
-            BoundingPolygon p = new BoundingPolygon(new Vector2D[] { 
-            new Vector2D(0,0),
-            new Vector2D(2,0),
-            new Vector2D(2,2),
-            new Vector2D(0,2),
-            });
-
-            Vector2D g = new Vector2D(0, 0);
-
-            BoundingPolygon p2 = new BoundingPolygon(new Vector2D[] { 
-            new Vector2D(1,1)+g,
-            new Vector2D(2,1)+g,
-            new Vector2D(2,2)+g,
-            new Vector2D(1,2)+g,
-            });
-            Console.WriteLine(p.Contains(new Vector2D(1,2)));
-            //Console.WriteLine(p.Intersects(p2));
-            Console.WriteLine(p.Contains(p2));
-
-            //Console.WriteLine(Math.Floor(1.1));
-
-
-           // Console.WriteLine(angle / MathHelper.TWO_PI);
-
-
-
-            //int value = 87000;
-            //Console.WriteLine(RoundUpToPowerOfTwo(value));
-
-
-           /* TimeTester test = new TimeTester(30000000, TEST1, TEST2);
-            test.Run();
-            Console.WriteLine(test);*/
 
             Console.WriteLine("Finished");
             Console.ReadLine();

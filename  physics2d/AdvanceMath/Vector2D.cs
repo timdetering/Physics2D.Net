@@ -593,18 +593,28 @@ namespace AdvanceMath
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Unit_vector"/></remarks>
         public static Vector2D Normalize(Vector2D source)
         {
+            Scalar oldmagnitude;
+            GetMagnitude(ref source, out oldmagnitude);
+            if (oldmagnitude == 0) { return Vector2D.Zero; }
+            oldmagnitude = (1 / oldmagnitude);
             Vector2D result;
-            SetMagnitude(ref source, ref MathHelper.One, out result);
+            result.X = source.X * oldmagnitude;
+            result.Y = source.Y * oldmagnitude;
             return result;
         }
         public static void Normalize(ref Vector2D source, out Vector2D result)
         {
-            SetMagnitude(ref source, ref MathHelper.One, out result);
+            Scalar oldmagnitude;
+            GetMagnitude(ref source, out oldmagnitude);
+            if (oldmagnitude == 0) { result = Zero; return; }
+            oldmagnitude = (1 / oldmagnitude);
+            result.X = source.X * oldmagnitude;
+            result.Y = source.Y * oldmagnitude;
         }
         [CLSCompliant(false)]
         public static void Normalize(ref Vector2D source)
         {
-            SetMagnitude(ref source, ref MathHelper.One, out source);
+            Normalize(ref source, out source);
         }
         /// <summary>
         /// This returns the Normalized Vector2D that is passed. This is also known as a Unit Vector.

@@ -153,25 +153,25 @@ namespace AdvanceMath
         /// </summary>
         /// <param name="column">The zero-based index of the Column of the <typeparamref name="V"/> to get.</param>
         /// <returns>The <typeparamref name="V"/> at the specified Column.</returns>
-        V GetColumn(int column);
+        V GetColumn(int columnIndex);
         /// <summary>
         /// Sets the <typeparamref name="V"/>  at the specified Column.
         /// </summary>
         /// <param name="column">The zero-based index of the Column of the <typeparamref name="V"/> to set.</param>
         /// <param name="value">The <typeparamref name="V"/> to set at the specified Column.</param>
-        void SetColumn(int column, V value);
+        void SetColumn(int columnIndex, V value);
         /// <summary>
         /// Gets the <typeparamref name="V"/> at the specified Row.
         /// </summary>
         /// <param name="row">The zero-based index of the Row of the <typeparamref name="V"/> to get.</param>
         /// <returns>The <typeparamref name="V"/> at the specified Row.</returns>
-        V GetRow(int row);
+        V GetRow(int rowIndex);
         /// <summary>
         /// Sets the <typeparamref name="V"/> at the specified Row.
         /// </summary>
         /// <param name="row">The zero-based index of the Row of the <typeparamref name="V"/> to set.</param>
         /// <param name="value">The <typeparamref name="V"/> to set at the specified Row.</param>
-        void SetRow(int row, V value);
+        void SetRow(int rowIndex, V value);
         /// <summary>
         /// Gets the Inverse of the IMatrix
         /// </summary>

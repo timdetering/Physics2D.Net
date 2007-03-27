@@ -36,7 +36,7 @@ using AdvanceMath.Design;
 namespace AdvanceMath
 {
     /// <summary>
-    /// 
+    /// A Vector with 3 dimensions.
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     [StructLayout(LayoutKind.Sequential, Size = Vector3D.Size, Pack = 0), Serializable]
@@ -274,6 +274,27 @@ namespace AdvanceMath
             result.Z = source.Z * scalar;
         }
         /// <summary>
+        /// Does Scaler Multiplication on a Vector3D.
+        /// </summary>
+        /// <param name="scalar">The scalar value that will multiply the Vector3D.</param>
+        /// <param name="source">The Vector3D to be multiplied.</param>
+        /// <returns>The Product of the Scaler Multiplication.</returns>
+        /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Scalar_multiplication"/></remarks>
+        public static Vector3D Multiply(Scalar scalar, Vector3D source)
+        {
+            Vector3D result;
+            result.X = scalar * source.X;
+            result.Y = scalar * source.Y;
+            result.Z = scalar * source.Z;
+            return result;
+        }
+        public static void Multiply(ref Scalar scalar, ref Vector3D source, out Vector3D result)
+        {
+            result.X = scalar * source.X;
+            result.Y = scalar * source.Y;
+            result.Z = scalar * source.Z;
+        }
+        /// <summary>
         ///		matrix * vector [3x3 * 3x1 = 3x1]
         /// </summary>
         /// <param name="vector"></param>
@@ -495,18 +516,30 @@ namespace AdvanceMath
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Unit_vector"/></remarks>
         public static Vector3D Normalize(Vector3D source)
         {
+            Scalar oldmagnitude;
+            GetMagnitude(ref source, out oldmagnitude);
+            if (oldmagnitude == 0) { return Zero; }
+            oldmagnitude = (1 / oldmagnitude);
             Vector3D result;
-            SetMagnitude(ref source, ref MathHelper.One, out result);
+            result.X = source.X * oldmagnitude;
+            result.Y = source.Y * oldmagnitude;
+            result.Z = source.Z * oldmagnitude;
             return result;
         }
         public static void Normalize(ref Vector3D source, out Vector3D result)
         {
-            SetMagnitude(ref source, ref MathHelper.One, out result);
+            Scalar oldmagnitude;
+            GetMagnitude(ref source, out oldmagnitude);
+            if (oldmagnitude == 0) { result = Zero; return; }
+            oldmagnitude = (1 / oldmagnitude);
+            result.X = source.X * oldmagnitude;
+            result.Y = source.Y * oldmagnitude;
+            result.Z = source.Z * oldmagnitude;
         }
         [CLSCompliant(false)]
         public static void Normalize(ref Vector3D source)
         {
-            SetMagnitude(ref source, ref MathHelper.One, out source);
+            Normalize(ref source, out source);
         }
         /// <summary>
         /// Negates a Vector3D.

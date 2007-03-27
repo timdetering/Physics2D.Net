@@ -40,16 +40,14 @@ namespace AdvanceMath
         public const Scalar E = (Scalar)System.Math.E;
         public const Scalar PI = (Scalar)System.Math.PI;
         public const Scalar TWO_PI = (Scalar)(System.Math.PI * 2);
-        public const Scalar TWO_PI_INV = (Scalar)(1 / (System.Math.PI * 2));
         public const Scalar HALF_PI = (Scalar)(System.Math.PI / 2);
-        public const Scalar HALF_THREE_PI = (Scalar)((2 * System.Math.PI) / 3);
+        public const Scalar HALF_THREE_PI = (Scalar)((3 * System.Math.PI) / 2);
         public const Scalar RADIANS_PER_DEGREE = (Scalar)(PI / 180);
         public const Scalar DEGREES_PER_RADIAN = (Scalar)(180 / PI);
         public const Scalar Tolerance = 0.000000001f;
 
         public const Scalar EPSILON = 1e-03f;
 
-        internal static Scalar One = 1;
         internal static Scalar Two = 2;
         #endregion
         #region methods
@@ -118,6 +116,10 @@ namespace AdvanceMath
             result = (value < min) ? (min) : ((value > max) ? (max) : (value));
         }
 
+
+
+
+
         /// <summary>
         /// Clamps a value between 2 values, but wraps the value around. So that one plus max would result in one plus min.
         /// </summary>
@@ -127,12 +129,9 @@ namespace AdvanceMath
         /// <returns>the clamped result</returns>
         public static Scalar WrapClamp(Scalar value, Scalar min, Scalar max)
         {
-            Scalar wrapPoint;
-            if (value < min) { wrapPoint = max; }
-            else if (value > max) { wrapPoint = min; }
-            else { return value; }
-            Scalar range = (max - min);
-            return value - (Scalar)Math.Truncate((value - wrapPoint) / range) * range;
+            if (min <= value && value < max) { return value; }
+            Scalar rem = (value - min) % (max - min);
+            return rem + ((rem < 0) ? (max) : (min));
         }
         /// <summary>
         /// Clamps a value between 2 values, but wraps the value around. So that one plus max would result in one plus min.
@@ -143,35 +142,30 @@ namespace AdvanceMath
         /// <param name="result">the clamped result</param>
         public static void WrapClamp(ref Scalar value, ref Scalar min, ref Scalar max, out Scalar result)
         {
-            Scalar wrapPoint;
-            if (value < min) { wrapPoint = max; }
-            else if (value > max) { wrapPoint = min; }
-            else
-            {
-                result = value;
-                return;
-            }
-            Scalar range = (max - min);
-            result = value - (Scalar)Math.Truncate((value - wrapPoint) / range) * range;
+            if (min <= value && value < max) { result = value; return; }
+            Scalar rem = (value - min) % (max - min);
+            result = rem + ((rem < 0) ? (max) : (min));
         }
 
-        
 
         public static Scalar ClampAngle(Scalar angle)
         {
-            if (Math.Abs(angle) <= PI) { return angle; }
-            return angle - (Scalar)(Math.Truncate(angle * TWO_PI_INV) + ((angle < 0) ? (-1) : (1))) * TWO_PI;
+            if (-PI <= angle && angle < PI) {     return angle; }
+            Scalar rem = (angle + PI) % (TWO_PI);
+            return rem + ((rem < 0) ? (PI) : (-PI));
         }
         [CLSCompliant(false)]
         public static void ClampAngle(ref Scalar angle)
         {
-            if (Math.Abs(angle) <= PI) { return; }
-            angle -= (Scalar)(Math.Truncate(angle * TWO_PI_INV) + ((angle < 0) ? (-1) : (1))) * TWO_PI;
+            if (-PI <= angle && angle < PI) { return; }
+            Scalar rem = (angle + PI) % (TWO_PI);
+            angle = rem + ((rem < 0) ? (PI) : (-PI));
         }
         public static void ClampAngle(ref Scalar angle, out Scalar result)
         {
-            if (Math.Abs(angle) <= PI) { result = angle; return; }
-            result = angle - (Scalar)(Math.Truncate(angle * TWO_PI_INV) + ((angle < 0) ? (-1) : (1))) * TWO_PI;
+            if (-PI <= angle && angle < PI) { result = angle; return; }
+            Scalar rem = (angle + PI) % (TWO_PI);
+            result = rem + ((rem < 0) ? (PI) : (-PI));
         }
 
         public static Scalar AngleSubtract(Scalar angle1, Scalar angle2)
@@ -204,18 +198,16 @@ namespace AdvanceMath
             c = (b * b) - (4 * a * c);
             if (0 <= c)
             {
-                b = -b;
                 c = Sqrt(c);
                 a = .5f / a;
-                plus = ((b + c) * a);
-                minus = ((b - c) * a);
+                plus = ((c - b) * a);
+                minus = ((-c - b) * a);
                 return true;
             }
             plus = 0;
             minus = 0;
             return false;
         }
-
         public static Scalar InvSqrt(Scalar number)
         {
             return 1 / Sqrt(number);

@@ -807,7 +807,7 @@ namespace AdvanceMath
         }
 
 
-        private static Matrix3x3 FromRotationX(Scalar radianAngle)
+        public static Matrix3x3 FromRotationX(Scalar radianAngle)
         {
             Matrix3x3 result;
 
@@ -827,7 +827,7 @@ namespace AdvanceMath
 
             return result;
         }
-        private static void FromRotationX(ref Scalar radianAngle, out Matrix3x3 result)
+        public static void FromRotationX(ref Scalar radianAngle, out Matrix3x3 result)
         {
             result.m21 = MathHelper.Sin(radianAngle);
 
@@ -843,7 +843,6 @@ namespace AdvanceMath
             result.m20 = 0;
             result.m22 = result.m11;
         }
-
         public static Matrix3x3 FromRotationY(Scalar radianAngle)
         {
             Matrix3x3 result;
@@ -952,7 +951,6 @@ namespace AdvanceMath
             Matrix3x3 first = FromLookAt(Vector3D.Zero, axis, new Vector3D(axis.Z, axis.X, axis.Y));
             return first.Inverted * FromRotationZ(radianAngle) * first;
         }
-
         internal static Matrix3x3 FromLookAt(Vector3D origin, Vector3D positiveZAxis, Vector3D onPositiveY)
         {
             Matrix3x3 rv = Identity;

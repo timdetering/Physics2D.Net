@@ -1,29 +1,18 @@
-﻿using System;
-using System.Reflection;
-using System.Security.Permissions;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AdvanceMath")]
+[assembly: AssemblyTitle("AdvanceMathUnitTest")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AdvanceMath")]
-[assembly: AssemblyCopyright("Copyright ©  2005-2007 Jonathan Mark Porter.")]
+[assembly: AssemblyProduct("AdvanceMathUnitTest")]
+[assembly: AssemblyCopyright("Copyright ©  2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: CLSCompliant(true)]
-
-
-#if !UNSAFE
-[assembly: SecurityPermission(SecurityAction.RequestRefuse, UnmanagedCode = true)]
-#endif
-[assembly: FileIOPermission(SecurityAction.RequestOptional, Unrestricted = true)]
-
-
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -31,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b536df6a-2bb5-4beb-832f-319515b1da21")]
+[assembly: Guid("97380000-7273-4240-adc7-d68ec2dde469")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -42,5 +31,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.5.*")]
-[assembly: AssemblyFileVersion("1.5.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

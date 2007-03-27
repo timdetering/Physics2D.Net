@@ -36,6 +36,11 @@ namespace AdvanceMath.Design
 {
     public class AdvPropertyDescriptor : PropertyDescriptor, IEquatable<AdvPropertyDescriptor>
     {
+        private static Attribute[] GetAttributes(MemberInfo property)
+        {
+            if (property == null) { throw new ArgumentNullException("property"); }
+            return (Attribute[])property.GetCustomAttributes(typeof(Attribute), true);
+        }
         MemberInfo info;
         FieldInfo field;
         PropertyInfo property;
@@ -44,7 +49,7 @@ namespace AdvanceMath.Design
             : this(field.Name, field)
         { }
         public AdvPropertyDescriptor(string name, FieldInfo field)
-            : base(name, (Attribute[])field.GetCustomAttributes(typeof(Attribute), true))
+            : base(name, GetAttributes(field))
         {
             this.info = field;
             this.field = field;
@@ -54,10 +59,9 @@ namespace AdvanceMath.Design
             : this(property.Name, property)
         { }
         public AdvPropertyDescriptor(string name, PropertyInfo property)
-            : base(name, (Attribute[])property.GetCustomAttributes(typeof(Attribute), true))
+            : base(name, GetAttributes(property))
         {
             this.info = property;
-            this.property = property;
             this.property = property;
             this.description = base.Description;
         }

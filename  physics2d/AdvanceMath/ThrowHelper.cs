@@ -47,6 +47,7 @@ namespace AdvanceMath
                 throw new ArgumentOutOfRangeException("array", String.Format("the array must have the length of {0} from the index", count));
             }
         }
+#if UNSAFE
         public static void CheckIndex(string name, int index, int count)
         {
             if (index < 0 || index >= count)
@@ -54,6 +55,7 @@ namespace AdvanceMath
                 throw GetThrowIndex(name, count);
             }
         }
+#endif
         public static Exception GetThrowIndex(string name, int count)
         {
             return new ArgumentOutOfRangeException(name, string.Format("the {0} must be greater or equal to zero and less then {1}", name, count));

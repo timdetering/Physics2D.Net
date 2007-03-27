@@ -35,7 +35,7 @@ using AdvanceMath.Design;
 namespace AdvanceMath
 {
     /// <summary>
-    /// (NOT USED BY PHYSICS2D)
+    /// A Vector with 4 dimensions.
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     //[StructLayout(LayoutKind.Sequential), Serializable]
@@ -349,7 +349,29 @@ namespace AdvanceMath
             result.Z = source.Z * scalar;
             result.W = source.W * scalar;
         }
-
+        /// <summary>
+        /// Does Scaler Multiplication on a Vector4D.
+        /// </summary>
+        /// <param name="scalar">The scalar value that will multiply the Vector4D.</param>
+        /// <param name="source">The Vector4D to be multiplied.</param>
+        /// <returns>The Product of the Scaler Multiplication.</returns>
+        /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Scalar_multiplication"/></remarks>
+        public static Vector4D Multiply(Scalar scalar, Vector4D source)
+        {
+            Vector4D result;
+            result.X = scalar * source.X;
+            result.Y = scalar * source.Y;
+            result.Z = scalar * source.Z;
+            result.W = scalar * source.W;
+            return result;
+        }
+        public static void Multiply(ref Scalar scalar, ref Vector4D source, out Vector4D result)
+        {
+            result.X = scalar * source.X;
+            result.Y = scalar * source.Y;
+            result.Z = scalar * source.Z;
+            result.W = scalar * source.W;
+        }
 
         public static Vector4D Transform(Matrix4x4 matrix, Vector4D vector)
         {
@@ -496,18 +518,32 @@ namespace AdvanceMath
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Unit_vector"/></remarks>
         public static Vector4D Normalize(Vector4D source)
         {
+            Scalar oldmagnitude;
+            GetMagnitude(ref source, out oldmagnitude);
+            if (oldmagnitude == 0) { return Zero; }
+            oldmagnitude = (1 / oldmagnitude);
             Vector4D result;
-            SetMagnitude(ref source, ref MathHelper.One, out result);
+            result.X = source.X * oldmagnitude;
+            result.Y = source.Y * oldmagnitude;
+            result.Z = source.Z * oldmagnitude;
+            result.W = source.W * oldmagnitude;
             return result;
         }
         public static void Normalize(ref Vector4D source, out Vector4D result)
         {
-            SetMagnitude(ref source, ref MathHelper.One, out result);
+            Scalar oldmagnitude;
+            GetMagnitude(ref source, out oldmagnitude);
+            if (oldmagnitude == 0) { result = Zero; return; }
+            oldmagnitude = (1 / oldmagnitude);
+            result.X = source.X * oldmagnitude;
+            result.Y = source.Y * oldmagnitude;
+            result.Z = source.Z * oldmagnitude;
+            result.W = source.W * oldmagnitude;
         }
         [CLSCompliant(false)]
         public static void Normalize(ref Vector4D source)
         {
-            SetMagnitude(ref source, ref MathHelper.One, out source);
+            Normalize(ref source, out source);
         }
         /// <summary>
         /// Thie Projects the left Vector4D onto the Right Vector4D.

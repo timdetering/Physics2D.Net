@@ -1,3 +1,7 @@
+AdvanceMathUnitTest
+NEXT VERSION:
+Added to test AdvanceMath using nunit.
+
 Physics2D.Net
 NEXT VERSION:
 changed: inlined code in the Body.UpdateVelocity method.
@@ -38,6 +42,10 @@ removed: System.Data from reference list.
 added: WrapClamp to MathHelper.
 changed: optimized a few methods.
 changed: all constants to not be float by default. allow sthe compiler to figure out if they are double or float.
+changed: Matri3x3.FromRotationX to be public.
+changed: the normalize methods on the vetor classes to be inlined.
+fixed: MathHelper.HALF_THREE_PI to be the correct value.
+fixed: ClampAngle and WrapClamp in MathHelper
 
 Physics2D.Net
 1.2.0.0:
