@@ -156,6 +156,30 @@ namespace AdvanceMath
             result.Z = (right.Z - left.Z) * amount.Z + left.Z;
         }
 
+        public static Scalar Distance(Vector3D left, Vector3D right)
+        {
+            Scalar result;
+            Distance(ref left, ref right, out result);
+            return result;
+        }
+        public static void Distance(ref Vector3D left, ref Vector3D right, out Scalar result)
+        {
+            Vector3D diff;
+            Subtract(ref left, ref right, out diff);
+            GetMagnitude(ref diff, out result);
+        }
+        public static Scalar DistanceSq(Vector3D left, Vector3D right)
+        {
+            Scalar result;
+            DistanceSq(ref left, ref right, out result);
+            return result;
+        }
+        public static void DistanceSq(ref Vector3D left, ref Vector3D right, out Scalar result)
+        {
+            Vector3D diff;
+            Subtract(ref left, ref right, out diff);
+            GetMagnitudeSq(ref diff, out result);
+        }
 
         /// <summary>
         /// Adds 2 Vectors2Ds.

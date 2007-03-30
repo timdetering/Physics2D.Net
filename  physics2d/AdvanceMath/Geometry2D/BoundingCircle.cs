@@ -55,7 +55,27 @@ namespace AdvanceMath.Geometry2D
             Scalar yRadius = (rect.Max.Y - rect.Min.Y) * .5f;
             result.Radius = MathHelper.Sqrt(xRadius * xRadius + yRadius * yRadius);
         }
-
+        public static BoundingCircle FromVectors(Vector2D[] vertexes)
+        {
+            BoundingCircle result;
+            FromVectors(vertexes, out result);
+            return result;
+        }
+        public static void FromVectors(Vector2D[] vertexes, out BoundingCircle result)
+        {
+            BoundingPolygon.GetCentroid(vertexes, out result.Position);
+            result.Radius = -1;
+            for (int index = 0; index < vertexes.Length; ++index)
+            {
+                Scalar distSq;
+                Vector2D.DistanceSq(ref result.Position, ref vertexes[index], out distSq);
+                if (result.Radius == -1 || (distSq < result.Radius))
+                {
+                    result.Radius = distSq;
+                }
+            }
+            result.Radius = MathHelper.Sqrt(result.Radius);
+        }
 
         [AdvBrowsable]
         public Vector2D Position;
@@ -74,10 +94,25 @@ namespace AdvanceMath.Geometry2D
             this.Radius = radius;
         }
 
+        public Scalar Area
+        {
+            get
+            {
+                return MathHelper.PI * Radius * Radius;
+            }
+        }
+        public Scalar Perimeter
+        {
+            get
+            {
+                return MathHelper.TWO_PI * Radius;
+            }
+        }
+
         public Scalar GetDistance(Vector2D point)
         {
             Scalar result;
-            GetDistance( ref point, out result);
+            GetDistance(ref point, out result);
             return result;
         }
         public void GetDistance(ref Vector2D point, out Scalar result)
@@ -144,7 +179,7 @@ namespace AdvanceMath.Geometry2D
             {
                 Contains(ref vertexes[index], out result);
                 if (!result) { return; }
-            } 
+            }
             result = true;
         }
 

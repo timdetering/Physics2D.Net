@@ -50,7 +50,7 @@ namespace AdvanceMath.Geometry2D
             this.Normal = normal;
             this.D = d;
         }
-        public Line(Scalar nX,Scalar nY, Scalar d)
+        public Line(Scalar nX, Scalar nY, Scalar d)
         {
             this.Normal.X = nX;
             this.Normal.Y = nY;

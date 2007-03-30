@@ -168,6 +168,31 @@ namespace AdvanceMath
             result.W = (right.W - left.W) * amount.W + left.W;
         }
 
+        public static Scalar Distance(Vector4D left, Vector4D right)
+        {
+            Scalar result;
+            Distance(ref left, ref right, out result);
+            return result;
+        }
+        public static void Distance(ref Vector4D left, ref Vector4D right, out Scalar result)
+        {
+            Vector4D diff;
+            Subtract(ref left, ref right, out diff);
+            GetMagnitude(ref diff, out result);
+        }
+        public static Scalar DistanceSq(Vector4D left, Vector4D right)
+        {
+            Scalar result;
+            DistanceSq(ref left, ref right, out result);
+            return result;
+        }
+        public static void DistanceSq(ref Vector4D left, ref Vector4D right, out Scalar result)
+        {
+            Vector4D diff;
+            Subtract(ref left, ref right, out diff);
+            GetMagnitudeSq(ref diff, out result);
+        }
+
         /// <summary>
         /// Adds 2 Vectors2Ds.
         /// </summary>

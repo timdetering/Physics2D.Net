@@ -152,10 +152,15 @@ namespace ConsoleDriver
         [STAThread]
         static void Main(string[] args)
         {
-            Console.WriteLine(-3 % 2);
 
-            Console.WriteLine(MathHelper.WrapClamp(-2, -1, 1));
-            Console.WriteLine(MathHelper.ClampAngle(MathHelper.HALF_THREE_PI));
+            Vector2D v1 = new Vector2D(0, 1);
+            Vector2D v2 = new Vector2D(2, 1);
+
+            Vector2D v3 = new Vector2D(1, 0);
+            Vector2D v4 = new Vector2D(1, 1);
+            bool re;
+            LineSegment.Intersects(ref v1, ref v2, ref v3, ref v4, out re);
+            Console.WriteLine(re);
 
 
             Console.WriteLine("Finished");

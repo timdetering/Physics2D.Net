@@ -21,6 +21,8 @@ changed: the sweep and prunes use of nodes so that it will reuse linked list nod
 added: a Pivot Joint class.
 removed: code in the Arbiter class that was not supposed to be there.
 changed: a few shape objects to utilize methods and classes in the AdvanceMath.Geometry2D namespace.
+moved: some logic in Polygon into advanceMaths BoundingPolygon
+renamed: Polygon.CalcArea and CalcCentroid to GetArea and GetCentroid
 
 AdvanceMath
 NEXT VERSION:
@@ -46,6 +48,7 @@ changed: Matri3x3.FromRotationX to be public.
 changed: the normalize methods on the vetor classes to be inlined.
 fixed: MathHelper.HALF_THREE_PI to be the correct value.
 fixed: ClampAngle and WrapClamp in MathHelper
+added: distance and distanceSq to all Vector classes.
 
 Physics2D.Net
 1.2.0.0:

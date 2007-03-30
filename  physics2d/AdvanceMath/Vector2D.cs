@@ -158,6 +158,30 @@ namespace AdvanceMath
             result.Y = (right.Y - left.Y) * amount.Y + left.Y;
         }
 
+        public static Scalar Distance(Vector2D left, Vector2D right)
+        {
+            Scalar result;
+            Distance(ref left, ref right, out result);
+            return result;
+        }
+        public static void Distance(ref Vector2D left, ref Vector2D right, out Scalar result)
+        {
+            Vector2D diff;
+            Subtract(ref left, ref right, out diff);
+            GetMagnitude(ref diff, out result);
+        }
+        public static Scalar DistanceSq(Vector2D left, Vector2D right)
+        {
+            Scalar result;
+            DistanceSq(ref left, ref right, out result);
+            return result;
+        }
+        public static void DistanceSq(ref Vector2D left, ref Vector2D right, out Scalar result)
+        {
+            Vector2D diff;
+            Subtract(ref left, ref right, out diff);
+            GetMagnitudeSq(ref diff, out result);
+        }
         /// <summary>
         /// Creates a Vector2D With the given length (<see cref="Magnitude"/>) and the given <see cref="Angle"/>.
         /// </summary>

@@ -64,6 +64,7 @@ namespace AdvanceMath.Geometry2D
             }
             result = count != 0;
         }
+
         public static bool ContainsInclusive(Vector2D[] vertexes, Vector2D point)
         {
             bool result;
@@ -78,15 +79,15 @@ namespace AdvanceMath.Geometry2D
             Vector2D v1 = vertexes[vertexes.Length - 1];
             Vector2D v2;
             for (int index = 0; index < vertexes.Length; index++, v1 = v2)
-            {    
+            {
                 v2 = vertexes[index];
-                if (((v1.Y <= point.Y) ^ (v2.Y <= point.Y)) || 
+                if (((v1.Y <= point.Y) ^ (v2.Y <= point.Y)) ||
                     (v1.Y == point.Y) || (v2.Y == point.Y))
                 {
                     Scalar xIntersection = (v1.X + ((point.Y - v1.Y) / (v2.Y - v1.Y)) * (v2.X - v1.X));
                     if (point.X < xIntersection) // P.X < intersect
                     {
-                        ++count;  
+                        ++count;
                     }
                     else if (xIntersection == point.X)
                     {
@@ -97,7 +98,37 @@ namespace AdvanceMath.Geometry2D
             }
             result = (count & 1) != 0; //true if odd.
         }
-        
+
+        public static bool Intersects(Vector2D[] vertexes1, Vector2D[] vertexes2)
+        {
+            bool result;
+            Intersects(vertexes1, vertexes2, out result);
+            return result;
+        }
+        public static void Intersects(Vector2D[] vertexes1, Vector2D[] vertexes2, out bool result)
+        {
+            if (vertexes1 == null) { throw new ArgumentNullException("vertexes1"); }
+            if (vertexes2 == null) { throw new ArgumentNullException("vertexes2"); }
+            if (vertexes1.Length < 2) { throw new ArgumentOutOfRangeException("vertexes1"); }
+            if (vertexes2.Length < 2) { throw new ArgumentOutOfRangeException("vertexes2"); }
+
+            Vector2D v1, v2, v3, v4;
+            v1 = vertexes1[vertexes1.Length - 1];
+            v3 = vertexes2[vertexes2.Length - 1];
+            result = false;
+            for (int index1 = 0; index1 < vertexes1.Length; ++index1, v1 = v2)
+            {
+                v2 = vertexes1[index1];
+                for (int index2 = 0; index2 < vertexes2.Length; ++index2, v3 = v4)
+                {
+                    v4 = vertexes1[index2];
+                    LineSegment.Intersects(ref v1, ref v2, ref v3, ref v4, out result);
+                    if (result) { return; }
+                }
+            }
+        }
+
+
         public static Scalar GetDistance(Vector2D[] vertexes, Vector2D point)
         {
             Scalar result;
@@ -125,7 +156,102 @@ namespace AdvanceMath.Geometry2D
                 }
             }
         }
+        /// <summary>
+        /// Calculates the Centroid of a polygon.
+        /// </summary>
+        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <returns>The Centroid of a polygon.</returns>
+        /// <remarks>
+        /// This is Also known as Center of Gravity/Mass.
+        /// </remarks>
+        public static Vector2D GetCentroid(Vector2D[] vertices)
+        {
+            Vector2D result;
+            GetCentroid(vertices, out result);
+            return result;
+        }
+        /// <summary>
+        /// Calculates the Centroid of a polygon.
+        /// </summary>
+        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <param name="centroid">The Centroid of a polygon.</param>
+        /// <remarks>
+        /// This is Also known as Center of Gravity/Mass.
+        /// </remarks>
+        public static void GetCentroid(Vector2D[] vertices, out Vector2D centroid)
+        {
+            if (vertices == null) { throw new ArgumentNullException("vertices"); }
+            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
+            centroid = Vector2D.Zero;
+            Scalar temp;
+            Scalar area = 0;
+            Vector2D v1 = vertices[vertices.Length - 1];
+            Vector2D v2;
+            for (int index = 0; index < vertices.Length; ++index, v1 = v2)
+            {
+                v2 = vertices[index];
+                Vector2D.ZCross(ref v1, ref v2, out temp);
+                area += temp;
+                centroid.X += ((v1.X + v2.X) * temp);
+                centroid.Y += ((v1.Y + v2.Y) * temp);
+            }
+            centroid *= (1 / (Math.Abs(area) * 3));
+        }
+        /// <summary>
+        /// Calculates the area of a polygon.
+        /// </summary>
+        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <returns>the area.</returns>
+        public static Scalar GetArea(Vector2D[] vertices)
+        {
+            Scalar result;
+            GetArea(vertices, out result);
+            return result;
+        }
+        /// <summary>
+        /// Calculates the area of a polygon.
+        /// </summary>
+        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <param name="result">the area.</param>
+        public static void GetArea(Vector2D[] vertices, out Scalar result)
+        {
+            if (vertices == null) { throw new ArgumentNullException("vertices"); }
+            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
+            result = 0;
+            Scalar temp;
+            Vector2D v1 = vertices[vertices.Length - 1];
+            Vector2D v2;
+            for (int index = 0; index < vertices.Length; ++index, v1 = v2)
+            {
+                v2 = vertices[index];
+                Vector2D.ZCross(ref v1, ref v2, out temp);
+                result += temp;
+            }
+            result = Math.Abs(result * .5f);
+        }
 
+
+        public static Scalar GetPerimeter(Vector2D[] vertices)
+        {
+            Scalar result;
+            GetPerimeter(vertices, out result);
+            return result;
+        }
+        public static void GetPerimeter(Vector2D[] vertices, out Scalar result)
+        {
+            if (vertices == null) { throw new ArgumentNullException("vertices"); }
+            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
+            Vector2D v1 = vertices[vertices.Length - 1];
+            Vector2D v2;
+            Scalar dist;
+            result = 0;
+            for (int index = 0; index < vertices.Length; ++index, v1 = v2)
+            {
+                v2 = vertices[index];
+                Vector2D.Distance(ref v1, ref v2, out dist);
+                result += dist;
+            }
+        }
 
         Vector2D[] vertexes;
         public BoundingPolygon(Vector2D[] vertexes)
@@ -139,7 +265,26 @@ namespace AdvanceMath.Geometry2D
             get { return vertexes; }
         }
 
-        public  Scalar GetDistance(Vector2D point)
+        public Scalar Area
+        {
+            get
+            {
+                Scalar result;
+                GetArea(vertexes, out result);
+                return result;
+            }
+        }
+        public Scalar Perimeter
+        {
+            get
+            {
+                Scalar result;
+                GetPerimeter(vertexes, out result);
+                return result;
+            }
+        }
+
+        public Scalar GetDistance(Vector2D point)
         {
             Scalar result;
             GetDistance(vertexes, ref point, out result);
@@ -158,9 +303,9 @@ namespace AdvanceMath.Geometry2D
         }
         public void Contains(ref Vector2D point, out bool result)
         {
-            ContainsInclusive(vertexes,  ref point, out result);
+            ContainsInclusive(vertexes, ref point, out result);
         }
-       
+
         public bool Contains(BoundingCircle circle)
         {
             bool result;
@@ -255,7 +400,7 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingRectangle rect, out bool result)
         {
-            Intersects(rect.Corners(), out result);
+            Intersects(this.vertexes, rect.Corners(), out result);
         }
         public void Intersects(ref BoundingCircle circle, out bool result)
         {
@@ -275,21 +420,7 @@ namespace AdvanceMath.Geometry2D
         public void Intersects(ref BoundingPolygon polygon, out bool result)
         {
             if (polygon == null) { throw new ArgumentNullException("polygon"); }
-            Intersects(polygon.vertexes, out result);
-        }
-        private void Intersects(Vector2D[] otherVertexes, out bool result)
-        {
-            for (int index = 0; index < vertexes.Length; ++index)
-            {
-                ContainsInclusive(otherVertexes,  ref vertexes[index], out result);
-                if (result) { return; }
-            }
-            for (int index = 0; index < otherVertexes.Length; ++index)
-            {
-                ContainsInclusive(vertexes,  ref otherVertexes[index], out result);
-                if (result) { return; }
-            }
-            result = false;
+            Intersects(this.vertexes, polygon.vertexes, out result);
         }
     }
 }

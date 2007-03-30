@@ -178,7 +178,7 @@ namespace AdvanceMath.Geometry2D
             FromCircle(ref circle, out result);
             return result;
         }
-        public static void FromCircle(ref BoundingCircle circle,out BoundingRectangle result)
+        public static void FromCircle(ref BoundingCircle circle, out BoundingRectangle result)
         {
             result.Max.X = circle.Position.X + circle.Radius;
             result.Max.Y = circle.Position.Y + circle.Radius;
@@ -217,6 +217,21 @@ namespace AdvanceMath.Geometry2D
             this.Min = min;
         }
 
+        public Scalar Area
+        {
+            get
+            {
+                return (Max.X - Min.X) * (Max.Y - Min.Y);
+            }
+        }
+        public Scalar Perimeter
+        {
+            get
+            {
+                return ((Max.X - Min.X) + (Max.Y - Min.Y)) * 2;
+            }
+        }
+
         public Vector2D[] Corners()
         {
             return new Vector2D[4]
@@ -253,7 +268,7 @@ namespace AdvanceMath.Geometry2D
             return
                 point.X <= Max.X &&
                 point.X >= Min.X &&
-                point.Y <= Max.Y && 
+                point.Y <= Max.Y &&
                 point.Y >= Min.Y;
         }
         public void Contains(ref Vector2D point, out bool result)

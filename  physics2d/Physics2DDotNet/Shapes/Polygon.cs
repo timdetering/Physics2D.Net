@@ -149,18 +149,11 @@ namespace Physics2DDotNet
         /// </summary>
         /// <param name="vertices">The vertices of the polygon.</param>
         /// <returns>The area.</returns>
-        public static Scalar CalcArea(Vector2D[] vertices)
+        public static Scalar GetArea(Vector2D[] vertices)
         {
-            if (vertices == null) { throw new ArgumentNullException("vertices"); }
-            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
-            Scalar returnvalue = 0;
-            int length = vertices.Length;
-            for (int pos1 = 0; pos1 < length; ++pos1)
-            {
-                int pos2 = (pos1 + 1) % length;
-                returnvalue += vertices[pos1] ^ vertices[pos2];
-            }
-            return Math.Abs(returnvalue * .5f);
+            Scalar result;
+            BoundingPolygon.GetArea(vertices,out result);
+            return result;
         }
         /// <summary>
         /// Calculates the Centroid of a polygon.
@@ -170,19 +163,11 @@ namespace Physics2DDotNet
         /// <remarks>
         /// This is Also known as Center of Gravity/Mass.
         /// </remarks>
-        public static Vector2D CalcCentroid(Vector2D[] vertices)
+        public static Vector2D GetCentroid(Vector2D[] vertices)
         {
-            if (vertices == null) { throw new ArgumentNullException("vertices"); }
-            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
-            Vector2D returnvalue = Vector2D.Zero;
-            int length = vertices.Length;
-            int pos2;
-            for (int pos1 = 0; pos1 != length; ++pos1)
-            {
-                pos2 = (pos1 + 1) % length;
-                returnvalue += ((vertices[pos1] + vertices[pos2]) * (vertices[pos1] ^ vertices[pos2]));
-            }
-            return returnvalue * (1 / (CalcArea(vertices) * 6));
+            Vector2D result;
+            BoundingPolygon.GetCentroid(vertices, out result);
+            return result;
         }
         /// <summary>
         /// repositions the polygon so the Centroid is the origin.
@@ -191,25 +176,11 @@ namespace Physics2DDotNet
         /// <returns>The vertices of the polygon with the Centroid as the Origin.</returns>
         public static Vector2D[] MakeCentroidOrigin(Vector2D[] vertices)
         {
-            if (vertices == null) { throw new ArgumentNullException("vertices"); }
-            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
-            Vector2D centroid = CalcCentroid(vertices);
+            Vector2D centroid;
+            BoundingPolygon.GetCentroid(vertices, out centroid);
             return OperationHelper.ArrayRefOp<Vector2D, Vector2D, Vector2D>(vertices, ref centroid, Vector2D.Subtract);
         }
-        public static Scalar CalcPerimeter(Vector2D[] vertices)
-        {
-            if (vertices == null) { throw new ArgumentNullException("vertices"); }
-            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
-            Scalar returnvalue = 0;
-            int length = vertices.Length;
-            int pos2;
-            for (int pos1 = 0; pos1 != length; ++pos1)
-            {
-                pos2 = (pos1 + 1) % length;
-                returnvalue += (vertices[pos1] - vertices[pos2]).Magnitude;
-            }
-            return returnvalue;
-        } 
+
         #endregion
         #region fields
         private DistanceGrid grid; 

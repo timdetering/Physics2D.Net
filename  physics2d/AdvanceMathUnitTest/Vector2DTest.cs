@@ -1,3 +1,26 @@
+#region MIT License
+/*
+ * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"), to deal 
+ * in the Software without restriction, including without limitation the rights to 
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+ * the Software, and to permit persons to whom the Software is furnished to do so, 
+ * subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be 
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+#endregion
+
 
 #if UseDouble
 using Scalar = System.Double;
@@ -12,8 +35,6 @@ using NUnit.Framework;
 
 namespace AdvanceMath.UnitTest
 {
-
-
 
     [TestFixture]
     public class Vector2DTest
@@ -90,11 +111,24 @@ namespace AdvanceMath.UnitTest
             Assert.AreEqual(matrix2x2 * Vector2D.XAxis, Vector2D.Transform(matrix2x2, Vector2D.XAxis), "matrix2x2 rotation");
             UnitHelper.RefOperationTesterRightSame<Matrix2x2, Vector2D>(matrix2x2, Vector2D.XAxis, matrix2x2 * Vector2D.XAxis, Vector2D.Transform, "matrix2x2 rotation");
             Matrix3x3 matrix3x3 = Matrix3x3.FromTranslate2D(-op1);
-            Assert.AreEqual((matrix3x3 * op1), Vector2D.Transform(matrix3x3, op1), "matrix3x3 Translate");
+            Assert.AreEqual(Vector2D.Zero, matrix3x3 * op1, "matrix3x3 Translate1");
+            Assert.AreEqual((matrix3x3 * op1), Vector2D.Transform(matrix3x3, op1), "matrix3x3 Translate2");
             UnitHelper.RefOperationTesterRightSame<Matrix3x3, Vector2D>(matrix3x3, op1, matrix3x3 * op1, Vector2D.Transform, "matrix3x3 Translate");
             matrix3x3 = Matrix3x3.FromRotationZ(MathHelper.PI);
             Assert.AreEqual((matrix3x3 * op1), Vector2D.Transform(matrix3x3, op1), "matrix3x3 rotation");
             UnitHelper.RefOperationTesterRightSame<Matrix3x3, Vector2D>(matrix3x3, op1, matrix3x3 * op1, Vector2D.Transform, "matrix3x3 rotation");
+
+
+            Matrix2x2 matrix2x2Inv = matrix2x2.Inverted;
+            Vector2D temp = matrix2x2 * op1;
+            temp = matrix2x2Inv * temp;
+            Assert.AreEqual(op1, temp, "inv2x2");
+
+            matrix3x3 = matrix3x3 * Matrix3x3.FromTranslate2D(-op1);
+            Matrix3x3 matrix3x3Inv = matrix3x3.Inverted;
+            temp = matrix3x3 * op1;
+            temp = matrix3x3Inv * temp;
+            Assert.AreEqual(op1, temp, "inv3x3");
         }
         [Test]
         public void Min()

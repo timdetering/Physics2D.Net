@@ -39,7 +39,34 @@ namespace AdvanceMath.Geometry2D
     [AdvBrowsableOrder("Vertex1,Vertex2")]
     public struct LineSegment : IEquatable<LineSegment>
     {
-        public const int Size =  Vector2D.Size*2;
+        public const int Size = Vector2D.Size * 2;
+
+        public static void Intersects(ref Vector2D v1, ref Vector2D v2, ref Vector2D v3, ref Vector2D v4, out bool result)
+        {
+            Scalar div, ua, ub;
+            div = 1 / ((v4.Y - v3.Y) * (v2.X - v1.X) - (v4.X - v3.X) * (v2.Y - v1.Y));
+            ua = ((v4.X - v3.X) * (v1.Y - v3.Y) - (v4.Y - v3.Y) * (v1.X - v3.X)) * div;
+            ub = ((v2.X - v1.X) * (v1.Y - v3.Y) - (v2.Y - v1.Y) * (v1.X - v3.X)) * div;
+            result = ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
+        }
+        public static bool Intersects(ref Vector2D v1, ref Vector2D v2, ref Vector2D v3, ref Vector2D v4, out Vector2D result)
+        {
+            Scalar div, ua, ub;
+            div = 1 / ((v4.Y - v3.Y) * (v2.X - v1.X) - (v4.X - v3.X) * (v2.Y - v1.Y));
+            ua = ((v4.X - v3.X) * (v1.Y - v3.Y) - (v4.Y - v3.Y) * (v1.X - v3.X)) * div;
+            ub = ((v2.X - v1.X) * (v1.Y - v3.Y) - (v2.Y - v1.Y) * (v1.X - v3.X)) * div;
+            if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)
+            {
+                Vector2D.Lerp(ref v1, ref v2, ref ua, out result);
+                return true;
+            }
+            else
+            {
+                result = Vector2D.Zero;
+                return false;
+            }
+        }
+
 
         public static void Intersects(ref Vector2D vertex1, ref Vector2D vertex2, ref Ray ray, out Scalar result)
         {
