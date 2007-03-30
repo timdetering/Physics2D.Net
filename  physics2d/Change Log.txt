@@ -23,6 +23,7 @@ removed: code in the Arbiter class that was not supposed to be there.
 changed: a few shape objects to utilize methods and classes in the AdvanceMath.Geometry2D namespace.
 moved: some logic in Polygon into advanceMaths BoundingPolygon
 renamed: Polygon.CalcArea and CalcCentroid to GetArea and GetCentroid
+changed: The Solver and Detecter with a few speed improvements.
 
 AdvanceMath
 NEXT VERSION:

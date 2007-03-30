@@ -50,7 +50,8 @@ namespace Physics2DDemo
 
             Demo demo = new Demo();
             OpenGlWindow g = new OpenGlWindow(1024, 768);
-            g.DrawCallback = demo.Draw;
+            g.Draw  += demo.Draw;
+            g.ReShape += demo.Reshape;
             g.Run();
         }
     }

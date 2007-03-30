@@ -40,6 +40,7 @@ using Physics2DDotNet.Math2D;
 using System.Media;
 using Tao.OpenGl;
 using SdlDotNet.Core;
+using SdlDotNet.Graphics;
 using System.Diagnostics;
 namespace Physics2DDemo
 {
@@ -934,7 +935,20 @@ namespace Physics2DDemo
             }
 
         }
-        public void Draw(int width, int height)
+
+        public void Reshape(object sender, EventArgs e)
+        {
+            clippersShape.SetRectangle(new BoundingRectangle(Video.Screen.Width, Video.Screen.Height, 0, 0));
+            lock (objects)
+            {
+                foreach (GlDrawObject obj in objects)
+                {
+                    obj.Invalidate();
+                }
+            }
+        }
+        
+        public void Draw(object sender,EventArgs e)
         {
             Gl.glPointSize(3);
             if (sparkle && updated)
@@ -943,7 +957,6 @@ namespace Physics2DDemo
                 AddParticles(sparkPoint, 20);
             }
 
-            clippersShape.SetRectangle(new BoundingRectangle(width, height, 0, 0));
 
             if (!started)
             {
@@ -952,10 +965,6 @@ namespace Physics2DDemo
                 t.IsBackground = true;
                 t.Start();
             }
-            Gl.glTranslatef(width / 2, height / 2, 0);
-            Gl.glRotatef(180, 0, 0, 1);
-            Gl.glRotatef(180, 0, 1, 0);
-            Gl.glTranslatef(-width / 2, -height / 2, 0);
             if (isSlow || isFast)
             {
                 Gl.glBegin(Gl.GL_QUADS);
@@ -1015,7 +1024,10 @@ namespace Physics2DDemo
             Matrix3x3 mat = entity.Shape.Matrix.VertexMatrix;
             Matrix3x3.Copy2DToOpenGlMatrix(ref mat, matrix);
         }
-
+        public void Invalidate()
+        {
+            list = -1;
+        }
         void DrawInternal()
         {
             if (entity.Shape is Physics2DDotNet.Particle)
@@ -1062,7 +1074,6 @@ namespace Physics2DDemo
                 Gl.glEnd();
             }
         }
-
         public void Draw()
         {
             if (entity.Lifetime.IsExpired || !shouldDraw)
@@ -1071,19 +1082,14 @@ namespace Physics2DDemo
             }
             if (Gl.glIsList(list) == 0)
             {
-                Gl.glPushMatrix();
                 Gl.glLoadIdentity();
                 list = Gl.glGenLists(1);
                 Gl.glNewList(list, Gl.GL_COMPILE);
                 DrawInternal();
                 Gl.glEndList();
-                Gl.glPopMatrix();
             }
-            Gl.glPushMatrix();
-            Gl.glMultMatrixf(matrix);
+            Gl.glLoadMatrixf(matrix);
             Gl.glCallList(list);
-            Gl.glPopMatrix();
-
         }
 
         public void Dispose()

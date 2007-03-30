@@ -89,22 +89,22 @@ namespace Physics2DDotNet.Solvers
         }
         sealed class Arbiter : ICollisionInfo
         {
-            static void Collide(List<Contact> contacts, Body entity1, Body entity2)
+            static void Collide(List<Contact> contacts, Body body1, Body body2)
             {
-                BoundingRectangle bb1 = entity1.Shape.Rectangle;
-                BoundingRectangle bb2 = entity2.Shape.Rectangle;
+                BoundingRectangle bb1 = body1.Shape.Rectangle;
+                BoundingRectangle bb2 = body2.Shape.Rectangle;
                 BoundingRectangle targetArea;
                 BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
-                Collide(contacts, entity1, entity2, ref targetArea);
-                Collide(contacts, entity2, entity1, ref targetArea);
+                Collide(contacts, body1, body2, ref targetArea);
+                Collide(contacts, body2, body1, ref targetArea);
             }
-            static void Collide(List<Contact> contacts, Body entity1, Body entity2, ref BoundingRectangle targetArea)
+            static void Collide(List<Contact> contacts, Body body1, Body body2, ref BoundingRectangle targetArea)
             {
-                if (!entity1.Shape.CanGetIntersection)
+                if (!body1.Shape.CanGetIntersection)
                 {
                     return;
                 }
-                Vector2D[] vertexes = entity2.Shape.Vertices;
+                Vector2D[] vertexes = body2.Shape.Vertices;
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
                     Vector2D vector = vertexes[index];
@@ -113,7 +113,7 @@ namespace Physics2DDotNet.Solvers
                     if (contains)
                     {
                         IntersectionInfo info;
-                        if (entity1.Shape.TryGetIntersection(vector, out info))
+                        if (body1.Shape.TryGetIntersection(vector, out info))
                         {
                             Contact contact = new Contact();
                             contact.normal = info.Normal;
@@ -124,13 +124,13 @@ namespace Physics2DDotNet.Solvers
                             }
                             contact.distance = info.Distance;
                             contact.position = vector;
-                            contact.id = index + 1;
-                            if (entity1.ID < entity2.ID)
+                            if (body1.ID < body2.ID)
                             {
-                                contact.id = -contact.id;
+                                contact.id = vertexes.Length - index;
                             }
                             else
                             {
+                                contact.id = index;
                                 Vector2D.Negate(ref contact.normal, out contact.normal);
                             }
                             contacts.Add(contact);
@@ -138,12 +138,9 @@ namespace Physics2DDotNet.Solvers
                     }
                 }
             }
+            static readonly Contact[] Empty = new Contact[0];
 
-            static int CompareContacts(Contact c1, Contact c2)
-            {
-                return c1.distance.CompareTo(c2.distance);
-            }
-            List<Contact> contacts;
+            Contact[] contacts;
             Body body1;
             Body body2;
             SequentialImpulsesTag tag1;
@@ -185,45 +182,47 @@ namespace Physics2DDotNet.Solvers
             public void Update()
             {
                 updated = true;
-                List<Contact> newContacts = new List<Contact>();
-                Collide(newContacts, body1, body2);
-                if (contacts == null)
+                List<Contact> newContacts;
+                bool isEmpty = null == contacts || Empty == contacts;
+                if (isEmpty)
                 {
-                    this.contacts = newContacts;
+                    newContacts = new List<Contact>();
                 }
                 else
                 {
-                    if (newContacts.Count == 0)
-                    {
-                        contacts.Clear();
-                    }
-                    else
-                    {
-                        List<Contact> mergedContacts = new List<Contact>();
-                        foreach (Contact contact in newContacts)
-                        {
-                            Contact oldcontact = contacts.Find(delegate(Contact old) { return old.id == contact.id; });
-                            if (oldcontact != null)
-                            {
-                                if (parent.warmStarting)
-                                {
-                                    contact.Pn = oldcontact.Pn;
-                                    contact.Pt = oldcontact.Pt;
-                                    contact.Pnb = oldcontact.Pnb;
-                                }
-                            }
-                            mergedContacts.Add(contact);
-                        }
-                        contacts.Clear();
-                        contacts = mergedContacts;
-                    }
+                    newContacts = new List<Contact>(contacts.Length);
                 }
-                if (contacts.Count > 0 &&
-                    parent.maxContactCount > 0 &&
-                    contacts.Count > parent.maxContactCount)
+                Collide(newContacts, body1, body2);
+                if (newContacts.Count == 0)
                 {
-                    contacts.Sort(CompareContacts);
-                    contacts.RemoveRange(parent.maxContactCount, contacts.Count - parent.maxContactCount);
+                    this.contacts = Empty;
+                }
+                else if (isEmpty)
+                {
+                    this.contacts = newContacts.ToArray();
+                }
+                else
+                {
+                    Contact[] mergedContacts = newContacts.ToArray();
+                    if (parent.warmStarting)
+                    {
+                        for (int index = 0, oldIndex = 0; index < mergedContacts.Length && oldIndex < contacts.Length; )
+                        {
+                            Contact oldC = contacts[oldIndex];
+                            Contact newC = mergedContacts[index];
+                            if (oldC.id == newC.id)
+                            {
+                                newC.Pn = oldC.Pn;
+                                newC.Pt = oldC.Pt;
+                                newC.Pnb = oldC.Pnb;
+                                ++oldIndex;
+                                ++index;
+                            }
+                            else if (oldC.id < newC.id) { ++oldIndex; }
+                            else { ++index; }
+                        }
+                    }
+                    this.contacts = mergedContacts;
                 }
             }
             static Random rand = new Random();
@@ -236,7 +235,7 @@ namespace Physics2DDotNet.Solvers
                 Scalar mass2Inv = body2.Mass.MassInv;
                 Scalar I2Inv = body2.Mass.MomentofInertiaInv;
 
-                for (int index = 0; index < contacts.Count; ++index)
+                for (int index = 0; index < contacts.Length; ++index)
                 {
                     Contact c = contacts[index];
                     Vector2D.Subtract(ref c.position, ref body1.State.Position.Linear, out c.r1);
@@ -319,15 +318,18 @@ namespace Physics2DDotNet.Solvers
                 Scalar mass2Inv = b2.Mass.MassInv;
                 Scalar I2Inv = b2.Mass.MomentofInertiaInv;
 
-                for (int index = 0; index < contacts.Count; ++index)
+                PhysicsState state1 = b1.State;
+                PhysicsState state2 = b2.State;
+
+                for (int index = 0; index < contacts.Length; ++index)
                 {
                     Contact c = contacts[index];
 
                     // Relative velocity at contact
                     Vector2D dv;
                     PhysicsHelper.GetRelativeVelocity(
-                        ref b1.State.Velocity,
-                        ref b2.State.Velocity,
+                        ref state1.Velocity,
+                        ref state2.Velocity,
                         ref c.r1, ref c.r2, out dv);
 
                     // Compute normal impulse
@@ -364,14 +366,14 @@ namespace Physics2DDotNet.Solvers
                     //Vector2D Pn = dPn * c.normal;
 
                     PhysicsHelper.SubtractImpulse(
-                        ref b1.State.Velocity,
+                        ref state1.Velocity,
                         ref Pn,
                         ref c.r1,
                         ref mass1Inv,
                         ref I1Inv);
 
                     PhysicsHelper.AddImpulse(
-                        ref b2.State.Velocity,
+                        ref state2.Velocity,
                         ref Pn,
                         ref c.r2,
                         ref mass2Inv,
@@ -420,8 +422,8 @@ namespace Physics2DDotNet.Solvers
                     // Relative velocity at contact
 
                     PhysicsHelper.GetRelativeVelocity(
-                        ref b1.State.Velocity,
-                        ref b2.State.Velocity,
+                        ref state1.Velocity,
+                        ref state2.Velocity,
                         ref c.r1, ref c.r2, out dv);
 
 
@@ -459,14 +461,14 @@ namespace Physics2DDotNet.Solvers
                     //Vector2D Pt = dPt * tangent;
 
                     PhysicsHelper.SubtractImpulse(
-                        ref b1.State.Velocity,
+                        ref state1.Velocity,
                         ref Pt,
                         ref c.r1,
                         ref mass1Inv,
                         ref I1Inv);
 
                     PhysicsHelper.AddImpulse(
-                        ref b2.State.Velocity,
+                        ref state2.Velocity,
                         ref Pt,
                         ref c.r2,
                         ref mass2Inv,
@@ -475,7 +477,7 @@ namespace Physics2DDotNet.Solvers
             }
             public bool Collided
             {
-                get { return contacts.Count > 0; }
+                get { return  contacts.Length > 0; }
             }
             ReadOnlyCollection<IContactInfo> ICollisionInfo.Contacts
             {
@@ -514,7 +516,6 @@ namespace Physics2DDotNet.Solvers
         Scalar biasFactor = 0.8f;
         Scalar allowedPenetration = 0.1f;
         int iterations = 10;
-        int maxContactCount = -1;
 
 
 
@@ -560,11 +561,6 @@ namespace Physics2DDotNet.Solvers
         {
             get { return iterations; }
             set { iterations = value; }
-        }
-        public int MaxContactCount
-        {
-            get { return maxContactCount; }
-            set { maxContactCount = value; }
         }
 
         protected internal override ICollisionInfo HandleCollision(Scalar dt, Body first, Body second)

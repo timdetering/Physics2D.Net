@@ -33,11 +33,10 @@ using Tao.OpenGl;
 
 namespace Physics2DDemo
 {
-    public delegate void DrawDelegate(int width, int height);
-
     public class OpenGlWindow
     {
-        public DrawDelegate DrawCallback;
+        public event EventHandler Draw;
+        public event EventHandler ReShape;
 
         Surface screen;
         int width;
@@ -49,23 +48,24 @@ namespace Physics2DDemo
             this.height = height;
         }
 
-        void Draw()
+        void OnDraw()
         {
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             Gl.glLoadIdentity();
-            if (DrawCallback != null) { DrawCallback(width, height); }
+            if (Draw != null) { Draw(this, EventArgs.Empty); }
             Video.GLSwapBuffers();
         }
-        void Reshape()
+        void OnReshape()
         {
             width = screen.Width;
             height = screen.Height;
             Gl.glViewport(0, 0, width, height);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
-            Gl.glOrtho(0, width, 0, height, -1, 1);
+            Gl.glOrtho(0, width, height,0 , -1, 1);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
+            if (ReShape != null) { ReShape(this,EventArgs.Empty); }
         }
 
         void Init()
@@ -92,7 +92,7 @@ namespace Physics2DDemo
             Events.Fps = 60;
 
             Init();
-            Reshape();
+            OnReshape();
             Events.Run();
         }
 
@@ -117,9 +117,9 @@ namespace Physics2DDemo
             if (screen.Width != width || screen.Height != height)
             {
                 Init();
-                Reshape();
+                OnReshape();
             }
-            Draw();
+            OnDraw();
         }
 
         private void Quit(object sender, QuitEventArgs e)
