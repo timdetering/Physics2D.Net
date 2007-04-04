@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Physics2DDemo", "Physics2DD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvanceMathUnitTest", "AdvanceMathUnitTest\AdvanceMathUnitTest.csproj", "{937E6A1D-7944-4CF8-846D-9C93A6CA2C85}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvanceMath", "AdvanceMath\AdvanceMath.csproj", "{A979FDB4-7AB7-444E-9632-77D69D22D743}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{937E6A1D-7944-4CF8-846D-9C93A6CA2C85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{937E6A1D-7944-4CF8-846D-9C93A6CA2C85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{937E6A1D-7944-4CF8-846D-9C93A6CA2C85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A979FDB4-7AB7-444E-9632-77D69D22D743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A979FDB4-7AB7-444E-9632-77D69D22D743}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A979FDB4-7AB7-444E-9632-77D69D22D743}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A979FDB4-7AB7-444E-9632-77D69D22D743}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

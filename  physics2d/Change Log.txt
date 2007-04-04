@@ -56,6 +56,7 @@ fixed: an elusive bug with the BoundingPolygon.GetDistance method and it should 
 changed: LineSegment.Getdistance so it will no longer return a negative value.
 changed: the order of parameters to the BoundingRectagle's constructors.
 removed: origin from Vector2D use Zero instead.
+added: Point2D
 
 Physics2D.Net
 1.2.0.0:

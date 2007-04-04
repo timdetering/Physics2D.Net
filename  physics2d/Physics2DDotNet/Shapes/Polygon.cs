@@ -73,36 +73,10 @@ namespace Physics2DDotNet
             List<Point2D> result = new List<Point2D>();
             do
             {
-                if (result.Count - 2 >= 0)
-                {
-                    Point2D back1 = result[result.Count - 1];
-                    Point2D back2 = result[result.Count - 2];
-                    if (IsInLine(ref back1, ref back2, ref current))
-                    {
-                        result[result.Count - 1] = current;
-                    }
-                    else
-                    {
-                        result.Add(current);
-                    }
-                }
-                else
-                {
-                    result.Add(current);
-                }
-                Point2D temp = current;
+                result.Add(current);
                 current = GetNextVertex(bitmap, current, last);
-                last = temp;
+                last = result[result.Count-1];
             } while (current != first);
-            if (result.Count - 2 >= 0)
-            {
-                Point2D back1 = result[result.Count - 1];
-                Point2D back2 = result[result.Count - 2];
-                if (IsInLine(ref back1, ref back2, ref current))
-                {
-                    result.RemoveAt(result.Count - 1);
-                }
-            }
             Vector2D[] rv = new Vector2D[result.Count];
             for (int index = 0; index < rv.Length; ++index)
             {
@@ -110,15 +84,6 @@ namespace Physics2DDotNet
                 rv[index].Y = result[index].Y;
             }
             return rv;
-        }
-        private static bool IsInLine(ref Point2D v1, ref Point2D v2, ref Point2D v3)
-        {
-            Scalar div1 = (Scalar)(v1.Y - v3.Y);
-            Scalar div2 = (Scalar)(v2.Y - v3.Y);
-            if (div1 == 0 && div1 == 0) { return true; }
-            div1 = (v1.X - v3.X) / div1;
-            div2 = (v2.X - v3.X) / div2;
-            return div1 == div2;
         }
         private static Point2D GetNextVertex(bool[,] bitmap, Point2D current, Point2D last)
         {
@@ -163,7 +128,7 @@ namespace Physics2DDotNet
         public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
         {
             if (bitmap == null) { throw new ArgumentNullException("bitmap"); }
-            return BitmapHelper.CreateFromBitmap(bitmap);
+            return Reduce(BitmapHelper.CreateFromBitmap(bitmap), 0);
         }
         /// <summary>
         /// creates vertexes that describe a Rectangle.
@@ -301,7 +266,6 @@ namespace Physics2DDotNet
             BoundingPolygon.GetCentroid(vertices, out centroid);
             return OperationHelper.ArrayRefOp<Vector2D, Vector2D, Vector2D>(vertices, ref centroid, Vector2D.Subtract);
         }
-
         #endregion
         #region fields
         private DistanceGrid grid; 
