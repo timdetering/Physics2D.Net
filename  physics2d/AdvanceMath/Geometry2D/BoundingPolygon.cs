@@ -37,13 +37,13 @@ namespace AdvanceMath.Geometry2D
     [Serializable]
     public sealed class BoundingPolygon
     {
-        public static bool ContainsExclusive(Vector2D[] vertexes, Vector2D point)
+        public static ContainmentType ContainsExclusive(Vector2D[] vertexes, Vector2D point)
         {
-            bool result;
+            ContainmentType result;
             ContainsExclusive(vertexes, ref point, out result);
             return result;
         }
-        public static void ContainsExclusive(Vector2D[] vertexes, ref Vector2D point, out bool result)
+        public static void ContainsExclusive(Vector2D[] vertexes, ref Vector2D point, out ContainmentType result)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
@@ -62,16 +62,16 @@ namespace AdvanceMath.Geometry2D
                     else { if (temp < 0) { count--; } }
                 }
             }
-            result = count != 0;
+            result = (count != 0) ? (ContainmentType.Contains) : (ContainmentType.Disjoint);
         }
 
-        public static bool ContainsInclusive(Vector2D[] vertexes, Vector2D point)
+        public static ContainmentType ContainsInclusive(Vector2D[] vertexes, Vector2D point)
         {
-            bool result;
+            ContainmentType result;
             ContainsInclusive(vertexes, ref point, out result);
             return result;
         }
-        public static void ContainsInclusive(Vector2D[] vertexes, ref Vector2D point, out bool result)
+        public static void ContainsInclusive(Vector2D[] vertexes, ref Vector2D point, out ContainmentType result)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
@@ -91,12 +91,12 @@ namespace AdvanceMath.Geometry2D
                     }
                     else if (xIntersection == point.X)
                     {
-                        result = true;
+                        result = ContainmentType.Contains;
                         return;
                     }
                 }
             }
-            result = (count & 1) != 0; //true if odd.
+            result = ((count & 1) != 0) ? (ContainmentType.Contains) : (ContainmentType.Disjoint); //true if odd.
         }
 
         public static bool Intersects(Vector2D[] vertexes1, Vector2D[] vertexes2)
@@ -128,7 +128,6 @@ namespace AdvanceMath.Geometry2D
             }
         }
 
-
         public static Scalar GetDistance(Vector2D[] vertexes, Vector2D point)
         {
             Scalar result;
@@ -138,24 +137,33 @@ namespace AdvanceMath.Geometry2D
         public static void GetDistance(Vector2D[] vertexes, ref Vector2D point, out Scalar result)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
-            result = -1;
-            Scalar resultAbs = Scalar.MaxValue;
-            Scalar other, otherABS;
-            Vector2D v1, v2;
-            v1 = vertexes[vertexes.Length - 1];
-            for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
+            Scalar distance1, distance2;
+            int nearestIndex = 0;
+            Vector2D.DistanceSq(ref point, ref vertexes[0], out distance1);
+            for (int index = 1; index < vertexes.Length; ++index)
             {
-                v2 = vertexes[index];
-                int index2 = (index + 1) % vertexes.Length;
-                LineSegment.GetDistance(ref v1, ref v2, ref point, out other);
-                otherABS = Math.Abs(other);
-                if (otherABS < resultAbs)
+                Vector2D.DistanceSq(ref point, ref vertexes[index], out distance2);
+                if (distance1 > distance2)
                 {
-                    result = other;
-                    resultAbs = otherABS;
+                    nearestIndex = index;
+                    distance1 = distance2;
                 }
             }
+            Vector2D prev = vertexes[(nearestIndex - 1 + vertexes.Length) % vertexes.Length];
+            Vector2D good = vertexes[nearestIndex];
+            Vector2D next = vertexes[(nearestIndex + 1) % vertexes.Length];
+            LineSegment.GetDistance(ref prev, ref good, ref point, out distance1);
+            LineSegment.GetDistance(ref good, ref next, ref point, out distance2);
+            result = Math.Min(distance1, distance2);
+            ContainmentType contains;
+            ContainsExclusive(vertexes, ref point, out contains);
+            if (contains == ContainmentType.Contains) { result = -result; }
         }
+
+
+
+
         /// <summary>
         /// Calculates the Centroid of a polygon.
         /// </summary>
@@ -230,7 +238,6 @@ namespace AdvanceMath.Geometry2D
             result = Math.Abs(result * .5f);
         }
 
-
         public static Scalar GetPerimeter(Vector2D[] vertices)
         {
             Scalar result;
@@ -295,68 +302,84 @@ namespace AdvanceMath.Geometry2D
             GetDistance(vertexes, ref point, out result);
         }
 
-        public bool Contains(Vector2D point)
+        public ContainmentType Contains(Vector2D point)
         {
-            bool result;
+            ContainmentType result;
             Contains(ref point, out result);
             return result;
         }
-        public void Contains(ref Vector2D point, out bool result)
+        public void Contains(ref Vector2D point, out ContainmentType result)
         {
             ContainsInclusive(vertexes, ref point, out result);
         }
 
-        public bool Contains(BoundingCircle circle)
+        public ContainmentType Contains(BoundingCircle circle)
         {
-            bool result;
+            ContainmentType result;
             Contains(ref circle, out result);
             return result;
         }
-        public void Contains(ref BoundingCircle circle, out bool result)
+        public void Contains(ref BoundingCircle circle, out ContainmentType result)
         {
             Scalar distance;
             GetDistance(ref circle.Position, out distance);
-            result = distance + circle.Radius <= 0;
+            distance += circle.Radius;
+            if (distance <= 0)
+            {
+                result = ContainmentType.Contains;
+            }
+            else if (distance <= circle.Radius)
+            {
+                result = ContainmentType.Intersects;
+            }
+            else
+            {
+                result = ContainmentType.Disjoint;
+            }
         }
 
-        public bool Contains(BoundingRectangle rect)
+        public ContainmentType Contains(BoundingRectangle rect)
         {
-            bool result;
+            ContainmentType result;
             Contains(ref rect, out result);
             return result;
         }
-        public void Contains(ref BoundingRectangle rect, out bool result)
+        public void Contains(ref BoundingRectangle rect, out ContainmentType result)
         {
             Contains(rect.Corners(), out result);
         }
 
-        public bool Contains(BoundingPolygon polygon)
+        public ContainmentType Contains(BoundingPolygon polygon)
         {
-            bool result;
+            ContainmentType result;
             Contains(ref polygon, out result);
             return result;
         }
-        public void Contains(ref BoundingPolygon polygon, out bool result)
+        public void Contains(ref BoundingPolygon polygon, out ContainmentType result)
         {
             if (polygon == null) { throw new ArgumentNullException("polygon"); }
             Contains(polygon.vertexes, out result);
         }
-        private void Contains(Vector2D[] otherVertexes, out bool result)
+        private void Contains(Vector2D[] otherVertexes, out ContainmentType result)
         {
+            ContainmentType contains;
+            result = ContainmentType.Unknown;
             for (int index = 0; index < vertexes.Length; ++index)
             {
-                ContainsExclusive(otherVertexes, ref vertexes[index], out result);
-                if (result) { result = false; return; }
+                ContainsExclusive(otherVertexes, ref vertexes[index], out contains);
+                if (contains == ContainmentType.Contains) { result = ContainmentType.Intersects; return; }
             }
-            for (int index = 0; index < otherVertexes.Length; ++index)
+            for (int index = 0; index < otherVertexes.Length && result != ContainmentType.Intersects; ++index)
             {
-                ContainsInclusive(vertexes, ref otherVertexes[index], out result);
-                if (!result)
-                {
-                    return;
-                }
+                ContainsInclusive(vertexes, ref otherVertexes[index], out contains);
+                result |= contains;
             }
-            result = true;
+            if (result == ContainmentType.Disjoint)
+            {
+                bool test;
+                Intersects(this.vertexes, otherVertexes, out test);
+                if (test) { result = ContainmentType.Intersects; }
+            }
         }
 
         public Scalar Intersects(Ray ray)

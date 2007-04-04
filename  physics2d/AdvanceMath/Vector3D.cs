@@ -116,19 +116,19 @@ namespace AdvanceMath
             dest.Y = source.Y;
         }
 
-        public static Vector3D Clamp(Vector3D value, Vector3D lower, Vector3D upper)
+        public static Vector3D Clamp(Vector3D value, Vector3D min, Vector3D max)
         {
             Vector3D result;
-            MathHelper.Clamp(ref value.X, ref  lower.X, ref  upper.X, out result.X);
-            MathHelper.Clamp(ref value.Y, ref  lower.Y, ref  upper.Y, out result.Y);
-            MathHelper.Clamp(ref value.Z, ref  lower.Z, ref  upper.Z, out result.Z);
+            MathHelper.Clamp(ref value.X, ref  min.X, ref  max.X, out result.X);
+            MathHelper.Clamp(ref value.Y, ref  min.Y, ref  max.Y, out result.Y);
+            MathHelper.Clamp(ref value.Z, ref  min.Z, ref  max.Z, out result.Z);
             return result;
         }
-        public static void Clamp(ref Vector3D value, ref Vector3D lower, ref Vector3D upper, out Vector3D result)
+        public static void Clamp(ref Vector3D value, ref Vector3D min, ref Vector3D max, out Vector3D result)
         {
-            MathHelper.Clamp(ref value.X, ref  lower.X, ref  upper.X, out result.X);
-            MathHelper.Clamp(ref value.Y, ref  lower.Y, ref  upper.Y, out result.Y);
-            MathHelper.Clamp(ref value.Z, ref  lower.Z, ref  upper.Z, out result.Z);
+            MathHelper.Clamp(ref value.X, ref  min.X, ref  max.X, out result.X);
+            MathHelper.Clamp(ref value.Y, ref  min.Y, ref  max.Y, out result.Y);
+            MathHelper.Clamp(ref value.Z, ref  min.Z, ref  max.Z, out result.Z);
         }
 
         public static Vector3D Lerp(Vector3D left, Vector3D right, Scalar amount)

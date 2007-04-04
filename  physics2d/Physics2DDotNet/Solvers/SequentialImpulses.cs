@@ -108,9 +108,9 @@ namespace Physics2DDotNet.Solvers
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
                     Vector2D vector = vertexes[index];
-                    bool contains;
+                    ContainmentType contains;
                     targetArea.Contains(ref vector, out contains);
-                    if (contains)
+                    if (contains == ContainmentType.Contains)
                     {
                         IntersectionInfo info;
                         if (body1.Shape.TryGetIntersection(vector, out info))

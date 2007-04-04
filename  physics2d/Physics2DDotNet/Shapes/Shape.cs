@@ -185,8 +185,12 @@ namespace Physics2DDotNet
         {
             this.matrix2D = matrix;
             Matrix2D.Invert(ref matrix, out matrix2DInv);
+            ApplyMatrixToVertexes();
+        }
+        protected void ApplyMatrixToVertexes()
+        {
             OperationHelper.ArrayRefOp<Matrix3x3, Vector2D, Vector2D>(
-                ref matrix.VertexMatrix,
+                ref matrix2D.VertexMatrix,
                 this.originalVertexes,
                 this.vertexes,
                 Vector2D.Transform);
@@ -215,9 +219,6 @@ namespace Physics2DDotNet
             this.parent = null;
         } 
         #endregion
-
-
-
     }
 
     /// <summary>

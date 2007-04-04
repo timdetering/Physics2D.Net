@@ -117,17 +117,15 @@ namespace AdvanceMath.Geometry2D
             if (tProj < 0)
             {
                 result = MathHelper.Sqrt(tProj * tProj + nProj * nProj);
-                if (nProj < 0) { result = -result; }
             }
             else if (tProj > edgeLength)
             {
                 tProj -= edgeLength;
                 result = MathHelper.Sqrt(tProj * tProj + nProj * nProj);
-                if (nProj < 0) { result = -result; }
             }
             else
             {
-                result = nProj;
+                result = Math.Abs(nProj);
             }
         }
 

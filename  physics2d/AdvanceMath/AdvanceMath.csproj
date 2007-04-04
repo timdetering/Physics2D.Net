@@ -38,6 +38,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContainmentType.cs" />
+    <Compile Include="Point2D.cs" />
     <Compile Include="Design\AdvPropertyDescriptor.cs" />
     <Compile Include="Design\AdvTypeConverter%27.cs" />
     <Compile Include="Design\AdvBrowsableAttribute.cs" />

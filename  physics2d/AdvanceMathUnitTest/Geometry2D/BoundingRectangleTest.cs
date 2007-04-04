@@ -38,13 +38,31 @@ namespace AdvanceMath.Geometry2D.UnitTest
     [TestFixture]
     public class BoundingRectangleTest
     {
+        BoundingCircle circle1;
+        BoundingCircle circle2;
+        BoundingCircle circle3;
+
+        BoundingRectangle rect1;
+        BoundingRectangle rect2;
+
+        BoundingPolygon polygon1;
+        BoundingPolygon polygon2;
+
         [SetUp]
         public void Init()
         {
+            circle1 = new BoundingCircle(Vector2D.YAxis, 2);
+            circle2 = new BoundingCircle(Vector2D.XAxis, 2);
+            rect1 = BoundingRectangle.FromCircle(circle1);
+            circle3 = BoundingCircle.FromRectangle(rect1);
+            rect2 = BoundingRectangle.FromCircle(circle3);
+            polygon1 = new BoundingPolygon(rect1.Corners());
         }
         [Test]
         public void ContainsCircle()
         {
+
+
             Assert.Fail("Not Implimented");
         }
         [Test]

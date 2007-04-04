@@ -36,7 +36,7 @@ namespace AdvanceMath.Geometry2D
 {
     [StructLayout(LayoutKind.Sequential, Size = BoundingRectangle.Size, Pack = 0), Serializable]
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingRectangle>))]
-    [AdvBrowsableOrder("Max,Min")]
+    [AdvBrowsableOrder("Min,Max")]
     public struct BoundingRectangle : IEquatable<BoundingRectangle>
     {
         public const int Size = Vector2D.Size * 2;
@@ -194,11 +194,11 @@ namespace AdvanceMath.Geometry2D
         /// <summary>
         /// Creates a new BoundingRectangle Instance.
         /// </summary>
-        /// <param name="maxX">The Upper Bound on the XAxis.</param>
-        /// <param name="maxY">The Upper Bound on the YAxis.</param>
         /// <param name="minX">The Lower Bound on the XAxis.</param>
         /// <param name="minY">The Lower Bound on the YAxis.</param>
-        public BoundingRectangle(Scalar maxX, Scalar maxY, Scalar minX, Scalar minY)
+        /// <param name="maxX">The Upper Bound on the XAxis.</param>
+        /// <param name="maxY">The Upper Bound on the YAxis.</param>
+        public BoundingRectangle(Scalar minX, Scalar minY, Scalar maxX, Scalar maxY)
         {
             this.Max.X = maxX;
             this.Max.Y = maxY;
@@ -208,10 +208,10 @@ namespace AdvanceMath.Geometry2D
         /// <summary>
         /// Creates a new BoundingRectangle Instance from 2 Vector2Ds.
         /// </summary>
-        /// <param name="max">The Upper Vector2D.</param>
         /// <param name="min">The Lower Vector2D.</param>
-        [InstanceConstructor("Max,Min")]
-        public BoundingRectangle(Vector2D max, Vector2D min)
+        /// <param name="max">The Upper Vector2D.</param>
+        [InstanceConstructor("Min,Max")]
+        public BoundingRectangle(Vector2D min, Vector2D max)
         {
             this.Max = max;
             this.Min = min;
@@ -263,73 +263,154 @@ namespace AdvanceMath.Geometry2D
             }
         }
 
-        public bool Contains(Vector2D point)
+        public ContainmentType Contains(Vector2D point)
         {
-            return
-                point.X <= Max.X &&
+            if (point.X <= Max.X &&
                 point.X >= Min.X &&
                 point.Y <= Max.Y &&
-                point.Y >= Min.Y;
+                point.Y >= Min.Y)
+            {
+                return ContainmentType.Contains;
+            }
+            else
+            {
+                return ContainmentType.Disjoint;
+            }
+
         }
-        public void Contains(ref Vector2D point, out bool result)
+        public void Contains(ref Vector2D point, out ContainmentType result)
         {
-            result =
-                point.X <= Max.X &&
+            if (point.X <= Max.X &&
                 point.X >= Min.X &&
                 point.Y <= Max.Y &&
-                point.Y >= Min.Y;
+                point.Y >= Min.Y)
+            {
+                result = ContainmentType.Contains;
+            }
+            else
+            {
+                result = ContainmentType.Disjoint;
+            }
         }
 
-        public bool Contains(BoundingRectangle rect)
+        public ContainmentType Contains(BoundingRectangle rect)
         {
-            return
-               this.Min.X <= rect.Min.X &&
-               this.Min.Y <= rect.Min.Y &&
-               this.Max.X >= rect.Max.X &&
-               this.Max.Y >= rect.Max.Y;
+            if (this.Min.X > rect.Max.X ||
+                this.Min.Y > rect.Max.Y ||
+                this.Max.X < rect.Min.X ||
+                this.Max.Y < rect.Min.Y)
+            {
+                return ContainmentType.Disjoint;
+            }
+            else if (
+                this.Min.X <= rect.Min.X &&
+                this.Min.Y <= rect.Min.Y &&
+                this.Max.X >= rect.Max.X &&
+                this.Max.Y >= rect.Max.Y)
+            {
+                return ContainmentType.Contains;
+            }
+            else
+            {
+                return ContainmentType.Intersects;
+            }
         }
-        public void Contains(ref BoundingRectangle rect, out bool result)
+        public void Contains(ref BoundingRectangle rect, out ContainmentType result)
         {
-            result =
-               this.Min.X <= rect.Min.X &&
-               this.Min.Y <= rect.Min.Y &&
-               this.Max.X >= rect.Max.X &&
-               this.Max.Y >= rect.Max.Y;
+            if (this.Min.X > rect.Max.X ||
+                this.Min.Y > rect.Max.Y ||
+                this.Max.X < rect.Min.X ||
+                this.Max.Y < rect.Min.Y)
+            {
+                result = ContainmentType.Disjoint;
+            }
+            else if (
+                this.Min.X <= rect.Min.X &&
+                this.Min.Y <= rect.Min.Y &&
+                this.Max.X >= rect.Max.X &&
+                this.Max.Y >= rect.Max.Y)
+            {
+                result = ContainmentType.Contains;
+            }
+            else
+            {
+                result = ContainmentType.Intersects;
+            }
         }
 
-        public bool Contains(BoundingCircle circle)
+        public ContainmentType Contains(BoundingCircle circle)
         {
-            return
-                (circle.Position.X + circle.Radius) <= Max.X &&
+             if ((circle.Position.X + circle.Radius) <= Max.X &&
+                 (circle.Position.X - circle.Radius) >= Min.X &&
+                 (circle.Position.Y + circle.Radius) <= Max.Y &&
+                 (circle.Position.Y - circle.Radius) >= Min.Y)
+            {
+                return ContainmentType.Contains;
+            }
+            else
+            {
+                bool intersects;
+                circle.Intersects(ref this, out intersects);
+                if (intersects)
+                {
+                    return ContainmentType.Intersects;
+                }
+                else
+                {
+                    return ContainmentType.Disjoint;
+                }
+            }
+        }
+        public void Contains(ref BoundingCircle circle, out ContainmentType result)
+        {
+            if ((circle.Position.X + circle.Radius) <= Max.X &&
                 (circle.Position.X - circle.Radius) >= Min.X &&
                 (circle.Position.Y + circle.Radius) <= Max.Y &&
-                (circle.Position.Y - circle.Radius) >= Min.Y;
-        }
-        public void Contains(ref BoundingCircle circle, out bool result)
-        {
-            result =
-                (circle.Position.X + circle.Radius) <= Max.X &&
-                (circle.Position.X - circle.Radius) >= Min.X &&
-                (circle.Position.Y + circle.Radius) <= Max.Y &&
-                (circle.Position.Y - circle.Radius) >= Min.Y;
+                (circle.Position.Y - circle.Radius) >= Min.Y)
+            {
+                result = ContainmentType.Contains;
+            }
+            else
+            {
+                bool intersects;
+                circle.Intersects(ref this, out intersects);
+                if (intersects)
+                {
+                    result = ContainmentType.Intersects;
+                }
+                else
+                {
+                    result = ContainmentType.Disjoint;
+                }
+            }
         }
 
-        public bool Contains(BoundingPolygon polygon)
+        public ContainmentType Contains(BoundingPolygon polygon)
         {
-            bool result;
+            ContainmentType result;
             Contains(ref polygon, out result);
             return result;
         }
-        public void Contains(ref BoundingPolygon polygon, out bool result)
+        public void Contains(ref BoundingPolygon polygon, out ContainmentType result)
         {
             if (polygon == null) { throw new ArgumentNullException("polygon"); }
             Vector2D[] vertexes = polygon.Vertexes;
-            for (int index = 0; index < vertexes.Length; ++index)
+            result = ContainmentType.Unknown;
+            for (int index = 0; index < vertexes.Length && result != ContainmentType.Intersects; ++index)
             {
-                Contains(ref vertexes[index], out result);
-                if (!result) { return; }
+                ContainmentType con;
+                Contains(ref vertexes[index], out con);
+                result |= con;
             }
-            result = true;
+            if (result == ContainmentType.Disjoint)
+            {
+                bool test;
+                polygon.Intersects(ref this, out test);
+                if (test)
+                {
+                    result = ContainmentType.Intersects;
+                }
+            }
         }
 
         public Scalar Intersects(Ray ray)
@@ -369,7 +450,7 @@ namespace AdvanceMath.Geometry2D
         public void Intersects(ref Ray ray, out Scalar result)
         {
 
-            if (Contains(ray.Origin))
+            if (Contains(ray.Origin)== ContainmentType.Contains)
             {
                 result = 0;
                 return;
@@ -455,7 +536,7 @@ namespace AdvanceMath.Geometry2D
 
         public override string ToString()
         {
-            return string.Format("{0} > {1}", Max, Min);
+            return string.Format("{0} < {1}", Min, Max);
         }
 
         public override bool Equals(object obj)

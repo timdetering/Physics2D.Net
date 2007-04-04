@@ -24,6 +24,7 @@ changed: a few shape objects to utilize methods and classes in the AdvanceMath.G
 moved: some logic in Polygon into advanceMaths BoundingPolygon
 renamed: Polygon.CalcArea and CalcCentroid to GetArea and GetCentroid
 changed: The Solver and Detecter with a few speed improvements.
+added: CreateFromBitmap to the Polygon class a BitmapHelper class that assists it. 
 
 AdvanceMath
 NEXT VERSION:
@@ -50,6 +51,11 @@ changed: the normalize methods on the vetor classes to be inlined.
 fixed: MathHelper.HALF_THREE_PI to be the correct value.
 fixed: ClampAngle and WrapClamp in MathHelper
 added: distance and distanceSq to all Vector classes.
+changed: the contains methods to be closer to XNAs model.
+fixed: an elusive bug with the BoundingPolygon.GetDistance method and it should be faster (in theory).
+changed: LineSegment.Getdistance so it will no longer return a negative value.
+changed: the order of parameters to the BoundingRectagle's constructors.
+removed: origin from Vector2D use Zero instead.
 
 Physics2D.Net
 1.2.0.0:

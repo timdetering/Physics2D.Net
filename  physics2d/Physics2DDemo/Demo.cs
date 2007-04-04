@@ -22,7 +22,11 @@
 #endregion
 
 
-
+#if UseDouble
+using Scalar = System.Double;
+#else
+using Scalar = System.Single;
+#endif
 
 using System;
 using System.Collections.Generic;
@@ -299,6 +303,12 @@ namespace Physics2DDemo
                     coefficients.Duplicate(),
                     new Lifespan());
         }
+
+
+
+
+
+
         void CreateAvatar()
         {
             float Ld2 = 30 / 2;
@@ -938,7 +948,7 @@ namespace Physics2DDemo
 
         public void Reshape(object sender, EventArgs e)
         {
-            clippersShape.SetRectangle(new BoundingRectangle(Video.Screen.Width, Video.Screen.Height, 0, 0));
+            clippersShape.SetRectangle(new BoundingRectangle(0, 0, Video.Screen.Width, Video.Screen.Height));
             lock (objects)
             {
                 foreach (GlDrawObject obj in objects)
@@ -994,6 +1004,7 @@ namespace Physics2DDemo
         #endregion
     }
 
+
     class GlDrawObject : IDisposable
     {
         public bool collided = true;
@@ -1006,6 +1017,7 @@ namespace Physics2DDemo
         {
             get { return removed; }
         }
+        
 
         public GlDrawObject(Body entity)
         {
@@ -1090,6 +1102,7 @@ namespace Physics2DDemo
             }
             Gl.glLoadMatrixf(matrix);
             Gl.glCallList(list);
+
         }
 
         public void Dispose()

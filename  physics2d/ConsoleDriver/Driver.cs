@@ -153,6 +153,40 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
+            BoundingRectangle rect = new BoundingRectangle(0, 0, 1, 1);
+            Console.WriteLine(rect.GetDistance(new Vector2D(2, 1)));
+
+
+            bool[,] test = new bool[,]
+            {
+                {false,true,false},
+                {true,true,true},
+                {false,true,false}
+            };
+            test = new bool[,]
+            {
+                {false,true ,false,false,false},
+                {true ,true ,true ,false,false},
+                {false,true ,true ,true ,false},
+                {false,false,true ,true ,true },
+                {false,false,false,true ,false}
+            };
+
+            Vector2D[] temp = Polygon.CreateFromBitmap(test);
+
+
+            BoundingCircle circle1 = new BoundingCircle(Vector2D.YAxis, 2);
+            BoundingCircle circle2 = new BoundingCircle(Vector2D.XAxis, 2);
+            BoundingRectangle rect1 = BoundingRectangle.FromCircle(circle1);
+            BoundingCircle circle3 = BoundingCircle.FromRectangle(rect1);
+
+            Console.WriteLine(circle3.Contains(rect1));
+            BoundingRectangle rectangle = new BoundingRectangle(0, 0, 1, 1);
+            BoundingCircle circle = new BoundingCircle(new Vector2D(1, 1) + Vector2D.SetMagnitude(new Vector2D(1, 1), 1), 0.9f);
+
+
+            Console.WriteLine(rectangle.Intersects(circle));
+
             Vector2D v1 = new Vector2D(0, 1);
             Vector2D v2 = new Vector2D(2, 1);
 

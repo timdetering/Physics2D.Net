@@ -117,7 +117,19 @@ namespace AdvanceMath
         }
 
 
-
+        public static void Sort(Scalar value1, Scalar value2, out Scalar max, out Scalar min)
+        {
+            if (value1 > value2)
+            {
+                max = value1;
+                min = value2;
+            }
+            else
+            {
+                max = value2;
+                min = value1;
+            }
+        }
 
 
         /// <summary>

@@ -72,10 +72,10 @@ namespace Physics2DDotNet
             }
             Vector2D vector;
             vector.X = rect.Min.X;
-            for (int x = 0; x < xSize; ++x, vector.X += spacing)
+            for (int x = 0; x < xSize; ++x, vector.X += gridSpacing)
             {
                 vector.Y = rect.Min.Y;
-                for (int y = 0; y < ySize; ++y, vector.Y += spacing)
+                for (int y = 0; y < ySize; ++y, vector.Y += gridSpacing)
                 {
                     shape.GetDistance(ref vector, out nodes[x][y]);
                 }
@@ -86,9 +86,9 @@ namespace Physics2DDotNet
         }
         public bool TryGetIntersection(Vector2D vector, out IntersectionInfo result)
         {
-            bool contains;
+            ContainmentType contains;
             rect.Contains(ref vector,out contains);
-            if (contains)
+            if (contains == ContainmentType.Contains)
             {
                 int x = (int)Math.Floor((vector.X - rect.Min.X) * gridSpacingInv);
                 int y = (int)Math.Floor((vector.Y - rect.Min.Y) * gridSpacingInv);

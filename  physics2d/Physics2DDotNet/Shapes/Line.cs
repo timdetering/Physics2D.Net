@@ -131,7 +131,6 @@ namespace Physics2DDotNet
             for (int index = 0; index < vertexes.Length - 1; ++index)
             {
                 LineSegment.GetDistance(ref vertexes[index], ref vertexes[index + 1], ref point, out other);
-                other = Math.Abs(other);
                 if (other < result)
                 {
                     result = other;

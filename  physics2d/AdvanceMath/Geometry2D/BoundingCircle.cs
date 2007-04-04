@@ -34,6 +34,11 @@ using System.Runtime.InteropServices;
 using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
+
+ 
+
+
+
     [StructLayout(LayoutKind.Sequential, Size = BoundingCircle.Size, Pack = 0), Serializable]
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingCircle>))]
     [AdvBrowsableOrder("Position,Radius")]
@@ -123,64 +128,111 @@ namespace AdvanceMath.Geometry2D
             result -= Radius;
         }
 
-        public bool Contains(Vector2D point)
+        public ContainmentType Contains(Vector2D point)
         {
             Scalar distance;
             GetDistance(ref point, out distance);
-            return distance <= 0;
+            return ((distance <= 0) ? (ContainmentType.Contains) : (ContainmentType.Disjoint));
         }
-        public void Contains(ref Vector2D point, out bool result)
+        public void Contains(ref Vector2D point, out ContainmentType result)
         {
             Scalar distance;
             GetDistance(ref point, out distance);
-            result = distance <= 0;
+            result = ((distance <= 0) ? (ContainmentType.Contains) : (ContainmentType.Disjoint));
         }
 
-        public bool Contains(BoundingCircle circle)
+        public ContainmentType Contains(BoundingCircle circle)
         {
             Scalar distance;
             GetDistance(ref circle.Position, out distance);
-            return distance + circle.Radius <= 0;
+            if (-distance >= circle.Radius)
+            {
+                return ContainmentType.Contains;
+            }
+            else if (distance > circle.Radius)
+            {
+                return ContainmentType.Disjoint;
+            }
+            else
+            {
+                return ContainmentType.Intersects;
+            }
         }
-        public void Contains(ref BoundingCircle circle, out bool result)
+        public void Contains(ref BoundingCircle circle, out ContainmentType result)
         {
             Scalar distance;
             GetDistance(ref circle.Position, out distance);
-            result = distance + circle.Radius <= 0;
+            if (-distance >= circle.Radius)
+            {
+                result = ContainmentType.Contains;
+            }
+            else if (distance > circle.Radius)
+            {
+                result = ContainmentType.Disjoint;
+            }
+            else
+            {
+                result = ContainmentType.Intersects;
+            }
         }
 
-        public bool Contains(BoundingRectangle rect)
+        public ContainmentType Contains(BoundingRectangle rect)
         {
-            bool result;
+            ContainmentType result;
             Contains(ref rect, out result);
             return result;
         }
-        public void Contains(ref BoundingRectangle rect, out bool result)
+        public void Contains(ref BoundingRectangle rect, out ContainmentType result)
         {
-            Scalar distance;
-            Vector2D maxDistance;
-            maxDistance.X = Math.Max(rect.Max.X - Position.X, Position.X - rect.Min.X);
-            maxDistance.Y = Math.Max(rect.Max.Y - Position.Y, Position.Y - rect.Min.Y);
-            Vector2D.GetMagnitude(ref maxDistance, out distance);
-            result = distance <= Radius;
+            Scalar mag;
+            Vector2D maxDistance,minDistance;
+            MathHelper.Sort(rect.Max.X - Position.X, Position.X - rect.Min.X, out maxDistance.X,out minDistance.X);
+            MathHelper.Sort(rect.Max.Y - Position.Y, Position.Y - rect.Min.Y, out maxDistance.Y,out minDistance.Y);
+            Vector2D.GetMagnitude(ref maxDistance, out mag);
+            if (mag <= Radius)
+            {
+                result = ContainmentType.Contains;
+            }
+            else 
+            {
+                Vector2D.GetMagnitude(ref minDistance, out mag);
+                if (mag <= Radius)
+                {
+                    result = ContainmentType.Intersects;
+                }
+                else
+                {
+                    result = ContainmentType.Disjoint;
+                }
+            }
         }
 
-        public bool Contains(BoundingPolygon polygon)
+        public ContainmentType Contains(BoundingPolygon polygon)
         {
-            bool result;
+            ContainmentType result;
             Contains(ref polygon, out result);
             return result;
         }
-        public void Contains(ref BoundingPolygon polygon, out bool result)
+        public void Contains(ref BoundingPolygon polygon, out ContainmentType result)
         {
             if (polygon == null) { throw new ArgumentNullException("polygon"); }
             Vector2D[] vertexes = polygon.Vertexes;
-            for (int index = 0; index < vertexes.Length; ++index)
+            result = ContainmentType.Unknown;
+            for (int index = 0; index < vertexes.Length && result != ContainmentType.Intersects; ++index)
             {
-                Contains(ref vertexes[index], out result);
-                if (!result) { return; }
+                ContainmentType con;
+                Contains(ref vertexes[index], out con);
+                result |= con;
             }
-            result = true;
+            if (result == ContainmentType.Disjoint)
+            {
+                bool test;
+                polygon.Intersects(ref this, out test);
+                if (test)
+                {
+                    result = ContainmentType.Intersects;
+                }
+            }
         }
 
         public Scalar Intersects(Ray ray)
@@ -273,19 +325,17 @@ namespace AdvanceMath.Geometry2D
         }
         public void Intersects(ref BoundingRectangle rect, out bool result)
         {
-            result =
-             (Position.X >= rect.Min.X || (rect.Min.X - Position.X) <= Radius) &&
-             (Position.X <= rect.Max.X || (Position.X - rect.Max.X) <= Radius) &&
-             (Position.Y >= rect.Min.Y || (rect.Min.Y - Position.Y) <= Radius) &&
-             (Position.Y <= rect.Max.Y || (Position.Y - rect.Max.Y) <= Radius);
+            Vector2D proj;
+            Vector2D.Clamp(ref Position,ref rect.Min,ref rect.Max, out proj);
+            Scalar distSq;
+            Vector2D.DistanceSq(ref Position, ref proj, out distSq);
+            result = distSq <= Radius * Radius;
         }
         public void Intersects(ref BoundingCircle circle, out bool result)
         {
-            Vector2D diff;
-            Vector2D.Subtract(ref circle.Position, ref Position, out diff);
-            Scalar distance;
-            Vector2D.GetMagnitude(ref  diff, out distance);
-            result = distance < (Radius + circle.Radius);
+            Scalar distSq;
+            Vector2D.DistanceSq(ref Position, ref circle.Position, out distSq);
+            result = distSq <= (Radius * Radius + circle.Radius * circle.Radius);
         }
         public void Intersects(ref BoundingPolygon polygon, out bool result)
         {

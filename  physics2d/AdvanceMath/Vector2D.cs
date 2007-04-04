@@ -59,10 +59,6 @@ namespace AdvanceMath
         /// <summary>
         /// Vector2D(0,0)
         /// </summary>
-        public static readonly Vector2D Origin = new Vector2D();
-        /// <summary>
-        /// Vector2D(0,0)
-        /// </summary>
         public static readonly Vector2D Zero = new Vector2D();
         /// <summary>
         /// Vector2D(1,0)
@@ -122,17 +118,17 @@ namespace AdvanceMath
         /// <param name="lower"></param>
         /// <param name="upper"></param>
         /// <returns></returns>
-        public static Vector2D Clamp(Vector2D value, Vector2D lower, Vector2D upper)
+        public static Vector2D Clamp(Vector2D value, Vector2D min, Vector2D max)
         {
             Vector2D result;
-            MathHelper.Clamp(ref value.X, ref  lower.X, ref  upper.X, out result.X);
-            MathHelper.Clamp(ref value.Y, ref  lower.Y, ref  upper.Y, out result.Y);
+            MathHelper.Clamp(ref value.X, ref  min.X, ref  max.X, out result.X);
+            MathHelper.Clamp(ref value.Y, ref  min.Y, ref  max.Y, out result.Y);
             return result;
         }
-        public static void Clamp(ref Vector2D value, ref Vector2D lower, ref Vector2D upper, out Vector2D result)
+        public static void Clamp(ref Vector2D value, ref Vector2D min, ref Vector2D max, out Vector2D result)
         {
-            MathHelper.Clamp(ref value.X, ref  lower.X, ref  upper.X, out result.X);
-            MathHelper.Clamp(ref value.Y, ref  lower.Y, ref  upper.Y, out result.Y);
+            MathHelper.Clamp(ref value.X, ref  min.X, ref  max.X, out result.X);
+            MathHelper.Clamp(ref value.Y, ref  min.Y, ref  max.Y, out result.Y);
         }
 
         public static Vector2D Lerp(Vector2D left, Vector2D right, Scalar amount)
@@ -160,27 +156,31 @@ namespace AdvanceMath
 
         public static Scalar Distance(Vector2D left, Vector2D right)
         {
-            Scalar result;
-            Distance(ref left, ref right, out result);
-            return result;
+            Scalar x, y;
+            x = left.X - right.X;
+            y = left.Y - right.Y;
+            return MathHelper.Sqrt(x * x + y * y);
         }
         public static void Distance(ref Vector2D left, ref Vector2D right, out Scalar result)
         {
-            Vector2D diff;
-            Subtract(ref left, ref right, out diff);
-            GetMagnitude(ref diff, out result);
+            Scalar x, y;
+            x = left.X - right.X;
+            y = left.Y - right.Y;
+            result = MathHelper.Sqrt(x * x + y * y);
         }
         public static Scalar DistanceSq(Vector2D left, Vector2D right)
         {
-            Scalar result;
-            DistanceSq(ref left, ref right, out result);
-            return result;
+            Scalar x, y;
+            x = left.X - right.X;
+            y = left.Y - right.Y;
+            return x * x + y * y;
         }
         public static void DistanceSq(ref Vector2D left, ref Vector2D right, out Scalar result)
         {
-            Vector2D diff;
-            Subtract(ref left, ref right, out diff);
-            GetMagnitudeSq(ref diff, out result);
+            Scalar x, y;
+            x = left.X - right.X;
+            y = left.Y - right.Y;
+            result = x * x + y * y;
         }
         /// <summary>
         /// Creates a Vector2D With the given length (<see cref="Magnitude"/>) and the given <see cref="Angle"/>.
@@ -727,7 +727,7 @@ namespace AdvanceMath
             result.Y = -sourceX;
         }
 
-        public static Vector2D Hermite(Vector2D value1, Vector2D tangent1, Vector2D value2, Vector2D tangent2,Scalar amount)
+        public static Vector2D Hermite(Vector2D value1, Vector2D tangent1, Vector2D value2, Vector2D tangent2, Scalar amount)
         {
             Vector2D result;
             Hermite(ref value1, ref tangent1, ref value2, ref tangent2, amount, out result);

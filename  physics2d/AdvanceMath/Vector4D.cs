@@ -123,21 +123,21 @@ namespace AdvanceMath
             dest.Y = source.Y;
         }
 
-        public static Vector4D Clamp(Vector4D value, Vector4D lower, Vector4D upper)
+        public static Vector4D Clamp(Vector4D value, Vector4D min, Vector4D max)
         {
             Vector4D result;
-            MathHelper.Clamp(ref value.X, ref  lower.X, ref  upper.X, out result.X);
-            MathHelper.Clamp(ref value.Y, ref  lower.Y, ref  upper.Y, out result.Y);
-            MathHelper.Clamp(ref value.Z, ref  lower.Z, ref  upper.Z, out result.Z);
-            MathHelper.Clamp(ref value.W, ref  lower.W, ref  upper.W, out result.W);
+            MathHelper.Clamp(ref value.X, ref  min.X, ref  max.X, out result.X);
+            MathHelper.Clamp(ref value.Y, ref  min.Y, ref  max.Y, out result.Y);
+            MathHelper.Clamp(ref value.Z, ref  min.Z, ref  max.Z, out result.Z);
+            MathHelper.Clamp(ref value.W, ref  min.W, ref  max.W, out result.W);
             return result;
         }
-        public static void Clamp(ref Vector4D value, ref Vector4D lower, ref Vector4D upper, out Vector4D result)
+        public static void Clamp(ref Vector4D value, ref Vector4D min, ref Vector4D max, out Vector4D result)
         {
-            MathHelper.Clamp(ref value.X, ref  lower.X, ref  upper.X, out result.X);
-            MathHelper.Clamp(ref value.Y, ref  lower.Y, ref  upper.Y, out result.Y);
-            MathHelper.Clamp(ref value.Z, ref  lower.Z, ref  upper.Z, out result.Z);
-            MathHelper.Clamp(ref value.W, ref  lower.W, ref  upper.W, out result.W);
+            MathHelper.Clamp(ref value.X, ref  min.X, ref  max.X, out result.X);
+            MathHelper.Clamp(ref value.Y, ref  min.Y, ref  max.Y, out result.Y);
+            MathHelper.Clamp(ref value.Z, ref  min.Z, ref  max.Z, out result.Z);
+            MathHelper.Clamp(ref value.W, ref  min.W, ref  max.W, out result.W);
         }
 
 

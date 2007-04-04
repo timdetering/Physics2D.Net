@@ -171,7 +171,7 @@ namespace Physics2DDotNet.Detectors
             int count2 = 0;
             List<Stub> list1;
             List<Stub> list2;
-            bool xSmall = lastXCount > lastYCount;
+            bool xSmall = lastXCount < lastYCount;
             if (xSmall)
             {
                 list1 = yStubs;

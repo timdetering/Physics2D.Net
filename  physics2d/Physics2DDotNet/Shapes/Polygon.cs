@@ -40,10 +40,131 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+
+    static class BitmapHelper
+    {
+        static Point2D[] bitmapPoints = new Point2D[]{
+            new Point2D (1,1),
+            new Point2D (0,1),
+            new Point2D (-1,1),
+            new Point2D (-1,0),
+            new Point2D (-1,-1),
+            new Point2D (0,-1),
+            new Point2D (1,-1),
+            new Point2D (1,0),
+        };
+        public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
+        {
+            Point2D first = Point2D.Zero;
+            bool test = true;
+            for (int x = bitmap.GetLength(0) - 1; x > -1 && test; --x)
+            {
+                for (int y = 0; y < bitmap.GetLength(1); ++y)
+                {
+                    if (bitmap[x, y])
+                    {
+                        first = new Point2D(x, y);
+                        test = false;
+                    }
+                }
+            }
+            Point2D current = first;
+            Point2D last = first - new Point2D(0, 1);
+            List<Point2D> result = new List<Point2D>();
+            do
+            {
+                if (result.Count - 2 >= 0)
+                {
+                    Point2D back1 = result[result.Count - 1];
+                    Point2D back2 = result[result.Count - 2];
+                    if (IsInLine(ref back1, ref back2, ref current))
+                    {
+                        result[result.Count - 1] = current;
+                    }
+                    else
+                    {
+                        result.Add(current);
+                    }
+                }
+                else
+                {
+                    result.Add(current);
+                }
+                Point2D temp = current;
+                current = GetNextVertex(bitmap, current, last);
+                last = temp;
+            } while (current != first);
+            if (result.Count - 2 >= 0)
+            {
+                Point2D back1 = result[result.Count - 1];
+                Point2D back2 = result[result.Count - 2];
+                if (IsInLine(ref back1, ref back2, ref current))
+                {
+                    result.RemoveAt(result.Count - 1);
+                }
+            }
+            Vector2D[] rv = new Vector2D[result.Count];
+            for (int index = 0; index < rv.Length; ++index)
+            {
+                rv[index].X = result[index].X;
+                rv[index].Y = result[index].Y;
+            }
+            return rv;
+        }
+        private static bool IsInLine(ref Point2D v1, ref Point2D v2, ref Point2D v3)
+        {
+            Scalar div1 = (Scalar)(v1.Y - v3.Y);
+            Scalar div2 = (Scalar)(v2.Y - v3.Y);
+            if (div1 == 0 && div1 == 0) { return true; }
+            div1 = (v1.X - v3.X) / div1;
+            div2 = (v2.X - v3.X) / div2;
+            return div1 == div2;
+        }
+        private static Point2D GetNextVertex(bool[,] bitmap, Point2D current, Point2D last)
+        {
+            int offset = 0;
+            Point2D point;
+            for (int index = 0; index < bitmapPoints.Length; ++index)
+            {
+                Point2D.Add(ref current, ref bitmapPoints[index], out point);
+                if (Point2D.Equals(ref point, ref last))
+                {
+                    offset = index + 1;
+                    break;
+                }
+            }
+            for (int index = 0; index < bitmapPoints.Length; ++index)
+            {
+                Point2D.Add(
+                    ref current,
+                    ref bitmapPoints[(index + offset) % bitmapPoints.Length],
+                    out point);
+                if (point.X >= 0 && point.X < bitmap.GetLength(0) &&
+                    point.Y >= 0 && point.Y < bitmap.GetLength(1) &&
+                    bitmap[point.X, point.Y])
+                {
+                    return point;
+                }
+            }
+            throw new Exception();
+        }
+    }
+
     [Serializable]
     public sealed class Polygon : Shape
     {
         #region static methods
+        /// <summary>
+        /// Takes a 2D boolean array with a true value representing a bitmap
+        /// and converts it to an array of vertex that surround that bitmap.
+        /// </summary>
+        /// <param name="bitmap">a bitmap to be converted. true means its collidable.</param>
+        /// <returns>a Vector2D[] representing the bitmap.</returns>
+        public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
+        {
+            if (bitmap == null) { throw new ArgumentNullException("bitmap"); }
+            return BitmapHelper.CreateFromBitmap(bitmap);
+        }
         /// <summary>
         /// creates vertexes that describe a Rectangle.
         /// </summary>

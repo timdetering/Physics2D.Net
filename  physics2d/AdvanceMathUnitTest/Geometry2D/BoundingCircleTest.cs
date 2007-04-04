@@ -61,30 +61,30 @@ namespace AdvanceMath.Geometry2D.UnitTest
         [Test]
         public void ContainsCircle()
         {
-            Assert.IsTrue(circle1.Contains(circle1),"1");
-            Assert.IsFalse(circle1.Contains(circle2),"2");
-            Assert.IsTrue(circle3.Contains(circle1), "3");
-            Assert.IsFalse(circle1.Contains(circle3), "4");
+            Assert.IsTrue(circle1.Contains(circle1) == ContainmentType.Contains,"1");
+            Assert.IsFalse(circle1.Contains(circle2) == ContainmentType.Contains, "2");
+            Assert.IsTrue(circle3.Contains(circle1) == ContainmentType.Contains, "3");
+            Assert.IsFalse(circle1.Contains(circle3) == ContainmentType.Contains, "4");
         }
         [Test]
         public void ContainsPoint()
         {
-            Assert.IsTrue(circle1.Contains(Vector2D.YAxis + new Vector2D(2, 0)), "1");
-            Assert.IsTrue(circle1.Contains(Vector2D.YAxis + new Vector2D(0, 2)), "2");
-            Assert.IsFalse(circle1.Contains(Vector2D.YAxis + new Vector2D(1, 2)), "3");
-            Assert.IsTrue(circle1.Contains(Vector2D.YAxis), "4");
+            Assert.IsTrue(circle1.Contains(Vector2D.YAxis + new Vector2D(2, 0)) == ContainmentType.Contains, "1");
+            Assert.IsTrue(circle1.Contains(Vector2D.YAxis + new Vector2D(0, 2)) == ContainmentType.Contains, "2");
+            Assert.IsFalse(circle1.Contains(Vector2D.YAxis + new Vector2D(1, 2)) == ContainmentType.Contains, "3");
+            Assert.IsTrue(circle1.Contains(Vector2D.YAxis) == ContainmentType.Contains, "4");
         }
         [Test]
         public void ContainsRectangle()
         {
-            Assert.IsTrue(circle3.Contains(rect1), "1");
-            Assert.IsFalse(circle1.Contains(rect1), "2");
+            Assert.IsTrue(circle3.Contains(rect1) == ContainmentType.Contains, "1");
+            Assert.IsFalse(circle1.Contains(rect1) == ContainmentType.Contains, "2");
         }
         [Test]
         public void ContainsPolygon()
         {
-            Assert.IsTrue(circle3.Contains(polygon1), "1");
-            Assert.IsFalse(circle1.Contains(polygon1), "2");
+            Assert.IsTrue(circle3.Contains(polygon1) == ContainmentType.Contains, "1");
+            Assert.IsFalse(circle1.Contains(polygon1) == ContainmentType.Contains, "2");
         }
         [Test]
         public void IntersectsRectangle()
