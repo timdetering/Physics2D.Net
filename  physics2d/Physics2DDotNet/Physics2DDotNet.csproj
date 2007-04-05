@@ -38,12 +38,12 @@
     <Compile Include="DataTypes\RemovedEventArgs.cs" />
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Ignorers\CollisionGroupIgnorer.cs" />
+    <Compile Include="Ignorers\CollisionIgnorer.cs" />
     <Compile Include="Joints\PivotJoint.cs" />
     <Compile Include="Joints\HingeJoint.cs" />
     <Compile Include="Math2D\ALVector2D.cs" />
     <Compile Include="DataTypes\Coefficients.cs" />
     <Compile Include="DataTypes\CollisionEventArgs.cs" />
-    <Compile Include="CollisionIgnorer.cs" />
     <Compile Include="Detectors\SweepAndPruneDetector.cs" />
     <Compile Include="DistanceGrid.cs" />
     <Compile Include="Math2D\Matrix2D.cs" />

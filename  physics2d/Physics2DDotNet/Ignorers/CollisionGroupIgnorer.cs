@@ -52,7 +52,7 @@ namespace Physics2DDotNet
         }
 
         /// <summary>
-        /// gets the number of collison Groups the ignore is part of.
+        /// Gets the number of collison Groups the ignorer is part of.
         /// </summary>
         public int Count
         {
@@ -67,7 +67,7 @@ namespace Physics2DDotNet
         /// Trys to add a group.
         /// </summary>
         /// <param name="item">The group ID to add.</param>
-        /// <returns>false if the ignore was already part of the group; otherwise false.</returns>
+        /// <returns>false if the ignorer was already part of the group; otherwise false.</returns>
         public bool Add(int item)
         {
             if (!Contains(item))
@@ -88,7 +88,6 @@ namespace Physics2DDotNet
             if (array == null) { throw new ArgumentNullException("collection"); }
             Array.Sort(array);
             List<int> newGroups = new List<int>(groups.Count + array.Length);
-            Comparer<int> comparer = Comparer<int>.Default;
 
             int newIndex = 0;
             int oldIndex = 0;
