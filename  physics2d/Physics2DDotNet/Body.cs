@@ -52,11 +52,13 @@ namespace Physics2DDotNet
             if (body1 == null) { throw new ArgumentNullException("body1"); }
             if (body2 == null) { throw new ArgumentNullException("body2"); }
             return
+                body1.isCollidable &&
+                body2.isCollidable &&
                 (body1.ignorer == null ||
-                (body1.ignorer.IsCollidable && body1.ignorer.CanCollide(body2)))
+                (body1.ignorer.CanCollide(body2)))
                 &&
                 (body2.ignorer == null ||
-                (body2.ignorer.IsCollidable && body2.ignorer.CanCollide(body1)));
+                (body2.ignorer.CanCollide(body1)));
         }
         #endregion
         #region events
@@ -109,6 +111,7 @@ namespace Physics2DDotNet
         bool ignoresCollisionResponce;
         bool broadPhaseDetectionOnly;
         bool isPending;
+        bool isCollidable;
         object tag;
         object solverTag;
         object detectorTag;
@@ -157,6 +160,7 @@ namespace Physics2DDotNet
             this.massInfo = massInfo;
             this.coefficients = coefficients;
             this.lifetime = lifetime;
+            this.isCollidable = true;
         }
 
         private Body(Body copy)
@@ -169,8 +173,14 @@ namespace Physics2DDotNet
             this.massInfo = copy.massInfo;
             this.coefficients = copy.coefficients;
             this.lifetime = copy.lifetime.Duplicate();
-            this.ignorer = copy.ignorer;
-
+            if (copy.ignorer is ICloneable)
+            {
+                this.ignorer = (CollisionIgnorer)((ICloneable)copy.ignorer).Clone();
+            }
+            else
+            {
+                this.ignorer = copy.ignorer;
+            }
             if (copy.tag is ICloneable)
             {
                 this.tag = ((ICloneable)copy.tag).Clone();
@@ -179,6 +189,10 @@ namespace Physics2DDotNet
             {
                 this.tag = copy.tag;
             }
+            this.isCollidable = copy.isCollidable;
+            this.broadPhaseDetectionOnly = copy.broadPhaseDetectionOnly;
+            this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
+            this.ignoresGravity = copy.ignoresGravity;
         }
         #endregion
         #region properties
@@ -356,7 +370,14 @@ namespace Physics2DDotNet
                 return engine != null && !isPending;
             }
         }
-
+        /// <summary>
+        /// gets and sets if the body will have any collision detection ran on it.
+        /// </summary>
+        public bool IsCollidable
+        {
+            get { return isCollidable; }
+            set { isCollidable = value; }
+        }
         public Scalar KineticEnergy
         {
             get
@@ -513,13 +534,7 @@ namespace Physics2DDotNet
         public bool CanCollide(Body other)
         {
             if (other == null) { throw new ArgumentNullException("other"); }
-            return
-                (ignorer == null ||
-                (ignorer.IsCollidable && ignorer.CanCollide(other)))
-                &&
-                (other.ignorer == null ||
-                (other.ignorer.IsCollidable && other.ignorer.CanCollide(other)));
-
+            return CanCollide(this, other);
         }
         public Body Duplicate()
         {

@@ -25,6 +25,9 @@ moved: some logic in Polygon into advanceMaths BoundingPolygon
 renamed: Polygon.CalcArea and CalcCentroid to GetArea and GetCentroid
 changed: The Solver and Detecter with a few speed improvements.
 added: CreateFromBitmap to the Polygon class a BitmapHelper class that assists it. 
+fixed: Body.duplicate to copy the boolean values.
+changed: the collisionIgnorer to not have the IsCollidable value and moved it to Body.
+Added: CollisionGroupIgnorer that impliments CollisionIgnorer
 
 AdvanceMath
 NEXT VERSION:

@@ -153,49 +153,29 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-            BoundingRectangle rect = new BoundingRectangle(0, 0, 1, 1);
-            Console.WriteLine(rect.GetDistance(new Vector2D(2, 1)));
+            CollisionGroupIgnorer ignorer = new CollisionGroupIgnorer();
+            ignorer.AddRange(new int[] { 1, 2, 3, 4, 5 });
+            ignorer.AddRange(new int[] { 1, 2, 3, 4, 5 });
+            ignorer.Add(6);
+            ignorer.Add(6);
+            ignorer.RemoveRange(new int[] { 1, 3, 5 });
+            Console.WriteLine(ignorer.Contains(3));
+            Console.WriteLine(ignorer.Contains(4));
+            Console.WriteLine(ignorer.ContainsRange(new int[] { 1, 2, 3, 4, 5, 6 }));
+            ignorer.AddRange(new int[] { 1, 3, 5 });
+            Console.WriteLine(ignorer.Contains(3));
+            Console.WriteLine(ignorer.ContainsRange(new int[] { 1, 2, 3, 4, 5, 6 }));
+            ignorer.RemoveRange(new int[] { 1, 3, 5 });
 
 
-            bool[,] test = new bool[,]
-            {
-                {false,true,false},
-                {true,true,true},
-                {false,true,false}
-            };
-            test = new bool[,]
-            {
-                {false,true ,false,false,false},
-                {true ,true ,true ,false,false},
-                {false,true ,true ,true ,false},
-                {false,false,true ,true ,true },
-                {false,false,false,true ,false}
-            };
-
-            Vector2D[] temp = Polygon.CreateFromBitmap(test);
-
-
-            BoundingCircle circle1 = new BoundingCircle(Vector2D.YAxis, 2);
-            BoundingCircle circle2 = new BoundingCircle(Vector2D.XAxis, 2);
-            BoundingRectangle rect1 = BoundingRectangle.FromCircle(circle1);
-            BoundingCircle circle3 = BoundingCircle.FromRectangle(rect1);
-
-            Console.WriteLine(circle3.Contains(rect1));
-            BoundingRectangle rectangle = new BoundingRectangle(0, 0, 1, 1);
-            BoundingCircle circle = new BoundingCircle(new Vector2D(1, 1) + Vector2D.SetMagnitude(new Vector2D(1, 1), 1), 0.9f);
-
-
-            Console.WriteLine(rectangle.Intersects(circle));
-
-            Vector2D v1 = new Vector2D(0, 1);
-            Vector2D v2 = new Vector2D(2, 1);
-
-            Vector2D v3 = new Vector2D(1, 0);
-            Vector2D v4 = new Vector2D(1, 1);
-            bool re;
-            LineSegment.Intersects(ref v1, ref v2, ref v3, ref v4, out re);
-            Console.WriteLine(re);
-
+            Body b = new Body(new PhysicsState(), new Circle(3, 7), 6, new Coefficients(1, 1, 1), new Lifespan());
+            b.Ignorer = ignorer;
+            CollisionGroupIgnorer ignorer2 = new CollisionGroupIgnorer();
+            ignorer2.AddRange(new int[] { 1, 3, 5 });
+            Console.WriteLine(ignorer2.CanCollide(b));
+            ignorer.AddRange(new int[] {  5 });
+            Console.WriteLine(ignorer2.CanCollide(b));
+            ignorer2.Remove(5);
 
             Console.WriteLine("Finished");
             Console.ReadLine();

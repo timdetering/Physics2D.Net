@@ -149,6 +149,7 @@ namespace Physics2DDotNet
         public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
         {
             if (bitmap == null) { throw new ArgumentNullException("bitmap"); }
+            if (bitmap.GetLength(0) < 2 || bitmap.GetLength(1) < 2) { throw new ArgumentOutOfRangeException("bitmap"); }
             return BitmapHelper.CreateFromBitmap(bitmap);
         }
         /// <summary>
@@ -332,7 +333,6 @@ namespace Physics2DDotNet
         {
             this.grid = copy.grid;
         }
-        
         #endregion
         #region properties
         public override bool CanGetIntersection

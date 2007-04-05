@@ -41,7 +41,6 @@ namespace Physics2DDotNet
     [Serializable]
     public abstract class CollisionIgnorer
     {
-        public abstract bool IsCollidable { get;set;}
         public abstract bool CanCollide(Body other);
         public virtual void UpdateTime(Scalar dt) { }
     }
