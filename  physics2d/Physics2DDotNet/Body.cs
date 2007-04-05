@@ -531,11 +531,6 @@ namespace Physics2DDotNet
             }
         }
 
-        public bool CanCollide(Body other)
-        {
-            if (other == null) { throw new ArgumentNullException("other"); }
-            return CanCollide(this, other);
-        }
         public Body Duplicate()
         {
             return new Body(this);

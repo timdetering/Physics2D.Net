@@ -28,6 +28,7 @@ added: CreateFromBitmap to the Polygon class a BitmapHelper class that assists i
 fixed: Body.duplicate to copy the boolean values.
 changed: the collisionIgnorer to not have the IsCollidable value and moved it to Body.
 Added: CollisionGroupIgnorer that impliments CollisionIgnorer
+removed: CanCollide(1) from Body. You should use CanCollide(2)
 
 AdvanceMath
 NEXT VERSION:
