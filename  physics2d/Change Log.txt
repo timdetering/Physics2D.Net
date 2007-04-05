@@ -57,6 +57,7 @@ changed: LineSegment.Getdistance so it will no longer return a negative value.
 changed: the order of parameters to the BoundingRectagle's constructors.
 removed: origin from Vector2D use Zero instead.
 added: Point2D
+added: IntersectionType
 
 Physics2D.Net
 1.2.0.0:

@@ -55,19 +55,7 @@ namespace Physics2DDotNet
         };
         public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
         {
-            Point2D first = Point2D.Zero;
-            bool test = true;
-            for (int x = bitmap.GetLength(0) - 1; x > -1 && test; --x)
-            {
-                for (int y = 0; y < bitmap.GetLength(1); ++y)
-                {
-                    if (bitmap[x, y])
-                    {
-                        first = new Point2D(x, y);
-                        test = false;
-                    }
-                }
-            }
+            Point2D first = GetFirst(bitmap);
             Point2D current = first;
             Point2D last = first - new Point2D(0, 1);
             List<Point2D> result = new List<Point2D>();
@@ -77,13 +65,22 @@ namespace Physics2DDotNet
                 current = GetNextVertex(bitmap, current, last);
                 last = result[result.Count-1];
             } while (current != first);
-            Vector2D[] rv = new Vector2D[result.Count];
-            for (int index = 0; index < rv.Length; ++index)
+            if (result.Count < 3) { throw new ArgumentException("TODO", "bitmap"); }
+            return Reduce(result);
+        }
+        private static Point2D GetFirst(bool[,] bitmap)
+        {
+            for (int x = bitmap.GetLength(0) - 1; x > -1; --x)
             {
-                rv[index].X = result[index].X;
-                rv[index].Y = result[index].Y;
+                for (int y = 0; y < bitmap.GetLength(1); ++y)
+                {
+                    if (bitmap[x, y])
+                    {
+                        return new Point2D(x, y);
+                    }
+                }
             }
-            return rv;
+            throw new ArgumentException("TODO", "bitmap");
         }
         private static Point2D GetNextVertex(bool[,] bitmap, Point2D current, Point2D last)
         {
@@ -111,7 +108,31 @@ namespace Physics2DDotNet
                     return point;
                 }
             }
-            throw new Exception();
+            throw new ArgumentException("TODO", "bitmap");
+        }
+        private static Vector2D[] Reduce(List<Point2D> list)
+        {
+            List<Vector2D> result = new List<Vector2D>(list.Count);
+            Point2D p1 = list[list.Count - 2];
+            Point2D p2 = list[list.Count - 1];
+            Point2D p3;
+            for (int index = 0; index < list.Count; ++index, p2 = p3)
+            {
+                p3 = list[index];
+                if (!IsInLine(ref p1, ref p2, ref p3))
+                {
+                    result.Add(new Vector2D(p2.X, p2.Y));
+                    p1 = p2;
+                }
+            }
+            return result.ToArray();
+        }
+        private static bool IsInLine(ref Point2D p1, ref Point2D p2, ref Point2D p3)
+        {
+            int slope1 = (p1.Y - p2.Y);
+            int slope2 = (p2.Y - p3.Y);
+            return 0 == slope1 && 0 == slope2 ||
+               ((p1.X - p2.X) / (Scalar)slope1) == ((p2.X - p3.X) / (Scalar)slope2);
         }
     }
 
@@ -128,7 +149,7 @@ namespace Physics2DDotNet
         public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
         {
             if (bitmap == null) { throw new ArgumentNullException("bitmap"); }
-            return Reduce(BitmapHelper.CreateFromBitmap(bitmap), 0);
+            return BitmapHelper.CreateFromBitmap(bitmap);
         }
         /// <summary>
         /// creates vertexes that describe a Rectangle.
@@ -215,20 +236,22 @@ namespace Physics2DDotNet
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 2) { throw new ArgumentOutOfRangeException("vertexes"); }
             if (minAngle < 0) { throw new ArgumentOutOfRangeException("minAngle"); }
-
-            List<Vector2D> list = new List<Vector2D>(vertexes.Length);
-            Scalar lastAngle = (vertexes[0] - vertexes[vertexes.Length-1]).Angle;
-            for (int index = 0; index < vertexes.Length; ++index)
+            List<Vector2D> result = new List<Vector2D>(vertexes.Length);
+            Vector2D v1, v2, v3;
+            v1 = vertexes[vertexes.Length - 2];
+            v2 = vertexes[vertexes.Length - 1];
+            for (int index = 0; index < vertexes.Length; ++index, v2 = v3)
             {
-                int index2 = (index + 1) % vertexes.Length;
-                Scalar angle = (vertexes[index2] - vertexes[index]).Angle;
-                if (Math.Abs(lastAngle - angle) > minAngle)
+                v3 = vertexes[index];
+                Scalar angle = (v1 - v2).Angle;
+                Scalar angle2 = (v2 - v3).Angle;
+                if (Math.Abs(MathHelper.ClampAngle(angle2 - angle)) > minAngle)
                 {
-                    list.Add(vertexes[index]);
+                    result.Add(v2);
+                    v1 = v2;
                 }
-                lastAngle = angle;
             }
-            return list.ToArray();
+            return result.ToArray();
         }
         /// <summary>
         /// Calculates the area of a polygon.
