@@ -611,14 +611,14 @@ namespace Physics2DDemo
                     1,
                     coefficients.Duplicate(),
                     new Lifespan(.5f));
-
-                particle.State.Velocity.Linear = Vector2D.FromLengthAndAngle(rand.Next(200, 1001), index * angle + ((float)rand.NextDouble() - .5f) * angle);
+                Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((float)rand.NextDouble() - .5f) * angle);
+                particle.State.Position.Linear += direction;
+                particle.State.Velocity.Linear = direction * rand.Next(200, 1001);
                 particles[index] = particle;
                 particle.Collided += new EventHandler<CollisionEventArgs>(particle_Collided);
-
             }
-            AddGlObjectRange(particles);
             engine.AddBodyRange(particles);
+            AddGlObjectRange(particles);
         }
 
         void ApplyMatrix(ALVector2D vector, IList<Body> collection)

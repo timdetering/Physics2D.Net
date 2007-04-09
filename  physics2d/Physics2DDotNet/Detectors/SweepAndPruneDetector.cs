@@ -49,6 +49,7 @@ namespace Physics2DDotNet.Detectors
             public Dictionary<int, object> colliders = new Dictionary<int, object>();
             public LinkedListNode<Wrapper> node;
             public Body body;
+            public bool shouldAddNode;
             Stub[] stubs;
             public Wrapper(Body body)
             {
@@ -73,6 +74,7 @@ namespace Physics2DDotNet.Detectors
                 colliders.Clear();
                 body.Shape.CalcBoundingRectangle();
                 BoundingRectangle rect = body.Shape.Rectangle;
+                shouldAddNode = rect.Min.X != rect.Max.X || rect.Min.Y != rect.Max.Y;
                 stubs[0].value = rect.Min.X;
                 stubs[1].value = rect.Max.X;
 
@@ -203,11 +205,17 @@ namespace Physics2DDotNet.Detectors
                         }
                         node = node.Next;
                     }
-                    currentBodies.AddLast(stub.wrapper.node);
+                    if (stub.wrapper.shouldAddNode)
+                    {
+                        currentBodies.AddLast(stub.wrapper.node);
+                    }
                 }
                 else
                 {
-                    currentBodies.Remove(stub.wrapper.node);
+                    if (stub.wrapper.shouldAddNode)
+                    {
+                        currentBodies.Remove(stub.wrapper.node);
+                    }
                 }
             }
             if (currentBodies.Count > 0)
@@ -237,11 +245,17 @@ namespace Physics2DDotNet.Detectors
                         }
                         node = node.Next;
                     }
-                    currentBodies.AddLast(stub.wrapper.node);
+                    if (stub.wrapper.shouldAddNode)
+                    {
+                        currentBodies.AddLast(stub.wrapper.node);
+                    }
                 }
                 else
                 {
-                    currentBodies.Remove(stub.wrapper.node);
+                    if (stub.wrapper.shouldAddNode)
+                    {
+                        currentBodies.Remove(stub.wrapper.node);
+                    }
                 }
             }
             if (currentBodies.Count > 0)
