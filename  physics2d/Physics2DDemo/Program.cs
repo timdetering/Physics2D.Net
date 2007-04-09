@@ -36,10 +36,10 @@ namespace Physics2DDemo
         static void Main(string[] args)
         {
 
-            Console.WriteLine("Welcome to the Physics2D Demo");
+            Console.WriteLine("Welcome to the Physics2D.Net Demo");
 
             Console.WriteLine("In the demo pressing the number keys will load different demos.");
-            Console.WriteLine("Left Clicking will allow you to pick items up.");
+            Console.WriteLine("Left Clicking will allow you to pick objects up.");
             Console.WriteLine("Middle clicking on the screen will launch a projectile where you click.");
             Console.WriteLine("Right clicking and holding will shoot out particles where you click.");
             Console.WriteLine("The arrow keys will control one of the objects on the screen");
