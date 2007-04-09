@@ -42,6 +42,7 @@ namespace AdvanceMath.Geometry2D.UnitTest
         BoundingCircle circle2;
         BoundingCircle circle3;
 
+        BoundingRectangle rect0;
         BoundingRectangle rect1;
         BoundingRectangle rect2;
 
@@ -57,23 +58,39 @@ namespace AdvanceMath.Geometry2D.UnitTest
             circle3 = BoundingCircle.FromRectangle(rect1);
             rect2 = BoundingRectangle.FromCircle(circle3);
             polygon1 = new BoundingPolygon(rect1.Corners());
+            rect0 = new BoundingRectangle(-1, 3.01f, 1, 6);
         }
         [Test]
         public void ContainsCircle()
         {
-
-
-            Assert.Fail("Not Implimented");
+            Assert.AreEqual(ContainmentType.Contains, rect2.Contains(circle3), "1");
+            Assert.AreEqual(ContainmentType.Intersects, rect1.Contains(circle3), "2");
+            Assert.AreEqual(ContainmentType.Intersects, rect1.Contains(circle2), "3");
+            Assert.AreEqual(ContainmentType.Disjoint, rect0.Contains(circle1), "4");
         }
         [Test]
         public void ContainsPoint()
         {
-            Assert.Fail("Not Implimented");
+            BoundingRectangle rect = new BoundingRectangle(0, 0, 2, 2);
+            Assert.AreEqual(ContainmentType.Contains, rect.Contains(new Vector2D(1, 1)), "1");
+            Assert.AreEqual(ContainmentType.Contains, rect.Contains(new Vector2D(2, 2)), "2");
+            Assert.AreEqual(ContainmentType.Contains, rect.Contains(new Vector2D(0, 2)), "3");
+            Assert.AreEqual(ContainmentType.Contains, rect.Contains(new Vector2D(0, 0)), "4");
+            Assert.AreEqual(ContainmentType.Disjoint, rect.Contains(new Vector2D(2, 3)), "5");
+            Assert.AreEqual(ContainmentType.Disjoint, rect.Contains(new Vector2D(-1, 0)), "6");
+            Assert.AreEqual(ContainmentType.Disjoint, rect.Contains(new Vector2D(-.0001f, 0)), "7");
+            Assert.AreEqual(ContainmentType.Disjoint, rect.Contains(new Vector2D(3, 1)), "8");
+            Assert.AreEqual(ContainmentType.Disjoint, rect.Contains(new Vector2D(1, -1)), "9");
         }
         [Test]
         public void ContainsRectangle()
         {
-            Assert.Fail("Not Implimented");
+            Assert.AreEqual(ContainmentType.Contains, rect0.Contains(rect0), "1");
+            Assert.AreEqual(ContainmentType.Contains, rect1.Contains(rect1), "2");
+            Assert.AreEqual(ContainmentType.Contains, rect2.Contains(rect2), "3");
+            Assert.AreEqual(ContainmentType.Contains, rect2.Contains(rect1), "4");
+            Assert.AreEqual(ContainmentType.Disjoint, rect0.Contains(rect1), "5");
+            Assert.AreEqual(ContainmentType.Intersects, rect1.Contains(rect2), "6");
         }
         [Test]
         public void ContainsPolygon()

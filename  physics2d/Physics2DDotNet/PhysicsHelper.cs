@@ -107,7 +107,12 @@ namespace Physics2DDotNet
                 (velocity2.Linear.Y + velocity2.Angular * point2.X) -
                 (velocity1.Linear.Y + velocity1.Angular * point1.X);
         }
-
+        public static void GetRelativeVelocity(
+            ref ALVector2D velocity1, ref Vector2D point1, out Vector2D result)
+        {
+            result.X = -(velocity1.Linear.X - velocity1.Angular * point1.Y);
+            result.Y = -(velocity1.Linear.Y + velocity1.Angular * point1.X);
+        }
 
         public static void AddImpulse(
             ref ALVector2D velocity, ref Vector2D impulse, ref Vector2D point,

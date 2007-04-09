@@ -30,6 +30,7 @@ changed: the collisionIgnorer to not have the IsCollidable value and moved it to
 Added: CollisionGroupIgnorer that impliments CollisionIgnorer
 removed: CanCollide(1) from Body. You should use CanCollide(2)
 moved: CollisionIgnorer into Ignorers directory.
+Added: another version of the  PhysicsHelper.GetRelativeVelocity to be used by PivotJoint.
 
 AdvanceMath
 NEXT VERSION:

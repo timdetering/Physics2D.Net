@@ -45,8 +45,6 @@ namespace Physics2DDotNet
 {
     public sealed class PivotJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
-        static ALVector2D Zero1 = ALVector2D.Zero;
-        static Vector2D Zero2 = Vector2D.Zero;
         Solvers.SequentialImpulsesSolver solver;
         Body body1;
 
@@ -160,12 +158,9 @@ namespace Physics2DDotNet
             Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
 
             Vector2D dv;
-            PhysicsHelper.GetRelativeVelocity(
-                ref body1.State.Velocity, ref Zero1,
-                ref r1, ref Zero2, out dv);
+            PhysicsHelper.GetRelativeVelocity(ref body1.State.Velocity, ref r1, out dv);
 
-            Vector2D impulse;
-            Vector2D vect1;
+            Vector2D impulse, vect1;
             Vector2D.Multiply(ref softness, ref accumulatedImpulse, out vect1);
             Vector2D.Subtract(ref bias, ref dv, out impulse);
             Vector2D.Subtract(ref impulse, ref vect1, out impulse);

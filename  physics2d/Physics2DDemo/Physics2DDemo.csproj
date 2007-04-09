@@ -33,7 +33,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\SdlDotNet.dll</HintPath>
     </Reference>
+    <Reference Include="SdlDotNet.OpenGl, Version=1.0.0.29966, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\SdlDotNet.OpenGl.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="Tao.OpenGl, Version=2.1.0.2, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Tao.OpenGl.dll</HintPath>
@@ -45,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Demo.cs" />
+    <Compile Include="OpenGlObject.cs" />
     <Compile Include="OpenGlWindow.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -60,10 +66,28 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="jpeg.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libpng12.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libtiff.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="SDL.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SDL_gfx.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL_image.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="SDL_mixer.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zlib1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

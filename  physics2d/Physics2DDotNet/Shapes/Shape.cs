@@ -33,6 +33,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Threading;
+using System.Xml.Serialization;
 
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
@@ -114,7 +115,7 @@ namespace Physics2DDotNet
         protected Scalar inertiaMultiplier;
         protected Vector2D[] originalVertexes;
         protected Vector2D[] vertexes;
-        private Body parent; 
+        private Body parent;
         #endregion
         #region constructors
         protected Shape(Vector2D[] vertexes)
@@ -141,7 +142,7 @@ namespace Physics2DDotNet
             }
             this.originalVertexes = copy.originalVertexes;
             this.vertexes = (Vector2D[])copy.vertexes.Clone();
-        } 
+        }
         #endregion
         #region properties
         public Body Parent
@@ -157,6 +158,7 @@ namespace Physics2DDotNet
         {
             get { return rect; }
         }
+        [XmlIgnore]
         public object Tag
         {
             get { return tag; }
@@ -177,7 +179,7 @@ namespace Physics2DDotNet
         public Vector2D[] Vertices
         {
             get { return vertexes; }
-        } 
+        }
         #endregion
         #region methods
         public abstract void CalcBoundingRectangle();
@@ -202,7 +204,7 @@ namespace Physics2DDotNet
             other.vertexes.CopyTo(this.vertexes, 0);
         }
         public abstract bool TryGetIntersection(Vector2D vector, out IntersectionInfo info);
-        public abstract void GetDistance(ref Vector2D vector,out Scalar result);
+        public abstract void GetDistance(ref Vector2D vector, out Scalar result);
         public abstract Shape Duplicate();
         public object Clone()
         {
@@ -217,7 +219,7 @@ namespace Physics2DDotNet
         internal void OnRemoved()
         {
             this.parent = null;
-        } 
+        }
         #endregion
     }
 

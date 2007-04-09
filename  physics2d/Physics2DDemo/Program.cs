@@ -39,7 +39,8 @@ namespace Physics2DDemo
             Console.WriteLine("Welcome to the Physics2D Demo");
 
             Console.WriteLine("In the demo pressing the number keys will load different demos.");
-            Console.WriteLine("Left clicking on the screen will launch a projectile where you click.");
+            Console.WriteLine("Left Clicking will allow you to pick items up.");
+            Console.WriteLine("Middle clicking on the screen will launch a projectile where you click.");
             Console.WriteLine("Right clicking and holding will shoot out particles where you click.");
             Console.WriteLine("The arrow keys will control one of the objects on the screen");
             Console.WriteLine("In the upper left corner a small colored box will appear.");
@@ -48,8 +49,8 @@ namespace Physics2DDemo
             Console.WriteLine("Press Enter To Start");
             Console.ReadLine();
 
-            Demo demo = new Demo();
             OpenGlWindow g = new OpenGlWindow(1024, 768);
+            Demo demo = new Demo();
             g.Draw  += demo.Draw;
             g.ReShape += demo.Reshape;
             g.Run();

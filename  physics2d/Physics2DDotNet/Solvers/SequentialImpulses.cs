@@ -138,6 +138,10 @@ namespace Physics2DDotNet.Solvers
                     }
                 }
             }
+            static Scalar ZeroClamp(Scalar value)
+            {
+                return ((value < 0) ? (0) : (value));
+            }
             static readonly Contact[] Empty = new Contact[0];
 
             Contact[] contacts;
@@ -170,7 +174,7 @@ namespace Physics2DDotNet.Solvers
                 this.friction = MathHelper.Sqrt(
                     this.body1.Coefficients.DynamicFriction *
                     this.body2.Coefficients.DynamicFriction);
-                this.restitution = body1.Coefficients.Restitution * body2.Coefficients.Restitution;
+                this.restitution = Math.Min(body1.Coefficients.Restitution, body2.Coefficients.Restitution);
                 this.parent = parent;
             }
             public bool Updated
@@ -289,8 +293,7 @@ namespace Physics2DDotNet.Solvers
                             ref mass2Inv,
                             ref I2Inv);
                     }
-                    // Initialize bias impulse to zero.
-                    c.Pnb = 0;
+
                     if (this.restitution == 0)
                     {
                         c.restitution = 0;
@@ -306,6 +309,8 @@ namespace Physics2DDotNet.Solvers
                         Vector2D.Dot(ref c.normal, ref rv, out vn);
                         c.restitution = -vn * this.restitution;
                     }
+                    // Initialize bias impulse to zero.
+                    c.Pnb = 0;
                 }
             }
             public void Apply()
@@ -352,12 +357,14 @@ namespace Physics2DDotNet.Solvers
                     {
                         // Clamp the accumulated impulse
                         Scalar Pn0 = c.Pn;
-                        c.Pn = Math.Max(Pn0 + dPn, 0.0f);
+                        c.Pn = ZeroClamp(Pn0 + dPn);
+                        //c.Pn = Math.Max(Pn0 + dPn, 0.0f);
                         dPn = c.Pn - Pn0;
                     }
                     else
                     {
-                        dPn = Math.Max(dPn, 0.0f);
+                        //dPn = Math.Max(dPn, 0.0f);
+                        dPn = ZeroClamp(dPn);
                     }
 
                     // Apply contact impulse
@@ -394,9 +401,10 @@ namespace Physics2DDotNet.Solvers
                         Vector2D.Dot(ref dv, ref c.normal, out vnb);
                         //Scalar vnb = Vector2D.Dot(dv, c.normal);
 
-                        Scalar dPnb = c.massNormal * (-vnb + c.bias);
+                        Scalar dPnb = c.massNormal * (c.bias - vnb);
                         Scalar Pnb0 = c.Pnb;
-                        c.Pnb = Math.Max(Pnb0 + dPnb, 0.0f);
+                        c.Pnb = ZeroClamp(Pnb0 + dPnb);
+                        // c.Pnb = Math.Max(Pnb0 + dPnb, 0.0f);
                         dPnb = c.Pnb - Pnb0;
 
                         Vector2D Pb;
@@ -436,12 +444,12 @@ namespace Physics2DDotNet.Solvers
                     Scalar dPt = c.massTangent * (-vt);
 
 
+
+
                     if (parent.accumulateImpulses)
                     {
                         // Compute friction impulse
                         Scalar maxPt = friction * c.Pn;
-
-
                         // Clamp friction
                         Scalar oldTangentImpulse = c.Pt;
                         c.Pt = MathHelper.Clamp(oldTangentImpulse + dPt, -maxPt, maxPt);
@@ -449,8 +457,9 @@ namespace Physics2DDotNet.Solvers
                     }
                     else
                     {
+                        // Compute friction impulse
                         Scalar maxPt = friction * dPn;
-                        dPt =   MathHelper.Clamp(dPt, -maxPt, maxPt);
+                        dPt = MathHelper.Clamp(dPt, -maxPt, maxPt);
                     }
 
 
@@ -477,7 +486,7 @@ namespace Physics2DDotNet.Solvers
             }
             public bool Collided
             {
-                get { return  contacts.Length > 0; }
+                get { return contacts.Length > 0; }
             }
             ReadOnlyCollection<IContactInfo> ICollisionInfo.Contacts
             {

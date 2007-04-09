@@ -191,8 +191,7 @@ namespace Physics2DDotNet
 
 
 
-            Vector2D impulse;
-            Vector2D vect1;
+            Vector2D impulse,vect1;
             Vector2D.Multiply(ref softness, ref accumulatedImpulse, out vect1);
             Vector2D.Subtract(ref bias, ref dv, out impulse);
             Vector2D.Subtract(ref impulse, ref vect1, out impulse);
