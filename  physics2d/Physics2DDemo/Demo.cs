@@ -602,7 +602,6 @@ namespace Physics2DDemo
         {
             Body[] particles = new Body[count];
             float angle = MathHelper.TWO_PI / count;
-
             for (int index = 0; index < count; ++index)
             {
                 Body particle = new Body(
@@ -617,8 +616,8 @@ namespace Physics2DDemo
                 particles[index] = particle;
                 particle.Collided += new EventHandler<CollisionEventArgs>(particle_Collided);
             }
-            engine.AddBodyRange(particles);
             AddGlObjectRange(particles);
+            engine.AddBodyRange(particles);
         }
 
         void ApplyMatrix(ALVector2D vector, IList<Body> collection)

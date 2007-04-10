@@ -72,8 +72,8 @@ namespace Physics2DDemo
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             Gl.glEnable(Gl.GL_BLEND);
             Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
-            Gl.glColor4f(1, 1, 1, 1);
             Gl.glTranslatef(-offset.X, -offset.Y, 0);
+            Gl.glColor3f(1, 1, 1);
             texture.Draw();
             Gl.glDisable(Gl.GL_TEXTURE_2D);
             Gl.glDisable(Gl.GL_BLEND);
