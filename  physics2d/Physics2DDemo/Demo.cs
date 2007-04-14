@@ -375,13 +375,14 @@ namespace Physics2DDemo
                 }
                 else if (char.IsWhiteSpace(c))
                 {
-                    position.X += font.SizeText(""+c).Width ;
+                    position.X += font.SizeText("" + c).Width;
                 }
                 else
                 {
                     Sprite sprite = GetLetter(c);
                     Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 3);
-                    Polygon shape = new Polygon(vertexes, 3);
+                    BoundingRectangle rect = BoundingRectangle.FromVectors(sprite.Vertexes);
+                    Polygon shape = new Polygon(vertexes, Math.Min(Math.Min((rect.Max.X - rect.Min.X) / 20, (rect.Max.Y - rect.Min.Y) / 20), 3));
                     shape.Tag = sprite;
                     Body b = AddShape(shape, 40, new ALVector2D(0, position + sprite.Offset));
                     maxy = Math.Max(maxy, sprite.Texture.Surface.Height);
@@ -981,7 +982,7 @@ namespace Physics2DDemo
             avatar.IsCollidable = false;
             AddText(
                 "WELCOME TO THE PHYSICS2D.NET DEMO.\nPLEASE ENJOY MESSING WITH IT.\nA LOT OF HARD WORK WENT INTO IT,\nSO THAT YOU COULD ENJOY IT.\nPLEASE SEND FEEDBACK.\nEACH CHARACTER HERE IS AN\nACTUAL BODY IN THE ENGINE.\nTHIS IS TO SHOW OFF THE BITMAP\nTO POLYGON ALGORITHM."
-                ,new Vector2D(10, 10));
+                ,new Vector2D(00, 00));
 
             waitHandle.Set();
         }
