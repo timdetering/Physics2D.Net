@@ -32,6 +32,7 @@ removed: CanCollide(1) from Body. You should use CanCollide(2)
 moved: CollisionIgnorer into Ignorers directory.
 Added: another version of the  PhysicsHelper.GetRelativeVelocity to be used by PivotJoint.
 changed: the Sweep and Prune to be a little more optimized for particles.
+changed: The shape object to make the inertia multiplier one of its constructors parameters. 
 
 AdvanceMath
 NEXT VERSION:

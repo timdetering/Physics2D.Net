@@ -74,12 +74,10 @@ namespace Physics2DDotNet
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
         public Circle(Scalar radius, int vertexCount, Scalar momentOfInertiaMultiplier)
-            : base(CreateCircle(radius, vertexCount))
+            : base(CreateCircle(radius, vertexCount), momentOfInertiaMultiplier)
         {
             if (radius <= 0) { throw new ArgumentOutOfRangeException("radius", "must be larger then zero"); }
-            if (momentOfInertiaMultiplier < 0) { throw new ArgumentOutOfRangeException("momentofInertiaMultiplier", "must be larger then zero"); }
             this.radius = radius;
-            this.inertiaMultiplier = momentOfInertiaMultiplier;
         }
         private Circle(Circle copy)
             : base(copy)

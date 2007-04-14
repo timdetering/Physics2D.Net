@@ -57,6 +57,7 @@ namespace Physics2DDemo
         PhysicsEngine engine;
         Stopwatch watch;
         List<OpenGlObject> objects;
+        Dictionary<string,Sprite> sprites = new Dictionary<string,Sprite>();
         Body bomb;
         Body avatar;
         Body clipper;
@@ -77,10 +78,7 @@ namespace Physics2DDemo
         Vector2D sparkPoint;
         float targetDt = .010f;
 
-        Sprite blockSprite = new Sprite(Path.Combine(dataDir, "fighter.png"));
-        Sprite bombSprite = new Sprite(Path.Combine(dataDir, "rocket.png"));
-        Sprite avatarSprite = new Sprite(Path.Combine(dataDir, "mech.png"));
-        
+         Font font;
         #endregion
         #region constructor
         public Demo()
@@ -105,6 +103,18 @@ namespace Physics2DDemo
         }
         #endregion
         #region methods
+
+
+        Sprite GetSprite(string path)
+        {
+            Sprite result;
+            if (!sprites.TryGetValue(path, out result))
+            {
+                result = new Sprite(Path.Combine(dataDir, path));
+                sprites.Add(path, result);
+            }
+            return result;
+        }
 
         #region event handlers
 
@@ -334,9 +344,10 @@ namespace Physics2DDemo
 
         void CreateBomb()
         {
-            Vector2D[] vertexes = Polygon.Subdivide(bombSprite.Vertexes, 10);
+            Sprite sprite = GetSprite("rocket.png");
+            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
             Polygon shape = new Polygon(vertexes, 4);
-            shape.Tag = bombSprite;
+            shape.Tag = sprite;
 
             bomb = new Body(new PhysicsState(),
                     shape,//new Physics2DDotNet.Circle(20, 20),
@@ -345,17 +356,64 @@ namespace Physics2DDemo
                     new Lifespan());
         }
 
-
-
+        List<Body> AddText(string text, Vector2D position)
+        {
+            if (font == null)
+            {
+                font = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 40);
+                font.Bold = true;
+            }
+            List<Body> result = new List<Body>();
+            Scalar initialx = position.X;
+            int maxy = 0;
+            foreach (char c in text)
+            {
+                if (c == '\n')
+                {
+                    position.Y += maxy;
+                    position.X = initialx;
+                }
+                else if (char.IsWhiteSpace(c))
+                {
+                    position.X += font.SizeText(""+c).Width ;
+                }
+                else
+                {
+                    Sprite sprite = GetLetter(c);
+                    Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 3);
+                    Polygon shape = new Polygon(vertexes, 3);
+                    shape.Tag = sprite;
+                    Body b = AddShape(shape, 40, new ALVector2D(0, position + sprite.Offset));
+                    maxy = Math.Max(maxy, sprite.Texture.Surface.Height);
+                    position.X += sprite.Texture.Surface.Width;
+                    result.Add(b);
+                }
+            }
+            return result;
+        }
+        Sprite GetLetter(char c)
+        {
+            string name = "Char:" + c;
+            Sprite sprite;
+            if (!sprites.TryGetValue(name, out sprite))
+            {
+                Surface surface = font.Render("" + c, System.Drawing.Color.Red, System.Drawing.Color.Black, true);
+                surface.TransparentColor = System.Drawing.Color.Black;
+                sprite = new Sprite(surface);
+                sprites.Add(name, sprite);
+            }
+            return sprite;
+        }
 
 
 
 
         void CreateAvatar()
         {
-            Vector2D[] vertexes = Polygon.Subdivide(this.avatarSprite.Vertexes, 10);
+            Sprite sprite = GetSprite("mech.png");
+            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
             Polygon shape = new Polygon(vertexes, 4);
-            shape.Tag = avatarSprite;
+            shape.Tag = sprite;
 
 
             avatar = new Body(new PhysicsState(new ALVector2D(0, 0, 60)),
@@ -374,7 +432,9 @@ namespace Physics2DDemo
         }
         void AddAvatar()
         {
-            avatar.State.Position.Linear = new Vector2D(200, 200);
+            avatar.IsCollidable = true;
+            avatar.Lifetime.IsExpired = false;
+            avatar.State.Position.Linear = new Vector2D(700, 200);
             avatar.State.Velocity.Linear = Vector2D.Zero;
             avatar.ApplyMatrix();
             AddGlObject(avatar);
@@ -478,7 +538,7 @@ namespace Physics2DDemo
         {
 
 
-            float size = 30;
+            float size = 32;
             float spacing = .01f;
             float Xspacing = 1f;
 
@@ -490,16 +550,21 @@ namespace Physics2DDemo
             float currentStep = 0;
 
 
-           Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(size, size);
+          /* Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(size, size);
            vertices = Physics2DDotNet.Polygon.Subdivide(vertices,  size / 2);
-           //vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (size + size) / 4);
-            Polygon shape = new Polygon(vertices, size / 2);
+            Polygon shape = new Polygon(vertices, size / 2);*/
+
+
+            Sprite sprite = GetSprite("block.png");
+            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Polygon shape = new Polygon(vertexes, 4);
+            shape.Tag = sprite;
 
             for (float y = ymax; y >= ymin; y -= (spacing + size))
             {
                 for (float x = xmin + currentStep; x < (xmax - currentStep); x += spacing + Xspacing + size)
                 {
-                    AddShape(shape, 20, new ALVector2D(.01f, new Vector2D(x, y)));
+                    AddShape(shape, 20, new ALVector2D(0, new Vector2D(x, y)));
                 }
                 currentStep += step;
             }
@@ -511,17 +576,24 @@ namespace Physics2DDemo
             float ymin = 560;
             float ymax = 700;
 
-            float size = 25;
+            float size = 32;
             float spacing = 1;
             float Xspacing = 20;
             float offset = 0;
             float offsetchange = .9f;
+
+            Sprite sprite = GetSprite("block.png");
+            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Polygon shape = new Polygon(vertexes, 4);
+            shape.Tag = sprite;
+
             for (float x = xmin; x < xmax; x += spacing + Xspacing + size)
             {
                 for (float y = ymax; y > ymin; y -= spacing + size)
                 {
+                    AddShape(shape, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
 
-                    AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
+                    //AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
                     offset = MathHelper.WrapClamp(offset + offsetchange, -offsetchange,  offsetchange);
                 }
             }
@@ -539,12 +611,12 @@ namespace Physics2DDemo
             engine.AddBody(e);
             return e;
         }
-        Body AddRectangle(float length, float width, float mass, ALVector2D position)
+        Body AddRectangle(float height, float width, float mass, ALVector2D position)
         {
-            Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(length, width);
-            vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (length + width) / 6);
+            Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(height, width);
+            vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (height + width) / 6);
 
-            Shape boxShape = new Physics2DDotNet.Polygon(vertices, Math.Min(length, width) / 2);
+            Shape boxShape = new Physics2DDotNet.Polygon(vertices, Math.Min(height, width) / 2);
             Body e =
                 new Body(
                      new PhysicsState(position),
@@ -579,7 +651,7 @@ namespace Physics2DDemo
         }
         void AddTower()
         {
-            float size = 30;
+            float size = 32;
             float x = 500;
             float spacing = size + 2;
 
@@ -588,9 +660,15 @@ namespace Physics2DDemo
             float offset = 0;
             float offsetchange = .9f;
 
+            Sprite sprite = GetSprite("block.png");
+            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Polygon shape = new Polygon(vertexes, 4);
+            shape.Tag = sprite;
+
             for (float y = maxY; y > minY; y -= spacing)
             {
-                AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
+                AddShape(shape, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
+                //AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
                 offset = MathHelper.WrapClamp(offset + offsetchange, -offsetchange,offsetchange);
             }
         }
@@ -636,15 +714,21 @@ namespace Physics2DDemo
 
         void AddTower2()
         {
-            float size = 30;
+            float size = 32;
             float x = 500;
             float spacing = size + 2;
 
-            float minY = 200;
+
+
+            Sprite sprite = GetSprite("block.png");
+            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Polygon shape = new Polygon(vertexes, 4);
+            shape.Tag = sprite; 
+            float minY = 100;
             float maxY = 400 - size / 2;
             for (float y = maxY; y > minY; y -= spacing)
             {
-                AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + rand.Next(-3, 4) * .1f, y)));
+                AddShape(shape, 20, new ALVector2D(0, new Vector2D(x + rand.Next(-3, 4) * .1f, y)));
             }
         }
         List<Body> AddRagDoll(Vector2D location)
@@ -737,24 +821,28 @@ namespace Physics2DDemo
             waitHandle.Reset();
             Reset();
             AddGravityField();
+            Sprite blockSprite = GetSprite("fighter.png");
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             Vector2D[] vertexes = Polygon.Subdivide(blockSprite.Vertexes,10);
             Polygon shape = new Polygon(vertexes,4);
             shape.Tag = blockSprite;
-            for (int i = 0; i < 500; i+=128)
+            for (int i = 128*3; i > -128; i -= 128)
             {
                 AddShape(shape, 40, new ALVector2D(0, new Vector2D(600, 272+i)));
             }
+
+            AddShape(new Circle(80,20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
           //  AddRectangle(40, 40, 20, );
             waitHandle.Set();
         }
-        void Demo2()
+        void Demo2OLD()
         {
             waitHandle.Reset();
             Reset();
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddTower();
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
             waitHandle.Set();
         }
         void Demo3()
@@ -764,6 +852,7 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(.1f, new Vector2D(600, 770)));
             AddTower();
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
             waitHandle.Set();
         }
         void Demo4()
@@ -774,6 +863,7 @@ namespace Physics2DDemo
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
 
             AddPyramid();
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
             waitHandle.Set();
         }
         void Demo5()
@@ -783,6 +873,7 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddTowers();
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
             waitHandle.Set();
         }
         void Demo6()
@@ -867,7 +958,7 @@ namespace Physics2DDemo
 
             waitHandle.Set();
         }
-        void Demo0()
+        void Demo02()
         {
             waitHandle.Reset();
             Reset();
@@ -879,6 +970,19 @@ namespace Physics2DDemo
             AddShape(shape, 20, new ALVector2D(0, 500, 300));
             AddShape(shape, 20, new ALVector2D(0, 600, 300));
             coefficients.Restitution = t;
+            
+            waitHandle.Set();
+        }
+        void Demo2()
+        {
+            waitHandle.Reset();
+            Reset();
+            avatar.Lifetime.IsExpired = true;
+            avatar.IsCollidable = false;
+            AddText(
+                "WELCOME TO THE PHYSICS2D.NET DEMO.\nPLEASE ENJOY MESSING WITH IT.\nA LOT OF HARD WORK WENT INTO IT,\nSO THAT YOU COULD ENJOY IT.\nPLEASE SEND FEEDBACK.\nEACH CHARACTER HERE IS AN\nACTUAL BODY IN THE ENGINE.\nTHIS IS TO SHOW OFF THE BITMAP\nTO POLYGON ALGORITHM."
+                ,new Vector2D(10, 10));
+
             waitHandle.Set();
         }
         void Demo11()
@@ -929,6 +1033,42 @@ namespace Physics2DDemo
                 }
                 reverse = !reverse;
             }
+            waitHandle.Set();
+        }
+        void Demo0()
+        {
+            waitHandle.Reset();
+            Reset();
+            avatar.Lifetime.IsExpired = true;
+            AddGravityField();
+            
+            AddLine(new Vector2D(-40, 200), new Vector2D(400,200), 30);
+            for (int x = 0; x < 400; x += 45)
+            {
+                AddRectangle(80, 15, 90, new ALVector2D(0, x, 145));
+            }
+
+
+            AddLine(new Vector2D(400, 150), new Vector2D(430, 150), 30);
+            AddLine(new Vector2D(430, 150), new Vector2D(600, 200), 30);
+            AddLine(new Vector2D(600, 200), new Vector2D(700, 300), 30);
+
+            AddLine(new Vector2D(1200, 200), new Vector2D(800, 420), 30);
+            AddLine(new Vector2D(800, 420), new Vector2D(700, 470), 30);
+            AddLine(new Vector2D(700, 470), new Vector2D(600, 486), 30);
+            AddLine(new Vector2D(600, 486), new Vector2D(560, 486), 30);
+            
+            Scalar rest = coefficients.Restitution;
+            coefficients.Restitution = 1;
+            AddCircle(20, 20, 300, new ALVector2D(0, 409, 125));
+            
+
+            for (int x = 160; x < 500; x += 41)
+            {
+                Body b = AddCircle(20, 20, 300, new ALVector2D(0, x, 450));
+                engine.AddJoint(new PivotJoint(b, b.State.Position.Linear - new Vector2D(0,600), new Lifespan()));
+            }
+            coefficients.Restitution = rest;
             waitHandle.Set();
         }
         public static Vector2D GetOrbitVelocity(Vector2D PosOfAccelPoint, Vector2D PosofShip, float AccelDoToGravity)
@@ -990,9 +1130,10 @@ namespace Physics2DDemo
 
         public void Reshape(object sender, EventArgs e)
         {
-            bombSprite.Refresh();
-            blockSprite.Refresh();
-            avatarSprite.Refresh();
+            foreach (Sprite s in sprites.Values)
+            {
+                s.Refresh();
+            }
             clippersShape.SetRectangle(new BoundingRectangle(0, 0, Video.Screen.Width, Video.Screen.Height));
             lock (objects)
             {

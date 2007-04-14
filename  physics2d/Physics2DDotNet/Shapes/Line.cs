@@ -73,13 +73,11 @@ namespace Physics2DDotNet
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
         public Line(Vector2D[] vertexes, Scalar thickness, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
-            : base(vertexes)
+            : base(vertexes, momentOfInertiaMultiplier)
         {
             if (thickness < 0) { throw new ArgumentOutOfRangeException("thickness", "must be equal or larger then zero"); }
-            if (momentOfInertiaMultiplier < 0) { throw new ArgumentOutOfRangeException("momentofInertiaMultiplier", "must be equal or larger then zero"); }
             this.thickness = thickness;
             this.thicknessHalf = thickness * .5f;
-            this.inertiaMultiplier = momentOfInertiaMultiplier;
             if (thickness > 0)
             {
                 this.grid = new DistanceGrid(this, gridSpacing);

@@ -43,25 +43,43 @@ namespace Physics2DDemo
     {
         Surface surface;
         SurfaceGl texture;
+
+
         Vector2D offset;
+
+
         Vector2D[] vertexes;
-        public Sprite(string path)
+
+        public Sprite(string path):this(new Surface(path))
         {
-            surface = new Surface(path);
+
+        }
+        public Sprite(Surface surface2)
+        {
+            this.surface =  surface2 ;
             texture = new SurfaceGl(surface, true); 
-            Color blank = surface.TransparentColor;
+            int blank = surface.TransparentColor.ToArgb();
             bool[,] bitmap = new bool[surface.Width, surface.Height];
+            Color[,] pixels = surface.GetPixels(new System.Drawing.Rectangle(0, 0, surface.Width, surface.Height));
+
             for (int x = 0; x < bitmap.GetLength(0); ++x)
             {
                 for (int y = 0; y < bitmap.GetLength(1); ++y)
                 {
-                    Color t = surface.GetPixel(new System.Drawing.Point(x, y));
-                    bitmap[x, y] = t.ToArgb() != blank.ToArgb();
+                    bitmap[x, y] = pixels[x, y].ToArgb() != blank;
                 }
             }
             vertexes = Polygon.CreateFromBitmap(bitmap);
             offset = Polygon.GetCentroid(vertexes);
             vertexes = Polygon.MakeCentroidOrigin(vertexes);
+        }
+        public Vector2D Offset
+        {
+            get { return offset; }
+        }
+        public SurfaceGl Texture
+        {
+            get { return texture; }
         }
         public Vector2D[] Vertexes
         {
@@ -79,14 +97,14 @@ namespace Physics2DDemo
         }
         public void Refresh()
         {
-            texture.Refresh();
+            texture.Delete();
         }
     }
 
 
     class OpenGlObject : IDisposable
     {
-
+        public static bool DrawLinesAndNormalsForSprites = false;
         public bool collided = true;
         public bool shouldDraw = true;
         float[] matrix = new float[16];
@@ -120,12 +138,48 @@ namespace Physics2DDemo
         {
             list = -1;
         }
+
+        void DrawNormal(ref Vector2D vertex1, ref Vector2D vertex2)
+        {
+            float edgeLength;
+            Vector2D tangent, normal;
+
+            Vector2D.Subtract(ref vertex1, ref vertex2, out tangent);
+            Vector2D.Normalize(ref tangent, out edgeLength, out tangent);
+            Vector2D.GetRightHandNormal(ref tangent, out normal);
+
+            Vector2D pos1 = vertex1 - tangent * (edgeLength * .5f);
+
+            Vector2D pos2 = pos1 + normal * 9;
+            Gl.glColor3f(0, 0, 1);
+            Gl.glVertex2f(pos1.X, pos1.Y);
+            Gl.glColor3f(0, 1, 1);
+            Gl.glVertex2f(pos2.X, pos2.Y);
+        }
         void DrawInternal()
         {
             if (entity.Shape.Tag is Sprite)
             {
                 Sprite s = (Sprite)entity.Shape.Tag;
                 s.Draw();
+                if (DrawLinesAndNormalsForSprites)
+                {
+                    Vector2D[] vertexes = s.Vertexes;
+                    Gl.glLineWidth(1);
+                    Gl.glBegin(Gl.GL_LINES);
+                    Vector2D v1 = vertexes[vertexes.Length - 1];
+                    Vector2D v2;
+                    for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
+                    {
+                        v2 = vertexes[index];
+                        Gl.glColor3f(1, 1, 1);
+                        Gl.glVertex2f(v1.X, v1.Y);
+                        Gl.glColor3f(1, 0, 0);
+                        Gl.glVertex2f(v2.X, v2.Y);
+                        DrawNormal(ref v1, ref v2);
+                    }
+                    Gl.glEnd();
+                }
             }
             else if (entity.Shape is Physics2DDotNet.Particle)
             {

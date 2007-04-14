@@ -155,12 +155,12 @@ namespace Physics2DDotNet
         /// <summary>
         /// creates vertexes that describe a Rectangle.
         /// </summary>
-        /// <param name="length">The length of the Rectangle</param>
+        /// <param name="height">The length of the Rectangle</param>
         /// <param name="width"></param>
         /// <returns>array of vectors the describe a rectangle</returns>
-        public static Vector2D[] CreateRectangle(Scalar length, Scalar width)
+        public static Vector2D[] CreateRectangle(Scalar height, Scalar width)
         {
-            Scalar Ld2 = length / 2;
+            Scalar Ld2 = height / 2;
             Scalar Wd2 = width / 2;
             return new Vector2D[4]
             {
@@ -230,13 +230,11 @@ namespace Physics2DDotNet
         /// Reduces a Polygon to the minumum number or vertexes need to represent it.  Does the opposite of Subdivide. 
         /// </summary>
         /// <param name="vertexes">The bloated vertex array.</param>
-        /// <param name="minAngle">The minimum allowed angle anything less then or equal will be removed. </param>
         /// <returns>The reduced vertexes.</returns>
-        public static Vector2D[] Reduce(Vector2D[] vertexes, Scalar minAngle)
+        public static Vector2D[] Reduce(Vector2D[] vertexes)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 2) { throw new ArgumentOutOfRangeException("vertexes"); }
-            if (minAngle < 0) { throw new ArgumentOutOfRangeException("minAngle"); }
             List<Vector2D> result = new List<Vector2D>(vertexes.Length);
             Vector2D v1, v2, v3;
             v1 = vertexes[vertexes.Length - 2];
@@ -244,9 +242,10 @@ namespace Physics2DDotNet
             for (int index = 0; index < vertexes.Length; ++index, v2 = v3)
             {
                 v3 = vertexes[index];
-                Scalar angle = (v1 - v2).Angle;
-                Scalar angle2 = (v2 - v3).Angle;
-                if (Math.Abs(MathHelper.ClampAngle(angle2 - angle)) > minAngle)
+                Scalar slope1 = (v1.Y - v2.Y);
+                Scalar slope2 = (v2.Y - v3.Y);
+                if (!(0 == slope1 && 0 == slope2 ||
+                   ((v1.X - v2.X) / slope1) == ((v2.X - v3.X) / slope2)))
                 {
                     result.Add(v2);
                     v1 = v2;
@@ -319,14 +318,12 @@ namespace Physics2DDotNet
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
         public Polygon(Vector2D[] vertexes, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
-            : base(vertexes)
+            : base(vertexes, momentOfInertiaMultiplier)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 3) { throw new ArgumentException("too few", "vertexes"); }
-            if (momentOfInertiaMultiplier <= 0) { throw new ArgumentOutOfRangeException("momentofInertiaMultiplier"); }
             if (gridSpacing <= 0) { throw new ArgumentOutOfRangeException("gridSpacing"); }
             this.grid = new DistanceGrid(this, gridSpacing);
-            this.inertiaMultiplier = momentOfInertiaMultiplier;
         }
         private Polygon(Polygon copy)
             : base(copy)

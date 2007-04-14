@@ -43,30 +43,30 @@ namespace Physics2DDotNet
     [StructLayout(LayoutKind.Explicit)]
     public struct PairID
     {
-        public static long GetId(int ID1, int ID2)
+        public static long GetId(int id1, int id2)
         {
             PairID result;
             result.ID = 0;
-            if (ID1 > ID2)
+            if (id1 > id2)
             {
-                result.lowID = ID2;
-                result.highID = ID1;
+                result.lowID = id2;
+                result.highID = id1;
             }
             else
             {
-                result.lowID = ID1;
-                result.highID = ID2;
+                result.lowID = id1;
+                result.highID = id2;
             }
             return result.ID;
         }
-        public static void GetIds(long id,out int ID1,out  int ID2)
+        public static void GetIds(long id,out int id1,out  int id2)
         {
             PairID result;
             result.lowID = 0;
             result.highID = 0;
             result.ID = id;
-            ID1 = result.lowID;
-            ID2 = result.highID;
+            id1 = result.lowID;
+            id2 = result.highID;
         }
         [FieldOffset(0)]
         long ID;

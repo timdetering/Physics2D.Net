@@ -229,7 +229,6 @@ namespace Physics2DDotNet.Solvers
                     this.contacts = mergedContacts;
                 }
             }
-            static Random rand = new Random();
             public void PreApply(Scalar dtInv)
             {
 

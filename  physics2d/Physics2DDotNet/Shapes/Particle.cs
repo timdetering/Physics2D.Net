@@ -51,9 +51,7 @@ namespace Physics2DDotNet
         /// </summary>
         public Particle()
             : this(1)
-        {
-
-        }
+        {  }
         /// <summary>
         /// Creates a new Particle Instance.
         /// </summary>
@@ -62,12 +60,8 @@ namespace Physics2DDotNet
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
         public Particle(Scalar momentOfInertiaMultiplier)
-            : base(new Vector2D[] { Vector2D.Zero })
-        {
-            if (momentOfInertiaMultiplier <= 0) { throw new ArgumentOutOfRangeException("momentofInertiaMultiplier"); }
-            this.inertiaMultiplier = momentOfInertiaMultiplier;
-            this.vertexes = new Vector2D[1];
-        }
+            : base(new Vector2D[] { Vector2D.Zero }, momentOfInertiaMultiplier)
+        { }
         private Particle(Particle copy)
             : base(copy) { }
         public Vector2D Location { get { return vertexes[0]; } }

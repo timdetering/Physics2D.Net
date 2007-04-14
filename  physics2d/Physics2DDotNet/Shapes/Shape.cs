@@ -118,13 +118,15 @@ namespace Physics2DDotNet
         private Body parent;
         #endregion
         #region constructors
-        protected Shape(Vector2D[] vertexes)
+        protected Shape(Vector2D[] vertexes, Scalar momentOfInertiaMultiplier)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (momentOfInertiaMultiplier <= 0) { throw new ArgumentOutOfRangeException("momentOfInertiaMultiplier"); }
             this.matrix2D = Matrix2D.Identity;
             this.matrix2DInv = Matrix2D.Identity;
             this.originalVertexes = vertexes;
             this.vertexes = (Vector2D[])vertexes.Clone();
+            this.inertiaMultiplier = momentOfInertiaMultiplier;
         }
         protected Shape(Shape copy)
         {
@@ -191,11 +193,11 @@ namespace Physics2DDotNet
         }
         protected void ApplyMatrixToVertexes()
         {
-            OperationHelper.ArrayRefOp<Matrix3x3, Vector2D, Vector2D>(
-                ref matrix2D.VertexMatrix,
-                this.originalVertexes,
-                this.vertexes,
-                Vector2D.Transform);
+            Matrix3x3 matrix = matrix2D.VertexMatrix;
+            for (int index = 0; index < originalVertexes.Length; ++index)
+            {
+                Vector2D.Transform(ref matrix, ref originalVertexes[index], out vertexes[index]);
+            }
         }
         public virtual void UpdateTime(Scalar dt) { }
         public virtual void Set(Shape other)
@@ -230,10 +232,8 @@ namespace Physics2DDotNet
     public sealed class RectangleShape : Shape
     {
         public RectangleShape()
-            : base(new Vector2D[0])
-        {
-            this.inertiaMultiplier = Scalar.PositiveInfinity;
-        }
+            : base(new Vector2D[0], Scalar.PositiveInfinity)
+        {}
         public override bool CanGetIntersection
         {
             get { return false; }
