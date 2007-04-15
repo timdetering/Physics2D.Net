@@ -796,9 +796,8 @@ namespace Physics2DDemo
             HingeJoint lknee = new HingeJoint(ltleg, lbleg, location + new Vector2D(-11, 115), new Lifespan());
             HingeJoint rhip = new HingeJoint(rtleg, torso, location + new Vector2D(8, 72), new Lifespan());
             HingeJoint rknee = new HingeJoint(rtleg, rbleg, location + new Vector2D(11, 115), new Lifespan());
-            List<HingeJoint> joints = new List<HingeJoint>();
+            List<Joint> joints = new List<Joint>();
             joints.Add(neck);
-
             joints.Add(lelbow);
             joints.Add(rshoulder);
 
@@ -811,10 +810,11 @@ namespace Physics2DDemo
             joints.Add(rhip);
             joints.Add(rknee);
 
-            engine.AddJointRange<HingeJoint>(joints);
+            
+            engine.AddJointRange<Joint>(joints);
+
             return result;
         }
-
 
 
         void Demo1()
@@ -883,7 +883,7 @@ namespace Physics2DDemo
             Reset();
             AddGravityField();
 
-            List<Body> chain = AddChain(new Vector2D(400, 50), 100, 30, 200, 10, 800);
+            List<Body> chain = AddChain(new Vector2D(400, 50), 100, 30, 200, 20, 800);
             Vector2D point = new Vector2D(300, 50);
 
             Body Anchor = AddCircle(30, 18, float.PositiveInfinity, new ALVector2D(0, point));
@@ -1182,9 +1182,9 @@ namespace Physics2DDemo
             lock (objects)
             {
                 objects.RemoveAll(delegate(OpenGlObject o) { if (o.Removed) { o.Dispose(); return true; } return false; });
-                foreach (OpenGlObject obj in objects)
+                for (int index = objects.Count - 1; index >= 0; --index)
                 {
-                    obj.Draw();
+                    objects[index].Draw();
                 }
             }
         }

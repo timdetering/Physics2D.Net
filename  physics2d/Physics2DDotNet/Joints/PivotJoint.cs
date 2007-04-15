@@ -43,10 +43,13 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+    /// <summary>
+    /// A joint that makes a single Body Pivot around an Anchor.
+    /// </summary>
     public sealed class PivotJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
         Solvers.SequentialImpulsesSolver solver;
-        Body body1;
+        Body body;
 
 
         Matrix2x2 M;
@@ -59,14 +62,14 @@ namespace Physics2DDotNet
         Scalar softness;
 
 
-        public PivotJoint(Body body1, Vector2D anchor, Lifespan lifetime)
+        public PivotJoint(Body body, Vector2D anchor, Lifespan lifetime)
             : base(lifetime)
         {
-            if (body1 == null) { throw new ArgumentNullException("body1"); }
-            this.body1 = body1;
+            if (body == null) { throw new ArgumentNullException("body1"); }
+            this.body = body;
             this.anchor = anchor;
-            body1.ApplyMatrix();
-            Matrix3x3 matrix1 = body1.Shape.MatrixInv.VertexMatrix;
+            body.ApplyMatrix();
+            Matrix3x3 matrix1 = body.Shape.MatrixInv.VertexMatrix;
             Vector2D.Transform(ref matrix1, ref anchor, out localAnchor1);
             softness = 0.001f;
             biasFactor = 0.2f;
@@ -89,7 +92,7 @@ namespace Physics2DDotNet
         }
         public override Body[] Bodies
         {
-            get { return new Body[1] { body1 }; }
+            get { return new Body[1] { body }; }
         }
         protected override void OnAdded()
         {
@@ -98,11 +101,11 @@ namespace Physics2DDotNet
         void Solvers.ISequentialImpulsesJoint.PreStep(Scalar dtInv)
         {
 
-            Scalar mass1Inv = body1.Mass.MassInv;
-            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
+            Scalar mass1Inv = body.Mass.MassInv;
+            Scalar inertia1Inv = body.Mass.MomentofInertiaInv;
 
             // Pre-compute anchors, mass matrix, and bias.
-            Matrix2x2 matrix1 = body1.Shape.Matrix.NormalMatrix;
+            Matrix2x2 matrix1 = body.Shape.Matrix.NormalMatrix;
 
             Vector2D.Transform(ref matrix1, ref localAnchor1, out r1);
 
@@ -127,7 +130,7 @@ namespace Physics2DDotNet
 
 
             Vector2D dp;
-            Vector2D.Add(ref body1.State.Position.Linear, ref r1, out dp);
+            Vector2D.Add(ref body.State.Position.Linear, ref r1, out dp);
             Vector2D.Subtract(ref anchor, ref dp, out dp);
 
 
@@ -144,7 +147,7 @@ namespace Physics2DDotNet
             if (solver.WarmStarting)
             {
                 PhysicsHelper.SubtractImpulse(
-                    ref body1.State.Velocity, ref accumulatedImpulse,
+                    ref body.State.Velocity, ref accumulatedImpulse,
                     ref r1, ref mass1Inv, ref inertia1Inv);
             }
             else
@@ -154,11 +157,11 @@ namespace Physics2DDotNet
         }
         void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
         {
-            Scalar mass1Inv = body1.Mass.MassInv;
-            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
+            Scalar mass1Inv = body.Mass.MassInv;
+            Scalar inertia1Inv = body.Mass.MomentofInertiaInv;
 
             Vector2D dv;
-            PhysicsHelper.GetRelativeVelocity(ref body1.State.Velocity, ref r1, out dv);
+            PhysicsHelper.GetRelativeVelocity(ref body.State.Velocity, ref r1, out dv);
 
             Vector2D impulse, vect1;
             Vector2D.Multiply(ref softness, ref accumulatedImpulse, out vect1);
@@ -168,7 +171,7 @@ namespace Physics2DDotNet
             //impulse = M * (bias - dv - softness * P);
 
             PhysicsHelper.SubtractImpulse(
-                ref body1.State.Velocity, ref impulse,
+                ref body.State.Velocity, ref impulse,
                 ref r1, ref mass1Inv, ref inertia1Inv);
 
 

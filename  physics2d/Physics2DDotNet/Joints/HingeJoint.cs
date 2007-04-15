@@ -43,6 +43,10 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+
+    /// <summary>
+    /// A Joint Between 2 Bodies that will pivot around an Anchor.
+    /// </summary>
     public sealed class HingeJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
         Solvers.SequentialImpulsesSolver solver;
@@ -82,7 +86,6 @@ namespace Physics2DDotNet
             softness = 0.001f;
             biasFactor = 0.2f;
         }
-
 
         public Scalar BiasFactor
         {

@@ -39,6 +39,8 @@
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Ignorers\CollisionGroupIgnorer.cs" />
     <Compile Include="Ignorers\CollisionIgnorer.cs" />
+    <Compile Include="Ignorers\CollisionObjectIgnorer.cs" />
+    <Compile Include="Joints\AngleJoint.cs" />
     <Compile Include="Joints\PivotJoint.cs" />
     <Compile Include="Joints\HingeJoint.cs" />
     <Compile Include="Math2D\ALVector2D.cs" />
