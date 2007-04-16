@@ -129,18 +129,11 @@ namespace Physics2DDotNet
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {
-            Scalar result;
-            Vector2D normal;
-            Vector2D.Subtract(ref vector, ref position, out normal);
-            Vector2D.Normalize(ref normal, out result, out normal);
-            result -= radius;
-            if (result <= 0)
-            {
-                info = new IntersectionInfo(vector, normal, result);
-                return true;
-            }
-            info = null;
-            return false;
+            Vector2D.Subtract(ref vector, ref position, out info.Normal);
+            Vector2D.Normalize(ref info.Normal, out info.Distance, out info.Normal);
+            info.Distance -= radius;
+            info.Position = vector;
+            return info.Distance <= 0;
         }
         public override void ApplyMatrix(ref Matrix2D matrix)
         {

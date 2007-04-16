@@ -89,62 +89,16 @@ namespace Physics2DDotNet.Solvers
         }
         sealed class Arbiter : ICollisionInfo
         {
-            static void Collide(List<Contact> contacts, Body body1, Body body2)
-            {
-                BoundingRectangle bb1 = body1.Shape.Rectangle;
-                BoundingRectangle bb2 = body2.Shape.Rectangle;
-                BoundingRectangle targetArea;
-                BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
-                Collide(contacts, body1, body2, ref targetArea);
-                Collide(contacts, body2, body1, ref targetArea);
-            }
-            static void Collide(List<Contact> contacts, Body body1, Body body2, ref BoundingRectangle targetArea)
-            {
-                if (!body1.Shape.CanGetIntersection)
-                {
-                    return;
-                }
-                Vector2D[] vertexes = body2.Shape.Vertices;
-                for (int index = 0; index < vertexes.Length; ++index)
-                {
-                    Vector2D vector = vertexes[index];
-                    ContainmentType contains;
-                    targetArea.Contains(ref vector, out contains);
-                    if (contains == ContainmentType.Contains)
-                    {
-                        IntersectionInfo info;
-                        if (body1.Shape.TryGetIntersection(vector, out info))
-                        {
-                            Contact contact = new Contact();
-                            contact.normal = info.Normal;
-                            if (Scalar.IsNaN(contact.normal.X) ||
-                                Scalar.IsNaN(contact.normal.Y))
-                            {
-                                continue;
-                            }
-                            contact.distance = info.Distance;
-                            contact.position = vector;
-                            if (body1.ID < body2.ID)
-                            {
-                                contact.id = vertexes.Length - index;
-                            }
-                            else
-                            {
-                                contact.id = index;
-                                Vector2D.Negate(ref contact.normal, out contact.normal);
-                            }
-                            contacts.Add(contact);
-                        }
-                    }
-                }
-            }
+
+           
             static Scalar ZeroClamp(Scalar value)
             {
                 return ((value < 0) ? (0) : (value));
             }
-            static readonly Contact[] Empty = new Contact[0];
 
-            Contact[] contacts;
+            LinkedList<Contact> contacts;
+            Contact[] contactsArray;
+
             Body body1;
             Body body2;
             SequentialImpulsesTag tag1;
@@ -176,6 +130,7 @@ namespace Physics2DDotNet.Solvers
                     this.body2.Coefficients.DynamicFriction);
                 this.restitution = Math.Min(body1.Coefficients.Restitution, body2.Coefficients.Restitution);
                 this.parent = parent;
+                this.contacts = new LinkedList<Contact>();
             }
             public bool Updated
             {
@@ -186,47 +141,89 @@ namespace Physics2DDotNet.Solvers
             public void Update()
             {
                 updated = true;
-                List<Contact> newContacts;
-                bool isEmpty = null == contacts || Empty == contacts;
-                if (isEmpty)
+                Collide();
+                if (contactsArray == null || contactsArray.Length != contacts.Count)
                 {
-                    newContacts = new List<Contact>();
+                    contactsArray = new Contact[contacts.Count];
                 }
-                else
+                contacts.CopyTo(contactsArray, 0);
+            }
+            void Collide()
+            {
+                BoundingRectangle bb1 = body1.Shape.Rectangle;
+                BoundingRectangle bb2 = body2.Shape.Rectangle;
+                BoundingRectangle targetArea;
+                BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
+
+                LinkedListNode<Contact> node = contacts.First;
+                if (body1.Shape.CanGetIntersection)
                 {
-                    newContacts = new List<Contact>(contacts.Length);
+                    Collide(ref node, this.body1, this.body2, false, ref targetArea);
                 }
-                Collide(newContacts, body1, body2);
-                if (newContacts.Count == 0)
+                if (body2.Shape.CanGetIntersection)
                 {
-                    this.contacts = Empty;
+                    Collide(ref node, this.body2, this.body1, true, ref targetArea);
                 }
-                else if (isEmpty)
+            }
+            void Collide(ref LinkedListNode<Contact> node, Body b1, Body b2,bool inverse, ref BoundingRectangle targetArea)
+            {
+                Vector2D[] vertexes = b2.Shape.Vertices;
+                IntersectionInfo info;
+                ContainmentType contains;
+                Contact contact;
+                for (int index = 0; index < vertexes.Length; ++index)
                 {
-                    this.contacts = newContacts.ToArray();
-                }
-                else
-                {
-                    Contact[] mergedContacts = newContacts.ToArray();
-                    if (parent.warmStarting)
+                    Vector2D vector = vertexes[index];
+                    targetArea.Contains(ref vector, out contains);
+                    int Id = (inverse) ? (index) : ((-vertexes.Length + index));
+
+                    while (node != null && node.Value.id < Id) { node = node.Next; }
+
+                    if (contains != ContainmentType.Contains ||
+                        !b1.Shape.TryGetIntersection(vector, out info) ||
+                        Scalar.IsNaN(info.Normal.X) ||
+                        Scalar.IsNaN(info.Normal.Y))
                     {
-                        for (int index = 0, oldIndex = 0; index < mergedContacts.Length && oldIndex < contacts.Length; )
+                        if (node != null && node.Value.id == Id)
                         {
-                            Contact oldC = contacts[oldIndex];
-                            Contact newC = mergedContacts[index];
-                            if (oldC.id == newC.id)
-                            {
-                                newC.Pn = oldC.Pn;
-                                newC.Pt = oldC.Pt;
-                                newC.Pnb = oldC.Pnb;
-                                ++oldIndex;
-                                ++index;
-                            }
-                            else if (oldC.id < newC.id) { ++oldIndex; }
-                            else { ++index; }
+                            LinkedListNode<Contact> nextNode = node.Next;
+                            contacts.Remove(node);
+                            node = nextNode;
                         }
                     }
-                    this.contacts = mergedContacts;
+                    else
+                    {
+                        if (node == null)
+                        {
+                            contact = new Contact();
+                            contact.id = Id;
+                            contacts.AddLast(contact);
+                        }
+                        else if (node.Value.id == Id)
+                        {
+                            contact = node.Value;
+                            node = node.Next;
+                            if (!parent.warmStarting)
+                            {
+                                contact.Pn = 0;
+                                contact.Pt = 0;
+                                contact.Pnb = 0;
+                            }
+                        }
+                        else
+                        {
+                            contact = new Contact();
+                            contact.id = Id;
+                            contacts.AddBefore(node, contact);
+                        }
+                        contact.normal = info.Normal;
+                        contact.distance = info.Distance;
+                        contact.position = vector;
+                        if (inverse)
+                        {
+                            Vector2D.Negate(ref contact.normal, out contact.normal);
+                        }
+                    }
                 }
             }
             public void PreApply(Scalar dtInv)
@@ -238,9 +235,9 @@ namespace Physics2DDotNet.Solvers
                 Scalar mass2Inv = body2.Mass.MassInv;
                 Scalar I2Inv = body2.Mass.MomentofInertiaInv;
 
-                for (int index = 0; index < contacts.Length; ++index)
+                for (int index = 0; index < contactsArray.Length; ++index)
                 {
-                    Contact c = contacts[index];
+                    Contact c = contactsArray[index];
                     Vector2D.Subtract(ref c.position, ref body1.State.Position.Linear, out c.r1);
                     Vector2D.Subtract(ref c.position, ref body2.State.Position.Linear, out c.r2);
 
@@ -325,9 +322,9 @@ namespace Physics2DDotNet.Solvers
                 PhysicsState state1 = b1.State;
                 PhysicsState state2 = b2.State;
 
-                for (int index = 0; index < contacts.Length; ++index)
+                for (int index = 0; index < contactsArray.Length; ++index)
                 {
-                    Contact c = contacts[index];
+                    Contact c = contactsArray[index];
 
                     // Relative velocity at contact
                     Vector2D dv;
@@ -485,18 +482,17 @@ namespace Physics2DDotNet.Solvers
             }
             public bool Collided
             {
-                get { return contacts.Length > 0; }
+                get { return contactsArray.Length > 0; }
             }
             ReadOnlyCollection<IContactInfo> ICollisionInfo.Contacts
             {
                 get
                 {
                     return new ReadOnlyCollection<IContactInfo>(
-                        new Physics2DDotNet.Collections.ImplicitCastCollection<IContactInfo, Contact>(contacts));
+                        new Physics2DDotNet.Collections.ImplicitCastCollection<IContactInfo, Contact>(contactsArray));
                 }
             }
         }
-
         static bool IsJointRemoved(ISequentialImpulsesJoint joint)
         {
             return !joint.IsAdded;

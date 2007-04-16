@@ -122,13 +122,14 @@ namespace Physics2DDotNet
                         Vector2D normal;
                         normal.X = right - left;
                         normal.Y = top - bottom;
-                        Vector2D.Normalize(ref normal, out normal);
-                        result = new IntersectionInfo(vector, normal, distance);
+                        Vector2D.Normalize(ref normal, out result.Normal);
+                        result.Position = vector;
+                        result.Distance = distance;
                         return true;
                     }
                 }
             }
-            result = null;
+            result = IntersectionInfo.Zero;
             return false;
         }
     }

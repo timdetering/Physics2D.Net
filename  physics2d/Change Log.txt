@@ -37,6 +37,10 @@ Added: AngleJoint.
 Added: CollisionObjectIgnorer.
 changed: Sequential impulse solver to clear forces after velocity is updated instead of after update position.
 changed: Sweep and Prune to be faster (by alot), by replacing the wrappers dictionary with a List and using BinarySearch for the second sweep.
+changed: IntersectionInfo into a struct.
+changed: TryGetIntersection to reflect the change of IntersectionInfo.
+changed: the Arbiter to minimize the number of contact creations. this was to massivly reduce the number of creation and deletion of objects. IE less memory allocation.
+
 
 AdvanceMath
 NEXT VERSION:

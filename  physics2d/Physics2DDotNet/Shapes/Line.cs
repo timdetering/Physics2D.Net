@@ -116,8 +116,8 @@ namespace Physics2DDotNet
             Vector2D.Transform(ref matrix2DInv.VertexMatrix, ref vector, out local);
             if (grid.TryGetIntersection(local, out info))
             {
-                Vector2D.Transform(ref matrix2D.NormalMatrix, ref info.normal, out info.normal);
-                info.position = vector;
+                Vector2D.Transform(ref matrix2D.NormalMatrix, ref info.Normal, out info.Normal);
+                info.Position = vector;
                 return true;
             }
             return false;

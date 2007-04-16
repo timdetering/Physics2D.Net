@@ -160,8 +160,19 @@ namespace Physics2DDotNet.Detectors
             xStubs.RemoveAll(StubIsRemoved);
             yStubs.RemoveAll(StubIsRemoved);
         }
+
+        private void Update()
+        {
+            for (int index = 0; index < wrappers.Count; ++index)
+            {
+                wrappers[index].Update();
+            }
+            xStubs.Sort(StubComparison);
+            yStubs.Sort(StubComparison);
+        }
         public override void Detect(Scalar dt)
         {
+            Update();
             int count1 = 0;
             int count2 = 0;
             int beginCount = 0;
@@ -171,13 +182,6 @@ namespace Physics2DDotNet.Detectors
             Stub stub;
             Wrapper wrapper;
             Body body1, body2;
-
-            for (int index = 0; index < wrappers.Count; ++index)
-            {
-                wrappers[index].Update();
-            }
-            xStubs.Sort(StubComparison);
-            yStubs.Sort(StubComparison);
 
             bool xSmall = lastXCount > lastYCount;
             if (xSmall)
@@ -229,10 +233,7 @@ namespace Physics2DDotNet.Detectors
                     }
                 }
             }
-            if (currentBodies.Count > 0)
-            {
-                throw new InvalidOperationException("The Detector is Corrupt!");
-            }
+
             if (count1 == 0)
             {
                 if (xSmall) { lastYCount = 0; }
@@ -283,10 +284,7 @@ namespace Physics2DDotNet.Detectors
                     }
                 }
             }
-            if (currentBodies.Count > 0)
-            {
-                throw new InvalidOperationException("The Detector is Corrupt!");
-            }
+
             if (xSmall)
             {
                 lastYCount = count1;
