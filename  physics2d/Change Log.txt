@@ -35,6 +35,8 @@ changed: the Sweep and Prune to be a little more optimized for particles.
 changed: The shape object to make the inertia multiplier one of its constructors parameters. 
 Added: AngleJoint.
 Added: CollisionObjectIgnorer.
+changed: Sequential impulse solver to clear forces after velocity is updated instead of after update position.
+changed: Sweep and Prune to be faster (by alot), by replacing the wrappers dictionary with a List and using BinarySearch for the second sweep.
 
 AdvanceMath
 NEXT VERSION:

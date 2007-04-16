@@ -628,6 +628,7 @@ namespace Physics2DDotNet.Solvers
                 SequentialImpulsesTag tag = tags[index];
                 tag.biasVelocity = ALVector2D.Zero;
                 tag.body.UpdateVelocity(dt);
+                tag.body.ClearForces();
             }
 
             Arbiter[] arbs = new Arbiter[arbiters.Count];
@@ -662,7 +663,6 @@ namespace Physics2DDotNet.Solvers
                 {
                     tag.body.UpdatePosition(dt);
                 }
-                tag.body.ClearForces();
             }
         }
         protected internal override void AddBodyRange(List<Body> collection)

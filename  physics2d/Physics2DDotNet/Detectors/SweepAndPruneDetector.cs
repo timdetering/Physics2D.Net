@@ -46,7 +46,8 @@ namespace Physics2DDotNet.Detectors
     {
         sealed class Wrapper
         {
-            public Dictionary<int, object> colliders = new Dictionary<int, object>();
+            public int beginCount;
+            public List<int> colliders = new List<int>();
             public LinkedListNode<Wrapper> node;
             public Body body;
             public bool shouldAddNode;
@@ -71,6 +72,7 @@ namespace Physics2DDotNet.Detectors
             }
             public void Update()
             {
+                beginCount = -1;
                 colliders.Clear();
                 body.Shape.CalcBoundingRectangle();
                 BoundingRectangle rect = body.Shape.Rectangle;
@@ -126,9 +128,6 @@ namespace Physics2DDotNet.Detectors
             this.xStubs = new List<Stub>();
             this.yStubs = new List<Stub>();
         }
-        /// <summary>
-        /// The amount of extra capacity for the collection that stores all collisions along the x-axis.
-        /// </summary>
         protected internal override void AddBodyRange(List<Body> collection)
         {
             int wrappercount = collection.Count + wrappers.Count;
@@ -163,17 +162,24 @@ namespace Physics2DDotNet.Detectors
         }
         public override void Detect(Scalar dt)
         {
+            int count1 = 0;
+            int count2 = 0;
+            int beginCount = 0;
+            List<Stub> list1, list2;
+            LinkedList<Wrapper> currentBodies = new LinkedList<Wrapper>();
+            LinkedListNode<Wrapper> node;
+            Stub stub;
+            Wrapper wrapper;
+            Body body1, body2;
+
             for (int index = 0; index < wrappers.Count; ++index)
             {
                 wrappers[index].Update();
             }
             xStubs.Sort(StubComparison);
             yStubs.Sort(StubComparison);
-            int count1 = 0;
-            int count2 = 0;
-            List<Stub> list1;
-            List<Stub> list2;
-            bool xSmall = lastXCount < lastYCount;
+
+            bool xSmall = lastXCount > lastYCount;
             if (xSmall)
             {
                 list1 = yStubs;
@@ -184,37 +190,42 @@ namespace Physics2DDotNet.Detectors
                 list1 = xStubs;
                 list2 = yStubs;
             }
-            LinkedList<Wrapper> currentBodies = new LinkedList<Wrapper>();
-            LinkedListNode<Wrapper> node;
+
             for (int index = 0; index < list1.Count; ++index)
             {
-                Stub stub = list1[index];
+                stub = list1[index];
+                wrapper = stub.wrapper;
+
                 if (stub.begin)
                 {
-                    Body body1 = stub.wrapper.body;
+                    body1 = wrapper.body;
                     node = currentBodies.First;
                     while (node != null)
                     {
                         count1++;
-                        Body body2 = node.Value.body;
+                        body2 = node.Value.body;
                         if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
                             Body.CanCollide(body1, body2))
                         {
-                            node.Value.colliders.Add(body1.ID, null);
-                            stub.wrapper.colliders.Add(body2.ID, null);
+                            node.Value.colliders.Add(body1.ID);
+                            wrapper.colliders.Add(body2.ID);
                         }
                         node = node.Next;
                     }
-                    if (stub.wrapper.shouldAddNode)
+                    if (wrapper.shouldAddNode)
                     {
-                        currentBodies.AddLast(stub.wrapper.node);
+                        currentBodies.AddLast(wrapper.node);
                     }
                 }
                 else
                 {
-                    if (stub.wrapper.shouldAddNode)
+                    if (wrapper.shouldAddNode)
                     {
-                        currentBodies.Remove(stub.wrapper.node);
+                        currentBodies.Remove(wrapper.node);
+                    }
+                    if (wrapper.colliders.Count > 0)
+                    {
+                        wrapper.colliders.Sort();
                     }
                 }
             }
@@ -230,31 +241,45 @@ namespace Physics2DDotNet.Detectors
             }
             for (int index = 0; index < list2.Count; ++index)
             {
-                Stub stub = list2[index];
+                stub = list2[index];
+                wrapper = stub.wrapper;
+
                 if (stub.begin)
                 {
-                    Body body1 = stub.wrapper.body;
-                    node = currentBodies.First;
-                    while (node != null)
+                    beginCount++;
+                    if (wrapper.colliders.Count == 0)
                     {
-                        count2++;
-                        Body body2 = node.Value.body;
-                        if (node.Value.colliders.ContainsKey(body1.ID))
-                        {
-                            this.OnCollision(dt, body1, body2);
-                        }
-                        node = node.Next;
+                        count2 += currentBodies.Count;
+                        wrapper.beginCount = beginCount;
                     }
-                    if (stub.wrapper.shouldAddNode)
+                    else
                     {
-                        currentBodies.AddLast(stub.wrapper.node);
+                        body1 = wrapper.body;
+                        node = currentBodies.First;
+                        while (node != null)
+                        {
+                            count2++;
+                            if (node.Value.colliders.BinarySearch(body1.ID) >= 0)
+                            {
+                                this.OnCollision(dt, body1, node.Value.body);
+                            }
+                            node = node.Next;
+                        }
+                        if (wrapper.shouldAddNode)
+                        {
+                            currentBodies.AddLast(wrapper.node);
+                        }
                     }
                 }
                 else
                 {
-                    if (stub.wrapper.shouldAddNode)
+                    if (wrapper.beginCount > 0)
                     {
-                        currentBodies.Remove(stub.wrapper.node);
+                        count2 += beginCount - wrapper.beginCount;
+                    }
+                    else if (wrapper.shouldAddNode)
+                    {
+                        currentBodies.Remove(wrapper.node);
                     }
                 }
             }
