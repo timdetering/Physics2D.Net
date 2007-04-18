@@ -58,7 +58,7 @@ namespace Physics2DDotNet
 
     public interface IJoint : IPhysicsEntity
     {
-        Body[] Bodies { get;}
+        ReadOnlyCollection<Body> Bodies { get;}
     }
 
     /// <summary>

@@ -132,6 +132,13 @@ namespace Physics2DDotNet
 
 
         protected internal abstract void RunLogic(Scalar dt);
+
+        /// <summary>
+        /// Before the item is allowed to be added to pending this method is called to 
+        /// throw any exceptions without corrupting the state of the Physics engine.
+        /// </summary>
+        /// <param name="engine">The engine the item is about to be added too.</param>
+        protected internal virtual void BeforeAddCheck(PhysicsEngine engine) { }
         internal void OnPendingInternal(PhysicsEngine engine)
         {
             this.isChecked = true;
@@ -141,6 +148,7 @@ namespace Physics2DDotNet
             if (Pending != null) { Pending(this, EventArgs.Empty); }
         }
         protected virtual void OnPending() { }
+
         internal void OnAddedInternal()
         {
             this.isPending = false;

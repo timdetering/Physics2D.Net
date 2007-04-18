@@ -366,7 +366,7 @@ namespace Physics2DDotNet
             PreCheckItem(item);
             lock (syncRoot)
             {
-                CheckItem(item);
+                CheckLogic(item);
                 item.OnPendingInternal(this);
                 pendingLogics.Add(item);
             }
@@ -387,7 +387,7 @@ namespace Physics2DDotNet
                 }
                 foreach (PhysicsLogic item in collection)
                 {
-                    CheckItem(item);
+                    CheckLogic(item);
                 }
                 foreach (PhysicsLogic item in collection)
                 {
@@ -416,7 +416,7 @@ namespace Physics2DDotNet
                 int index = 0;
                 foreach (T item in collection)
                 {
-                    CheckItem(item);
+                    CheckLogic(item);
                     array[index++] = item;
                 }
                 foreach (T item in collection)
@@ -670,16 +670,14 @@ namespace Physics2DDotNet
         private void CheckJoint(Joint joint)
         {
             CheckItem(joint);
-            foreach (Body item in joint.Bodies)
-            {
-                if (item.Engine != this)
-                {
-                    throw new InvalidOperationException("All Bodies the Joint Effects Must Be added to the Same Engine Before the Joint is added.");
-                }
-            }
+            joint.BeforeAddCheckInternal(this);
             solver.CheckJoint(joint);
         }
-
+        private void CheckLogic(PhysicsLogic  logic)
+        {
+            CheckItem(logic);
+            logic.BeforeAddCheck(this);
+        }
         internal void RunLogic(Scalar dt)
         {
             for (int index = 0; index < logics.Count; ++index)

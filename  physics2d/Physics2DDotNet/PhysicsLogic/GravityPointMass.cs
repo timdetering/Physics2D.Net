@@ -38,54 +38,50 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class GravityPointMass : PhysicsLogic
     {
-        static Lifespan GetLifeSpan(Body source, Lifespan lifetime)
-        {
-            if (source == null) { throw new ArgumentNullException("source"); }
-            if (lifetime == null) { throw new ArgumentNullException("lifeTime"); }
-            return new Lifespan(lifetime.Age, lifetime.MaxAge, source.Lifetime);
-        }
-
         Scalar metersPerDistanceUnit;
-        Body source;
-        public GravityPointMass(Body source, Scalar metersPerDistanceUnit, Lifespan lifetime)
-            : base(GetLifeSpan(source, lifetime))
+        Body body;
+        public GravityPointMass(Body body, Scalar metersPerDistanceUnit, Lifespan lifetime)
+            : base(lifetime)
         {
+            if (body == null) { throw new ArgumentNullException("source"); }
             if (metersPerDistanceUnit <= 0) { throw new ArgumentOutOfRangeException("metersPerDistanceUnit"); }
-            this.source = source;
+            this.body = body;
             this.metersPerDistanceUnit = metersPerDistanceUnit;
         }
         protected internal override void RunLogic(Scalar dt)
         {
             foreach (Body e in Bodies)
             {
-                if (e != source && !e.IgnoresGravity)
+                if (e != body && !e.IgnoresGravity)
                 {
                     Scalar magnitude;
                     Vector2D gravity;
-                    Vector2D.Subtract(ref source.State.Position.Linear, ref e.State.Position.Linear, out gravity);
+                    Vector2D.Subtract(ref body.State.Position.Linear, ref e.State.Position.Linear, out gravity);
                     Vector2D.Normalize(ref gravity, out magnitude, out gravity);
-                    magnitude = (source.Mass.AccelerationDueToGravity /
+                    magnitude = (body.Mass.AccelerationDueToGravity /
                             (magnitude * magnitude * metersPerDistanceUnit * metersPerDistanceUnit));
                     Vector2D.Multiply(ref gravity, ref magnitude, out gravity);
                     Vector2D.Add(ref e.State.Acceleration.Linear, ref gravity, out e.State.Acceleration.Linear);
                 }
             }
         }
-
-        void OnSourceLifetimeChanged(object sender, EventArgs e)
+        protected internal override void BeforeAddCheck(PhysicsEngine engine)
         {
-            this.Lifetime = GetLifeSpan(source, this.Lifetime);
+            if (body.Engine != engine) { throw new InvalidOperationException("The Body must be added to the Engine before the GravityPointMass."); }
         }
         protected override void OnAdded()
         {
-            this.Lifetime = GetLifeSpan(source, this.Lifetime);
-            this.source.LifetimeChanged += OnSourceLifetimeChanged;
+            this.body.Removed += OnBodyRemoved;
+        }
+        void OnBodyRemoved(object sender, RemovedEventArgs e)
+        {
+            this.Lifetime.IsExpired = true;
         }
         protected override void OnRemoved(PhysicsEngine engine, bool wasPending)
         {
             if (!wasPending)
             {
-                this.source.LifetimeChanged -= OnSourceLifetimeChanged;
+                this.body.Removed -= OnBodyRemoved;
             }
         }
     }

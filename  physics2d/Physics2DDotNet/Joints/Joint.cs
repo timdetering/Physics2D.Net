@@ -125,10 +125,21 @@ namespace Physics2DDotNet
         /// <summary>
         /// Gets the bodies the Joint effects.
         /// </summary>
-        public abstract Body[] Bodies { get;}
+        public abstract ReadOnlyCollection<Body> Bodies { get;}
 
 
         protected internal virtual void UpdateTime(Scalar dt) { }
+        protected internal void BeforeAddCheckInternal(PhysicsEngine engine)
+        {
+            foreach (Body item in Bodies)
+            {
+                if (item.Engine != engine)
+                {
+                    throw new InvalidOperationException("All Bodies the Joint Effects Must Be added to the Same Engine Before the Joint is added.");
+                }
+            }
+            BeforeAddCheck(engine);
+        }
         internal void OnPendingInternal(PhysicsEngine engine)
         {
             this.isChecked = false;
@@ -164,8 +175,8 @@ namespace Physics2DDotNet
             bool wasPending = this.isPending;
             this.isPending = false;
             this.engine = null;
-            OnRemoved(engine,wasPending);
-            if (Removed != null) { Removed(this, new RemovedEventArgs(engine,wasPending)); }
+            OnRemoved(engine, wasPending);
+            if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }
         }
         void OnBodyRemoved(object sender, EventArgs e)
         {
@@ -173,6 +184,12 @@ namespace Physics2DDotNet
         }
         protected virtual void OnPending() { }
         protected virtual void OnAdded() { }
-        protected virtual void OnRemoved(PhysicsEngine engine,bool wasPending) { }
+        protected virtual void OnRemoved(PhysicsEngine engine, bool wasPending) { }
+        /// <summary>
+        /// Before the item is allowed to be added to pending this method is called to 
+        /// throw any exceptions without corrupting the state of the Physics engine.
+        /// </summary>
+        /// <param name="engine">The engine the item is about to be added too.</param>
+        protected virtual void BeforeAddCheck(PhysicsEngine engine) { } 
     }
 }

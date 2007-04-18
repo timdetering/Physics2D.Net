@@ -40,7 +40,8 @@ changed: Sweep and Prune to be faster (by alot), by replacing the wrappers dicti
 changed: IntersectionInfo into a struct.
 changed: TryGetIntersection to reflect the change of IntersectionInfo.
 changed: the Arbiter to minimize the number of contact creations. this was to massivly reduce the number of creation and deletion of objects. IE less memory allocation.
-
+added: new method for throwing errors to classes that are added to the engine.
+changed: Joints.bodies to be the ReadOnlycollection.
 
 AdvanceMath
 NEXT VERSION:

@@ -31,6 +31,7 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 using AdvanceMath;
 using Physics2DDotNet.Math2D;
@@ -81,9 +82,9 @@ namespace Physics2DDotNet
             get { return softness; }
             set { softness = value; }
         }
-        public override Body[] Bodies
+        public override ReadOnlyCollection<Body> Bodies
         {
-            get { return new Body[2] { body1, body2 }; }
+            get { return Array.AsReadOnly<Body>(new Body[2] { body1, body2 }); }
         }
         protected override void OnAdded()
         {
