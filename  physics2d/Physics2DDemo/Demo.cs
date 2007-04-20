@@ -412,7 +412,7 @@ namespace Physics2DDemo
         void CreateAvatar()
         {
             Sprite sprite = GetSprite("mech.png");
-            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Vector2D[] vertexes = sprite.Vertexes;
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite;
 
@@ -557,7 +557,7 @@ namespace Physics2DDemo
 
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Vector2D[] vertexes = sprite.Vertexes;
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite;
 
@@ -584,7 +584,7 @@ namespace Physics2DDemo
             float offsetchange = .9f;
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Vector2D[] vertexes = sprite.Vertexes;
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite;
 
@@ -662,7 +662,7 @@ namespace Physics2DDemo
             float offsetchange = .9f;
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Vector2D[] vertexes = sprite.Vertexes;
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite;
 
@@ -722,7 +722,7 @@ namespace Physics2DDemo
 
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
+            Vector2D[] vertexes = sprite.Vertexes;
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite; 
             float minY = 100;
@@ -824,10 +824,10 @@ namespace Physics2DDemo
             AddGravityField();
             Sprite blockSprite = GetSprite("fighter.png");
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            Vector2D[] vertexes = Polygon.Subdivide(blockSprite.Vertexes,10);
+            Vector2D[] vertexes = blockSprite.Vertexes;
             Polygon shape = new Polygon(vertexes,4);
             shape.Tag = blockSprite;
-            for (int i = 128*3; i > -128; i -= 128)
+                for (int i = 128*3; i > -128; i -= 128)
             {
                 AddShape(shape, 40, new ALVector2D(0, new Vector2D(600, 272+i)));
             }

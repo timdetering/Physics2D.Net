@@ -70,6 +70,11 @@ namespace Physics2DDemo
                 }
             }
             vertexes = Polygon.CreateFromBitmap(bitmap);
+            Console.WriteLine("Before {0}", vertexes.Length);
+            vertexes = Polygon.Reduce(vertexes,3);
+            Console.WriteLine("After {0}", vertexes.Length);
+            vertexes = Polygon.Subdivide(vertexes, 10);
+            Console.WriteLine("Subdivide {0}", vertexes.Length);
             offset = Polygon.GetCentroid(vertexes);
             vertexes = Polygon.MakeCentroidOrigin(vertexes);
         }

@@ -118,7 +118,13 @@ namespace Physics2DDotNet
             Point2D p3;
             for (int index = 0; index < list.Count; ++index, p2 = p3)
             {
-                p3 = list[index];
+                if (index == list.Count - 1)
+                {
+                    if (result.Count == 0) { throw new ArgumentException("Bad Polygon"); }
+                    p3.X = (int)result[0].X;
+                    p3.Y = (int)result[0].Y;
+                }
+                else { p3 = list[index]; }
                 if (!IsInLine(ref p1, ref p2, ref p3))
                 {
                     result.Add(new Vector2D(p2.X, p2.Y));
@@ -227,25 +233,46 @@ namespace Physics2DDotNet
             return result;
         }
         /// <summary>
-        /// Reduces a Polygon to the minumum number or vertexes need to represent it.  Does the opposite of Subdivide. 
+        /// Reduces a Polygon's number of vertexes.
         /// </summary>
-        /// <param name="vertexes">The bloated vertex array.</param>
+        /// <param name="vertexes">The Polygon to reduce.</param>
         /// <returns>The reduced vertexes.</returns>
         public static Vector2D[] Reduce(Vector2D[] vertexes)
         {
+            return Reduce(vertexes, 0);
+        }
+        /// <summary>
+        /// Reduces a Polygon's number of vertexes.
+        /// </summary>
+        /// <param name="vertexes">The Polygon to reduce.</param>
+        /// <param name="areaTolerance">
+        /// The amount the removal of a vertex is allowed to change the area of the polygon.
+        /// (Setting this value to 0 will reverse what the Subdivide method does) 
+        /// </param>
+        /// <returns>The reduced vertexes.</returns>
+        public static Vector2D[] Reduce(Vector2D[] vertexes, Scalar areaTolerance)
+        {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 2) { throw new ArgumentOutOfRangeException("vertexes"); }
+            if (areaTolerance < 0) { throw new ArgumentOutOfRangeException("areaTolerance","must be equal to or greater then zero."); }
             List<Vector2D> result = new List<Vector2D>(vertexes.Length);
             Vector2D v1, v2, v3;
+            Scalar old1, old2, new1;
             v1 = vertexes[vertexes.Length - 2];
             v2 = vertexes[vertexes.Length - 1];
+            areaTolerance = areaTolerance * 2;
             for (int index = 0; index < vertexes.Length; ++index, v2 = v3)
             {
-                v3 = vertexes[index];
-                Scalar slope1 = (v1.Y - v2.Y);
-                Scalar slope2 = (v2.Y - v3.Y);
-                if (!(0 == slope1 && 0 == slope2 ||
-                   ((v1.X - v2.X) / slope1) == ((v2.X - v3.X) / slope2)))
+                if (index == vertexes.Length - 1)
+                {
+                    if (result.Count == 0) { throw new ArgumentOutOfRangeException("areaTolerance", "The Tolerance is too high!"); }
+                    v3 = result[0];
+                }
+                else { v3 = vertexes[index]; }
+                Vector2D.ZCross(ref v1, ref v2, out old1);
+                Vector2D.ZCross(ref v2, ref v3, out old2);
+                Vector2D.ZCross(ref v1, ref v3, out new1);
+                if (Math.Abs(new1 - (old1 + old2)) > areaTolerance)
                 {
                     result.Add(v2);
                     v1 = v2;
