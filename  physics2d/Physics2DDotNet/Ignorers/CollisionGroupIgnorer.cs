@@ -73,7 +73,11 @@ namespace Physics2DDotNet
             if (!Contains(item))
             {
                 groups.Add(item);
-                groups.Sort();
+                if (groups.Count > 1 && 
+                    item < groups[groups.Count - 2])
+                {
+                    groups.Sort();
+                }
                 return true;
             }
             return false;
