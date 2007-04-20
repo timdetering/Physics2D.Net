@@ -938,11 +938,11 @@ namespace Physics2DDemo
             //engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
             //AddDiaganol_StressTest();
             //AddRandom_StressTest();
-            AddTowers_StressTest();
-            /*AddText(
+            //AddTowers_StressTest();
+            AddText(
                 "WELCOME TO THE PHYSICS2D.NET DEMO.\nPLEASE ENJOY MESSING WITH IT.\nA LOT OF HARD WORK WENT INTO IT,\nSO THAT YOU COULD ENJOY IT.\nPLEASE SEND FEEDBACK.\nEACH CHARACTER HERE IS AN\nACTUAL BODY IN THE ENGINE.\nTHIS IS TO SHOW OFF THE BITMAP\nTO POLYGON ALGORITHM."
                 , new Vector2D(00, 00));
-            */
+            
             waitHandle.Set();
         }
         void Demo2OLD()
@@ -1249,7 +1249,7 @@ namespace Physics2DDemo
             if (sparkle && updated)
             {
                 updated = false;
-                AddParticles(sparkPoint, 20);
+                AddParticles(sparkPoint, 200);
             }
 
 

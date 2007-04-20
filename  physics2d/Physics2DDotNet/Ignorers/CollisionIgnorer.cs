@@ -38,10 +38,33 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+    /// <summary>
+    /// Base class for Collision Ignorers to impliment.
+    /// </summary>
     [Serializable]
     public abstract class CollisionIgnorer
     {
-        public abstract bool CanCollide(Body other);
+        bool isInverted;
+
+        protected CollisionIgnorer() { }
+        protected CollisionIgnorer(CollisionIgnorer copy)
+        {
+            this.isInverted = copy.isInverted;
+        }
+        /// <summary>
+        /// Get and sets if the result of this ignorer is inverted.
+        /// </summary>
+        public bool IsInverted
+        {
+            get { return isInverted; }
+            set { isInverted = value; }
+        }
+
+        internal bool CanCollideInternal(Body other)
+        {
+            return isInverted ^ CanCollide(other);
+        }
+        protected abstract bool CanCollide(Body other);
         public virtual void UpdateTime(Scalar dt) { }
     }
 }

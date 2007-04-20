@@ -39,7 +39,7 @@ namespace Physics2DDotNet
     [Serializable]
     public class CollisionObjectIgnorer : CollisionIgnorer
     {
-        public override bool CanCollide(Body other)
+        protected override bool CanCollide(Body other)
         {
             return other.Ignorer != this;
         }

@@ -153,29 +153,6 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-            CollisionGroupIgnorer ignorer = new CollisionGroupIgnorer();
-            ignorer.AddRange(new int[] { 1, 2, 3, 4, 5 });
-            ignorer.AddRange(new int[] { 1, 2, 3, 4, 5 });
-            ignorer.Add(6);
-            ignorer.Add(6);
-            ignorer.RemoveRange(new int[] { 1, 3, 5 });
-            Console.WriteLine(ignorer.Contains(3));
-            Console.WriteLine(ignorer.Contains(4));
-            Console.WriteLine(ignorer.ContainsRange(new int[] { 1, 2, 3, 4, 5, 6 }));
-            ignorer.AddRange(new int[] { 1, 3, 5 });
-            Console.WriteLine(ignorer.Contains(3));
-            Console.WriteLine(ignorer.ContainsRange(new int[] { 1, 2, 3, 4, 5, 6 }));
-            ignorer.RemoveRange(new int[] { 1, 3, 5 });
-
-
-            Body b = new Body(new PhysicsState(), new Circle(3, 7), 6, new Coefficients(1, 1, 1), new Lifespan());
-            b.Ignorer = ignorer;
-            CollisionGroupIgnorer ignorer2 = new CollisionGroupIgnorer();
-            ignorer2.AddRange(new int[] { 1, 3, 5 });
-            Console.WriteLine(ignorer2.CanCollide(b));
-            ignorer.AddRange(new int[] {  5 });
-            Console.WriteLine(ignorer2.CanCollide(b));
-            ignorer2.Remove(5);
 
             Console.WriteLine("Finished");
             Console.ReadLine();

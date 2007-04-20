@@ -46,7 +46,7 @@ namespace Physics2DDotNet
         {
             groups = new List<int>();
         }
-        protected CollisionGroupIgnorer(CollisionGroupIgnorer copy)
+        protected CollisionGroupIgnorer(CollisionGroupIgnorer copy):base(copy)
         {
             this.groups = new List<int>(copy.groups);
         }
@@ -220,19 +220,39 @@ namespace Physics2DDotNet
                 return false;
             });
         }
-
-        public override bool CanCollide(Body other)
-        {
-            CollisionGroupIgnorer value = other.Ignorer as CollisionGroupIgnorer;
-            return
-                value == null ||
-                CanCollideInternal(value);
-        }
         /// <summary>
         /// returns if the 2 ignores are not part of the same group.
         /// </summary>
         /// <param name="other">the other CollisionGroupIgnorer</param>
         /// <returns>true if they are not part of the same group; otherwiase false.</returns>
+
+        void ICollection<int>.Add(int item)
+        {
+            Add(item);
+        }
+        /// <summary>
+        /// removes the ignorer from all groups.
+        /// </summary>
+        public void Clear()
+        {
+            groups.Clear();
+        }
+        public void CopyTo(int[] array, int arrayIndex)
+        {
+            groups.CopyTo(array, arrayIndex);
+        }
+        public IEnumerator<int> GetEnumerator()
+        {
+            return groups.GetEnumerator();
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+        public virtual object Clone()
+        {
+            return new CollisionGroupIgnorer(this);
+        }
         public bool CanCollide(CollisionGroupIgnorer other)
         {
             if (other == null) { throw new ArgumentNullException("other"); }
@@ -260,32 +280,12 @@ namespace Physics2DDotNet
             }
             return true;
         }
-        void ICollection<int>.Add(int item)
+        protected override bool CanCollide(Body other)
         {
-            Add(item);
-        }
-        /// <summary>
-        /// removes the ignorer from all groups.
-        /// </summary>
-        public void Clear()
-        {
-            groups.Clear();
-        }
-        public void CopyTo(int[] array, int arrayIndex)
-        {
-            groups.CopyTo(array, arrayIndex);
-        }
-        public IEnumerator<int> GetEnumerator()
-        {
-            return groups.GetEnumerator();
-        }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-        public virtual object Clone()
-        {
-            return new CollisionGroupIgnorer(this);
+            CollisionGroupIgnorer value = other.Ignorer as CollisionGroupIgnorer;
+            return
+                value == null ||
+                CanCollideInternal(value);
         }
     }
 }

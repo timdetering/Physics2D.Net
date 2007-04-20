@@ -46,7 +46,7 @@ Fixed: A bug in the Reduce methods that would evaluate the last edge incorrectly
 Changed: the Polygon.Reduce method to evaluate vertex removal based on the how it would change the area instead of on the difference in angle. 
 Changed: Sweep and Prune to sort with a IComparer instead of a delegate. (Speed boost)
 Changed: Sweep and Prune to be faster by adding a custom IntList class to store colliders. 
-
+Added: a IsInverted Property to the CollisionIgnorer class.
 
 AdvanceMath
 NEXT VERSION:

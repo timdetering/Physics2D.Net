@@ -55,10 +55,10 @@ namespace Physics2DDotNet
                 body1.isCollidable &&
                 body2.isCollidable &&
                 (body1.ignorer == null ||
-                (body1.ignorer.CanCollide(body2)))
+                (body1.ignorer.CanCollideInternal(body2)))
                 &&
                 (body2.ignorer == null ||
-                (body2.ignorer.CanCollide(body1)));
+                (body2.ignorer.CanCollideInternal(body1)));
         }
         #endregion
         #region events
