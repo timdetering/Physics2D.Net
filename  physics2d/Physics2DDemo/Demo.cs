@@ -321,11 +321,10 @@ namespace Physics2DDemo
 
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
-            solver.Iterations = 13;
+            solver.Iterations = 12;
             solver.SplitImpulse = true;
             solver.BiasFactor = .7f;
             solver.AllowedPenetration = .1f;
-           // solver.MaxContactCount =1;
             engine.Solver = solver;
 
             engine.BodiesAdded += new EventHandler<CollectionEventArgs<Body>>(engine_BodiesAdded);
@@ -815,6 +814,99 @@ namespace Physics2DDemo
 
             return result;
         }
+        void AddDiaganol_StressTest()
+        {
+
+            float size = 32;
+            float spacing = 3f;
+
+            float ymin = -90000;
+            float ymax = 90000;
+
+            Sprite sprite = GetSprite("block.png");
+            Vector2D[] vertexes = sprite.Vertexes;
+            Polygon shape = new Polygon(vertexes, 4);
+            shape.Tag = sprite;
+
+            for (float y = ymax; y >= ymin; y -= (spacing + size))
+            {
+                
+                    AddShape(shape, 20, new ALVector2D(0, new Vector2D(y, y)));
+                
+            }
+        }
+        void AddTowers_StressTest()
+        {
+
+            float box = 900;
+            float xmin = -box;
+            float xmax = box;
+            float ymin = -box;
+            float ymax = box;
+
+            float size = 32;
+            float spacing = 2;
+
+            Sprite sprite = GetSprite("block.png");
+            Vector2D[] vertexes = sprite.Vertexes;
+            Polygon shape = new Polygon(vertexes, 4);
+            shape.Tag = sprite;
+            List<Body> bodies = new List<Body>();
+            for (float x = xmin; x < xmax; x += spacing + size)
+            {
+                for (float y = ymax; y > ymin; y -= spacing + size)
+                {
+                    Body e =
+                    new Body(
+                         new PhysicsState(new ALVector2D(0, new Vector2D(x, y))),
+                         shape,
+                         20,
+                         coefficients.Duplicate(),
+                         new Lifespan());
+
+
+                    bodies.Add(e);
+                }
+            }
+            AddGlObjectRange(bodies);
+            engine.AddBodyRange(bodies);
+        }
+        void AddRandom_StressTest()
+        {
+
+            float box = 900;
+            float xmin = -box;
+            float xmax = box;
+            float ymin = -box;
+            float ymax = box;
+
+            float size = 32;
+            float spacing = 2;
+
+            Sprite sprite = GetSprite("block.png");
+            Vector2D[] vertexes = sprite.Vertexes;
+            Polygon shape = new Polygon(vertexes, 4);
+            shape.Tag = sprite;
+            List<Body> bodies = new List<Body>();
+            for (float x = xmin; x < xmax; x += spacing + size)
+            {
+                for (float y = ymax; y > ymin; y -= spacing + size)
+                {
+                    Body e =
+                    new Body(
+                         new PhysicsState(new ALVector2D(0, new Vector2D(x + (float)rand.NextDouble() * 900000, y + (float)rand.NextDouble() * 900000))),
+                         shape,
+                         20,
+                         coefficients.Duplicate(),
+                         new Lifespan());
+
+
+                    bodies.Add(e);
+                }
+            }
+            AddGlObjectRange(bodies);
+            engine.AddBodyRange(bodies);
+        }
 
 
         void Demo1()
@@ -822,6 +914,7 @@ namespace Physics2DDemo
             waitHandle.Reset();
             Reset();
             AddGravityField();
+
             Sprite blockSprite = GetSprite("fighter.png");
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             Vector2D[] vertexes = blockSprite.Vertexes;
@@ -834,6 +927,22 @@ namespace Physics2DDemo
 
             AddShape(new Circle(80,20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
           //  AddRectangle(40, 40, 20, );
+            waitHandle.Set();
+        }
+        void Demo2()
+        {
+            waitHandle.Reset();
+            Reset();
+            avatar.Lifetime.IsExpired = true;
+            avatar.IsCollidable = false;
+            //engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
+            //AddDiaganol_StressTest();
+            //AddRandom_StressTest();
+            AddTowers_StressTest();
+            /*AddText(
+                "WELCOME TO THE PHYSICS2D.NET DEMO.\nPLEASE ENJOY MESSING WITH IT.\nA LOT OF HARD WORK WENT INTO IT,\nSO THAT YOU COULD ENJOY IT.\nPLEASE SEND FEEDBACK.\nEACH CHARACTER HERE IS AN\nACTUAL BODY IN THE ENGINE.\nTHIS IS TO SHOW OFF THE BITMAP\nTO POLYGON ALGORITHM."
+                , new Vector2D(00, 00));
+            */
             waitHandle.Set();
         }
         void Demo2OLD()
@@ -974,18 +1083,7 @@ namespace Physics2DDemo
             
             waitHandle.Set();
         }
-        void Demo2()
-        {
-            waitHandle.Reset();
-            Reset();
-            avatar.Lifetime.IsExpired = true;
-            avatar.IsCollidable = false;
-            AddText(
-                "WELCOME TO THE PHYSICS2D.NET DEMO.\nPLEASE ENJOY MESSING WITH IT.\nA LOT OF HARD WORK WENT INTO IT,\nSO THAT YOU COULD ENJOY IT.\nPLEASE SEND FEEDBACK.\nEACH CHARACTER HERE IS AN\nACTUAL BODY IN THE ENGINE.\nTHIS IS TO SHOW OFF THE BITMAP\nTO POLYGON ALGORITHM."
-                ,new Vector2D(00, 00));
 
-            waitHandle.Set();
-        }
         void Demo11()
         {
             waitHandle.Reset();

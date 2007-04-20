@@ -42,6 +42,11 @@ changed: TryGetIntersection to reflect the change of IntersectionInfo.
 changed: the Arbiter to minimize the number of contact creations. this was to massivly reduce the number of creation and deletion of objects. IE less memory allocation.
 added: new method for throwing errors to classes that are added to the engine.
 changed: Joints.bodies to be the ReadOnlycollection.
+Fixed: A bug in the Reduce methods that would evaluate the last edge incorrectly.
+Changed: the Polygon.Reduce method to evaluate vertex removal based on the how it would change the area instead of on the difference in angle. 
+Changed: Sweep and Prune to sort with a IComparer instead of a delegate. (Speed boost)
+Changed: Sweep and Prune to be faster by adding a custom IntList class to store colliders. 
+
 
 AdvanceMath
 NEXT VERSION:

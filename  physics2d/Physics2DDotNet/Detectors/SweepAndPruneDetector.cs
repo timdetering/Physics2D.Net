@@ -41,13 +41,79 @@ using Physics2DDotNet.Math2D;
 namespace Physics2DDotNet.Detectors
 {
 
+
     [Serializable]
     public sealed class SweepAndPruneDetector : BroadPhaseCollisionDetector
     {
+        sealed class IntList 
+        {
+            static int[] Default = new int[0];
+            int[] array = Default;
+            int length = 0;
+            public int Count
+            {
+                get
+                {
+                    return length;
+                }
+            }
+            public void Add(int item)
+            {
+                if (array.Length == length)
+                {
+                    int newLenght = ((array.Length != 0) ? (array.Length * 2) : (4));
+                    int[] newArray = new int[newLenght];
+                    array.CopyTo(newArray, 0);
+                    this.array = newArray;
+                }
+                this.array[length++] = item;
+            }
+            public void Sort()
+            {
+                Array.Sort<int>(array, 0, length);
+            }
+            public bool Contains(int item)
+            {
+                int min = 0;
+                int max = length - 1;
+                while (min <= max)
+                {
+                    int index = ((max - min) >> 1) + min;
+                    int value = array[index];
+                    if (value < item)
+                    {
+                        min = index + 1;
+                    }
+                    else if (value > item)
+                    {
+                        max = index - 1;
+                    }
+                    else 
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            public void Clear()
+            {
+                length = 0;
+            }
+        }
+        sealed class StubComparer : IComparer<Stub>
+        {
+            public int Compare(Stub left, Stub right)
+            {
+                if (left.value < right.value) { return -1; }
+                else if (left.value > right.value) { return 1; }
+                else { return ((left == right) ? (0) : ((left.begin) ? (-1) : (1))); }
+            }
+        }
         sealed class Wrapper
         {
             public int beginCount;
-            public List<int> colliders = new List<int>();
+            public IntList colliders = new IntList();
+            //public List<int> colliders = new List<int>();
             public LinkedListNode<Wrapper> node;
             public Body body;
             public bool shouldAddNode;
@@ -94,11 +160,10 @@ namespace Physics2DDotNet.Detectors
                 this.wrapper = wrapper;
                 this.begin = begin;
             }
-            public override string ToString()
-            {
-                return string.Format("{0}:{1}", wrapper.body.ID, (begin) ? ("Begin") : ("End"));
-            }
         }
+
+        static StubComparer comparer = new StubComparer();
+
         static bool WrapperIsRemoved(Wrapper wrapper)
         {
             return !wrapper.body.IsAdded;
@@ -106,15 +171,6 @@ namespace Physics2DDotNet.Detectors
         static bool StubIsRemoved(Stub stub)
         {
             return !stub.wrapper.body.IsAdded;
-        }
-        static int StubComparison(Stub left, Stub right)
-        {
-            int result = left.value.CompareTo(right.value);
-            if (result == 0 && left != right)
-            {
-                result = ((left.begin) ? (-1) : (1));
-            }
-            return result;
         }
         List<Wrapper> wrappers;
         List<Stub> xStubs;
@@ -161,14 +217,15 @@ namespace Physics2DDotNet.Detectors
             yStubs.RemoveAll(StubIsRemoved);
         }
 
+
         private void Update()
         {
             for (int index = 0; index < wrappers.Count; ++index)
             {
                 wrappers[index].Update();
             }
-            xStubs.Sort(StubComparison);
-            yStubs.Sort(StubComparison);
+            xStubs.Sort(comparer);
+            yStubs.Sort(comparer);
         }
         public override void Detect(Scalar dt)
         {
@@ -244,7 +301,6 @@ namespace Physics2DDotNet.Detectors
             {
                 stub = list2[index];
                 wrapper = stub.wrapper;
-
                 if (stub.begin)
                 {
                     beginCount++;
@@ -260,7 +316,7 @@ namespace Physics2DDotNet.Detectors
                         while (node != null)
                         {
                             count2++;
-                            if (node.Value.colliders.BinarySearch(body1.ID) >= 0)
+                            if (node.Value.colliders.Contains(body1.ID))
                             {
                                 this.OnCollision(dt, body1, node.Value.body);
                             }
