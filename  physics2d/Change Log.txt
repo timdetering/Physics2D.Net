@@ -47,6 +47,7 @@ Changed: the Polygon.Reduce method to evaluate vertex removal based on the how i
 Changed: Sweep and Prune to sort with a IComparer instead of a delegate. (Speed boost)
 Changed: Sweep and Prune to be faster by adding a custom IntList class to store colliders. 
 Added: a IsInverted Property to the CollisionIgnorer class.
+changed: made the code more aware of divide by zero errors.
 
 AdvanceMath
 NEXT VERSION:
@@ -80,6 +81,9 @@ changed: the order of parameters to the BoundingRectagle's constructors.
 removed: origin from Vector2D use Zero instead.
 added: Point2D
 added: IntersectionType
+changed: made the code more aware of divide by zero errors.
+
+
 
 Physics2D.Net
 1.2.0.0:

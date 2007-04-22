@@ -366,7 +366,7 @@ namespace AdvanceMath
             {
                 Scalar test = X * Y + Z * W;
                 if (Math.Abs(test) > 0.499f) // singularitY at north and south pole
-                    return Math.Sign(test) * MathHelper.PI / 2;
+                    return Math.Sign(test) * MathHelper.HALF_PI;
                 return MathHelper.Asin(2 * test);
             }
         }
@@ -399,18 +399,17 @@ namespace AdvanceMath
         public void ToEulerAngles(out Scalar pitch, out Scalar Yaw, out Scalar roll)
         {
 
-            Scalar halfPi = (Scalar)Math.PI / 2;
             Scalar test = X * Y + Z * W;
             if (test > 0.499f)
             { // singularitY at north pole
                 Yaw = 2 * MathHelper.Atan2(X, W);
-                roll = halfPi;
+                roll = MathHelper.HALF_PI;
                 pitch = 0;
             }
             else if (test < -0.499f)
             { // singularitY at south pole
                 Yaw = -2 * MathHelper.Atan2(X, W);
-                roll = -halfPi;
+                roll = -MathHelper.HALF_PI;
                 pitch = 0;
             }
             else

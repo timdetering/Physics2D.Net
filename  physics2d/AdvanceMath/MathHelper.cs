@@ -40,8 +40,8 @@ namespace AdvanceMath
         public const Scalar E = (Scalar)System.Math.E;
         public const Scalar PI = (Scalar)System.Math.PI;
         public const Scalar TWO_PI = (Scalar)(System.Math.PI * 2);
-        public const Scalar HALF_PI = (Scalar)(System.Math.PI / 2);
-        public const Scalar HALF_THREE_PI = (Scalar)((3 * System.Math.PI) / 2);
+        public const Scalar HALF_PI = (Scalar)(System.Math.PI *.5);
+        public const Scalar HALF_THREE_PI = (Scalar)(1.5 * System.Math.PI) ;
         public const Scalar RADIANS_PER_DEGREE = (Scalar)(PI / 180);
         public const Scalar DEGREES_PER_RADIAN = (Scalar)(180 / PI);
         public const Scalar Tolerance = 0.000000001f;
@@ -201,20 +201,23 @@ namespace AdvanceMath
         /// <returns><see langword="false" /> if an error would have been thrown; otherwise <see langword="true" />.</returns>
         public static bool TrySolveQuadratic(Scalar a, Scalar b, Scalar c, out Scalar plus, out Scalar minus)
         {
-            if (0 == a)
+            if (b == 0)
             {
-                plus = -c / b;
-                minus = plus;
-                return true;
-            }
-            c = (b * b) - (4 * a * c);
-            if (0 <= c)
-            {
-                c = Sqrt(c);
-                a = .5f / a;
-                plus = ((c - b) * a);
-                minus = ((-c - b) * a);
-                return true;
+                if (0 == a)
+                {
+                    plus = -c / b;
+                    minus = plus;
+                    return true;
+                }
+                c = (b * b) - (4 * a * c);
+                if (0 <= c)
+                {
+                    c = Sqrt(c);
+                    a = .5f / a;
+                    plus = ((c - b) * a);
+                    minus = ((-c - b) * a);
+                    return true;
+                }
             }
             plus = 0;
             minus = 0;

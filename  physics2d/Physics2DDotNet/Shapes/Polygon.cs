@@ -166,8 +166,8 @@ namespace Physics2DDotNet
         /// <returns>array of vectors the describe a rectangle</returns>
         public static Vector2D[] CreateRectangle(Scalar height, Scalar width)
         {
-            Scalar Ld2 = height / 2;
-            Scalar Wd2 = width / 2;
+            Scalar Ld2 = height *.5f;
+            Scalar Wd2 = width * .5f;
             return new Vector2D[4]
             {
                 new Vector2D(Wd2, Ld2),

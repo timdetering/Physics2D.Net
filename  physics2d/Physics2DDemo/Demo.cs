@@ -59,7 +59,6 @@ namespace Physics2DDemo
         List<OpenGlObject> objects;
         Dictionary<string,Sprite> sprites = new Dictionary<string,Sprite>();
         Body bomb;
-        Body avatar;
         Body clipper;
         RectangleShape clippersShape;
         Vector2D bombTarget;
@@ -77,6 +76,7 @@ namespace Physics2DDemo
         bool sparkle;
         Vector2D sparkPoint;
         float targetDt = .010f;
+        List<Body> avatarBodies;
 
          Font font;
         #endregion
@@ -223,36 +223,45 @@ namespace Physics2DDemo
                     Demo0();
                     break;
                 case SdlDotNet.Input.Key.LeftArrow:
-                    force += new Vector2D(-forceMag, 0);
+                    torque += torqueMag;
+                    //force += new Vector2D(-forceMag, 0);
                     break;
                 case SdlDotNet.Input.Key.RightArrow:
-                    force += new Vector2D(forceMag, 0);
+                    torque -= torqueMag;
+                    // force += new Vector2D(forceMag, 0);
                     break;
                 case SdlDotNet.Input.Key.UpArrow:
-                    avatar.IgnoresGravity = true;
-                    force += new Vector2D(0, -forceMag);
+                    //avatarBodies.IgnoresGravity = true;
+                    //force += new Vector2D(0, -forceMag);
                     break;
                 case SdlDotNet.Input.Key.DownArrow:
-                    force += new Vector2D(0, forceMag);
+                    //force += new Vector2D(0, forceMag);
+                    break;
+                case SdlDotNet.Input.Key.Space:
+                    LaunchProjectile();
                     break;
             }
         }
+        Scalar torqueMag = -900000;
+        Scalar torque = 0;
         void Events_KeyboardUp(object sender, SdlDotNet.Input.KeyboardEventArgs e)
         {
             switch (e.Key)
             {
                 case SdlDotNet.Input.Key.LeftArrow:
-                    force -= new Vector2D(-forceMag, 0);
+                    torque -= torqueMag;
+                    //force -= new Vector2D(-forceMag, 0);
                     break;
                 case SdlDotNet.Input.Key.RightArrow:
-                    force -= new Vector2D(forceMag, 0);
+                    torque += torqueMag;
+                    // force -= new Vector2D(forceMag, 0);
                     break;
                 case SdlDotNet.Input.Key.UpArrow:
-                    avatar.IgnoresGravity = false;
-                    force -= new Vector2D(0, -forceMag);
+                    //avatarBodies.IgnoresGravity = false;
+                    //force -= new Vector2D(0, -forceMag);
                     break;
                 case SdlDotNet.Input.Key.DownArrow:
-                    force -= new Vector2D(0, forceMag);
+                    //force -= new Vector2D(0, forceMag);
                     break;
             }
         }
@@ -272,7 +281,25 @@ namespace Physics2DDemo
         }
         void avatar_Updated(object sender, UpdatedEventArgs e)
         {
-            avatar.State.ForceAccumulator.Linear += force;
+            Scalar maxVelocity = 40;
+
+            Scalar vel = 0;
+            for (int index = 1; index < avatarBodies.Count; ++index)
+            {
+                vel = Math.Max(Math.Abs(avatarBodies[index].State.Velocity.Angular), vel);
+            }
+
+            Scalar multiply = Math.Abs((vel) / maxVelocity);
+            if (vel > maxVelocity)
+            {
+                multiply = 1;
+            }
+            for (int index = 1; index < avatarBodies.Count; ++index)
+            {
+                avatarBodies[index].State.ForceAccumulator.Angular += (torque - torque * multiply);
+            }
+
+            // avatarBodies.State.ForceAccumulator.Linear += force;
         }
         void particle_Collided(object sender, CollisionEventArgs e)
         {
@@ -308,6 +335,36 @@ namespace Physics2DDemo
         }
         #endregion
 
+        void LaunchProjectile()
+        {
+            Scalar radius = 5;
+            Scalar velocity = 2000;
+            Matrix2D mat = avatarBodies[0].Shape.Matrix;
+            Vector2D position = mat.VertexMatrix *(avatarBarrelOffset);
+            Vector2D direction = mat.NormalMatrix * Vector2D.XAxis;
+            PhysicsState state = new PhysicsState();
+            state.Position.Linear = position;
+            state.Velocity.Linear = velocity * direction + avatarBodies[0].State.Velocity.Linear;
+
+            Body weapon = new Body(state,
+                new Circle(radius, 8),
+                5,
+                coefficients.Duplicate(),
+                new Lifespan(10));
+            weapon.Ignorer = avatarBodies[0].Ignorer;
+            weapon.Collided += weapon_Collided;
+            AddGlObject(weapon);
+            engine.AddBody(weapon);
+            avatarBodies[0].State.Velocity.Linear -= (velocity * weapon.Mass.Mass * avatarBodies[0].Mass.MassInv) * direction;
+        }
+
+        void weapon_Collided(object sender, CollisionEventArgs e)
+        {
+            Body weapon = (Body)sender;
+            weapon.Lifetime.IsExpired = true;
+            AddParticles(weapon.State.Position.Linear, weapon.State.Velocity.Linear*.5f, 200);
+            weapon.Collided -= weapon_Collided;
+        }
         /// <summary>
         /// initializes the PhysicsEngine
         /// </summary>
@@ -348,7 +405,7 @@ namespace Physics2DDemo
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite;
 
-            bomb = new Body(new PhysicsState(),
+            bomb = new Body(new PhysicsState(new ALVector2D(0,500,-60)),
                     shape,//new Physics2DDotNet.Circle(20, 20),
                     120,
                     coefficients.Duplicate(),
@@ -381,7 +438,7 @@ namespace Physics2DDemo
                     Sprite sprite = GetLetter(c);
                     Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 3);
                     BoundingRectangle rect = BoundingRectangle.FromVectors(sprite.Vertexes);
-                    Polygon shape = new Polygon(vertexes, Math.Min(Math.Min((rect.Max.X - rect.Min.X) / 20, (rect.Max.Y - rect.Min.Y) / 20), 3));
+                    Polygon shape = new Polygon(vertexes, Math.Min(Math.Min((rect.Max.X - rect.Min.X) / 8, (rect.Max.Y - rect.Min.Y) / 8), 3));
                     shape.Tag = sprite;
                     Body b = AddShape(shape, 40, new ALVector2D(0, position + sprite.Offset));
                     maxy = Math.Max(maxy, sprite.Texture.Surface.Height);
@@ -406,22 +463,75 @@ namespace Physics2DDemo
         }
 
 
-
-
+        List<Vector2D> avatarOffsets;
+        List<Joint> avatarJoints;
+        Vector2D avatarBarrelOffset;
         void CreateAvatar()
         {
-            Sprite sprite = GetSprite("mech.png");
+            Sprite sprite = GetSprite("tank.png");
             Vector2D[] vertexes = sprite.Vertexes;
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite;
 
-
-            avatar = new Body(new PhysicsState(new ALVector2D(0, 0, 60)),
+            CollisionObjectIgnorer ignorer = new CollisionObjectIgnorer();
+            Body a = new Body(new PhysicsState(new ALVector2D(0, 0, 0)),
                 shape,
-                new MassInfo(40, float.PositiveInfinity),
+                300,//new MassInfo(40, float.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
-            avatar.Updated += new EventHandler<UpdatedEventArgs>(avatar_Updated);
+            a.Updated += new EventHandler<UpdatedEventArgs>(avatar_Updated);
+            avatarBodies = new List<Body>();
+            avatarOffsets = new List<Vector2D>();
+            avatarJoints = new List<Joint>();
+            avatarBodies.Add(a);
+            a.Ignorer = ignorer;
+
+
+
+
+            Scalar wheelSize = 18;
+            Scalar wheelSpacing = -9;
+            Scalar lenghtPercent = .84f;
+            BoundingRectangle rect  = shape.Rectangle;
+            Scalar y = (rect.Max.Y +4)  ;
+            Body lastWheel = null ;
+            BoundingPolygon polygon = new BoundingPolygon(vertexes);
+
+            Ray ray2 = new Ray(new Vector2D(rect.Max.X, y), -Vector2D.YAxis);
+            Scalar y3 = y - polygon.Intersects(ray2);
+            avatarBarrelOffset = new Vector2D(rect.Max.X, y3);
+            
+            for (Scalar x = rect.Min.X + wheelSize ; x < (rect.Max.X - wheelSize ) * lenghtPercent; x += (wheelSize*2 + wheelSpacing))
+            {
+
+                Ray ray = new Ray(new Vector2D(x, y), -Vector2D.YAxis);
+                Scalar y2 = y-  polygon.Intersects(ray);
+
+
+
+                Vector2D offset = new Vector2D(x, y2);
+
+                Body wheel = new Body(
+                    new PhysicsState(new ALVector2D(0, offset)),
+                    new Circle(wheelSize, 30),
+                    10,
+                    new Coefficients(0,1,1),//  coefficients.Duplicate(),
+                    new Lifespan());
+                HingeJoint joint = new HingeJoint(a, wheel, offset, new Lifespan());
+                joint.Softness = .1f;
+                wheel.Ignorer = ignorer;
+
+                if (lastWheel != null)
+                {
+                    AngleJoint joint2 = new AngleJoint(lastWheel, wheel, new Lifespan());
+                    avatarJoints.Add(joint2);
+                }
+
+                avatarJoints.Add(joint);
+                avatarOffsets.Add(offset);
+                avatarBodies.Add(wheel);
+                lastWheel = wheel;
+            }
         }
 
         void AddBomb()
@@ -432,13 +542,35 @@ namespace Physics2DDemo
         }
         void AddAvatar()
         {
-            avatar.IsCollidable = true;
-            avatar.Lifetime.IsExpired = false;
-            avatar.State.Position.Linear = new Vector2D(700, 200);
-            avatar.State.Velocity.Linear = Vector2D.Zero;
-            avatar.ApplyMatrix();
-            AddGlObject(avatar);
-            engine.AddBody(avatar);
+
+            Vector2D position = new Vector2D(100, -100);
+
+            avatarBodies[0].IsCollidable = true;
+            avatarBodies[0].Lifetime.IsExpired = false;
+            avatarBodies[0].State.Position.Linear = position;
+            avatarBodies[0].State.Position.Angular = 0;
+            avatarBodies[0].State.Velocity = ALVector2D.Zero;
+            avatarBodies[0].ApplyMatrix();
+
+
+            for (int index = 1; index < avatarBodies.Count; ++index)
+            {
+                avatarBodies[index].IsCollidable = true;
+                avatarBodies[index].Lifetime.IsExpired = false;
+                avatarBodies[index].State.Position.Linear = position + avatarOffsets[index - 1];
+                avatarBodies[index].State.Position.Angular = 0;
+                avatarBodies[index].State.Velocity = ALVector2D.Zero;
+                avatarBodies[index].ApplyMatrix();
+            }
+            for (int index = 0; index < avatarJoints.Count; ++index)
+            {
+                avatarJoints[index].Lifetime.IsExpired = false;
+            }
+            AddGlObjectRange(avatarBodies);
+            engine.AddBodyRange(avatarBodies);
+            engine.AddJointRange(avatarJoints);
+
+
         }
         void AddClipper()
         {
@@ -678,6 +810,10 @@ namespace Physics2DDemo
         }
         void AddParticles(Vector2D position, int count)
         {
+            AddParticles(position, Vector2D.Zero, count);
+        }
+        void AddParticles(Vector2D position,Vector2D velocity, int count)
+        {
             Body[] particles = new Body[count];
             float angle = MathHelper.TWO_PI / count;
             for (int index = 0; index < count; ++index)
@@ -686,11 +822,11 @@ namespace Physics2DDemo
                     new PhysicsState(new ALVector2D(0, position)),
                     new Particle(),
                     1,
-                    coefficients.Duplicate(),
+                   new Coefficients(1,.5f,.5f),// coefficients.Duplicate(),
                     new Lifespan(.5f));
                 Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((float)rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
-                particle.State.Velocity.Linear = direction * rand.Next(200, 1001);
+                particle.State.Velocity.Linear = direction * rand.Next(200, 1001) + velocity;
                 particles[index] = particle;
                 particle.Collided += new EventHandler<CollisionEventArgs>(particle_Collided);
             }
@@ -933,8 +1069,8 @@ namespace Physics2DDemo
         {
             waitHandle.Reset();
             Reset();
-            avatar.Lifetime.IsExpired = true;
-            avatar.IsCollidable = false;
+          //  avatarBodies.Lifetime.IsExpired = true;
+            //avatarBodies.IsCollidable = false;
             //engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
             //AddDiaganol_StressTest();
             //AddRandom_StressTest();
@@ -1138,7 +1274,7 @@ namespace Physics2DDemo
         {
             waitHandle.Reset();
             Reset();
-            avatar.Lifetime.IsExpired = true;
+          //  avatarBodies.Lifetime.IsExpired = true;
             AddGravityField();
             
             AddLine(new Vector2D(-40, 200), new Vector2D(400,200), 30);

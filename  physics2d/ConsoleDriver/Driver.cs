@@ -142,7 +142,14 @@ namespace ConsoleDriver
 
     static class Driver
     {
-
+        static void TestMethod( int c, int d)
+        {
+            int a,b;
+            a = 40;
+            b = (c+ d )*a;
+            a = rand.Next();
+            a = b+ d *a+a;
+        }
 
 
         static Random rand = new Random();

@@ -54,11 +54,11 @@ namespace Physics2DDotNet
         }
         public static MassInfo FromHollowCylinder(Scalar mass, Scalar innerRadius, Scalar outerRadius)
         {
-            return new MassInfo(mass, (Scalar).5 * mass * (innerRadius * innerRadius + outerRadius * outerRadius));
+            return new MassInfo(mass, .5f * mass * (innerRadius * innerRadius + outerRadius * outerRadius));
         }
         public static MassInfo FromSolidCylinder(Scalar mass, Scalar radius)
         {
-            return new MassInfo(mass, (Scalar).5 * mass * (radius * radius));
+            return new MassInfo(mass, .5f * mass * (radius * radius));
         }
         public static MassInfo FromRectangle(Scalar mass, Scalar length, Scalar width)
         {
