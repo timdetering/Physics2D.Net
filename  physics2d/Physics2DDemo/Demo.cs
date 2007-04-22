@@ -1385,7 +1385,7 @@ namespace Physics2DDemo
             if (sparkle && updated)
             {
                 updated = false;
-                AddParticles(sparkPoint, 200);
+                AddParticles(sparkPoint, 20);
             }
 
 
