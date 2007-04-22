@@ -42,7 +42,8 @@ namespace Physics2DDemo
             Console.WriteLine("Left Clicking will allow you to pick objects up.");
             Console.WriteLine("Middle clicking on the screen will launch a projectile where you click.");
             Console.WriteLine("Right clicking and holding will shoot out particles where you click.");
-            Console.WriteLine("The arrow keys will control one of the objects on the screen");
+            Console.WriteLine("The left and right arrow keys will move the tank.");
+            Console.WriteLine("SpaceBar will fire the tanks cannon.");
             Console.WriteLine("In the upper left corner a small colored box will appear.");
             Console.WriteLine("If it is green then the engine has too little to do and is skipping a timestep");
             Console.WriteLine("If it is red then the engine has too much to do.");
