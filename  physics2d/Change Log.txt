@@ -1,9 +1,9 @@
 AdvanceMathUnitTest
-NEXT VERSION:
+0.0.0.1:
 Added to test AdvanceMath using nunit.
 
 Physics2D.Net
-NEXT VERSION:
+1.3.0.0:
 changed: inlined code in the Body.UpdateVelocity method.
 changed: ApplyMatrix to use MathHelper.ClampAngle instead of its own logic.
 Removed: The BiasMultiplier from the PreApply method in Arbiter.
@@ -48,9 +48,10 @@ Changed: Sweep and Prune to sort with a IComparer instead of a delegate. (Speed 
 Changed: Sweep and Prune to be faster by adding a custom IntList class to store colliders. 
 Added: a IsInverted Property to the CollisionIgnorer class.
 changed: made the code more aware of divide by zero errors.
+Added: Body1 and Body2 properties to IContact.
 
 AdvanceMath
-NEXT VERSION:
+1.6.0.0:
 Added: a new define: UNSAFE
 Changed: made it so all code that has or uses unsafe code blocks is inside "#if UNSAFE #endif" statements. 
 Renamed: RadianMin to ClampAngle
@@ -82,7 +83,7 @@ removed: origin from Vector2D use Zero instead.
 added: Point2D
 added: IntersectionType
 changed: made the code more aware of divide by zero errors.
-
+Added: the Clamped class.
 
 
 Physics2D.Net

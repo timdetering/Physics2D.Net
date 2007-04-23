@@ -38,6 +38,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clamped.cs" />
     <Compile Include="ContainmentType.cs" />
     <Compile Include="Point2D.cs" />
     <Compile Include="Design\AdvPropertyDescriptor.cs" />

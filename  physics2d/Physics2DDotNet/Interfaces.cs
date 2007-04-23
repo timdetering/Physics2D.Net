@@ -67,7 +67,7 @@ namespace Physics2DDotNet
     public interface IContactInfo
     {
         /// <summary>
-        /// The world coordinates of the contact.
+        /// Gets The world coordinates of the contact.
         /// </summary>
         Vector2D Position { get;}
         /// <summary>
@@ -75,8 +75,18 @@ namespace Physics2DDotNet
         /// </summary>
         Vector2D Normal { get;}
         /// <summary>
-        /// The distance the contact is inside the other object.
+        /// Gets The distance the contact is inside the other object.
         /// </summary>
         Scalar Distance { get;}
+        /// <summary>
+        /// Gets The First Body that is part of the Contact.
+        /// (The Normal belongs to this Body.)
+        /// </summary>
+        Body Body1 { get;}
+        /// <summary>
+        /// Gets The Second Body that is part of the Contact.
+        /// (The Position of the Vertex belongs to this Body.)
+        /// </summary>
+        Body Body2 { get;}
     }
 }

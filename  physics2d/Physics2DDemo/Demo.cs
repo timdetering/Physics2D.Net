@@ -48,6 +48,10 @@ using SdlDotNet.Graphics;
 using System.Diagnostics;
 namespace Physics2DDemo
 {
+    /// <summary>
+    /// This demo is not written to high standards as the rest of the engine is. 
+    /// Nor does it use the engine in a optimal way. 
+    /// </summary>
     class Demo
     {
         #region fields

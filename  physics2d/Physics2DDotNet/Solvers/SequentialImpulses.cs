@@ -68,11 +68,14 @@ namespace Physics2DDotNet.Solvers
             public Scalar massTangent;
             public Scalar bias;
             public Scalar restitution;
-
-
             public Vector2D r1;
             public Vector2D r2;
-
+            Arbiter arbiter;
+            
+            public Contact(Arbiter arbiter)
+            {
+                this.arbiter = arbiter;
+            }
 
             Vector2D IContactInfo.Position
             {
@@ -85,6 +88,14 @@ namespace Physics2DDotNet.Solvers
             Scalar IContactInfo.Distance
             {
                 get { return distance; }
+            }
+            Body IContactInfo.Body1
+            {
+                get { return (id < 0) ? (arbiter.body1) : (arbiter.body2); }
+            }
+            Body IContactInfo.Body2
+            {
+                get { return (id < 0) ? (arbiter.body2) : (arbiter.body1); }
             }
         }
         sealed class Arbiter : ICollisionInfo
@@ -99,8 +110,8 @@ namespace Physics2DDotNet.Solvers
             LinkedList<Contact> contacts;
             Contact[] contactsArray;
 
-            Body body1;
-            Body body2;
+            public Body body1;
+            public Body body2;
             SequentialImpulsesTag tag1;
             SequentialImpulsesTag tag2;
 
@@ -180,9 +191,7 @@ namespace Physics2DDotNet.Solvers
                     while (node != null && node.Value.id < Id) { node = node.Next; }
 
                     if (contains != ContainmentType.Contains ||
-                        !b1.Shape.TryGetIntersection(vector, out info) ||
-                        Scalar.IsNaN(info.Normal.X) ||
-                        Scalar.IsNaN(info.Normal.Y))
+                        !b1.Shape.TryGetIntersection(vector, out info))
                     {
                         if (node != null && node.Value.id == Id)
                         {
@@ -195,7 +204,7 @@ namespace Physics2DDotNet.Solvers
                     {
                         if (node == null)
                         {
-                            contact = new Contact();
+                            contact = new Contact(this);
                             contact.id = Id;
                             contacts.AddLast(contact);
                         }
@@ -212,7 +221,7 @@ namespace Physics2DDotNet.Solvers
                         }
                         else
                         {
-                            contact = new Contact();
+                            contact = new Contact(this);
                             contact.id = Id;
                             contacts.AddBefore(node, contact);
                         }
