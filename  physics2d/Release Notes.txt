@@ -2,6 +2,14 @@ Release Notes fo Physics2D.Net
 
 Since God Created me and Jesus Saved me All glory goes to God.
 
+1.3.0.0
+Quite a few changes for this release and bug fixes. You can check the change log for a rather extensive list. 
+There is also a lot of speed / memory use improvements.
+I added the ability to generate a polygon from a bitmap. (This is really fun to play with) 
+I started some nunit tests for AdvanceMath. A added a completely new Geometry2D namespace to AdvanceMath this contains a lot of geometry classes and quite a few methods for testing intersection and such similar to XNA’s design. The nunit tests for them are incomplete so no guaranties that they work the way they should.  I also implemented some collision ignorers for your consumption. I also fixed an annoying stability bug with Contacts. I’ve also wrote a better Polygon.Reduce method that weighs vertex removal based on how much they would change the polygons area and it works extremely well.
+
+The tank in the demo is a lot of fun to play with even with the fact that it’s limited by the screen not moving.
+
 
 1.2.0.0
 The largest noticeable changes are that I’ve implemented split impulses for the joints. I changed how a few events get generated and added some more events. 
