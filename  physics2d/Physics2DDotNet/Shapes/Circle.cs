@@ -105,6 +105,18 @@ namespace Physics2DDotNet
         {
             get { return true; }
         }
+        public override bool CanGetDistance
+        {
+            get { return true; }
+        }
+        public override bool BroadPhaseDetectionOnly
+        {
+            get { return false; }
+        }
+        public override bool CanGetCustomIntersection
+        {
+            get { return false; }
+        }
         #endregion
         #region methods
         public override void CalcBoundingRectangle()
@@ -129,11 +141,17 @@ namespace Physics2DDotNet
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {
-            Vector2D.Subtract(ref vector, ref position, out info.Normal);
-            Vector2D.Normalize(ref info.Normal, out info.Distance, out info.Normal);
+            Vector2D.Transform(ref this.matrix2DInv.VertexMatrix, ref vector, out  vector);
+            //Vector2D.Subtract(ref vector, ref Zero, out info.Normal);
+            Vector2D.Normalize(ref vector, out info.Distance, out info.Normal);
+            Vector2D.Transform(ref this.matrix2D.NormalMatrix, ref info.Normal, out  info.Normal);
             info.Distance -= radius;
             info.Position = vector;
             return info.Distance <= 0;
+        }
+        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        {
+            throw new NotSupportedException();
         }
         public override void ApplyMatrix(ref Matrix2D matrix)
         {

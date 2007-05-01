@@ -549,7 +549,7 @@ namespace Physics2DDotNet
             int count = bodies.Count;
             for (int index = 0; index < count; ++index)
             {
-                bodies[index].OnStateChanged();
+                bodies[index].OnPositionChanged();
             }
         }
 
@@ -689,24 +689,38 @@ namespace Physics2DDotNet
         {
             if (first.Mass.MassInv == 0 && second.Mass.MassInv == 0) { return; }
 
-            if (first.BroadPhaseDetectionOnly || second.BroadPhaseDetectionOnly)
+            if (first.Shape.CanGetCustomIntersection ||
+                second.Shape.CanGetCustomIntersection ||
+                first.Shape.BroadPhaseDetectionOnly ||
+                second.Shape.BroadPhaseDetectionOnly)
             {
-                if (first.BroadPhaseDetectionOnly)
+                object customIntersectionInfo;
+                if (first.Shape.BroadPhaseDetectionOnly)
                 {
                     first.OnCollision(second, null);
                 }
-                if (second.BroadPhaseDetectionOnly)
+                else if (first.Shape.CanGetCustomIntersection &&
+                         first.Shape.TryGetCustomIntersection(second, out  customIntersectionInfo))
+                {
+                    first.OnCollision(second, customIntersectionInfo);
+                }
+                if (second.Shape.BroadPhaseDetectionOnly)
                 {
                     second.OnCollision(first, null);
+                }
+                else if (second.Shape.CanGetCustomIntersection &&
+                         second.Shape.TryGetCustomIntersection(first, out  customIntersectionInfo))
+                {
+                    second.OnCollision(first, customIntersectionInfo);
                 }
             }
             else
             {
-                ICollisionInfo info = solver.HandleCollision(dt, first, second);
-                if (info.Collided)
+                ReadOnlyCollection<IContactInfo> contacts;
+                if (solver.TryGetIntersection(dt, first, second, out contacts))
                 {
-                    first.OnCollision(second, info);
-                    second.OnCollision(first, info);
+                    first.OnCollision(second, contacts);
+                    second.OnCollision(first, contacts);
                 }
             }
 

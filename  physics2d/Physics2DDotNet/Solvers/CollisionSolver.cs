@@ -38,11 +38,6 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet.Solvers
 {
-    public interface ICollisionInfo
-    {
-        bool Collided { get;}
-        ReadOnlyCollection<IContactInfo> Contacts { get;}
-    }
     [Serializable]
     public abstract class CollisionSolver
     {
@@ -64,7 +59,7 @@ namespace Physics2DDotNet.Solvers
             get { return engine; }
         }
 
-        protected internal abstract ICollisionInfo HandleCollision(Scalar dt, Body first, Body second);
+        protected internal abstract bool TryGetIntersection(Scalar dt, Body first, Body second,out ReadOnlyCollection<IContactInfo> contacts);
         protected internal abstract void Solve(Scalar dt);
 
         internal void OnAddedInternal(PhysicsEngine engine)

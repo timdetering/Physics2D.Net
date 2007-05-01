@@ -52,6 +52,7 @@ namespace Physics2DDotNet
         public DistanceGrid(Shape shape, Scalar spacing)
         {
             if (shape == null) { throw new ArgumentNullException("shape"); }
+            if (!shape.CanGetDistance) { throw new ArgumentException("The Shape must support Get Distance", "shape"); }
             if (spacing <= 0) { throw new ArgumentOutOfRangeException("spacing"); }
             //prepare the shape.
             Matrix2D old = shape.Matrix;

@@ -45,14 +45,24 @@ namespace Physics2DDotNet
     {
         ReadOnlyCollection<IContactInfo> contacts;
         Body other;
+        object customIntersectionInfo;
         public CollisionEventArgs(Body other, ReadOnlyCollection<IContactInfo> contacts)
         {
             this.other = other;
             this.contacts = contacts;
         }
+        public CollisionEventArgs(Body other, object customIntersectionInfo)
+        {
+            this.other = other;
+            this.customIntersectionInfo = customIntersectionInfo;
+        }
         public Body Other
         {
             get { return other; }
+        }
+        public object CustomCollisionInfo
+        {
+            get { return customIntersectionInfo; }
         }
         public ReadOnlyCollection<IContactInfo> Contacts
         {

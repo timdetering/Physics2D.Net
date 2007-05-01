@@ -59,7 +59,7 @@ namespace Physics2DDemo
         static Random rand = new Random();
         ManualResetEvent waitHandle;
         PhysicsEngine engine;
-        Stopwatch watch;
+        PhysicsTimer timer;
         List<OpenGlObject> objects;
         Dictionary<string,Sprite> sprites = new Dictionary<string,Sprite>();
         Body bomb;
@@ -68,18 +68,12 @@ namespace Physics2DDemo
         Vector2D bombTarget;
         Coefficients coefficients = new Coefficients(0, .4f, .4f);
 
-        float forceMag = 20000;
-        Vector2D force;
 
-        bool isSlow;
-        bool isFast;
 
-        bool started;
         bool updated;
 
         bool sparkle;
         Vector2D sparkPoint;
-        float targetDt = .010f;
         List<Body> avatarBodies;
 
          Font font;
@@ -94,12 +88,12 @@ namespace Physics2DDemo
             Events.KeyboardUp += new EventHandler<SdlDotNet.Input.KeyboardEventArgs>(Events_KeyboardUp);
             Events.MouseMotion += new EventHandler<SdlDotNet.Input.MouseMotionEventArgs>(Events_MouseMotion);
             waitHandle = new ManualResetEvent(true);
-            watch = new Stopwatch();
             objects = new List<OpenGlObject>();
             
             
 
             CreateEngine();
+            timer = new PhysicsTimer(Update, .010f);
             CreateBomb();
             CreateAvatar();
             CreateClipper();
@@ -154,7 +148,7 @@ namespace Physics2DDemo
                 IntersectionInfo info;
                 foreach (Body b in engine.Bodies)
                 {
-                    if (b.IsCollidable && !b.BroadPhaseDetectionOnly &&
+                    if (b.IsCollidable && !b.Shape.BroadPhaseDetectionOnly &&
                         b.Shape.CanGetIntersection &&
                         b.Shape.TryGetIntersection(point, out info))
                     {
@@ -243,6 +237,10 @@ namespace Physics2DDemo
                     break;
                 case SdlDotNet.Input.Key.Space:
                     LaunchProjectile();
+                    break;
+                case SdlDotNet.Input.Key.Pause:
+                case SdlDotNet.Input.Key.P:
+                    timer.IsRunning = !timer.IsRunning;
                     break;
             }
         }
@@ -397,7 +395,6 @@ namespace Physics2DDemo
             clippersShape = new RectangleShape();
             clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0, 0, 0), new Lifespan());
             clipper.IgnoresGravity = true;
-            clipper.BroadPhaseDetectionOnly = true;
             clipper.Collided += new EventHandler<CollisionEventArgs>(clipper_Collided);
             clipper.Updated += new EventHandler<UpdatedEventArgs>(clipper_Updated);
         }
@@ -458,7 +455,7 @@ namespace Physics2DDemo
             Sprite sprite;
             if (!sprites.TryGetValue(name, out sprite))
             {
-                Surface surface = font.Render("" + c, System.Drawing.Color.Red, System.Drawing.Color.Black, true);
+                Surface surface = font.Render("" + c, System.Drawing.Color.Blue, System.Drawing.Color.Black, true);
                 surface.TransparentColor = System.Drawing.Color.Black;
                 sprite = new Sprite(surface);
                 sprites.Add(name, sprite);
@@ -868,7 +865,7 @@ namespace Physics2DDemo
             float maxY = 400 - size / 2;
             for (float y = maxY; y > minY; y -= spacing)
             {
-                AddShape(shape, 20, new ALVector2D(0, new Vector2D(x + rand.Next(-3, 4) * .1f, y)));
+                AddShape(shape, 20, new ALVector2D(rand.Next(-10, 0) * .1f, new Vector2D(x + rand.Next(-90, 90) * .1f, y)));
             }
         }
         List<Body> AddRagDoll(Vector2D location)
@@ -1058,15 +1055,22 @@ namespace Physics2DDemo
             Sprite blockSprite = GetSprite("fighter.png");
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             Vector2D[] vertexes = blockSprite.Vertexes;
-            Polygon shape = new Polygon(vertexes,4);
+            Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = blockSprite;
-                for (int i = 128*3; i > -128; i -= 128)
+            for (int i = 128 * 3; i > -128; i -= 128)
             {
-                AddShape(shape, 40, new ALVector2D(0, new Vector2D(600, 272+i)));
+              Body b =  AddShape(shape, 40, new ALVector2D(0, new Vector2D(600, 272 + i)));
+              //b.Transformation *= Matrix3x3.FromScale(new Vector2D(1, .5f));
+             /* Matrix3x3 matrix = b.Transformation;
+              matrix.m21 = -.01f;
+              matrix.m20 = .01f;
+              matrix.m22 = .98f;
+              b.Transformation = matrix;*/
             }
 
-            AddShape(new Circle(80,20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
-          //  AddRectangle(40, 40, 20, );
+            Body ball = AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
+            ball.Transformation *= Matrix3x3.FromScale(new Vector2D(1, .9f));
+            //  AddRectangle(40, 40, 20, );
             waitHandle.Set();
         }
         void Demo2()
@@ -1323,50 +1327,15 @@ namespace Physics2DDemo
             return orbitvelocity;
         }
 
-
-        /// <summary>
-        /// created this to run the physics update in becuase opengl was taking up to much CPU.
-        /// </summary>
-        public void PhysicsProcess()
+        public void Update(float dt)
         {
-            float extraDt = 0;
-            watch.Start();
-            while (true)
-            {
-                float dt = watch.ElapsedMilliseconds / 1000f;
-                extraDt += dt;
-
-                if (extraDt < targetDt)
-                {
-                    //GC.Collect();
-                    isFast = true;
-                    int sleep = (int)((targetDt - (extraDt + dt)) * 900);
-                    if (sleep < 0) { sleep = 0; }
-                    Thread.Sleep(sleep);
-                }
-                else
-                {
-                    isFast = false;
-                    extraDt -= targetDt;
-                    if (extraDt > targetDt)
-                    {
-                        extraDt = targetDt;
-                        isSlow = true;
-                    }
-                    else
-                    {
-                        isSlow = false;
-                    }
-                    watch.Reset();
-                    watch.Start();
-                    engine.Update(targetDt);
-                    updated = true;
-                }
-                waitHandle.WaitOne();
-            }
-
+            engine.Update(dt);
+            updated = true;
+            waitHandle.WaitOne();
         }
 
+
+        bool started;
         public void Reshape(object sender, EventArgs e)
         {
             foreach (Sprite s in sprites.Values)
@@ -1396,14 +1365,12 @@ namespace Physics2DDemo
             if (!started)
             {
                 started = true;
-                Thread t = new Thread(PhysicsProcess);
-                t.IsBackground = true;
-                t.Start();
+                timer.IsRunning = true;
             }
-            if (isSlow || isFast)
+            if (timer.State == TimerState.Slow || timer.State == TimerState.Fast)
             {
                 Gl.glBegin(Gl.GL_QUADS);
-                if (isSlow)
+                if (timer.State == TimerState.Slow)
                 {
                     Gl.glColor3f(.5f, 0, 0);
                 }

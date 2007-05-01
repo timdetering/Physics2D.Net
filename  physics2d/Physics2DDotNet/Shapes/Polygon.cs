@@ -362,7 +362,19 @@ namespace Physics2DDotNet
         public override bool CanGetIntersection
         {
             get { return true; }
-        } 
+        }
+        public override bool CanGetDistance
+        {
+            get { return true; }
+        }
+        public override bool BroadPhaseDetectionOnly
+        {
+            get { return false; }
+        }
+        public override bool CanGetCustomIntersection
+        {
+            get { return false; }
+        }
         #endregion
         #region methods
         public override void CalcBoundingRectangle()
@@ -384,6 +396,10 @@ namespace Physics2DDotNet
                 return true;
             }
             return false;
+        }
+        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        {
+            throw new NotSupportedException();
         }
         public override Shape Duplicate()
         {

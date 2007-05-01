@@ -1,3 +1,18 @@
+Physics2D.Net
+NEXT VERSION
+changed: moved the BroadPhaseDetectionOnly to Shape and made it abstract and read only.
+Added: CanGetDistance property to Shape.
+changed: renamed Body.StateChanged to PositionChanged and will be only raised when it is changed.
+Added: a Transformation property to Body to transform the shape.
+changed: refactored some collsion handling.
+Added: CanGetcustomIntersection and TryGetCustomIntersection to Shape.
+changed: CollsionEventArgs to have extra members to handle custom intersection methods in Shape.
+changed: Distance grid to not accept Shapes you cannot GetDistance from.
+removed: ICollisionInfo
+added: MultiPartPolygon class.
+added: PhysicsTimer class.
+
+removed: 
 AdvanceMathUnitTest
 0.0.0.1:
 Added to test AdvanceMath using nunit.

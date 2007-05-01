@@ -98,7 +98,7 @@ namespace Physics2DDotNet.Solvers
                 get { return (id < 0) ? (arbiter.body2) : (arbiter.body1); }
             }
         }
-        sealed class Arbiter : ICollisionInfo
+        sealed class Arbiter 
         {
 
            
@@ -493,7 +493,7 @@ namespace Physics2DDotNet.Solvers
             {
                 get { return contactsArray.Length > 0; }
             }
-            ReadOnlyCollection<IContactInfo> ICollisionInfo.Contacts
+            public ReadOnlyCollection<IContactInfo> Contacts
             {
                 get
                 {
@@ -576,7 +576,7 @@ namespace Physics2DDotNet.Solvers
             set { iterations = value; }
         }
 
-        protected internal override ICollisionInfo HandleCollision(Scalar dt, Body first, Body second)
+        protected internal override bool TryGetIntersection(Scalar dt, Body first, Body second, out ReadOnlyCollection<IContactInfo> contacts)
         {
             long id = PairID.GetId(first.ID, second.ID);
             Arbiter arbiter;
@@ -599,7 +599,8 @@ namespace Physics2DDotNet.Solvers
                     arbiters.Add(id, arbiter);
                 }
             }
-            return arbiter;
+            contacts = arbiter.Contacts;
+            return arbiter.Collided;
         }
         void RemoveEmpty()
         {

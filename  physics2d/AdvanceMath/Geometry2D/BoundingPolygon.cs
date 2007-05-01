@@ -203,7 +203,9 @@ namespace AdvanceMath.Geometry2D
                 centroid.X += ((v1.X + v2.X) * temp);
                 centroid.Y += ((v1.Y + v2.Y) * temp);
             }
-            centroid *= (1 / (Math.Abs(area) * 3));
+            temp = 1 / (Math.Abs(area) * 3);
+            centroid.X *= temp;
+            centroid.Y *= temp;
         }
         /// <summary>
         /// Calculates the area of a polygon.

@@ -47,6 +47,9 @@ namespace Physics2DDotNet
     [Serializable]
     public abstract class Shape : IDuplicateable<Shape>
     {
+        #region static fields
+        protected readonly static Vector2D[] Empty = new Vector2D[0];
+        #endregion
         #region static methods
         public static Scalar InertiaOfCylindricalShell(Scalar radius)
         {
@@ -74,22 +77,21 @@ namespace Physics2DDotNet
             if (vertexes.Length == 0) { throw new ArgumentOutOfRangeException("vertexes"); }
             if (vertexes.Length == 1) { return 0; }
 
-            Scalar denom = 0.0f;
-            Scalar numer = 0.0f;
-
-            for (int j = vertexes.Length - 1, i = 0; i < vertexes.Length; j = i, i++)
+            Scalar denom = 0;
+            Scalar numer = 0;
+            Scalar a, b, c, d;
+            Vector2D v1, v2;
+            v1 = vertexes[vertexes.Length - 1];
+            for (int index = 0; index < vertexes.Length; index++, v1 = v2)
             {
-                Scalar a, b, c;
-                Vector2D P0 = vertexes[j];
-                Vector2D P1 = vertexes[i];
-                Vector2D.Dot(ref P1, ref P1, out a);
-                Vector2D.Dot(ref P1, ref P0, out b);
-                Vector2D.Dot(ref P0, ref P0, out c);
-                a += b + c;
-                Vector2D.ZCross(ref P0, ref P1, out b);
-                b = Math.Abs(b);
-                denom += (b * a);
-                numer += b;
+                v2 = vertexes[index];
+                Vector2D.Dot(ref v2, ref v2, out a);
+                Vector2D.Dot(ref v2, ref v1, out b);
+                Vector2D.Dot(ref v1, ref v1, out c);
+                Vector2D.ZCross(ref v1, ref v2, out d);
+                d = Math.Abs(d);
+                numer += d;
+                denom += (a + b + c) * d;
             }
             return denom / (numer * 6);
         }
@@ -147,6 +149,16 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+        public abstract bool CanGetIntersection { get;}
+        public abstract bool CanGetDistance { get;}
+        public abstract bool CanGetCustomIntersection { get;}
+        /// <summary>
+        /// Gets if this detects collisions only with bounding boxes 
+        /// and if it does then only bodies colliding it will also generate collision events as well.
+        /// if this is true it can allow you to write your own collision Solver just for this Shape. 
+        /// Or you can use this to do clipping.
+        /// </summary>
+        public abstract bool BroadPhaseDetectionOnly { get;}
         public Body Parent
         {
             get { return parent; }
@@ -155,7 +167,6 @@ namespace Physics2DDotNet
         {
             get { return inertiaMultiplier; }
         }
-        public abstract bool CanGetIntersection { get;}
         public BoundingRectangle Rectangle
         {
             get { return rect; }
@@ -190,6 +201,7 @@ namespace Physics2DDotNet
             this.matrix2D = matrix;
             Matrix2D.Invert(ref matrix, out matrix2DInv);
             ApplyMatrixToVertexes();
+            CalcBoundingRectangle();
         }
         protected void ApplyMatrixToVertexes()
         {
@@ -206,6 +218,7 @@ namespace Physics2DDotNet
             other.vertexes.CopyTo(this.vertexes, 0);
         }
         public abstract bool TryGetIntersection(Vector2D vector, out IntersectionInfo info);
+        public abstract bool TryGetCustomIntersection(Body other, out object customIntersectionInfo);
         public abstract void GetDistance(ref Vector2D vector, out Scalar result);
         public abstract Shape Duplicate();
         public object Clone()
@@ -227,28 +240,79 @@ namespace Physics2DDotNet
 
     /// <summary>
     /// A shape whose BoundingRectangle is manualy Set and will not change, unless manualy changed.
+    /// It is meant for clipping and Area triggers.
     /// </summary>
     [Serializable]
     public sealed class RectangleShape : Shape
     {
+        public event EventHandler BoundingRectangleRequested;
         public RectangleShape()
-            : base(new Vector2D[0], Scalar.PositiveInfinity)
-        {}
+            : base(Empty, Scalar.PositiveInfinity)
+        { }
         public override bool CanGetIntersection
+        {
+            get { return true; }
+        }
+        public override bool CanGetDistance
+        {
+            get { return true; }
+        }
+        public override bool BroadPhaseDetectionOnly
+        {
+            get { return true; }
+        }
+        public override bool CanGetCustomIntersection
         {
             get { return false; }
         }
+
         public void SetRectangle(BoundingRectangle rectangle)
         {
             this.rect = rectangle;
         }
-        public override void ApplyMatrix(ref Matrix2D matrix){}
-        public override void CalcBoundingRectangle() {}
+        public override void ApplyMatrix(ref Matrix2D matrix) { }
+        public override void CalcBoundingRectangle()
+        {
+            if (BoundingRectangleRequested != null)
+            {
+                BoundingRectangleRequested(this, EventArgs.Empty);
+            }
+        }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        {
+            ContainmentType type;
+            rect.Contains(ref vector, out type);
+            if (type == ContainmentType.Contains)
+            {
+                Scalar xDist, yDist;
+                info.Position = vector;
+                xDist = Math.Min(rect.Min.X - vector.X, vector.X - rect.Min.X);
+                yDist = Math.Min(rect.Min.Y - vector.Y, vector.Y - rect.Min.Y);
+                if (xDist < yDist)
+                {
+                    info.Distance = xDist;
+                    info.Normal.Y = 0;
+                    info.Normal.X = (xDist < 0) ? (1) : (-1);
+                }
+                else 
+                {
+                    info.Distance = yDist;
+                    info.Normal.X = 0;
+                    info.Normal.Y = (yDist < 0) ? (1) : (-1);
+                }
+                return true;
+            }
+            else
+            {
+                info = IntersectionInfo.Zero;
+                return false;
+            }
+        }
+        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }
-        public override void GetDistance(ref Vector2D point,out Scalar result)
+        public override void GetDistance(ref Vector2D point, out Scalar result)
         {
             rect.GetDistance(ref point, out result);
         }
@@ -257,5 +321,4 @@ namespace Physics2DDotNet
             return new RectangleShape();
         }
     }
-
 }

@@ -69,12 +69,29 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
+        public override bool CanGetDistance
+        {
+            get { return true; }
+        }
+        public override bool BroadPhaseDetectionOnly
+        {
+            get { return false; }
+        }
+        public override bool CanGetCustomIntersection
+        {
+            get { return false; }
+        }
+
         public override void CalcBoundingRectangle()
         {
             rect.Max = vertexes[0];
             rect.Min = vertexes[0];
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        {
+            throw new NotSupportedException();
+        }
+        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }

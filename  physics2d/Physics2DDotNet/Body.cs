@@ -30,6 +30,7 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
+using System.Collections.ObjectModel;
 using AdvanceMath;
 using Physics2DDotNet.Math2D;
 
@@ -83,10 +84,10 @@ namespace Physics2DDotNet
         /// </summary>
         public event EventHandler Pending;
         /// <summary>
-        /// Raised when the State has been Changed.
+        /// Raised when the Position has been Changed.
         /// Raised by either the Solver or a call to ApplyMatrix.
         /// </summary>
-        public event EventHandler StateChanged;
+        public event EventHandler PositionChanged;
         /// <summary>
         /// Raised when the Body has been updated to a change in time.
         /// </summary>
@@ -97,6 +98,7 @@ namespace Physics2DDotNet
         public event EventHandler<CollisionEventArgs> Collided;
         #endregion
         #region fields
+        ALVector2D lastPosition;
         PhysicsEngine engine;
         Shape shape;
         PhysicsState state;
@@ -109,12 +111,12 @@ namespace Physics2DDotNet
         internal bool isChecked;
         bool ignoresGravity;
         bool ignoresCollisionResponce;
-        bool broadPhaseDetectionOnly;
         bool isPending;
         bool isCollidable;
         object tag;
         object solverTag;
         object detectorTag;
+        private Matrix2D transformation = Matrix2D.Identity;
         #endregion
         #region constructors
         /// <summary>
@@ -190,7 +192,6 @@ namespace Physics2DDotNet
                 this.tag = copy.tag;
             }
             this.isCollidable = copy.isCollidable;
-            this.broadPhaseDetectionOnly = copy.broadPhaseDetectionOnly;
             this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
             this.ignoresGravity = copy.ignoresGravity;
         }
@@ -350,17 +351,6 @@ namespace Physics2DDotNet
             set { ignoresCollisionResponce = value; }
         }
         /// <summary>
-        /// Gets and Sets if this body detects collisions only with bounding boxes 
-        /// and if it does then only bodies colliding it will also generate collision events as well.
-        /// Setting this to true can allow you to write your own collision Solver just for this Body. 
-        /// Or you can use this to do clipping.
-        /// </summary>
-        public bool BroadPhaseDetectionOnly
-        {
-            get { return broadPhaseDetectionOnly; }
-            set { broadPhaseDetectionOnly = value; }
-        }
-        /// <summary>
         /// Gets if the object has been added to the engine.
         /// </summary>
         public bool IsAdded
@@ -378,6 +368,9 @@ namespace Physics2DDotNet
             get { return isCollidable; }
             set { isCollidable = value; }
         }
+        /// <summary>
+        /// Gets the Total Kinetic Energy of the Body.
+        /// </summary>
         public Scalar KineticEnergy
         {
             get
@@ -390,6 +383,26 @@ namespace Physics2DDotNet
 
             }
         }
+        /// <summary>
+        /// Gets and Sets the Matrix3x3 that transforms the Shape belonging to the Body.
+        /// TODO: make it so this wont break Circle.CalcBoundingRectangle() and Line.CalcBoundingRectangle()
+        /// </summary>
+        public Matrix3x3 Transformation
+        {
+            get { return transformation.VertexMatrix; }
+            set
+            {
+                transformation.VertexMatrix = value;
+                Matrix3x3.Transpose(ref value, out value);
+                Matrix3x3.Invert(ref value, out value);
+                Matrix2x2.Copy(ref value, out transformation.NormalMatrix);
+                Scalar x = transformation.NormalMatrix.m00 + transformation.NormalMatrix.m01;
+                Scalar y = transformation.NormalMatrix.m10 + transformation.NormalMatrix.m11;
+                Scalar multiply = 1 / MathHelper.Sqrt(x * x + y * y);
+                Matrix2x2.Multiply(ref transformation.NormalMatrix, ref multiply, out transformation.NormalMatrix);
+            }
+        }
+
         #endregion
         #region methods
         public void UpdatePosition(Scalar dt)
@@ -524,10 +537,11 @@ namespace Physics2DDotNet
         }
         private void ApplyMatrixInternal(ref Matrix2D matrix)
         {
+            Matrix2D.Multiply(ref matrix, ref transformation, out matrix);
             shape.ApplyMatrix(ref matrix);
             if (engine == null || !engine.inUpdate)
             {
-                OnStateChanged();
+                OnPositionChanged();
             }
         }
 
@@ -540,16 +554,29 @@ namespace Physics2DDotNet
             return Duplicate();
         }
 
-        internal void OnCollision(Body other, Solvers.ICollisionInfo collisionInfo)
+        internal void OnCollision(Body other, ReadOnlyCollection<IContactInfo> contacts)
         {
             if (Collided != null)
             {
-                Collided(this, new CollisionEventArgs(other, (collisionInfo == null) ? (null) : (collisionInfo.Contacts)));
+                Collided(this, new CollisionEventArgs(other, contacts));
             }
         }
-        internal void OnStateChanged()
+        internal void OnCollision(Body other, object customIntersectionInfo)
         {
-            if (StateChanged != null) { StateChanged(this, EventArgs.Empty); }
+            if (Collided != null)
+            {
+                Collided(this, new CollisionEventArgs(other, customIntersectionInfo));
+            }
+        }
+
+        internal void OnPositionChanged()
+        {
+            if (PositionChanged != null&&
+                !ALVector2D.Equals(ref lastPosition ,ref state.Position))
+            { 
+                PositionChanged(this, EventArgs.Empty);
+                lastPosition = state.Position;
+            }
         }
         internal void OnPending(PhysicsEngine engine)
         {

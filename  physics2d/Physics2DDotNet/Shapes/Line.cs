@@ -97,6 +97,19 @@ namespace Physics2DDotNet
         {
             get { return grid != null; }
         }
+        public override bool CanGetDistance
+        {
+            get { return true; }
+        }
+        public override bool BroadPhaseDetectionOnly
+        {
+            get { return false; }
+        }
+        public override bool CanGetCustomIntersection
+        {
+            get { return false; }
+        }
+
         public override void CalcBoundingRectangle()
         {
             BoundingRectangle.FromVectors(vertexes, out rect);
@@ -122,6 +135,10 @@ namespace Physics2DDotNet
             }
             return false;
         }
+        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        {
+            throw new NotSupportedException();
+        }
         public override void GetDistance(ref Vector2D point, out Scalar result)
         {
             result = Scalar.MaxValue;
@@ -140,5 +157,11 @@ namespace Physics2DDotNet
         {
             return new Line(this);
         }
+
+
+
+
+
+
     }
 }

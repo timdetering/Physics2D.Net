@@ -156,10 +156,35 @@ namespace ConsoleDriver
         static Stopwatch stopwatch = new Stopwatch();
 
         static void nothering(object obj) { }
+
+
         [STAThread]
         static void Main(string[] args)
         {
 
+
+
+
+
+            Vector2D[] vertexes1 = new Vector2D[]
+            {
+                new Vector2D(-1,1),
+                new Vector2D(-3,1),
+                new Vector2D(-3,-1),
+                new Vector2D(-1,-1),
+            };
+            Vector2D[] vertexes2 = new Vector2D[]
+            {
+                new Vector2D(1,-1),
+                new Vector2D(3,-1),
+                new Vector2D(3,1),
+                new Vector2D(1,1),
+            };
+            Vector2D[][] polygons = new Vector2D[2][];
+            polygons[0] = vertexes1;
+            polygons[1] = vertexes2;
+            Console.WriteLine(MultiPartPolygon.GetCentroid(polygons));
+            Console.WriteLine(MultiPartPolygon.GetArea(polygons));
 
             Console.WriteLine("Finished");
             Console.ReadLine();

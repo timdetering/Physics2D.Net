@@ -27,7 +27,9 @@
 using System;
 using System.Runtime.InteropServices;
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
+using Physics2DDotNet.Math2D;
 using SdlDotNet.Core;
 using SdlDotNet.Graphics;
 using SdlDotNet.Input;
@@ -110,6 +112,7 @@ namespace Physics2DDemo
     class OpenGlObject : IDisposable
     {
         public static bool DrawLinesAndNormalsForSprites = false;
+        public static bool DrawBoundingBoxes = false;
         public bool collided = true;
         public bool shouldDraw = true;
         float[] matrix = new float[16];
@@ -125,12 +128,12 @@ namespace Physics2DDemo
         public OpenGlObject(Body entity)
         {
             this.entity = entity;
-            this.entity.StateChanged += entity_NewState;
+            this.entity.PositionChanged += entity_NewState;
             this.entity.Removed += entity_Removed;
         }
         void entity_Removed(object sender, RemovedEventArgs e)
         {
-            this.entity.StateChanged -= entity_NewState;
+            this.entity.PositionChanged -= entity_NewState;
             this.entity.Removed -= entity_Removed;
             this.removed = true;
         }
@@ -229,6 +232,7 @@ namespace Physics2DDemo
                 }
                 Gl.glEnd();
             }
+
         }
         public void Draw()
         {
@@ -246,6 +250,29 @@ namespace Physics2DDemo
             }
             Gl.glLoadMatrixf(matrix);
             Gl.glCallList(list);
+            if (DrawBoundingBoxes)
+            {
+                Gl.glLineWidth(1);
+                BoundingRectangle rect = entity.Shape.Rectangle;
+                Gl.glLoadIdentity();
+                Gl.glColor3f(1,1,1);
+                Gl.glBegin(Gl.GL_LINES);
+
+                Gl.glVertex2f(rect.Min.X, rect.Min.Y);
+                Gl.glVertex2f(rect.Min.X, rect.Max.Y);
+
+                Gl.glVertex2f(rect.Min.X, rect.Max.Y);
+                Gl.glVertex2f(rect.Max.X, rect.Max.Y);
+
+                Gl.glVertex2f(rect.Max.X, rect.Max.Y);
+                Gl.glVertex2f(rect.Max.X, rect.Min.Y);
+
+                Gl.glVertex2f(rect.Max.X, rect.Min.Y);
+                Gl.glVertex2f(rect.Min.X, rect.Min.Y);
+
+                Gl.glEnd();
+
+            }
         }
         public void Dispose()
         {
