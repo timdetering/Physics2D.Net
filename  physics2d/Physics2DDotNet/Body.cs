@@ -386,6 +386,7 @@ namespace Physics2DDotNet
         /// <summary>
         /// Gets and Sets the Matrix3x3 that transforms the Shape belonging to the Body.
         /// TODO: make it so this wont break Circle.CalcBoundingRectangle() and Line.CalcBoundingRectangle()
+        /// TODO: make sure this is right in terms of the normal matrix. because I just did stuff till it seamed to work.
         /// </summary>
         public Matrix3x3 Transformation
         {
@@ -393,9 +394,11 @@ namespace Physics2DDotNet
             set
             {
                 transformation.VertexMatrix = value;
-                Matrix3x3.Transpose(ref value, out value);
-                Matrix3x3.Invert(ref value, out value);
-                Matrix2x2.Copy(ref value, out transformation.NormalMatrix);
+                Matrix3x3 temp = value;
+                Matrix3x3.Invert(ref temp, out temp);
+                Matrix3x3.Transpose(ref temp, out temp);
+                Matrix3x3.Invert(ref temp, out temp);
+                Matrix2x2.Copy(ref temp, out transformation.NormalMatrix);
                 Scalar x = transformation.NormalMatrix.m00 + transformation.NormalMatrix.m01;
                 Scalar y = transformation.NormalMatrix.m10 + transformation.NormalMatrix.m11;
                 Scalar multiply = 1 / MathHelper.Sqrt(x * x + y * y);
@@ -427,7 +430,7 @@ namespace Physics2DDotNet
         }
         public void UpdateVelocity(Scalar dt)
         {
-            float massInv = massInfo.MassInv;
+            Scalar massInv = massInfo.MassInv;
             if (massInv != 0)
             {
                 state.Acceleration.Linear.X += state.ForceAccumulator.Linear.X * massInv;

@@ -162,6 +162,8 @@ namespace Physics2DDotNet
         }
 
         private Vector2D[][] polygons;
+
+
         private DistanceGrid grid; 
 
         #region constructors
@@ -184,7 +186,10 @@ namespace Physics2DDotNet
         }
         #endregion
 
-
+        public Vector2D[][] Polygons
+        {
+            get { return polygons; }
+        }
 
         public override bool CanGetIntersection
         {
@@ -204,7 +209,7 @@ namespace Physics2DDotNet
             get { return false; }
         }
 
-        public override void CalcBoundingRectangle()
+        protected override void CalcBoundingRectangle()
         {
             BoundingRectangle.FromVectors(base.vertexes, out rect);
         }
@@ -222,7 +227,7 @@ namespace Physics2DDotNet
             return false;
         }
 
-        public override void GetDistance(ref Vector2D vector, out float result)
+        public override void GetDistance(ref Vector2D vector, out Scalar result)
         {
             result = Scalar.MaxValue;
             Scalar temp;

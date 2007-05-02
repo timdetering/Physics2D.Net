@@ -127,10 +127,7 @@ namespace Physics2DDemo
         }
         void Events_MouseMotion(object sender, SdlDotNet.Input.MouseMotionEventArgs e)
         {
-            if (sparkle)
-            {
-                sparkPoint = new Vector2D(e.X, e.Y);
-            }
+            sparkPoint = new Vector2D(e.X, e.Y);
             if (cursorJoint != null)
             {
                 Vector2D point = cursorJoint.Anchor;
@@ -139,6 +136,7 @@ namespace Physics2DDemo
                 cursorJoint.Anchor = point;
             }
         }
+        Body Lazer;
 
         void Events_MouseButtonDown(object sender, SdlDotNet.Input.MouseButtonEventArgs e)
         {
@@ -242,7 +240,36 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.P:
                     timer.IsRunning = !timer.IsRunning;
                     break;
+                case SdlDotNet.Input.Key.E:
+                    AddRays();
+                    break;
             }
+        }
+        void AddRays()
+        {
+            List<RaySegment> segments = new List<RaySegment>();
+            RaySegment seg = new RaySegment();
+            seg.Length = 300;
+            seg.RayInstance = new Ray(Vector2D.Zero,Vector2D.XYAxis);
+            segments.Add(seg);
+            
+            seg = new RaySegment();
+            seg.Length = 300;
+            seg.RayInstance = new Ray(Vector2D.Zero,Vector2D.Normalize(Vector2D.XYAxis+   Vector2D.YAxis));
+            segments.Add(seg);
+            
+            
+            seg = new RaySegment();
+            seg.Length = 300;
+            seg.RayInstance = new Ray(Vector2D.Zero, Vector2D.Normalize(Vector2D.XYAxis + Vector2D.XAxis));
+            segments.Add(seg);
+
+            Lazer = new Body(new PhysicsState(), new RaySegments(segments.ToArray()), 1, new Coefficients(1, 1, 1), new Lifespan());
+            AddGlObject(Lazer);
+            engine.AddBody(Lazer);
+            Lazer.State.Position.Linear = sparkPoint;
+            Lazer.State.Velocity.Angular = .31f;
+            Lazer.IgnoresGravity = true;
         }
         Scalar torqueMag = -900000;
         Scalar torque = 0;
@@ -265,6 +292,11 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.DownArrow:
                     //force -= new Vector2D(0, forceMag);
                     break;
+                case SdlDotNet.Input.Key.E:
+                    Lazer.Lifetime.IsExpired = true;
+
+                    break;
+
             }
         }
 

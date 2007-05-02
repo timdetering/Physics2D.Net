@@ -192,7 +192,7 @@ namespace Physics2DDotNet
         }
         #endregion
         #region methods
-        public abstract void CalcBoundingRectangle();
+        protected abstract void CalcBoundingRectangle();
         public virtual void ApplyMatrix(ref Matrix2D matrix)
         {
             this.matrix2D = matrix;
@@ -268,7 +268,7 @@ namespace Physics2DDotNet
             this.rect = rectangle;
         }
         public override void ApplyMatrix(ref Matrix2D matrix) { }
-        public override void CalcBoundingRectangle()
+        protected override void CalcBoundingRectangle()
         {
             if (BoundingRectangleRequested != null)
             {

@@ -136,7 +136,6 @@ namespace Physics2DDotNet.Detectors
             {
                 beginCount = -1;
                 colliders.Clear();
-                body.Shape.CalcBoundingRectangle();
                 BoundingRectangle rect = body.Shape.Rectangle;
                 shouldAddNode = rect.Min.X != rect.Max.X || rect.Min.Y != rect.Max.Y;
                 stubs[0].value = rect.Min.X;

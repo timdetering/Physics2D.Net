@@ -168,7 +168,7 @@ namespace Physics2DDotNet
         }
         void EngineProcess()
         {
-            float extraDt, dt;
+            Scalar extraDt, dt;
             extraDt = 0;
             while (!isDisposed)
             {

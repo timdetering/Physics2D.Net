@@ -11,8 +11,11 @@ changed: Distance grid to not accept Shapes you cannot GetDistance from.
 removed: ICollisionInfo
 added: MultiPartPolygon class.
 added: PhysicsTimer class.
+fixed: A really retarded bug by me in the MathHelper.TrySolveQuadratic.
+added: RaySegments class and support classes.
+changed: replaced all instances of float with Scalar.
 
-removed: 
+ 
 AdvanceMathUnitTest
 0.0.0.1:
 Added to test AdvanceMath using nunit.

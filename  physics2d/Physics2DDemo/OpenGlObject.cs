@@ -124,12 +124,45 @@ namespace Physics2DDemo
             get { return removed; }
         }
 
+        float[] distances;
 
         public OpenGlObject(Body entity)
         {
             this.entity = entity;
             this.entity.PositionChanged += entity_NewState;
             this.entity.Removed += entity_Removed;
+            if (entity.Shape is RaySegments)
+            {
+                RaySegments se = (RaySegments)entity.Shape;
+                entity.Collided += new EventHandler<CollisionEventArgs>(entity_Collided);
+                distances = new float[se.Segments.Length];
+                entity.Updated += new EventHandler<UpdatedEventArgs>(entity_Updated);
+            }
+        }
+        bool collided2 = false;
+        void entity_Updated(object sender, UpdatedEventArgs e)
+        {
+            if (!collided2)
+            {
+                for (int index = 0; index < distances.Length; index++)
+                {
+                    distances[index] = -1;
+                }
+            }
+            collided2 = false;
+        }
+
+        void entity_Collided(object sender, CollisionEventArgs e)
+        {
+            RaySegmentIntersectionInfo info = (RaySegmentIntersectionInfo)e.CustomCollisionInfo;
+            for (int index = 0; index < distances.Length; index++)
+            {
+                if (!collided2 || distances[index] == -1 || (info.Distances[index] < distances[index] && info.Distances[index] != -1))
+                {
+                    distances[index] = info.Distances[index];
+                }
+            }
+            collided2 = true;
         }
         void entity_Removed(object sender, RemovedEventArgs e)
         {
@@ -211,6 +244,31 @@ namespace Physics2DDemo
                 }
                 Gl.glEnd();
             }
+            else if (entity.Shape is Physics2DDotNet.RaySegments)
+            {
+                Gl.glLineWidth(1);
+                RaySegments collection = (RaySegments)entity.Shape;
+                Gl.glBegin(Gl.GL_LINES);
+                for(int index = 0; index < collection.Segments.Length;++index)
+                {
+                    Gl.glColor3f(1, 0, 1);
+                    RaySegment ray = collection.Segments[index];
+                    Gl.glVertex2f(ray.RayInstance.Origin.X, ray.RayInstance.Origin.Y);
+                     float length;
+                     if (distances[index] == -1)
+                     {
+                         length = ray.Length;
+                     }
+                     else
+                     {
+                         length = distances[index];
+                     }
+                     Vector2D temp = ray.RayInstance.Origin + ray.RayInstance.Direction * length;
+                     Gl.glColor3f(1, 1, 1);
+                     Gl.glVertex2f(temp.X, temp.Y);
+                }
+                Gl.glEnd();
+            }
             else
             {
                 Gl.glBegin(Gl.GL_POLYGON);
@@ -240,16 +298,25 @@ namespace Physics2DDemo
             {
                 return;
             }
-            if (Gl.glIsList(list) == 0)
+            if (distances == null)
+            {
+
+                if (Gl.glIsList(list) == 0)
+                {
+                    Gl.glLoadIdentity();
+                    list = Gl.glGenLists(1);
+                    Gl.glNewList(list, Gl.GL_COMPILE);
+                    DrawInternal();
+                    Gl.glEndList();
+                }
+                Gl.glLoadMatrixf(matrix);
+                Gl.glCallList(list);
+            }
+            else
             {
                 Gl.glLoadIdentity();
-                list = Gl.glGenLists(1);
-                Gl.glNewList(list, Gl.GL_COMPILE);
                 DrawInternal();
-                Gl.glEndList();
             }
-            Gl.glLoadMatrixf(matrix);
-            Gl.glCallList(list);
             if (DrawBoundingBoxes)
             {
                 Gl.glLineWidth(1);

@@ -201,7 +201,7 @@ namespace AdvanceMath
         /// <returns><see langword="false" /> if an error would have been thrown; otherwise <see langword="true" />.</returns>
         public static bool TrySolveQuadratic(Scalar a, Scalar b, Scalar c, out Scalar plus, out Scalar minus)
         {
-            if (b == 0)
+            if (b != 0)
             {
                 if (0 == a)
                 {

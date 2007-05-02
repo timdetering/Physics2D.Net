@@ -375,7 +375,7 @@ namespace Physics2DDotNet
         }
         #endregion
         #region methods
-        public override void CalcBoundingRectangle()
+        protected override void CalcBoundingRectangle()
         {
             BoundingRectangle.FromVectors(vertexes, out rect);
         }

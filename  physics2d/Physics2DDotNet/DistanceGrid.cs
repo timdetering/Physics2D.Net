@@ -55,7 +55,6 @@ namespace Physics2DDotNet
             Matrix2D old = shape.Matrix;
             Matrix2D ident = Matrix2D.Identity;
             shape.ApplyMatrix(ref ident);
-            shape.CalcBoundingRectangle();
 
             this.rect = shape.Rectangle;
             this.gridSpacing = spacing;
@@ -80,7 +79,6 @@ namespace Physics2DDotNet
             }
             //restore the shape
             shape.ApplyMatrix(ref old);
-            shape.CalcBoundingRectangle();
         }
         public bool TryGetIntersection(Vector2D vector, out IntersectionInfo result)
         {

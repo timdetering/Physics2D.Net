@@ -119,7 +119,7 @@ namespace Physics2DDotNet
         }
         #endregion
         #region methods
-        public override void CalcBoundingRectangle()
+        protected override void CalcBoundingRectangle()
         {
             rect.Max.X = position.X + radius;
             rect.Max.Y = position.Y + radius;

@@ -455,7 +455,6 @@ namespace AdvanceMath.Geometry2D
                 result = 0;
                 return;
             }
-
             Scalar distance;
             Scalar intersectValue;
             result = -1;

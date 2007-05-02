@@ -79,7 +79,7 @@ namespace Physics2DDotNet
             get { return false; }
         }
 
-        public override void CalcBoundingRectangle()
+        protected override void CalcBoundingRectangle()
         {
             rect.Max = vertexes[0];
             rect.Min = vertexes[0];

@@ -89,7 +89,7 @@ namespace Physics2DDotNet
         {
             this.solver = (Solvers.SequentialImpulsesSolver)Engine.Solver;
         }
-        void Solvers.ISequentialImpulsesJoint.PreStep(float dtInv)
+        void Solvers.ISequentialImpulsesJoint.PreStep(Scalar dtInv)
         {
             Scalar difference = MathHelper.ClampAngle(body1.State.Position.Angular - body2.State.Position.Angular) - angle;
             bias = -biasFactor * dtInv * difference;

@@ -107,7 +107,7 @@ namespace Physics2DDotNet
             get { return false; }
         }
 
-        public override void CalcBoundingRectangle()
+        protected override void CalcBoundingRectangle()
         {
             BoundingRectangle.FromVectors(vertexes, out rect);
             rect.Max.X += thicknessHalf;
@@ -154,11 +154,5 @@ namespace Physics2DDotNet
         {
             return new Line(this);
         }
-
-
-
-
-
-
     }
 }
