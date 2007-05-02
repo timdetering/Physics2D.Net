@@ -30,8 +30,6 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Threading;
 
 using AdvanceMath;
 using Physics2DDotNet.Math2D;

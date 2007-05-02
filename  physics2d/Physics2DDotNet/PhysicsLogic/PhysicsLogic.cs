@@ -32,8 +32,6 @@ using Scalar = System.Single;
 using System;
 using System.Collections.Generic;
 
-using AdvanceMath;
-using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {

@@ -29,12 +29,14 @@ using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
-using Physics2DDotNet.Math2D;
-using AdvanceMath;
-using AdvanceMath.Design;
+
 using System;
 using System.Runtime.InteropServices;
-using System.ComponentModel;
+
+using AdvanceMath;
+using AdvanceMath.Design;
+using Physics2DDotNet.Math2D;
+
 namespace Physics2DDotNet
 {
     /// <summary>

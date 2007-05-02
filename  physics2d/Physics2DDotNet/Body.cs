@@ -571,9 +571,9 @@ namespace Physics2DDotNet
 
         internal void OnPositionChanged()
         {
-            if (PositionChanged != null&&
-                !ALVector2D.Equals(ref lastPosition ,ref state.Position))
-            { 
+            if (PositionChanged != null &&
+                !ALVector2D.Equals(ref lastPosition, ref state.Position))
+            {
                 PositionChanged(this, EventArgs.Empty);
                 lastPosition = state.Position;
             }

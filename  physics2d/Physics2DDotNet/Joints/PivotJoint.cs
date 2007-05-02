@@ -32,10 +32,8 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
 
 
 

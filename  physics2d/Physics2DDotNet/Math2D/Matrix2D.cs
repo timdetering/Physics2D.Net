@@ -28,14 +28,11 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Diagnostics;
-using System.Text;
-using System.Xml.Serialization;
+using System.Runtime.InteropServices;
 
 using AdvanceMath;
 using AdvanceMath.Design;
 
-using System.Runtime.InteropServices;
 namespace Physics2DDotNet.Math2D
 {
     [StructLayout(LayoutKind.Sequential, Size = Matrix2D.Size, Pack = 0), Serializable]

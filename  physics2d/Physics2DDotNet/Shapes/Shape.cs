@@ -30,9 +30,6 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Threading;
 using System.Xml.Serialization;
 
 using AdvanceMath;
