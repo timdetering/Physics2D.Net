@@ -14,8 +14,9 @@ added: PhysicsTimer class.
 fixed: A really retarded bug by me in the MathHelper.TrySolveQuadratic.
 added: RaySegments class and support classes.
 changed: replaced all instances of float with Scalar.
+fixed: restitution to Work a whole lot better.
+removed: Line shape since it would not work with certain features like the new raySegments Shape. And it can be represented better with a polygon.
 
- 
 AdvanceMathUnitTest
 0.0.0.1:
 Added to test AdvanceMath using nunit.

@@ -37,7 +37,6 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-
     [Serializable]
     public sealed class MultiPartPolygon : Shape
     {
@@ -178,6 +177,7 @@ namespace Physics2DDotNet
             this.polygons = polygons;
             this.grid = new DistanceGrid(this, gridSpacing);
         }
+        
         private MultiPartPolygon(MultiPartPolygon copy)
             : base(copy)
         {

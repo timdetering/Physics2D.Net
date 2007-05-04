@@ -113,6 +113,9 @@ namespace Physics2DDotNet
         bool ignoresCollisionResponce;
         bool isPending;
         bool isCollidable;
+        bool isTransformed;
+
+
         object tag;
         object solverTag;
         object detectorTag;
@@ -393,17 +396,31 @@ namespace Physics2DDotNet
             get { return transformation.VertexMatrix; }
             set
             {
-                transformation.VertexMatrix = value;
-                Matrix3x3 temp = value;
-                Matrix3x3.Invert(ref temp, out temp);
-                Matrix3x3.Transpose(ref temp, out temp);
-                Matrix3x3.Invert(ref temp, out temp);
-                Matrix2x2.Copy(ref temp, out transformation.NormalMatrix);
-                Scalar x = transformation.NormalMatrix.m00 + transformation.NormalMatrix.m01;
-                Scalar y = transformation.NormalMatrix.m10 + transformation.NormalMatrix.m11;
-                Scalar multiply = 1 / MathHelper.Sqrt(x * x + y * y);
-                Matrix2x2.Multiply(ref transformation.NormalMatrix, ref multiply, out transformation.NormalMatrix);
+                if (value == Matrix3x3.Identity)
+                {
+                    isTransformed = false;
+                    transformation = Matrix2D.Identity;
+                }
+                else
+                {
+                    isTransformed = true;
+                    transformation.VertexMatrix = value;
+                    Matrix3x3 temp = value;
+                    Matrix3x3.Invert(ref temp, out temp);
+                    Matrix3x3.Transpose(ref temp, out temp);
+                    Matrix3x3.Invert(ref temp, out temp);
+                    Matrix2x2.Copy(ref temp, out transformation.NormalMatrix);
+                    Scalar x = transformation.NormalMatrix.m00 + transformation.NormalMatrix.m01;
+                    Scalar y = transformation.NormalMatrix.m10 + transformation.NormalMatrix.m11;
+                    Scalar multiply = 1 / MathHelper.Sqrt(x * x + y * y);
+                    Matrix2x2.Multiply(ref transformation.NormalMatrix, ref multiply, out transformation.NormalMatrix);
+                }
             }
+        }
+
+        public bool IsTransformed
+        {
+            get { return isTransformed; }
         }
 
         #endregion

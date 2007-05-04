@@ -67,7 +67,6 @@ namespace Physics2DDotNet.Solvers
             public Scalar massNormal;
             public Scalar massTangent;
             public Scalar bias;
-            public Scalar restitution;
             public Vector2D r1;
             public Vector2D r2;
             Arbiter arbiter;
@@ -100,7 +99,9 @@ namespace Physics2DDotNet.Solvers
         }
         sealed class Arbiter 
         {
-
+            static Contact[]  Empty = new Contact[0];
+            Circle circle1;
+            Circle circle2;
            
             static Scalar ZeroClamp(Scalar value)
             {
@@ -126,19 +127,19 @@ namespace Physics2DDotNet.Solvers
                 {
                     this.body1 = body1;
                     this.body2 = body2;
-                    this.tag1 = (SequentialImpulsesTag)body1.SolverTag;
-                    this.tag2 = (SequentialImpulsesTag)body2.SolverTag;
                 }
                 else
                 {
                     this.body1 = body2;
                     this.body2 = body1;
-                    this.tag1 = (SequentialImpulsesTag)body2.SolverTag;
-                    this.tag2 = (SequentialImpulsesTag)body1.SolverTag;
                 }
+                this.tag1 = (SequentialImpulsesTag)this.body1.SolverTag;
+                this.tag2 = (SequentialImpulsesTag)this.body2.SolverTag;
+                this.circle1 = this.body1.Shape as Circle;
+                this.circle2 = this.body2.Shape as Circle;
                 this.friction = MathHelper.Sqrt(
-                    this.body1.Coefficients.DynamicFriction *
-                    this.body2.Coefficients.DynamicFriction);
+                        this.body1.Coefficients.DynamicFriction *
+                        this.body2.Coefficients.DynamicFriction);
                 this.restitution = Math.Min(body1.Coefficients.Restitution, body2.Coefficients.Restitution);
                 this.parent = parent;
                 this.contacts = new LinkedList<Contact>();
@@ -152,12 +153,78 @@ namespace Physics2DDotNet.Solvers
             public void Update()
             {
                 updated = true;
-                Collide();
+                if (circle1 != null && circle2 != null && 
+                    !body1.IsTransformed && !body2.IsTransformed)
+                {
+                    CollideCircles();
+                }
+                else
+                {
+                    Collide();
+                }
+                if (contacts.Count == 0)
+                {
+                    contactsArray = Empty;
+                    return;
+                }
                 if (contactsArray == null || contactsArray.Length != contacts.Count)
                 {
                     contactsArray = new Contact[contacts.Count];
                 }
                 contacts.CopyTo(contactsArray, 0);
+            }
+            void CollideCircles()
+            {
+                Contact contact;
+                if (contacts.First == null)
+                {
+                    contact = new Contact(this);
+                    contacts.AddLast(contact);
+                }
+                else
+                {
+                    contact = contacts.First.Value;
+                }
+
+
+                Vector2D normal,p1,p2;
+                Scalar distance,r2;
+                p1 = circle1.Position;
+                p2 = circle2.Position;
+                r2 = circle2.Radius;
+                //diff = circle2.Position - circle1.Position;
+                Vector2D.Subtract(ref  p2, ref p1, out normal);
+                Vector2D.Normalize(ref normal, out distance, out normal);
+                distance -= r2 + circle1.Radius;
+                if (distance > 0)
+                {
+                    contacts.Clear();
+                }
+                else
+                {
+                    contact.distance = distance;
+                    contact.normal = normal;
+                    Vector2D.Multiply(ref r2, ref normal, out normal);
+                    Vector2D.Subtract(ref p2, ref normal, out contact.position);
+                  //  contact.position = circle2.Position - normal * circle2.Radius;
+                }
+
+             /*   Matrix2D inv = circle1.MatrixInv;
+                Matrix2D mat = circle1.Matrix;
+
+                Vector2D.Normalize(ref normal, out normal);
+
+                Vector2D.Transform(ref inv.NormalMatrix, ref normal, out normal);
+                Vector2D.Normalize(ref normal);
+                normal = normal * circle1.Radius;
+                Vector2D.Transform(ref mat.VertexMatrix, ref normal, out normal);
+                IntersectionInfo info;
+                circle2.TryGetIntersection(normal, out info);
+                contact.distance = info.Distance;
+                Vector2D.Negate(ref info.Normal, out contact.normal);
+                contact.position = info.Position;*/
+
+ 
             }
             void Collide()
             {
@@ -280,7 +347,9 @@ namespace Physics2DDotNet.Solvers
                     {
                         // Apply normal + friction impulse
                         Vector2D vect1, vect2, P;
-                        Vector2D.Multiply(ref c.normal, ref c.Pn, out vect1);
+
+                        Scalar temp = (1+this.restitution) * c.Pn;
+                        Vector2D.Multiply(ref c.normal, ref temp, out vect1);
                         Vector2D.Multiply(ref tangent, ref c.Pt, out vect2);
                         Vector2D.Add(ref vect1, ref vect2, out P);
 
@@ -297,22 +366,6 @@ namespace Physics2DDotNet.Solvers
                             ref c.r2,
                             ref mass2Inv,
                             ref I2Inv);
-                    }
-
-                    if (this.restitution == 0)
-                    {
-                        c.restitution = 0;
-                    }
-                    else
-                    {
-                        // sets up the restitution
-                        Scalar vn;
-                        Vector2D rv;
-                        PhysicsHelper.GetRelativeVelocity(
-                            ref body1.State.Velocity, ref body2.State.Velocity,
-                            ref c.r1, ref c.r2, out rv);
-                        Vector2D.Dot(ref c.normal, ref rv, out vn);
-                        c.restitution = -vn * this.restitution;
                     }
                     // Initialize bias impulse to zero.
                     c.Pnb = 0;
@@ -350,11 +403,11 @@ namespace Physics2DDotNet.Solvers
                     Scalar dPn;
                     if (parent.splitImpulse)
                     {
-                        dPn = c.massNormal * (c.restitution - vn);
+                        dPn = c.massNormal * ( - vn);
                     }
                     else
                     {
-                        dPn = c.massNormal * (c.restitution - vn + c.bias);
+                        dPn = c.massNormal * (c.bias - vn);
                     }
 
 

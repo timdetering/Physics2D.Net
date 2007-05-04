@@ -111,6 +111,8 @@ namespace Physics2DDemo
 
     class OpenGlObject : IDisposable
     {
+        public static Random rand = new Random();
+
         public static bool DrawLinesAndNormalsForSprites = false;
         public static bool DrawBoundingBoxes = false;
         public bool collided = true;
@@ -131,6 +133,8 @@ namespace Physics2DDemo
             this.entity = entity;
             this.entity.PositionChanged += entity_NewState;
             this.entity.Removed += entity_Removed;
+            Matrix3x3 mat = entity.Shape.Matrix.VertexMatrix;
+            Matrix3x3.Copy2DToOpenGlMatrix(ref mat, matrix);
             if (entity.Shape is RaySegments)
             {
                 RaySegments se = (RaySegments)entity.Shape;
@@ -224,20 +228,10 @@ namespace Physics2DDemo
             }
             else if (entity.Shape is Physics2DDotNet.Particle)
             {
+                
                 Gl.glBegin(Gl.GL_POINTS);
                 Gl.glColor3f(1, 0, 0);
-                foreach (Vector2D vector in entity.Shape.OriginalVertices)
-                {
-                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
-                }
-                Gl.glEnd();
-            }
-            else if (entity.Shape is Physics2DDotNet.Line)
-            {
-                Physics2DDotNet.Line line = (Physics2DDotNet.Line)entity.Shape;
-                Gl.glLineWidth((float)line.Thickness);
-                Gl.glColor3f(0, 0, 1);
-                Gl.glBegin(Gl.GL_LINE_STRIP);
+                //Gl.glColor3d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
                 foreach (Vector2D vector in entity.Shape.OriginalVertices)
                 {
                     Gl.glVertex2f((float)vector.X, (float)vector.Y);

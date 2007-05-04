@@ -33,6 +33,7 @@ using Scalar = System.Single;
 using System;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
@@ -121,10 +122,17 @@ namespace Physics2DDotNet
         #region methods
         protected override void CalcBoundingRectangle()
         {
-            rect.Max.X = position.X + radius;
-            rect.Max.Y = position.Y + radius;
-            rect.Min.X = position.X - radius;
-            rect.Min.Y = position.Y - radius;
+            if (Parent.IsTransformed)
+            {
+                BoundingRectangle.FromVectors(vertexes, out rect);
+            }
+            else
+            {
+                rect.Max.X = position.X + radius;
+                rect.Max.Y = position.Y + radius;
+                rect.Min.X = position.X - radius;
+                rect.Min.Y = position.Y - radius;
+            }
         }
         public override void Set(Shape shape)
         {
@@ -141,12 +149,11 @@ namespace Physics2DDotNet
         }
         public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
         {
+            info.Position = vector;
             Vector2D.Transform(ref this.matrix2DInv.VertexMatrix, ref vector, out  vector);
-            //Vector2D.Subtract(ref vector, ref Zero, out info.Normal);
             Vector2D.Normalize(ref vector, out info.Distance, out info.Normal);
             Vector2D.Transform(ref this.matrix2D.NormalMatrix, ref info.Normal, out  info.Normal);
             info.Distance -= radius;
-            info.Position = vector;
             return info.Distance <= 0;
         }
         public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
