@@ -166,6 +166,8 @@ namespace Physics2DDotNet
             this.coefficients = coefficients;
             this.lifetime = lifetime;
             this.isCollidable = true;
+            Matrix2D matrix = shape.Matrix;
+            ALVector2D.Transform(ref matrix, ref lastPosition, out lastPosition);
         }
 
         private Body(Body copy)

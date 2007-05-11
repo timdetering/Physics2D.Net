@@ -16,6 +16,7 @@ added: RaySegments class and support classes.
 changed: replaced all instances of float with Scalar.
 fixed: restitution to Work a whole lot better.
 removed: Line shape since it would not work with certain features like the new raySegments Shape. And it can be represented better with a polygon.
+changed: made the Body constructor to set last position so the position changed event will fire correctly the first time.
 
 AdvanceMathUnitTest
 0.0.0.1:

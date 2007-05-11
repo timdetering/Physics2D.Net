@@ -70,10 +70,12 @@ namespace Physics2DDemo
                 {
                     bitmap[x, y] = pixels[x, y].ToArgb() != blank;
                 }
-            }
+            }  
             vertexes = Polygon.CreateFromBitmap(bitmap);
             Console.WriteLine("Before {0}", vertexes.Length);
-            vertexes = Polygon.Reduce(vertexes,3);
+            vertexes = Polygon.Reduce(vertexes, 1);
+            vertexes = Polygon.Reduce(vertexes, 2);
+            vertexes = Polygon.Reduce(vertexes, 3);
             Console.WriteLine("After {0}", vertexes.Length);
             vertexes = Polygon.Subdivide(vertexes, 10);
             Console.WriteLine("Subdivide {0}", vertexes.Length);
@@ -142,6 +144,7 @@ namespace Physics2DDemo
                 distances = new float[se.Segments.Length];
                 entity.Updated += new EventHandler<UpdatedEventArgs>(entity_Updated);
             }
+            entity.ApplyMatrix();
         }
         bool collided2 = false;
         void entity_Updated(object sender, UpdatedEventArgs e)

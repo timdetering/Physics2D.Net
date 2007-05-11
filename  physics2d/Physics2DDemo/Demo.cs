@@ -1152,7 +1152,7 @@ namespace Physics2DDemo
               b.Transformation = matrix;*/
             }
 
-            Body ball = AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
+            Body ball = AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             ball.Transformation *= Matrix3x3.FromScale(new Vector2D(1, .8f));
 
             waitHandle.Set();
@@ -1164,7 +1164,7 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddTower();
-            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             waitHandle.Set();
         }
         void Demo3()
@@ -1174,7 +1174,7 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(.1f, new Vector2D(600, 770)));
             AddTower();
-            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             waitHandle.Set();
         }
         void Demo4()
@@ -1185,7 +1185,7 @@ namespace Physics2DDemo
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
 
             AddPyramid();
-            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             waitHandle.Set();
         }
         void Demo5()
@@ -1195,7 +1195,7 @@ namespace Physics2DDemo
             AddGravityField();
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             AddTowers();
-            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(000, 272)));
+            AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             waitHandle.Set();
         }
         void Demo6()
@@ -1305,7 +1305,7 @@ namespace Physics2DDemo
             
             Scalar rest = coefficients.Restitution;
             coefficients.Restitution = 1;
-            AddCircle(20, 20, 300, new ALVector2D(0, 409, 125));
+            AddCircle(20, 20, 300, new ALVector2D(0, 409, 115));
             
 
             for (int x = 160; x < 500; x += 42)
