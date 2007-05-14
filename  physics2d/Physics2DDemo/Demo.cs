@@ -729,6 +729,7 @@ namespace Physics2DDemo
                 new MassInfo(float.PositiveInfinity, float.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
+            body.Shape.IgnoreVertexes = true;
             body.IgnoresGravity = true;
             AddGlObject(body);
             engine.AddBody(body);
@@ -1292,7 +1293,6 @@ namespace Physics2DDemo
             {
                 AddRectangle(80, 15, 90, new ALVector2D(0, x, 145));
             }
-
 
             AddLine(new Vector2D(400, 150), new Vector2D(430, 150), 30);
             AddLine(new Vector2D(430, 150), new Vector2D(600, 200), 30);

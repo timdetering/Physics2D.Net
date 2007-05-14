@@ -234,11 +234,11 @@ namespace Physics2DDotNet.Solvers
                 BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
 
                 LinkedListNode<Contact> node = contacts.First;
-                if (body1.Shape.CanGetIntersection)
+                if (!body2.Shape.IgnoreVertexes && body1.Shape.CanGetIntersection)
                 {
                     Collide(ref node, this.body1, this.body2, false, ref targetArea);
                 }
-                if (body2.Shape.CanGetIntersection)
+                if (!body1.Shape.IgnoreVertexes && body2.Shape.CanGetIntersection)
                 {
                     Collide(ref node, this.body2, this.body1, true, ref targetArea);
                 }
@@ -578,10 +578,9 @@ namespace Physics2DDotNet.Solvers
 
 
 
-
-        Scalar biasFactor = 0.8f;
+        Scalar biasFactor = 0.7f;
         Scalar allowedPenetration = 0.1f;
-        int iterations = 10;
+        int iterations = 12;
 
 
 

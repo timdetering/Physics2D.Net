@@ -115,6 +115,9 @@ namespace Physics2DDotNet
         protected Vector2D[] originalVertexes;
         protected Vector2D[] vertexes;
         private Body parent;
+        bool ignoreVertexes;
+
+
         #endregion
         #region constructors
         protected Shape(Vector2D[] vertexes, Scalar momentOfInertiaMultiplier)
@@ -129,6 +132,7 @@ namespace Physics2DDotNet
         }
         protected Shape(Shape copy)
         {
+            this.ignoreVertexes = copy.ignoreVertexes;
             this.matrix2D = copy.matrix2D;
             this.matrix2DInv = copy.matrix2DInv;
             this.inertiaMultiplier = copy.inertiaMultiplier;
@@ -146,6 +150,14 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+        /// <summary>
+        /// Gets and Sets if this shape's Vertexes will not be used in collision detection.
+        /// </summary>
+        public bool IgnoreVertexes
+        {
+            get { return ignoreVertexes; }
+            set { ignoreVertexes = value; }
+        }
         public abstract bool CanGetIntersection { get;}
         public abstract bool CanGetDistance { get;}
         public abstract bool CanGetCustomIntersection { get;}
