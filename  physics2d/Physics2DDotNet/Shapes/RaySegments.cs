@@ -51,7 +51,7 @@ namespace Physics2DDotNet
         public RaySegment(Vector2D origin,Vector2D direction, Scalar length)
         {
             this.RayInstance.Origin = origin;
-            this.RayInstance.Direction = origin;
+            this.RayInstance.Direction = direction;
             this.Length = length;
         }
     }
@@ -345,5 +345,4 @@ namespace Physics2DDotNet
             return new RaySegments(this);
         }
     }
-
 }

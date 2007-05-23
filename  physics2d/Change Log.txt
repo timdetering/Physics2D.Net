@@ -1,5 +1,9 @@
+AdvanceMath
+1.6.1.0:
+fixed: A really retarded bug by me in the MathHelper.TrySolveQuadratic.
+
 Physics2D.Net
-NEXT VERSION
+1.4.0.0:
 changed: moved the BroadPhaseDetectionOnly to Shape and made it abstract and read only.
 Added: CanGetDistance property to Shape.
 changed: renamed Body.StateChanged to PositionChanged and will be only raised when it is changed.
@@ -11,7 +15,6 @@ changed: Distance grid to not accept Shapes you cannot GetDistance from.
 removed: ICollisionInfo
 added: MultiPartPolygon class.
 added: PhysicsTimer class.
-fixed: A really retarded bug by me in the MathHelper.TrySolveQuadratic.
 added: RaySegments class and support classes.
 changed: replaced all instances of float with Scalar.
 fixed: restitution to Work a whole lot better.

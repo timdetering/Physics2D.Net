@@ -201,23 +201,20 @@ namespace AdvanceMath
         /// <returns><see langword="false" /> if an error would have been thrown; otherwise <see langword="true" />.</returns>
         public static bool TrySolveQuadratic(Scalar a, Scalar b, Scalar c, out Scalar plus, out Scalar minus)
         {
-            if (b != 0)
+            if (0 == a)
             {
-                if (0 == a)
-                {
-                    plus = -c / b;
-                    minus = plus;
-                    return true;
-                }
-                c = (b * b) - (4 * a * c);
-                if (0 <= c)
-                {
-                    c = Sqrt(c);
-                    a = .5f / a;
-                    plus = ((c - b) * a);
-                    minus = ((-c - b) * a);
-                    return true;
-                }
+                plus = -c / b;
+                minus = plus;
+                return true;
+            }
+            c = (b * b) - (4 * a * c);
+            if (0 <= c)
+            {
+                c = Sqrt(c);
+                a = .5f / a;
+                plus = ((c - b) * a);
+                minus = ((-c - b) * a);
+                return true;
             }
             plus = 0;
             minus = 0;
