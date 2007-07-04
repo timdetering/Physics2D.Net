@@ -41,7 +41,7 @@ namespace Physics2DDotNet
 
     static class BitmapHelper
     {
-        static Point2D[] bitmapPoints = new Point2D[]{
+        static readonly Point2D[] bitmapPoints = new Point2D[]{
             new Point2D (1,1),
             new Point2D (0,1),
             new Point2D (-1,1),
@@ -164,7 +164,7 @@ namespace Physics2DDotNet
         /// <returns>array of vectors the describe a rectangle</returns>
         public static Vector2D[] CreateRectangle(Scalar height, Scalar width)
         {
-            Scalar Ld2 = height *.5f;
+            Scalar Ld2 = height * .5f;
             Scalar Wd2 = width * .5f;
             return new Vector2D[4]
             {
@@ -198,7 +198,6 @@ namespace Physics2DDotNet
             if (maxLength <= 0) { throw new ArgumentOutOfRangeException("maxLength"); }
 
             LinkedList<Vector2D> list = new LinkedList<Vector2D>(vertexes);
-
             LinkedListNode<Vector2D> node = list.First;
             while (node != null)
             {
@@ -217,7 +216,7 @@ namespace Physics2DDotNet
                 if (mag > maxLength)
                 {
                     int count = (int)MathHelper.Ceiling(mag / maxLength);
-                    mag = mag / (mag * count);
+                    mag = 1f / count;
                     Vector2D.Multiply(ref line, ref mag, out line);
                     for (int pos = 1; pos < count; ++pos)
                     {

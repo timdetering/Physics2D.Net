@@ -168,36 +168,60 @@ namespace Physics2DDotNet
         /// Or you can use this to do clipping.
         /// </summary>
         public abstract bool BroadPhaseDetectionOnly { get;}
+        /// <summary>
+        /// Gets the Body this Shape is part of.
+        /// </summary>
         public Body Parent
         {
             get { return parent; }
         }
+        /// <summary>
+        /// Gets the Moment of Inertia Multiplier. Which is the ratio of inertia to mass of a Body.
+        /// </summary>
         public Scalar MomentofInertiaMultiplier
         {
             get { return inertiaMultiplier; }
         }
+        /// <summary>
+        /// Gets the Bounding Rectangle of the Shape. (This is only calculated when ApplyMatrix() is called.)
+        /// </summary>
         public BoundingRectangle Rectangle
         {
             get { return rect; }
         }
+        /// <summary>
+        /// Gets and Sets a User Defined Object.
+        /// </summary>
         [XmlIgnore]
         public object Tag
         {
             get { return tag; }
             set { tag = value; }
         }
+        /// <summary>
+        /// Gets The current Matrix being Applied to the Shape.
+        /// </summary>
         public Matrix2D Matrix
         {
             get { return matrix2D; }
         }
+        /// <summary>
+        /// Gets The Inverse of the current Matrix being Applied to the Shape.
+        /// </summary>
         public Matrix2D MatrixInv
         {
             get { return matrix2DInv; }
         }
+        /// <summary>
+        /// Gets the original (body/local) Vertices with the origin being the center of the Body.
+        /// </summary>
         public Vector2D[] OriginalVertices
         {
             get { return originalVertexes; }
         }
+        /// <summary>
+        /// Gets the transformed (world) Vertices with the origin being the center of the world.
+        /// </summary>
         public Vector2D[] Vertices
         {
             get { return vertexes; }

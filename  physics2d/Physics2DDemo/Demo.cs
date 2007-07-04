@@ -44,6 +44,7 @@ using Physics2DDotNet.Math2D;
 using System.Media;
 using Tao.OpenGl;
 using SdlDotNet.Core;
+using SdlDotNet.OpenGl;
 using SdlDotNet.Graphics;
 using System.Diagnostics;
 namespace Physics2DDemo
@@ -68,7 +69,7 @@ namespace Physics2DDemo
         Vector2D bombTarget;
         Coefficients coefficients = new Coefficients(.5f, .4f, .4f);
 
-
+        SurfaceGl pauseSprite;
 
         bool updated;
 
@@ -81,7 +82,8 @@ namespace Physics2DDemo
         #region constructor
         public Demo()
         {
-
+            font = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 40);
+            font.Bold = true;
             Events.MouseButtonDown += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonDown);
             Events.MouseButtonUp += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonUp);
             Events.KeyboardDown += new EventHandler<SdlDotNet.Input.KeyboardEventArgs>(Events_KeyboardDown);
@@ -89,12 +91,14 @@ namespace Physics2DDemo
             Events.MouseMotion += new EventHandler<SdlDotNet.Input.MouseMotionEventArgs>(Events_MouseMotion);
             waitHandle = new ManualResetEvent(true);
             objects = new List<OpenGlObject>();
-            
-            
+
+            pauseSprite = new SurfaceGl(font.Render("PAUSED", System.Drawing.Color.White, System.Drawing.Color.Black, true));
+
 
             CreateEngine();
             timer = new PhysicsTimer(Update, .010f);
             //timer = new PhysicsTimer(Update, .010f);
+
             CreateBomb();
             CreateAvatar();
             CreateClipper();
@@ -482,11 +486,11 @@ namespace Physics2DDemo
 
         List<Body> AddText(string text, Vector2D position)
         {
-            if (font == null)
+            /*if (font == null)
             {
                 font = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 40);
                 font.Bold = true;
-            }
+            }*/
             List<Body> result = new List<Body>();
             Scalar initialx = position.X;
             int maxy = 0;
@@ -1514,6 +1518,18 @@ namespace Physics2DDemo
                 Gl.glVertex2f(10, 10);
                 Gl.glVertex2f(0, 10);
                 Gl.glEnd();
+            }
+            if (timer.State == TimerState.Paused)
+            {
+                Gl.glLoadIdentity();
+                BoundingRectangle rect = this.clippersShape.Rectangle;
+                Gl.glEnable(Gl.GL_TEXTURE_2D);
+                Gl.glEnable(Gl.GL_BLEND);
+                Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
+                Gl.glColor3f(1, 1, 1);
+                pauseSprite.Draw((rect.Max.X- rect.Min.X) / 2 - pauseSprite.Surface.Width / 2, (rect.Max.Y - rect.Min.Y) / 2 - pauseSprite.Surface.Height / 2);
+                Gl.glDisable(Gl.GL_TEXTURE_2D);
+                Gl.glDisable(Gl.GL_BLEND);
             }
 
         }

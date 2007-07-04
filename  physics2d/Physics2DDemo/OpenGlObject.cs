@@ -25,6 +25,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
@@ -59,10 +60,14 @@ namespace Physics2DDemo
         public Sprite(Surface surface2)
         {
             this.surface =  surface2 ;
-            texture = new SurfaceGl(surface, true); 
+            texture = new SurfaceGl(surface, true);
+            texture.WrapS = WrapOption.GL_CLAMP;
+            texture.WrapT = WrapOption.GL_CLAMP;
+            //texture.MagFilter = MagnificationOption.GL_LINEAR;
+            //texture.MinFilter = MinifyingOption.GL_LINEAR_MIPMAP_LINEAR;
             int blank = surface.TransparentColor.ToArgb();
             bool[,] bitmap = new bool[surface.Width, surface.Height];
-            Color[,] pixels = surface.GetPixels(new System.Drawing.Rectangle(0, 0, surface.Width, surface.Height));
+            Color[,] pixels = surface.GetColors(new System.Drawing.Rectangle(0, 0, surface.Width, surface.Height));
 
             for (int x = 0; x < bitmap.GetLength(0); ++x)
             {
@@ -115,23 +120,28 @@ namespace Physics2DDemo
     {
         public static Random rand = new Random();
 
-        public static bool DrawLinesAndNormalsForSprites = false;
+        public static bool DrawCollisionPoints = false;
+        public static bool DrawLinesAndNormalsForSprites = true;
         public static bool DrawBoundingBoxes = false;
+
         public bool collided = true;
         public bool shouldDraw = true;
+
         float[] matrix = new float[16];
         Body entity;
         int list = -1;
         bool removed;
+
         public bool Removed
         {
             get { return removed; }
         }
 
         float[] distances;
-
+        List<Vector2D> points;
         public OpenGlObject(Body entity)
         {
+            this.points = new List<Vector2D>();
             this.entity = entity;
             this.entity.PositionChanged += entity_NewState;
             this.entity.Removed += entity_Removed;
@@ -143,6 +153,10 @@ namespace Physics2DDemo
                 entity.Collided += new EventHandler<CollisionEventArgs>(entity_Collided);
                 distances = new float[se.Segments.Length];
                 entity.Updated += new EventHandler<UpdatedEventArgs>(entity_Updated);
+            }
+            else if (DrawCollisionPoints && !(entity.Shape is Particle))
+            {
+                entity.Collided += entity_Collided2;
             }
             entity.ApplyMatrix();
         }
@@ -157,6 +171,16 @@ namespace Physics2DDemo
                 }
             }
             collided2 = false;
+        }
+        void entity_Collided2(object sender, CollisionEventArgs e)
+        {
+            lock (points)
+            {
+                foreach (IContactInfo info in e.Contacts)
+                {
+                    points.Add(info.Position);
+                }
+            }
         }
 
         void entity_Collided(object sender, CollisionEventArgs e)
@@ -336,6 +360,22 @@ namespace Physics2DDemo
 
                 Gl.glEnd();
 
+            }
+            if (DrawCollisionPoints)
+            {
+                Gl.glLoadIdentity();
+                Gl.glColor3f(0, 0, 1);
+                Gl.glPointSize(3);
+                Gl.glBegin(Gl.GL_POINTS);
+                lock (points)
+                {
+                    foreach (Vector2D point in points)
+                    {
+                        Gl.glVertex2f(point.X, point.Y);
+                    }
+                    points.Clear();
+                }
+                Gl.glEnd();
             }
         }
         public void Dispose()

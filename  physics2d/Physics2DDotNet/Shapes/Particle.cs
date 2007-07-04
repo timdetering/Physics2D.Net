@@ -94,9 +94,7 @@ namespace Physics2DDotNet
         }
         public override void GetDistance(ref Vector2D point,out Scalar result)
         {
-            Vector2D temp;
-            Vector2D.Subtract(ref point, ref vertexes[0], out temp);
-            Vector2D.GetMagnitude(ref temp, out result);
+            Vector2D.Distance(ref point, ref vertexes[0], out result);
         }
         public override Shape Duplicate()
         {

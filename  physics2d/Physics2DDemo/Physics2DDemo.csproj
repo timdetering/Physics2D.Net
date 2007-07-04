@@ -39,7 +39,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Tao.OpenGl, Version=2.1.0.2, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
+    <Reference Include="Tao.OpenGl, Version=2.1.0.4, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Tao.OpenGl.dll</HintPath>
     </Reference>
