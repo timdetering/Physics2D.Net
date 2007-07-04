@@ -121,7 +121,7 @@ namespace Physics2DDemo
         public static Random rand = new Random();
 
         public static bool DrawCollisionPoints = false;
-        public static bool DrawLinesAndNormalsForSprites = true;
+        public static bool DrawLinesAndNormalsForSprites = false;
         public static bool DrawBoundingBoxes = false;
 
         public bool collided = true;
