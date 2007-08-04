@@ -52,7 +52,6 @@ namespace Physics2DDotNet.Solvers
         }
     }
 
-
     public sealed class SequentialImpulsesSolver : CollisionSolver
     {
         sealed class Contact : IContactInfo

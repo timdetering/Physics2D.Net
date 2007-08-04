@@ -1,23 +1,23 @@
-#region LGPL License
+#region MIT License
 /*
- * Physics 2D is a 2 Dimensional Rigid Body Physics Engine written in C#. 
- * For the latest info, see http://physics2d.sourceforge.net/
- * Copyright (C) 2005-2006  Jonathan Mark Porter
+ * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"), to deal 
+ * in the Software without restriction, including without limitation the rights to 
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+ * the Software, and to permit persons to whom the Software is furnished to do so, 
+ * subject to the following conditions:
  * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * The above copyright notice and this permission notice shall be 
+ * included in all copies or substantial portions of the Software.
  * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
- * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
  */
 #endregion
 
@@ -37,12 +37,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 using Physics2DDotNet.Math2D;
 using AdvanceMath;
 using System.Runtime.InteropServices;
-using System.Xml.Serialization;
+
 using System.Security;
 using System.Security.AccessControl;
 
 //using ExceptionEventHandler = System.EventHandler<ConsoleDriver.ExceptionEventArgs>;
 using System.Reflection;
+
 using System.Diagnostics;
 
 using AdvanceMath.Design;
@@ -50,6 +51,9 @@ using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
 namespace ConsoleDriver
 {
+
+
+
     public class TimeTester
     {
         Stopwatch stopwatch = new Stopwatch();
@@ -144,7 +148,40 @@ namespace ConsoleDriver
 
     static class Driver
     {
-        static void TestMethod( int c, int d)
+        public static void TwoPassFileErase(string path, int blockSize, Random random)
+        {
+            if (path == null) { throw new ArgumentNullException("path"); }
+            if (blockSize <= 0) { throw new ArgumentOutOfRangeException("blockSize"); }
+            if (random == null) { throw new ArgumentNullException("random"); }
+            using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Write))
+            {
+                Byte[] buffer = new byte[blockSize];
+                long length = stream.Length;
+                for (long index = 0; index < length; index += buffer.Length)
+                {
+                    random.NextBytes(buffer);
+                    stream.Write(buffer, 0, buffer.Length);
+                }
+                stream.Flush();
+                stream.Seek(0, SeekOrigin.Begin);
+                Array.Clear(buffer, 0, buffer.Length);
+                for (long index = 0; index < length; index += buffer.Length)
+                {
+                    stream.Write(buffer, 0, buffer.Length);
+                }
+                stream.Flush();
+            }
+            string newPath;
+            do
+            {
+                newPath = Path.Combine(Path.GetDirectoryName(path), Path.GetRandomFileName());
+            } while (File.Exists(newPath));
+            File.Move(path, newPath);
+            File.Delete(newPath);
+        }
+
+
+        static void TestMethod(int c, int d)
         {
             int a,b;
             a = 40;
@@ -163,7 +200,6 @@ namespace ConsoleDriver
         [STAThread]
         static void Main(string[] args)
         {
-
 
 
 

@@ -30,8 +30,10 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
+#endif
+
 using AdvanceMath.Design ;
 namespace AdvanceMath
 {
@@ -40,9 +42,11 @@ namespace AdvanceMath
     /// This is the Vector Class.
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
-    [StructLayout(LayoutKind.Sequential, Size = Point2D.Size, Pack = 0), Serializable]
+    [StructLayout(LayoutKind.Sequential, Size = Point2D.Size)]
     [AdvBrowsableOrder("X,Y")]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Point2D>))]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Point2D>)), Serializable]
+#endif
     public struct Point2D : IEquatable<Point2D>
     {
         #region const fields
@@ -187,16 +191,20 @@ namespace AdvanceMath
         /// <summary>
         /// This is the X value. (Usually represents a horizontal position or direction.)
         /// </summary>
-        [XmlAttribute]
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the X-Axis")]
+#endif
         public int X;
         /// <summary>
         /// This is the Y value. (Usually represents a vertical position or direction.)
         /// </summary>
-        [XmlAttribute]
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Y-Axis")]
+#endif
         public int Y;
         #endregion
         #region constructors
@@ -326,6 +334,7 @@ namespace AdvanceMath
             return ToStringInternal(FormatString);
         }
 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         public static bool TryParse(string s, out Point2D result)
         {
             if (s == null)
@@ -350,6 +359,7 @@ namespace AdvanceMath
                 return false;
             }
         }
+#endif
         [ParseMethod]
         public static Point2D Parse(string s)
         {
@@ -367,7 +377,6 @@ namespace AdvanceMath
             value.Y = int.Parse(vals[1]);
             return value;
         }
-
         /// <summary>
         ///		Provides a unique hash code based on the member variables of this
         ///		class.  This should be done because the equality operators (==, !=)

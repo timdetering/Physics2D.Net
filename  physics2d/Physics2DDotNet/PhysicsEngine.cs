@@ -44,7 +44,9 @@ namespace Physics2DDotNet
     /// <summary>
     /// The Engine that will Apply Physics to object added to it.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class PhysicsEngine
     {
         #region static methods
@@ -110,11 +112,17 @@ namespace Physics2DDotNet
         #endregion
         #region fields
         private int nextBodyID;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
+#endif
         object syncRoot = new object();
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-        AdvReaderWriterLock rwLock;
+#endif
+        CFReaderWriterLock rwLock;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
+#endif
         internal bool inUpdate;
 
         private List<PhysicsLogic> logics;
@@ -136,7 +144,7 @@ namespace Physics2DDotNet
         #region constructors
         public PhysicsEngine()
         {
-            this.rwLock = new AdvReaderWriterLock();
+            this.rwLock = new CFReaderWriterLock();
 
             this.joints = new List<Joint>();
             this.bodies = new List<Body>();
@@ -155,46 +163,31 @@ namespace Physics2DDotNet
         /// <summary>
         /// Gets A threadSafe List of Joints (You wont get the "The collection has changed" Exception with this)
         /// </summary>
-        public ThreadSafeList<Joint> Joints
+        public ReadOnlyThreadSafeList<Joint> Joints
         {
             get
             {
-                ThreadSafeList<Joint> result =
-                    new ThreadSafeList<Joint>(
-                    joints,
-                    rwLock);
-                result.MakeReadOnly();
-                return result;
+                return new ReadOnlyThreadSafeList<Joint>(rwLock, joints);
             }
         }
         /// <summary>
         /// Gets A threadSafe List of Bodies (You wont get the "The collection has changed" Exception with this)
         /// </summary>
-        public ThreadSafeList<Body> Bodies
+        public ReadOnlyThreadSafeList<Body> Bodies
         {
             get
             {
-                ThreadSafeList<Body> result =
-                    new ThreadSafeList<Body>(
-                    bodies,
-                    rwLock);
-                result.MakeReadOnly();
-                return result;
+                return new ReadOnlyThreadSafeList<Body>(rwLock, bodies);
             }
         }
         /// <summary>
         /// Gets A threadSafe List of PhysicsLogics (You wont get the "The collection has changed" Exception with this)
         /// </summary>
-        public ThreadSafeList<PhysicsLogic> Logics
+        public ReadOnlyThreadSafeList<PhysicsLogic> Logics
         {
             get
             {
-                ThreadSafeList<PhysicsLogic> result =
-                    new ThreadSafeList<PhysicsLogic>(
-                    logics,
-                    rwLock);
-                result.MakeReadOnly();
-                return result;
+                return new ReadOnlyThreadSafeList<PhysicsLogic>(rwLock, logics);
             }
         }
         /// <summary>
@@ -353,8 +346,6 @@ namespace Physics2DDotNet
             }
         }
 
-
-
         /// <summary>
         /// Adds a PhysicsLogic to the pending queue and will be truly added on a call to Update.
         /// </summary>
@@ -426,14 +417,16 @@ namespace Physics2DDotNet
         }
 
         /// <summary>
-        /// Updates the Engine with a change in time. This call wil block all access to the engine while it is running.
+        /// Updates the Engine with a change in time. 
+        /// This call will block all access to the engine while it is running.
+        /// A complete call to this method is also known as a timestep.
         /// </summary>
-        /// <param name="dt">the change in time</param>
+        /// <param name="dt">The change in time since the last call to this method. (In Seconds)</param>
         public void Update(Scalar dt)
         {
             if (dt < 0) { throw new ArgumentOutOfRangeException("dt"); }
             CheckState();
-            WriterLock wLock = rwLock.Write;
+            rwLock.EnterWrite();
             inUpdate = true;
             try
             {
@@ -448,7 +441,7 @@ namespace Physics2DDotNet
             finally
             {
                 inUpdate = false;
-                wLock.Release();
+                rwLock.ExitWrite();
             }
         }
 
@@ -457,12 +450,18 @@ namespace Physics2DDotNet
         /// </summary>
         public void Clear()
         {
-            using (rwLock.Write)
+            rwLock.EnterWrite();
+            try
             {
                 ClearPending();
                 ClearAdded();
             }
+            finally
+            {
+                rwLock.ExitWrite();
+            }
         }
+
         private void ClearPending()
         {
             List<Body> pendingBodies;
@@ -614,14 +613,13 @@ namespace Physics2DDotNet
         {
             lock (syncRoot)
             {
-                AddPendingBodies();
-                AddPendingJoints();
-                AddPendingLogics();
+                if (pendingBodies.Count > 0) { AddPendingBodies(); }
+                if (pendingJoints.Count > 0) { AddPendingJoints(); }
+                if (pendingLogics.Count > 0) { AddPendingLogics(); }
             }
         }
         private void AddPendingBodies()
         {
-            if (pendingBodies.Count == 0) { return; }
             bodies.AddRange(pendingBodies);
             solver.AddBodyRange(pendingBodies);
             broadPhase.AddBodyRange(pendingBodies);
@@ -637,7 +635,6 @@ namespace Physics2DDotNet
         }
         private void AddPendingJoints()
         {
-            if (pendingJoints.Count == 0) { return; }
             joints.AddRange(pendingJoints);
             solver.AddJointRange(pendingJoints);
             for (int index = 0; index < pendingJoints.Count; ++index)
@@ -650,7 +647,6 @@ namespace Physics2DDotNet
         }
         private void AddPendingLogics()
         {
-            if (pendingLogics.Count == 0) { return; }
             logics.AddRange(pendingLogics);
             for (int index = 0; index < pendingLogics.Count; ++index)
             {

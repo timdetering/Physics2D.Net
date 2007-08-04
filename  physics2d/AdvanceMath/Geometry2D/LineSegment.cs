@@ -34,9 +34,11 @@ using System.Runtime.InteropServices;
 using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
-    [StructLayout(LayoutKind.Sequential, Size = LineSegment.Size, Pack = 0), Serializable]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<LineSegment>))]
+    [StructLayout(LayoutKind.Sequential, Size = LineSegment.Size)]
     [AdvBrowsableOrder("Vertex1,Vertex2")]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<LineSegment>)), Serializable]
+#endif
     public struct LineSegment : IEquatable<LineSegment>
     {
         public const int Size = Vector2D.Size * 2;

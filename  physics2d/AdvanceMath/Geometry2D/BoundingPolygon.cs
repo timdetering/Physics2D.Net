@@ -34,7 +34,9 @@ using System.Runtime.InteropServices;
 using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class BoundingPolygon
     {
         public static ContainmentType ContainsExclusive(Vector2D[] vertexes, Vector2D point)

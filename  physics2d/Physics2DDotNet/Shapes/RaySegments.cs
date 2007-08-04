@@ -62,8 +62,11 @@ namespace Physics2DDotNet
         {
             this.distances = distances;
         }
-        public ReadOnlyCollection<Scalar> Distances{get{return Array.AsReadOnly<Scalar> (distances);}}
+        public ReadOnlyCollection<Scalar> Distances{get{return new ReadOnlyCollection<Scalar>(distances);}}
     }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [Serializable]
+#endif
     public class RaySegments : Shape
     {
         RaySegment[] originalSegments;

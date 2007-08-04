@@ -46,7 +46,7 @@ using Tao.OpenGl;
 using SdlDotNet.Core;
 using SdlDotNet.OpenGl;
 using SdlDotNet.Graphics;
-using System.Diagnostics;
+
 namespace Physics2DDemo
 {
     /// <summary>
@@ -1463,9 +1463,11 @@ namespace Physics2DDemo
                 }
             }
         }
-        
+        void noth(object o) { }
         public void Draw(object sender,EventArgs e)
         {
+          // bool b = engine.Bodies.Exists(delegate(Body bo) { return bo.IsTransformed; });
+          // noth(b);
             Gl.glPointSize(3);
             if (sparkle && updated)
             {

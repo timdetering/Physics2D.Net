@@ -321,8 +321,7 @@ namespace Physics2DDemo
             }
             if (distances == null)
             {
-
-                if (Gl.glIsList(list) == 0)
+                if (list == -1)
                 {
                     Gl.glLoadIdentity();
                     list = Gl.glGenLists(1);

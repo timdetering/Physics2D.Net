@@ -36,7 +36,9 @@ namespace Physics2DDotNet
     /// <summary>
     /// A Gravity Field that apply gravity pulling in one direction regardless of the Body's position.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class GravityField : PhysicsLogic
     {
         Vector2D gravity;

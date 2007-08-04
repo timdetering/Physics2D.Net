@@ -33,7 +33,9 @@ using System;
 
 namespace Physics2DDotNet
 {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class UpdatedEventArgs : EventArgs
     {
         Scalar dt;

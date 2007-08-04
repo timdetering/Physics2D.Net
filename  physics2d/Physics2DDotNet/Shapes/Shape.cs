@@ -30,18 +30,21 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Xml.Serialization;
-
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Math2D;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+using System.Xml.Serialization;
+#endif
 
 namespace Physics2DDotNet
 {
     /// <summary>
     /// A abstract class used to define the Shape of a Body.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public abstract class Shape : IDuplicateable<Shape>
     {
         #region static fields
@@ -192,7 +195,9 @@ namespace Physics2DDotNet
         /// <summary>
         /// Gets and Sets a User Defined Object.
         /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public object Tag
         {
             get { return tag; }
@@ -275,7 +280,9 @@ namespace Physics2DDotNet
     /// A shape whose BoundingRectangle is manualy Set and will not change, unless manualy changed.
     /// It is meant for clipping and Area triggers.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class RectangleShape : Shape
     {
         public event EventHandler BoundingRectangleRequested;

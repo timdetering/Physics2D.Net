@@ -30,18 +30,22 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
+using AdvanceMath.Design;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360  && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-using AdvanceMath.Design ;
+#endif
+
 namespace AdvanceMath
 {
     /// <summary>
     /// A class that keeps a value clamped.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-    [AdvBrowsableOrder("Min,Value,Max")]
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Clamped>))]
-    public sealed class Clamped : ICloneable, IComparable<Clamped>,IEquatable<Clamped>
+#endif
+    [AdvBrowsableOrder("Min,Value,Max")]
+    public sealed class Clamped : ICloneable, IComparable<Clamped>, IEquatable<Clamped>
     {
         [ParseMethod]
         public static Clamped Parse(string s)
@@ -50,7 +54,22 @@ namespace AdvanceMath
             {
                 throw new ArgumentNullException("s");
             }
-            string[] vals = s.Split(new char[] { '<','(',')' },StringSplitOptions.RemoveEmptyEntries); 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+
+            string[] vals = s.Split(new char[] { '<', '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
+#else
+            string[] temp = s.Split(new char[] { '<', '(', ')' });
+            int index2 = 0;
+            for (int index1 = 0; index1 < temp.Length; ++index1)
+            {
+                if (temp[index1].Length > 0)
+                {
+                    temp[index2++] = temp[index1];
+                }
+            }
+            string[] vals = new string[index2];
+            Array.Copy(temp, vals, vals.Length);
+#endif
             if (vals.Length != 3)
             {
                 throw new FormatException();
@@ -60,6 +79,7 @@ namespace AdvanceMath
                 Scalar.Parse(vals[0]),
                 Scalar.Parse(vals[2]));
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         public static bool TryParse(string s, out Clamped result)
         {
             if (s != null)
@@ -80,6 +100,7 @@ namespace AdvanceMath
             result = null;
             return false;
         }
+#endif
 
         Scalar value;
         Scalar min;
@@ -122,7 +143,9 @@ namespace AdvanceMath
        /// <summary>
        /// Gets and Sets the current value.
        /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [AdvBrowsable]
+#endif
         public Scalar Value
         {
             get { return this.value; }
@@ -134,7 +157,9 @@ namespace AdvanceMath
         /// <summary>
         /// Gets and Sets the minimum value.
         /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [AdvBrowsable]
+#endif
         public Scalar Min
         {
             get { return min; }
@@ -148,7 +173,9 @@ namespace AdvanceMath
         /// <summary>
         /// Gets and Sets the maximum value.
         /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [AdvBrowsable]
+#endif
         public Scalar Max
         {
             get { return max; }
@@ -162,7 +189,9 @@ namespace AdvanceMath
         /// <summary>
         /// Gets and Sets the percent with Min being 0 (0%) and Max being 1 (100%)
         /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Scalar Percent
         {
             get

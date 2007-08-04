@@ -34,7 +34,9 @@ using AdvanceMath;
 
 namespace Physics2DDotNet
 {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public struct IntersectionInfo
     {
         public static IntersectionInfo Zero = new IntersectionInfo();

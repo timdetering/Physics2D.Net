@@ -34,7 +34,9 @@ using AdvanceMath;
 namespace Physics2DDotNet
 {
 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class GravityPointField : PhysicsLogic
     {
         Vector2D location;

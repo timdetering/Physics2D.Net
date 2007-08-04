@@ -39,7 +39,9 @@ namespace Physics2DDotNet
     /// A physics logic is a way for the engine to effect object within the Update call.
     /// Gravity is a Example of a PhysicsLogic.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public abstract class PhysicsLogic : IPhysicsEntity
     {
         /// <summary>

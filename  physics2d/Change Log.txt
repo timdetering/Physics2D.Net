@@ -1,4 +1,20 @@
 AdvanceMath
+NEXTVERSION:
+added: "#if !CompactFramework ... #endif"  statements for all non Compact framework compatible code.
+removed: some unneeded code that was not supported by compact framework.
+changed: now compiles on compact framework.
+
+Physics2D.Net
+NEXTVERSION:
+added: "#if !CompactFramework ... #endif"  statements for all non Compact framework compatible code.
+changed: PhysicsTimer to be compatible with the Compact framework
+removed: most of the classes in Collections.
+Added: CFReaderWriterLock which a class to replace the .Net frameworks ReaderWriterLock class since the Compact Framework does not have it. 
+Added: ReadOnlyThreadSafeList to replace all those classes in collections.
+changed: some code to be do things in a more compact framework friendly manner.
+changed: now compiles on compact framework.
+
+AdvanceMath
 1.6.1.0:
 fixed: A really retarded bug by me in the MathHelper.TrySolveQuadratic.
 

@@ -22,15 +22,12 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
-using System.ComponentModel.Design.Serialization;
-using System.Globalization;
 
 namespace AdvanceMath.Design
 {
+
     [global::System.AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class AdvBrowsableAttribute : Attribute
     {
@@ -44,6 +41,7 @@ namespace AdvanceMath.Design
         {
             get { return name; }
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         public static PropertyDescriptorCollection GetDispMembers(Type t)
         {
             string[] order = AdvBrowsableOrderAttribute.GetOrder(t);
@@ -107,5 +105,7 @@ namespace AdvanceMath.Design
             }
             return new PropertyDescriptorCollection(rv.ToArray());
         }
+#endif
     }
+
 }

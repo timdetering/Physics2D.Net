@@ -45,6 +45,9 @@ namespace Physics2DDotNet
     /// <summary>
     /// A joint that makes a single Body Pivot around an Anchor.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [Serializable]
+#endif
     public sealed class PivotJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
         Solvers.SequentialImpulsesSolver solver;
@@ -91,7 +94,7 @@ namespace Physics2DDotNet
         }
         public override ReadOnlyCollection<Body> Bodies
         {
-            get { return Array.AsReadOnly<Body>(new Body[1] { body }); }
+            get { return new ReadOnlyCollection<Body>(new Body[1] { body }); }
         }
         protected override void OnAdded()
         {

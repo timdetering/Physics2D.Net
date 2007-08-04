@@ -40,7 +40,9 @@ namespace Physics2DDotNet
     /// <summary>
     /// Describes a Connection between 2 objects. 
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public abstract class Joint : IJoint
     {
         /// <summary>

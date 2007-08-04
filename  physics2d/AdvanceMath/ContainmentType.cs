@@ -35,7 +35,9 @@ using System.Runtime.InteropServices;
 
 namespace AdvanceMath
 {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     [Flags]
     public enum ContainmentType
     {

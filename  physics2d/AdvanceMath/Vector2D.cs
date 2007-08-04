@@ -30,9 +30,11 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
+using AdvanceMath.Design;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-using AdvanceMath.Design ;
+#endif
+
 namespace AdvanceMath
 {
 
@@ -40,9 +42,11 @@ namespace AdvanceMath
     /// This is the Vector Class.
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
-    [StructLayout(LayoutKind.Sequential, Size = Vector2D.Size, Pack = 0), Serializable]
+    [StructLayout(LayoutKind.Sequential, Size = Vector2D.Size)]
     [AdvBrowsableOrder("X,Y")]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector2D>))]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector2D>)), Serializable]
+#endif
     public struct Vector2D : IVector<Vector2D>
     {
         #region const fields
@@ -792,16 +796,20 @@ namespace AdvanceMath
         /// <summary>
         /// This is the X value. (Usually represents a horizontal position or direction.)
         /// </summary>
-        [XmlAttribute]
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the X-Axis")]
+#endif
         public Scalar X;
         /// <summary>
         /// This is the Y value. (Usually represents a vertical position or direction.)
         /// </summary>
-        [XmlAttribute]
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Y-Axis")]
+#endif
         public Scalar Y;
         #endregion
         #region constructors
@@ -885,7 +893,9 @@ namespace AdvanceMath
         /// Gets or Sets the Magnitude (Length) of the Vector2D. 
         /// </summary>
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector"/></remarks>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Scalar Magnitude
         {
             get
@@ -914,7 +924,9 @@ namespace AdvanceMath
         /// If the Magnitude of the Vector is 1 then The 
         /// Angles {0,Math.PI/2,Math.PI/2,3*Math.PI/2} would have the vectors {(1,0),(0,1),(-1,0),(0,-1)} respectively.
         /// </remarks>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Scalar Angle
         {
             get
@@ -1186,6 +1198,7 @@ namespace AdvanceMath
             return ToStringInternal(FormatString);
         }
 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         public static bool TryParse(string s, out Vector2D result)
         {
             if (s == null)
@@ -1210,6 +1223,7 @@ namespace AdvanceMath
                 return false;
             }
         }
+#endif
         [ParseMethod]
         public static Vector2D Parse(string s)
         {

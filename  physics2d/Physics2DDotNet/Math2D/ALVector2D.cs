@@ -39,16 +39,16 @@ namespace Physics2DDotNet.Math2D
     /// <summary>
     /// Class Used to store a Linear Value along with an Angular Value. Like Position and Orientation. 
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Size = ALVector2D.Size, Pack = 0), Serializable]
+    [StructLayout(LayoutKind.Sequential, Size = ALVector2D.Size)]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<ALVector2D>))]
-    [AdvBrowsableOrder("Angular,Linear")]
+    [AdvBrowsableOrder("Angular,Linear"), Serializable]
+#endif
     public struct ALVector2D : IEquatable<ALVector2D>
     {
-
-
         public static ALVector2D Parse(string text)
         {
-            string[] vals = text.Trim(' ', '(', '[', '<', ')', ']', '>').Split(new char[] { ',' }, 2);
+            string[] vals = text.Trim(' ', '(', '[', '<', ')', ']', '>').Split(new char[] { ',' });
             if (vals.Length != 2)
             {
                 throw new FormatException(string.Format("Cannot parse the text '{0}' because it does not have 2 parts separated by commas in the form (x,y) with optional parenthesis.", text));
@@ -68,6 +68,7 @@ namespace Physics2DDotNet.Math2D
                 }
             }
         }
+
         public const int Size = sizeof(Scalar) + Vector2D.Size;
         /// <summary>
         /// ALVector2D(0,Vector2D.Zero)

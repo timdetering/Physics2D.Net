@@ -305,19 +305,15 @@ namespace AdvanceMath
         public static Scalar Floor(Scalar d) { return (Scalar)Math.Floor(d); }
         public static Scalar IEEERemainder(Scalar x, Scalar y) { return (Scalar)Math.IEEERemainder(x, y); }
         public static Scalar Log(Scalar d) { return (Scalar)Math.Log(d); }
-        public static Scalar Log(Scalar a, Scalar newBase) { return (Scalar)Math.Log(a, newBase); }
         public static Scalar Log10(Scalar d) { return (Scalar)Math.Log10(d); }
         public static Scalar Pow(Scalar x, Scalar y) { return (Scalar)Math.Pow(x, y); }
         public static Scalar Round(Scalar a) { return (Scalar)Math.Round(a); }
         public static Scalar Round(Scalar value, int digits) { return (Scalar)Math.Round(value, digits); }
-        public static Scalar Round(Scalar value, MidpointRounding mode) { return (Scalar)Math.Round(value, mode); }
-        public static Scalar Round(Scalar value, int digits, MidpointRounding mode) { return (Scalar)Math.Round(value, digits, mode); }
         public static Scalar Sin(Scalar a) { return (Scalar)Math.Sin(a); }
         public static Scalar Sinh(Scalar value) { return (Scalar)Math.Sinh(value); }
         public static Scalar Sqrt(Scalar d) { return (Scalar)Math.Sqrt(d); }
         public static Scalar Tan(Scalar a) { return (Scalar)Math.Tan(a); }
         public static Scalar Tanh(Scalar value) { return (Scalar)Math.Tanh(value); }
-        public static Scalar Truncate(Scalar d) { return (Scalar)Math.Truncate(d); }
         #endregion
 
 

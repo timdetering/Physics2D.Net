@@ -37,7 +37,9 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public class CollisionEventArgs : EventArgs
     {
         ReadOnlyCollection<IContactInfo> contacts;

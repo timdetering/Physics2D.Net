@@ -25,13 +25,7 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Collections;
-using System.ComponentModel;
 using System.Reflection;
-using System.ComponentModel.Design.Serialization;
-using System.Globalization;
 
 namespace AdvanceMath.Design
 {

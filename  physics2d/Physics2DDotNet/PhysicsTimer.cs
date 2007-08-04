@@ -31,10 +31,60 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Threading;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Diagnostics;
+#endif
+
 
 namespace Physics2DDotNet
 {
+#if CompactFramework || WindowsCE || PocketPC || XBOX360 
+    class Stopwatch
+    {
+        bool started = false;
+        TimeSpan timeSpan = TimeSpan.Zero;
+        DateTime time;
+        public long ElapsedMilliseconds
+        {
+            get
+            {
+                if (started)
+                {
+                    TimeSpan result = DateTime.Now.Subtract(time);
+                    return result.Milliseconds;
+                }
+                else
+                {
+                    return timeSpan.Milliseconds;
+                }
+            }
+        }
+        public void Reset()
+        {
+            started = false;
+            timeSpan = TimeSpan.Zero;
+        }
+        public void Start()
+        {
+            if (!started)
+            {
+                started = true;
+                time = DateTime.Now.Subtract(timeSpan);
+            }
+        }
+        public void Stop()
+        {
+            if (started)
+            {
+                timeSpan += DateTime.Now.Subtract(time);
+                started = false;
+            }
+        }
+    }
+#endif
+
+
+
     /// <summary>
     /// The State of a PhysicsTimer
     /// </summary>
@@ -93,10 +143,6 @@ namespace Physics2DDotNet
             this.callback = callback;
             this.waitHandle = new ManualResetEvent(false);
             this.watch = new Stopwatch();
-            this.engineThread = new Thread(EngineProcess);
-            this.engineThread.IsBackground = true;
-            this.engineThread.Name = string.Format("PhysicsEngine Thread: {0}", threadCount++);
-
         }
         /// <summary>
         /// Gets and Sets if the PhysicsTimer is currently calling the Callback.
@@ -116,8 +162,11 @@ namespace Physics2DDotNet
                     if (value)
                     {
                         watch.Start();
-                        if ((this.engineThread.ThreadState & System.Threading.ThreadState.Unstarted) == System.Threading.ThreadState.Unstarted)
+                        if (this.engineThread == null)
                         {
+                            this.engineThread = new Thread(EngineProcess);
+                            this.engineThread.IsBackground = true;
+                            this.engineThread.Name = string.Format("PhysicsEngine Thread: {0}", threadCount++);
                             this.engineThread.Start();
                         }
                         else
@@ -220,7 +269,7 @@ namespace Physics2DDotNet
                     watch.Stop();
                     isRunning = false;
                     state = TimerState.Disposed;
-                    if (!engineThread.Join((int)(targetInterval * 1000)))
+                    if (engineThread != null && !engineThread.Join((int)(targetInterval * 1000)))
                     {
                         engineThread.Abort();
                     }

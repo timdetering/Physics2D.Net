@@ -37,7 +37,9 @@ namespace Physics2DDotNet
     /// A collision ignorer that uses group numbers to do collision ignoring.
     /// If 2 objects are members of the same group then they will not collide.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public class CollisionGroupIgnorer : CollisionIgnorer, ICollection<int>, ICloneable
     {
         List<int> groups = new List<int>();

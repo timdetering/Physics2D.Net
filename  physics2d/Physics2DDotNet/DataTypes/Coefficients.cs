@@ -35,7 +35,9 @@ namespace Physics2DDotNet
     /// <summary>
     /// Describes the Coefficients of a surface.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class Coefficients : IDuplicateable<Coefficients>
     {
         private Scalar restitution;

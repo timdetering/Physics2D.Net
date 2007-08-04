@@ -40,7 +40,9 @@ namespace Physics2DDotNet
     /// <summary>
     /// Represents a Single point.
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class Particle : Shape
     {
         /// <summary>

@@ -25,15 +25,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
-using System.ComponentModel.Design.Serialization;
-using System.Globalization;
 
 namespace AdvanceMath.Design
 {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     public class AdvPropertyDescriptor : PropertyDescriptor, IEquatable<AdvPropertyDescriptor>
     {
         private static Attribute[] GetAttributes(MemberInfo property)
@@ -137,4 +134,5 @@ namespace AdvanceMath.Design
             return info.Equals(other.info);
         }
     }
+#endif
 }

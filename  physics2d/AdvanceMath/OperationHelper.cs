@@ -31,10 +31,9 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Xml.Serialization;
-using System.CodeDom;
-using global::Microsoft.CSharp;
+
+
+
 namespace AdvanceMath
 {
     public delegate void RefOperation<TLeft, TRight, TResult>(ref TLeft left, ref TRight right, out TResult result);

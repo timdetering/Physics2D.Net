@@ -34,9 +34,11 @@ using System.Runtime.InteropServices;
 using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
-    [StructLayout(LayoutKind.Sequential, Size = BoundingRectangle.Size, Pack = 0), Serializable]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingRectangle>))]
+    [StructLayout(LayoutKind.Sequential, Size = BoundingRectangle.Size)]
     [AdvBrowsableOrder("Min,Max")]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingRectangle>)), Serializable]
+#endif
     public struct BoundingRectangle : IEquatable<BoundingRectangle>
     {
         public const int Size = Vector2D.Size * 2;

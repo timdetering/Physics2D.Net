@@ -38,7 +38,9 @@ namespace Physics2DDotNet.Detectors
 {
 
 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class SweepAndPruneDetector : BroadPhaseCollisionDetector
     {
         sealed class IntList 

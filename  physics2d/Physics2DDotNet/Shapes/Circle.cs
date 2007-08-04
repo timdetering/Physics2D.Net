@@ -41,7 +41,9 @@ namespace Physics2DDotNet
     /// <summary>
     /// A Circle
     /// </summary>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
+#endif
     public sealed class Circle : Shape
     {
         private static Vector2D Zero = Vector2D.Zero;

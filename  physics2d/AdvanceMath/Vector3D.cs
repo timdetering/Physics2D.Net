@@ -29,19 +29,21 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Xml.Serialization;
 using AdvanceMath.Design;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+using System.Xml.Serialization;
+#endif
 namespace AdvanceMath
 {
     /// <summary>
     /// A Vector with 3 dimensions.
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
-    [StructLayout(LayoutKind.Sequential, Size = Vector3D.Size, Pack = 0), Serializable]
+    [StructLayout(LayoutKind.Sequential, Size = Vector3D.Size)]
     [AdvBrowsableOrder("X,Y,Z")]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector3D>))]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector3D>)), Serializable]
+#endif
     public struct Vector3D : IVector<Vector3D>
     {
         #region const fields
@@ -685,23 +687,29 @@ namespace AdvanceMath
         /// <summary>
         /// This is the X value.
         /// </summary>
-        [XmlAttribute]
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the X-Axis")]
+#endif
         public Scalar X;
         /// <summary>
         /// This is the Y value.
         /// </summary>
-        [XmlAttribute]
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Y-Axis")]
+#endif
         public Scalar Y;
         /// <summary>
         /// This is the Z value. 
         /// </summary>
-        [XmlAttribute]
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Z-Axis")]
+#endif
         public Scalar Z;
         #endregion
         #region constructors
@@ -767,7 +775,9 @@ namespace AdvanceMath
         /// Gets or Sets the Magnitude (Length) of the Vector3D. 
         /// </summary>
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector"/></remarks>
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Scalar Magnitude
         {
             get
@@ -1083,6 +1093,7 @@ namespace AdvanceMath
             return ToStringInternal(FormatString);
         }
 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         public static bool TryParse(string s, out Vector3D result)
         {
             if (s == null)
@@ -1108,6 +1119,7 @@ namespace AdvanceMath
                 return false;
             }
         }
+#endif
         [ParseMethod]
         public static Vector3D Parse(string s)
         {

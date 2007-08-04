@@ -22,19 +22,13 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Collections;
-using System.ComponentModel;
 using System.Reflection;
-using System.ComponentModel.Design.Serialization;
-using System.Globalization;
 
 namespace AdvanceMath.Design
 {
     [global::System.AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class AdvBrowsableOrderAttribute : Attribute
     {
-
         string[] order;
 
         /// <summary>
@@ -45,10 +39,7 @@ namespace AdvanceMath.Design
         {
             this.order = order.Split(',');
         }
-        /*public AdvBrowsableOrderAttribute(params string[] order)
-        {
-            this.order = order;
-        }*/
+
         public string[] Order
         {
             get { return order; }

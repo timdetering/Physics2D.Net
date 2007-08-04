@@ -27,11 +27,15 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Diagnostics;
+
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml.Serialization;
 using AdvanceMath.Design;
+
+
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+using System.Xml.Serialization;
+#endif
 
 
 // NOTE. The (x,y,z) coordinate system is assumed to be right-handed.
@@ -54,9 +58,11 @@ namespace AdvanceMath
     /// <summary>
     /// A 3x3 matrix which can represent rotations around axes.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Size = Matrix3x3.Size, Pack = 0), Serializable]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix3x3>))]
+    [StructLayout(LayoutKind.Sequential, Size = Matrix3x3.Size)]
     [AdvBrowsableOrder("Rx,Ry,Rz")]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix3x3>)), Serializable]
+#endif
     public struct Matrix3x3 : IMatrix<Matrix3x3, Vector3D>
     {
         #region const fields
@@ -1131,11 +1137,13 @@ namespace AdvanceMath
             ParseHelper.ParseMatrix<Matrix3x3>(s, ref rv);
             return rv;
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         public static bool TryParse(string s, out Matrix3x3 result)
         {
             result = Zero;
             return ParseHelper.TryParseMatrix<Matrix3x3>(s, ref result);
         }
+#endif
 
 
         public static bool Equals(Matrix3x3 left, Matrix3x3 right)
@@ -1160,11 +1168,17 @@ namespace AdvanceMath
         // | m00 m01 m02 |
         // | m10 m11 m12 |
         // | m20 m21 m22 |
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Scalar m00, m01, m02;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Scalar m10, m11, m12;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Scalar m20, m21, m22;
 
         #endregion
@@ -1203,7 +1217,9 @@ namespace AdvanceMath
         #endregion
         #region Properties
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The First row of the Matrix3x3")]
+#endif
         public Vector3D Rx
         {
             get
@@ -1222,7 +1238,9 @@ namespace AdvanceMath
             }
         }
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The Second row of the Matrix3x3")]
+#endif
         public Vector3D Ry
         {
             get
@@ -1241,7 +1259,9 @@ namespace AdvanceMath
             }
         }
         [AdvBrowsable]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The Third row of the Matrix3x3")]
+#endif
         public Vector3D Rz
         {
             get
@@ -1259,7 +1279,9 @@ namespace AdvanceMath
                 m22 = value.Z;
             }
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Vector3D Cx
         {
             get
@@ -1273,7 +1295,9 @@ namespace AdvanceMath
                 this.m20 = value.Z;
             }
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Vector3D Cy
         {
             get
@@ -1287,7 +1311,9 @@ namespace AdvanceMath
                 this.m21 = value.Z;
             }
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
+#endif
         public Vector3D Cz
         {
             get

@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ImplicitCastCollection.cs" />
+    <Compile Include="Collections\ReadOnlyThreadSafeList.cs" />
     <Compile Include="DataTypes\CollectionEventArgs.cs" />
     <Compile Include="DataTypes\MassInfo.cs" />
     <Compile Include="DataTypes\RemovedEventArgs.cs" />
@@ -76,14 +77,6 @@
     <Compile Include="Solvers\ISequentialImpulsesJoint.cs" />
     <Compile Include="Solvers\SequentialImpulses.cs" />
     <Compile Include="Shapes\Shape.cs" />
-    <Compile Include="Collections\AdvReaderWriterLock.cs" />
-    <Compile Include="Collections\WrappedCollection.cs" />
-    <Compile Include="Collections\WrappedDictonary.cs" />
-    <Compile Include="Collections\WrappedEnumerable.cs" />
-    <Compile Include="Collections\WrappedEnumerator.cs" />
-    <Compile Include="Collections\WrappedList.cs" />
-    <Compile Include="Collections\ThreadSafeDictonary.cs" />
-    <Compile Include="Collections\ThreadSafeList.cs" />
     <Compile Include="DataTypes\UpdatedEventArgs.cs" />
     <Compile Include="PhysicsTimer.cs" />
   </ItemGroup>

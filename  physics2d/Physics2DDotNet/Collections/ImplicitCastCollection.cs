@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Threading;
 namespace Physics2DDotNet.Collections
 {
+
     public class ImplicitCastCollection<TBase, TParent> : IList<TBase>
         where TParent : TBase
     {

@@ -39,9 +39,11 @@ namespace AdvanceMath.Geometry2D
 
 
 
-    [StructLayout(LayoutKind.Sequential, Size = BoundingCircle.Size, Pack = 0), Serializable]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingCircle>))]
+    [StructLayout(LayoutKind.Sequential, Size = BoundingCircle.Size)]
     [AdvBrowsableOrder("Position,Radius")]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingCircle>)), Serializable]
+#endif
     public struct BoundingCircle : IEquatable<BoundingCircle>
     {
         public const int Size = Vector2D.Size + sizeof(Scalar);

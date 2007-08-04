@@ -24,16 +24,17 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.ComponentModel.Design.Serialization;
+#endif
 using System.Globalization;
 
 namespace AdvanceMath.Design
 {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     public class AdvTypeConverter<TType> : ExpandableObjectConverter
     {
         ConstructorInfo instanceCtor;
@@ -172,4 +173,5 @@ namespace AdvanceMath.Design
         }
 
     }
+#endif
 }

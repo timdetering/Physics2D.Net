@@ -30,21 +30,26 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Runtime.Serialization;
 using AdvanceMath;
 using AdvanceMath.Design;
 using Physics2DDotNet.Math2D;
-
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+using System.Runtime.Serialization;
+#endif
 namespace Physics2DDotNet
 {
 
     /// <summary>
     /// This class Stores mass information and Moment of Inertia Together since they are very closly related.
     /// </summary>
-    [Serializable]
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>))]
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>)),Serializable]
+#endif
     [AdvBrowsableOrder("Mass,MomentofInertia")]
-    public sealed class MassInfo : IDeserializationCallback
+    public sealed class MassInfo 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+        : IDeserializationCallback
+#endif
     {
 
         #region static methods
@@ -99,11 +104,17 @@ namespace Physics2DDotNet
         #region fields
         private Scalar mass;
         private Scalar momentofInertia;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
+#endif
         private Scalar massInv;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
+#endif
         private Scalar momentofInertiaInv;
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
+#endif
         private Scalar accelerationDueToGravity;
         #endregion
         #region constructors
