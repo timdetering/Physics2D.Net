@@ -33,8 +33,9 @@ using AdvanceMath;
 
 namespace Physics2DDotNet
 {
+
     /// <summary>
-    /// A Gravity Field that apply gravity pulling in one direction regardless of the Body's position.
+    /// A Gravity Field that apply gravity pulling in one direction regardless of the Body's position with zero dropoff.
     /// </summary>
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]

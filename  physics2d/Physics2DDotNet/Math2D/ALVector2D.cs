@@ -24,7 +24,6 @@
 
 
 
-
 #if UseDouble
 using Scalar = System.Double;
 #else

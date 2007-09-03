@@ -162,7 +162,25 @@ namespace AdvanceMath.Geometry2D
             ContainsExclusive(vertexes, ref point, out contains);
             if (contains == ContainmentType.Contains) { result = -result; }
         }
+       /* public static void GetDistance2(Vector2D[] vertexes, ref Vector2D point, out Scalar result)
+        {
+            ContainmentType contains;
+            ContainsExclusive(vertexes, ref point, out contains);
+            Vector2D v1, v2, normal, distance;
+            Scalar dot;
+            v1 = vertexes[vertexes.Length - 1];
+            for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
+            {
+                v2 = vertexes[index];
+                Vector2D.Subtract(ref point, ref v1, out distance);
+                Vector2D.Subtract(ref v2, ref v1, out normal);
+                Vector2D.GetLeftHandNormal(ref normal, out normal);
+                Vector2D.Normalize(ref normal, out normal);
 
+                Vector2D.Dot(ref normal, ref edge, out dot);
+
+            }
+        }*/
 
 
 

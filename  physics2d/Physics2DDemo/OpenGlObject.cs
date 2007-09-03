@@ -379,11 +379,11 @@ namespace Physics2DDemo
         }
         public void Dispose()
         {
-            if (Gl.glIsList(list) != 0)
+            if (list != -1)
             {
                 Gl.glDeleteLists(list, 1);
+                list = -1;
             }
-            list = -1;
         }
     }
 }

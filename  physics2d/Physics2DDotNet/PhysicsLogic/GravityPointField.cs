@@ -33,7 +33,9 @@ using AdvanceMath;
 
 namespace Physics2DDotNet
 {
-
+    /// <summary>
+    /// A PhysicsLogic to causes a Gravity a a certain point with zero dropoff.
+    /// </summary>
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
 #endif
@@ -41,11 +43,26 @@ namespace Physics2DDotNet
     {
         Vector2D location;
         Scalar gravity;
+        /// <summary>
+        /// Creates a new GravityPointField Instance.
+        /// </summary>
+        /// <param name="location">The location of the Gravity point.</param>
+        /// <param name="gravity"></param>
+        /// <param name="lifetime"></param>
         public GravityPointField(Vector2D location, Scalar gravity, Lifespan lifetime)
             : base(lifetime)
         {
             this.location = location;
             this.gravity = gravity;
+        }
+        public Vector2D Location {
+            get { return location; }
+            set { location = value; }
+        }
+        public Scalar Gravity
+        {
+            get { return gravity; }
+            set { gravity = value; }
         }
         protected internal override void RunLogic(Scalar dt)
         {

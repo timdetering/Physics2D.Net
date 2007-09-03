@@ -44,7 +44,7 @@ namespace Physics2DDotNet
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Size = PhysicsState.Size)]
     [AdvBrowsableOrder("Position,Velocity,Acceleration,ForceAccumulator")]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360  
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<PhysicsState>)), Serializable]
 #endif
     public sealed class PhysicsState

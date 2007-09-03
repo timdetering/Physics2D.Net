@@ -33,6 +33,9 @@ using AdvanceMath;
 
 namespace Physics2DDotNet
 {
+    /// <summary>
+    /// A PhysicsLogic to causes a Body to have a realistic pull of Gravity with a exponential drop-off. 
+    /// </summary>
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
 #endif
@@ -40,6 +43,20 @@ namespace Physics2DDotNet
     {
         Scalar metersPerDistanceUnit;
         Body body;
+        /// <summary>
+        /// Creates a new GravityPointMass Instance.
+        /// </summary>
+        /// <param name="body">The body that will be the source of gravity.</param>
+        /// <param name="lifetime">A object Describing how long the object will be in the engine.</param>
+        public GravityPointMass(Body body, Lifespan lifetime):
+            this(body,1,lifetime)
+        {}
+        /// <summary>
+        /// Creates a new GravityPointMass Instance.
+        /// </summary>
+        /// <param name="body">The body that will be the source of gravity.</param>
+        /// <param name="metersPerDistanceUnit">The scale of of the universe.</param>
+        /// <param name="lifetime">A object Describing how long the object will be in the engine.</param>
         public GravityPointMass(Body body, Scalar metersPerDistanceUnit, Lifespan lifetime)
             : base(lifetime)
         {

@@ -235,7 +235,9 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.T:
                     DemoT();
                     break;
-
+                case SdlDotNet.Input.Key.Y:
+                    DemoY();
+                    break;
                 case SdlDotNet.Input.Key.LeftArrow:
                     torque += torqueMag;
                     //force += new Vector2D(-forceMag, 0);
@@ -911,9 +913,9 @@ namespace Physics2DDemo
                 Body particle = new Body(
                     new PhysicsState(new ALVector2D(0, position)),
                     new Particle(),
-                    1,
+                    1f,
                    new Coefficients(1,.5f,.5f),// coefficients.Duplicate(),
-                    new Lifespan(.5f));
+                    new Lifespan(.9f));
                 Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((float)rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
                 particle.State.Velocity.Linear = direction * rand.Next(200, 1001) + velocity;
@@ -1121,6 +1123,40 @@ namespace Physics2DDemo
                     Body e =
                     new Body(
                          new PhysicsState(new ALVector2D(0, new Vector2D(x + (float)rand.NextDouble() * 900000, y + (float)rand.NextDouble() * 900000))),
+                         shape,
+                         20,
+                         coefficients.Duplicate(),
+                         new Lifespan());
+
+
+                    bodies.Add(e);
+                }
+            }
+            AddGlObjectRange(bodies);
+            engine.AddBodyRange(bodies);
+        }
+        void AddCircles_StressTest()
+        {
+
+            float box = 500;
+            float xmin = 0;
+            float xmax = box;
+            float ymin = 0;
+            float ymax = box;
+
+            float size = 15;
+            float spacing = 2;
+
+           // Particle shape = new Particle(); 
+            Circle shape = new Circle(7, 10);
+            List<Body> bodies = new List<Body>();
+            for (float x = xmin; x < xmax; x += spacing + size)
+            {
+                for (float y = ymax; y > ymin; y -= spacing + size)
+                {
+                    Body e =
+                    new Body(
+                         new PhysicsState(new ALVector2D(0, new Vector2D(x, y))),
                          shape,
                          20,
                          coefficients.Duplicate(),
@@ -1422,7 +1458,13 @@ namespace Physics2DDemo
 
             waitHandle.Set();
         }
-
+        void DemoY()
+        {
+            waitHandle.Reset();
+            Reset(false);
+            AddCircles_StressTest();
+            waitHandle.Set();
+        }
 
 
 
@@ -1533,7 +1575,6 @@ namespace Physics2DDemo
                 Gl.glDisable(Gl.GL_TEXTURE_2D);
                 Gl.glDisable(Gl.GL_BLEND);
             }
-
         }
         #endregion
     }
