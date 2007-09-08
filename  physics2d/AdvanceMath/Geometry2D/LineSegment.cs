@@ -105,17 +105,23 @@ namespace AdvanceMath.Geometry2D
             }
             result = -1;
         }
+
         public static void GetDistance(ref Vector2D vertex1, ref Vector2D vertex2, ref Vector2D point, out Scalar result)
         {
             Scalar edgeLength, nProj, tProj;
-            Vector2D tangent, normal, local;
+            Vector2D edge, local;//, normal;
 
             Vector2D.Subtract(ref point, ref vertex2, out local);
-            Vector2D.Subtract(ref vertex1, ref vertex2, out tangent);
-            Vector2D.Normalize(ref tangent, out edgeLength, out tangent);
-            Vector2D.GetRightHandNormal(ref tangent, out normal);
-            Vector2D.Dot(ref local, ref normal, out nProj);
-            Vector2D.Dot(ref local, ref tangent, out tProj);
+            Vector2D.Subtract(ref vertex1, ref vertex2, out edge);
+            Vector2D.Normalize(ref edge, out edgeLength, out edge);
+
+            //Vector2D.GetRightHandNormal(ref edge, out normal);
+           // Vector2D.Dot(ref local, ref normal, out nProj);
+           // Vector2D.Dot(ref local, ref edge, out tProj);
+
+            nProj = local.Y * edge.X - local.X * edge.Y;
+            tProj = local.X * edge.X + local.Y * edge.Y;
+
             if (tProj < 0)
             {
                 result = MathHelper.Sqrt(tProj * tProj + nProj * nProj);
@@ -130,7 +136,6 @@ namespace AdvanceMath.Geometry2D
                 result = Math.Abs(nProj);
             }
         }
-
         [AdvBrowsable]
         public Vector2D Vertex1;
         [AdvBrowsable]

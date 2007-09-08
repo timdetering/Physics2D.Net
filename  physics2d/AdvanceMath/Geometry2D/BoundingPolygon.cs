@@ -50,13 +50,14 @@ namespace AdvanceMath.Geometry2D
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
             int count = 0; //intersection count
-            Vector2D v1 = vertexes[vertexes.Length - 1];
-            Vector2D v2;
+            bool t1;
+            Vector2D v1, v2;
             Scalar temp;
+            v1 = vertexes[vertexes.Length - 1];
             for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
             {
                 v2 = vertexes[index];
-                bool t1 = (v1.Y <= point.Y);
+                t1 = (v1.Y <= point.Y);
                 if (t1 ^ (v2.Y <= point.Y))
                 {
                     temp = ((point.Y - v1.Y) * (v2.X - v1.X) - (point.X - v1.X) * (v2.Y - v1.Y));
@@ -136,7 +137,7 @@ namespace AdvanceMath.Geometry2D
             GetDistance(vertexes, ref point, out result);
             return result;
         }
-        public static void GetDistance(Vector2D[] vertexes, ref Vector2D point, out Scalar result)
+        /*public static void GetDistance(Vector2D[] vertexes, ref Vector2D point, out Scalar result)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
@@ -161,27 +162,32 @@ namespace AdvanceMath.Geometry2D
             ContainmentType contains;
             ContainsExclusive(vertexes, ref point, out contains);
             if (contains == ContainmentType.Contains) { result = -result; }
-        }
-       /* public static void GetDistance2(Vector2D[] vertexes, ref Vector2D point, out Scalar result)
+        }*/
+        public static void GetDistance(Vector2D[] vertexes, ref Vector2D point, out Scalar result)
         {
-            ContainmentType contains;
-            ContainsExclusive(vertexes, ref point, out contains);
-            Vector2D v1, v2, normal, distance;
-            Scalar dot;
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
+            int count = 0; //intersection count
+            bool t1;
+            Vector2D v1, v2;
+            Scalar temp,distance,goodDistance;
             v1 = vertexes[vertexes.Length - 1];
+            goodDistance = Scalar.PositiveInfinity;
             for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
             {
                 v2 = vertexes[index];
-                Vector2D.Subtract(ref point, ref v1, out distance);
-                Vector2D.Subtract(ref v2, ref v1, out normal);
-                Vector2D.GetLeftHandNormal(ref normal, out normal);
-                Vector2D.Normalize(ref normal, out normal);
-
-                Vector2D.Dot(ref normal, ref edge, out dot);
-
+                t1 = (v1.Y <= point.Y);
+                if (t1 ^ (v2.Y <= point.Y))
+                {
+                    temp = ((point.Y - v1.Y) * (v2.X - v1.X) - (point.X - v1.X) * (v2.Y - v1.Y));
+                    if (t1) { if (temp > 0) { count++; } }
+                    else { if (temp < 0) { count--; } }
+                }
+                LineSegment.GetDistance(ref v1, ref v2, ref point, out distance);
+                if (distance < goodDistance) { goodDistance = distance; }
             }
-        }*/
-
+            result = (count != 0) ? (-goodDistance) : (goodDistance);
+        }
 
 
         /// <summary>

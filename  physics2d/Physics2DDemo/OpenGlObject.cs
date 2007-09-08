@@ -255,7 +255,7 @@ namespace Physics2DDemo
             }
             else if (entity.Shape is Physics2DDotNet.Particle)
             {
-                
+
                 Gl.glBegin(Gl.GL_POINTS);
                 Gl.glColor3f(1, 0, 0);
                 //Gl.glColor3d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
@@ -270,23 +270,23 @@ namespace Physics2DDemo
                 Gl.glLineWidth(1);
                 RaySegments collection = (RaySegments)entity.Shape;
                 Gl.glBegin(Gl.GL_LINES);
-                for(int index = 0; index < collection.Segments.Length;++index)
+                for (int index = 0; index < collection.Segments.Length; ++index)
                 {
                     Gl.glColor3f(1, 0, 1);
                     RaySegment ray = collection.Segments[index];
                     Gl.glVertex2f(ray.RayInstance.Origin.X, ray.RayInstance.Origin.Y);
-                     float length;
-                     if (distances[index] == -1)
-                     {
-                         length = ray.Length;
-                     }
-                     else
-                     {
-                         length = distances[index];
-                     }
-                     Vector2D temp = ray.RayInstance.Origin + ray.RayInstance.Direction * length;
-                     Gl.glColor3f(1, 1, 1);
-                     Gl.glVertex2f(temp.X, temp.Y);
+                    float length;
+                    if (distances[index] == -1)
+                    {
+                        length = ray.Length;
+                    }
+                    else
+                    {
+                        length = distances[index];
+                    }
+                    Vector2D temp = ray.RayInstance.Origin + ray.RayInstance.Direction * length;
+                    Gl.glColor3f(1, 1, 1);
+                    Gl.glVertex2f(temp.X, temp.Y);
                 }
                 Gl.glEnd();
             }

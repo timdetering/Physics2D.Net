@@ -3,6 +3,8 @@ NEXTVERSION:
 added: "#if !CompactFramework ... #endif"  statements for all non Compact framework compatible code.
 removed: some unneeded code that was not supported by compact framework.
 changed: now compiles on compact framework.
+Fixed: a bug in BoundingPolygon.GetDistance. It may be slower as a result.
+Changed: LineSegment.GetDistance to be a little more optimized.
 
 Physics2D.Net
 NEXTVERSION:
@@ -13,6 +15,7 @@ Added: CFReaderWriterLock which a class to replace the .Net frameworks ReaderWri
 Added: ReadOnlyThreadSafeList to replace all those classes in collections.
 changed: some code to be do things in a more compact framework friendly manner.
 changed: now compiles on compact framework.
+Added: The Serializable Attribute to RaySegment and RaySegmentIntersectionInfo.
 
 AdvanceMath
 1.6.1.0:
