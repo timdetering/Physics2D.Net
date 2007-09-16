@@ -5,6 +5,7 @@ removed: some unneeded code that was not supported by compact framework.
 changed: now compiles on compact framework.
 Fixed: a bug in BoundingPolygon.GetDistance. It may be slower as a result.
 Changed: LineSegment.GetDistance to be a little more optimized.
+Fixed: a bug with AdvanceMath.Design.AdvPropertyDescriptor.IsReadOnly.
 
 Physics2D.Net
 NEXTVERSION:

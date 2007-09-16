@@ -76,7 +76,7 @@ namespace AdvanceMath.Design
         }
         public override bool IsReadOnly
         {
-            get { return !(property == null || !property.CanWrite); }
+            get { return property != null && !property.CanWrite; }
         }
         public override Type PropertyType
         {
