@@ -6,6 +6,8 @@ changed: now compiles on compact framework.
 Fixed: a bug in BoundingPolygon.GetDistance. It may be slower as a result.
 Changed: LineSegment.GetDistance to be a little more optimized.
 Fixed: a bug with AdvanceMath.Design.AdvPropertyDescriptor.IsReadOnly.
+Fixed: a few problems pointed out by AeHNC in AdvanceMath.Design
+Removed: useless using statements
 
 Physics2D.Net
 NEXTVERSION:
@@ -17,6 +19,7 @@ Added: ReadOnlyThreadSafeList to replace all those classes in collections.
 changed: some code to be do things in a more compact framework friendly manner.
 changed: now compiles on compact framework.
 Added: The Serializable Attribute to RaySegment and RaySegmentIntersectionInfo.
+Changed: The physicsTimer so it no longer tries to abort the Physics thread when it is disposed. (people had security problems with this)
 
 AdvanceMath
 1.6.1.0:

@@ -30,8 +30,6 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace AdvanceMath
 {

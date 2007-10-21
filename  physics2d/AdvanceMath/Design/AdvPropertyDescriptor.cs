@@ -31,7 +31,7 @@ using System.Reflection;
 namespace AdvanceMath.Design
 {
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    public class AdvPropertyDescriptor : PropertyDescriptor, IEquatable<AdvPropertyDescriptor>
+    public class AdvPropertyDescriptor : PropertyDescriptor, ICustomTypeDescriptor, IEquatable<AdvPropertyDescriptor>
     {
         private static Attribute[] GetAttributes(MemberInfo property)
         {
@@ -68,6 +68,11 @@ namespace AdvanceMath.Design
         }
         public override object GetValue(object component)
         {
+            if (component is PropertyDescriptor)
+            {
+                Object result = ((PropertyDescriptor)component).GetValue(null);
+                if (result.GetType() != ComponentType) { return result; }
+            }
             if (field == null)
             {
                 return property.GetValue(component, null);
@@ -133,6 +138,60 @@ namespace AdvanceMath.Design
         {
             return info.Equals(other.info);
         }
+
+
+        #region ICustomTypeDescriptor Members
+        AttributeCollection ICustomTypeDescriptor.GetAttributes()
+        {
+            return TypeDescriptor.GetAttributes(ComponentType);
+        }
+        string ICustomTypeDescriptor.GetClassName()
+        {
+            return ComponentType.Name;
+        }
+        string ICustomTypeDescriptor.GetComponentName()
+        {
+            return null;
+        }
+        TypeConverter ICustomTypeDescriptor.GetConverter()
+        {
+            return null;
+        }
+        EventDescriptor ICustomTypeDescriptor.GetDefaultEvent()
+        {
+            return null;
+        }
+        PropertyDescriptor ICustomTypeDescriptor.GetDefaultProperty()
+        {
+            return this;
+        }
+        object ICustomTypeDescriptor.GetEditor(Type editorBaseType)
+        {
+            return null;
+        }
+
+        EventDescriptorCollection ICustomTypeDescriptor.GetEvents()
+        {
+            return EventDescriptorCollection.Empty;
+        }
+        EventDescriptorCollection ICustomTypeDescriptor.GetEvents(Attribute[] attributes)
+        {
+            return EventDescriptorCollection.Empty;
+        }
+
+        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties()
+        {
+            return TypeDescriptor.GetConverter(ComponentType).GetProperties(null);
+        }
+        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties(Attribute[] attributes)
+        {
+            return TypeDescriptor.GetConverter(ComponentType).GetProperties(null, null, attributes);
+        }
+        object ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor pd)
+        {
+            return this;
+        }
+        #endregion
     }
 #endif
 }

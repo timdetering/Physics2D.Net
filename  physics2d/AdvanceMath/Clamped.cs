@@ -29,7 +29,6 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Runtime.InteropServices;
 using AdvanceMath.Design;
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360  && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;

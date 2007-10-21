@@ -257,6 +257,7 @@ namespace Physics2DDotNet
                     }
                 }
             }
+            state = TimerState.Disposed;
         }
         protected virtual void Dispose(bool disposing)
         {
@@ -268,11 +269,6 @@ namespace Physics2DDotNet
                     waitHandle.Set();
                     watch.Stop();
                     isRunning = false;
-                    state = TimerState.Disposed;
-                    if (engineThread != null && !engineThread.Join((int)(targetInterval * 1000)))
-                    {
-                        engineThread.Abort();
-                    }
                     state = TimerState.Disposed;
                     waitHandle.Close();
                 }

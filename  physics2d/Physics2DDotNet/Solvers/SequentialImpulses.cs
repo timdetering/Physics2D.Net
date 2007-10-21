@@ -152,7 +152,7 @@ namespace Physics2DDotNet.Solvers
             public void Update()
             {
                 updated = true;
-                if (circle1 != null && circle2 != null && 
+                if (circle1 != null && circle2 != null &&
                     !body1.IsTransformed && !body2.IsTransformed)
                 {
                     CollideCircles();
@@ -161,6 +161,10 @@ namespace Physics2DDotNet.Solvers
                 {
                     Collide();
                 }
+                UpdateContacts();
+            }
+            void UpdateContacts()
+            {
                 if (contacts.Count == 0)
                 {
                     contactsArray = Empty;
@@ -303,7 +307,6 @@ namespace Physics2DDotNet.Solvers
             }
             public void PreApply(Scalar dtInv)
             {
-
 
                 Scalar mass1Inv = body1.Mass.MassInv;
                 Scalar I1Inv = body1.Mass.MomentofInertiaInv;

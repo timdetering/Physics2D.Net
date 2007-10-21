@@ -33,7 +33,6 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-//using Physics2D.CollisionDetection;
 using Physics2DDotNet.Math2D;
 using AdvanceMath;
 using System.Runtime.InteropServices;
@@ -41,7 +40,6 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.AccessControl;
 
-//using ExceptionEventHandler = System.EventHandler<ConsoleDriver.ExceptionEventArgs>;
 using System.Reflection;
 
 using System.Diagnostics;

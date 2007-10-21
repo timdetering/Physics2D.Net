@@ -35,10 +35,6 @@ using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
 
- 
-
-
-
     [StructLayout(LayoutKind.Sequential, Size = BoundingCircle.Size)]
     [AdvBrowsableOrder("Position,Radius")]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 

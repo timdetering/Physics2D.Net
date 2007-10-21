@@ -27,9 +27,7 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-
 using System.Runtime.InteropServices;
-using System.Text;
 using AdvanceMath.Design;
 
 

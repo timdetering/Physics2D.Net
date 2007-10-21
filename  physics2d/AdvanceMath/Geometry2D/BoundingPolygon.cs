@@ -30,8 +30,6 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Runtime.InteropServices;
-using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 

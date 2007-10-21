@@ -766,8 +766,8 @@ namespace Physics2DDemo
             float spacing = .01f;
             float Xspacing = 1f;
 
-            float xmin = 300;
-            float xmax = 800;
+            float xmin = 400;
+            float xmax = 850;
             float ymin = 50;
             float ymax = 720 - size / 2;
             float step = (size + spacing + Xspacing) / 2;

@@ -30,8 +30,6 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Runtime.InteropServices;
-
 
 
 namespace AdvanceMath
@@ -42,7 +40,6 @@ namespace AdvanceMath
 
     public static class OperationHelper
     {
-
         public static TResult[] ArrayRefOp<TLeft, TRight, TResult>(TLeft[] leftArray, ref TRight right, RefOperation<TLeft, TRight, TResult> operation)
         {
             TResult[] result = new TResult[leftArray.Length];
@@ -94,8 +91,6 @@ namespace AdvanceMath
             }
         }
 
-
-
         public static TResult[] ArrayValOp<TLeft, TRight, TResult>(TLeft[] leftArray, TRight right, ValOperation<TLeft, TRight, TResult> operation)
         {
             TResult[] result = new TResult[leftArray.Length];
@@ -146,7 +141,5 @@ namespace AdvanceMath
                 result[pos] = operation(leftArray[pos], rightArray[pos]);
             }
         }
-
-
     }
 }

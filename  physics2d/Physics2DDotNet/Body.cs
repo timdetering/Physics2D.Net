@@ -319,7 +319,7 @@ namespace Physics2DDotNet
             }
         }
         /// <summary>
-        /// Gets a object Solver Defined object.
+        /// Gets a Solver Defined object.
         /// </summary>
         public object SolverTag
         {
@@ -327,7 +327,7 @@ namespace Physics2DDotNet
             internal set { solverTag = value; }
         }
         /// <summary>
-        /// Gets a object Detector Defined object.
+        /// Gets a Detector Defined object.
         /// </summary>
         public object DetectorTag
         {

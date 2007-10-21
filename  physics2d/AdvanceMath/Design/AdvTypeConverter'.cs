@@ -37,6 +37,7 @@ namespace AdvanceMath.Design
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     public class AdvTypeConverter<TType> : ExpandableObjectConverter
     {
+        ConstructorInfo instanceNoArgsCtor;
         ConstructorInfo instanceCtor;
         MethodInfo parse;
         PropertyDescriptorCollection descriptions;
@@ -48,6 +49,7 @@ namespace AdvanceMath.Design
             this.descriptions = AdvBrowsableAttribute.GetDispMembers(t);
             if (descriptions != null)
             {
+                this.instanceNoArgsCtor = t.GetConstructor(Type.EmptyTypes);
                 this.instanceCtor = InstanceConstructorAttribute.GetConstructor(t, out instanceCtorParamNames);
                 if (this.instanceCtor != null)
                 {
@@ -71,7 +73,6 @@ namespace AdvanceMath.Design
                     }
                 }
             }
-            Console.WriteLine();
         }
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -82,13 +83,15 @@ namespace AdvanceMath.Design
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return
-                (instanceCtor != null && destinationType == typeof(InstanceDescriptor)) ||
+                ((instanceCtor != null || instanceNoArgsCtor != null) &&
+                destinationType == typeof(InstanceDescriptor)) ||
                 base.CanConvertTo(context, destinationType);
         }
         public override bool GetCreateInstanceSupported(ITypeDescriptorContext context)
         {
             return
                 instanceCtor != null ||
+                instanceNoArgsCtor != null ||
                 base.GetCreateInstanceSupported(context);
         }
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
@@ -118,29 +121,49 @@ namespace AdvanceMath.Design
         }
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (instanceCtor != null &&
-                value is TType &&
+            if (value is TType &&
                 destinationType == typeof(InstanceDescriptor))
             {
-
-                return new InstanceDescriptor(instanceCtor, GetInstanceDescriptorObjects(value));
+                if (instanceCtor != null)
+                {
+                    return new InstanceDescriptor(instanceCtor, GetInstanceDescriptorObjects(value));
+                }
+                else if (instanceNoArgsCtor != null)
+                {
+                    return new InstanceDescriptor(instanceNoArgsCtor, null);
+                }
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
         public override object CreateInstance(ITypeDescriptorContext context, IDictionary propertyValues)
         {
-            if (instanceCtor != null)
+            try
             {
-                try
+                PropertyDescriptor propertyDescriptor = context.Instance as PropertyDescriptor;
+                object result = null;
+                if (instanceNoArgsCtor != null)
                 {
-                    return instanceCtor.Invoke(GetInstanceDescriptorObjects(propertyValues));
+                    result = instanceNoArgsCtor.Invoke(null);
+                    foreach (string name in propertyValues.Keys)
+                    {
+                        descriptions.Find(name, false).SetValue(result, propertyValues[name]);
+                    }
                 }
-                catch (TargetInvocationException ex)
+                else if (instanceCtor != null)
                 {
-                    throw ex.InnerException;
+                    result = instanceCtor.Invoke(GetInstanceDescriptorObjects(propertyValues));
+                }
+                if (result != null)
+                {
+                    if (propertyDescriptor != null)
+                    {
+                        propertyDescriptor.SetValue(null, result);
+                    }
+                    return result;
                 }
             }
+            catch (TargetInvocationException ex) { throw ex.InnerException; }
             return base.CreateInstance(context, propertyValues);
         }
         public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
@@ -157,12 +180,16 @@ namespace AdvanceMath.Design
             object[] rv = new object[instanceCtorParamNames.Length];
             for (int index = 0; index < instanceCtorParamNames.Length; ++index)
             {
-                rv[index] = propertyValues[instanceCtorParamNames[index]];
+                rv[index] = propertyValues[descriptions.Find(instanceCtorParamNames[index], false).Name];
             }
             return rv;
         }
         private object[] GetInstanceDescriptorObjects(object value)
         {
+            if (value is IDictionary)
+            {
+                return GetInstanceDescriptorObjects((IDictionary)value);
+            }
             object[] rv = new object[instanceCtorParamNames.Length];
             for (int index = 0; index < instanceCtorParamNames.Length; ++index)
             {
