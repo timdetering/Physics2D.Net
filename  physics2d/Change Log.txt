@@ -20,6 +20,8 @@ changed: some code to be do things in a more compact framework friendly manner.
 changed: now compiles on compact framework.
 Added: The Serializable Attribute to RaySegment and RaySegmentIntersectionInfo.
 Changed: The physicsTimer so it no longer tries to abort the Physics thread when it is disposed. (people had security problems with this)
+Changed: The physicsTimer to no longer use the Stopwatch class.
+fixed: a bug with PhysicsTimer.IsRunning that would cause it not to unpause.
 
 AdvanceMath
 1.6.1.0:

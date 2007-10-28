@@ -31,59 +31,10 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Threading;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-using System.Diagnostics;
-#endif
 
 
 namespace Physics2DDotNet
 {
-#if CompactFramework || WindowsCE || PocketPC || XBOX360 
-    class Stopwatch
-    {
-        bool started = false;
-        TimeSpan timeSpan = TimeSpan.Zero;
-        DateTime time;
-        public long ElapsedMilliseconds
-        {
-            get
-            {
-                if (started)
-                {
-                    TimeSpan result = DateTime.Now.Subtract(time);
-                    return result.Milliseconds;
-                }
-                else
-                {
-                    return timeSpan.Milliseconds;
-                }
-            }
-        }
-        public void Reset()
-        {
-            started = false;
-            timeSpan = TimeSpan.Zero;
-        }
-        public void Start()
-        {
-            if (!started)
-            {
-                started = true;
-                time = DateTime.Now.Subtract(timeSpan);
-            }
-        }
-        public void Stop()
-        {
-            if (started)
-            {
-                timeSpan += DateTime.Now.Subtract(time);
-                started = false;
-            }
-        }
-    }
-#endif
-
-
 
     /// <summary>
     /// The State of a PhysicsTimer
@@ -125,11 +76,12 @@ namespace Physics2DDotNet
         bool isDisposed;
         static int threadCount;
         Scalar targetInterval;
-        Stopwatch watch;
         PhysicsCallback callback;
-        ManualResetEvent waitHandle;
+        AutoResetEvent waitHandle;
         Thread engineThread;
         bool isRunning;
+        DateTime lastRun;
+
         /// <summary>
         /// Creates a new PhysicsTimer Instance.
         /// </summary>
@@ -141,8 +93,7 @@ namespace Physics2DDotNet
             if (targetInterval <= 0) { throw new ArgumentOutOfRangeException("targetDt"); }
             this.targetInterval = targetInterval;
             this.callback = callback;
-            this.waitHandle = new ManualResetEvent(false);
-            this.watch = new Stopwatch();
+            this.waitHandle = new AutoResetEvent(true);
         }
         /// <summary>
         /// Gets and Sets if the PhysicsTimer is currently calling the Callback.
@@ -156,12 +107,11 @@ namespace Physics2DDotNet
             set
             {
                 if (isDisposed) { throw new ObjectDisposedException(this.ToString()); }
-                if (isRunning ^ value)
+                if (this.isRunning ^ value)
                 {
-                    isRunning = value;
+                    this.isRunning = value;
                     if (value)
                     {
-                        watch.Start();
                         if (this.engineThread == null)
                         {
                             this.engineThread = new Thread(EngineProcess);
@@ -172,12 +122,7 @@ namespace Physics2DDotNet
                         else
                         {
                             waitHandle.Set();
-                            waitHandle.Reset();
                         }
-                    }
-                    else
-                    {
-                        watch.Stop();
                     }
                 }
             }
@@ -224,13 +169,13 @@ namespace Physics2DDotNet
                 if (!isRunning)
                 {
                     state = TimerState.Paused;
-                    watch.Reset();
                     waitHandle.WaitOne(Timeout.Infinite, false);
-                    watch.Start();
+                    lastRun = DateTime.Now;
+                    extraDt = 0;
                 }
                 else
                 {
-                    dt = watch.ElapsedMilliseconds / 1000f;
+                    dt = (Scalar)(DateTime.Now.Subtract(lastRun).TotalMilliseconds / 1000);
                     extraDt += dt;
                     if (extraDt < targetInterval)
                     {
@@ -251,8 +196,7 @@ namespace Physics2DDotNet
                         {
                             state = TimerState.Normal;
                         }
-                        watch.Reset();
-                        watch.Start();
+                        lastRun = DateTime.Now;
                         callback(targetInterval);
                     }
                 }
@@ -267,7 +211,6 @@ namespace Physics2DDotNet
                 {
                     isDisposed = true;
                     waitHandle.Set();
-                    watch.Stop();
                     isRunning = false;
                     state = TimerState.Disposed;
                     waitHandle.Close();
