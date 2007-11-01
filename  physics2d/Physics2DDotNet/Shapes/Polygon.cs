@@ -147,11 +147,14 @@ namespace Physics2DDotNet
     {
         #region static methods
         /// <summary>
-        /// Takes a 2D boolean array with a true value representing a bitmap
-        /// and converts it to an array of vertex that surround that bitmap.
+        /// Takes a 2D Boolean array with a true value representing a collidable pixel and converts 
+        /// it to an array of vertex that surrounds that bitmap. The bitmap should be a single piece 
+        /// if there are many pieces it will only return the geometry of the first piece it comes 
+        /// across. Make sure there are at least 3 pixels in a piece otherwise an exception will be 
+        /// thrown (it wont be a polygon). 
         /// </summary>
         /// <param name="bitmap">a bitmap to be converted. true means its collidable.</param>
-        /// <returns>a Vector2D[] representing the bitmap.</returns>
+        /// <returns>A Vector2D[] representing the bitmap.</returns>
         public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
         {
             if (bitmap == null) { throw new ArgumentNullException("bitmap"); }
@@ -166,6 +169,8 @@ namespace Physics2DDotNet
         /// <returns>array of vectors the describe a rectangle</returns>
         public static Vector2D[] CreateRectangle(Scalar height, Scalar width)
         {
+            if (height <= 0) { throw new ArgumentOutOfRangeException("height", "must be greater then 0"); }
+            if (width <= 0) { throw new ArgumentOutOfRangeException("width", "must be greater then 0"); }
             Scalar Ld2 = height * .5f;
             Scalar Wd2 = width * .5f;
             return new Vector2D[4]
@@ -197,7 +202,7 @@ namespace Physics2DDotNet
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 2) { throw new ArgumentOutOfRangeException("vertexes"); }
-            if (maxLength <= 0) { throw new ArgumentOutOfRangeException("maxLength"); }
+            if (maxLength <= 0) { throw new ArgumentOutOfRangeException("maxLength", "must be greater then zero"); }
 
             LinkedList<Vector2D> list = new LinkedList<Vector2D>(vertexes);
             LinkedListNode<Vector2D> node = list.First;
