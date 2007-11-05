@@ -37,34 +37,43 @@ using AdvanceMath.Geometry2D;
 namespace Physics2DDotNet.Detectors
 {
 
-
+    /// <summary>
+    /// The Sweep and Prune detector should be O(nlogn), but can be O(n^2) if everything is colliding.  
+    /// </summary>
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
 #endif
     public sealed class SweepAndPruneDetector : BroadPhaseCollisionDetector
     {
-        sealed class IntList 
+        sealed class IntList
         {
             static int[] Default = new int[0];
             int[] array = Default;
             int length = 0;
+            int bloom = 0; // based off the idea of a bloom filter. 
             public int Count
             {
-                get
-                {
-                    return length;
-                }
+                get { return length; }
             }
             public void Add(int item)
             {
                 if (array.Length == length)
                 {
-                    int newLenght = ((array.Length != 0) ? (array.Length * 2) : (4));
-                    int[] newArray = new int[newLenght];
-                    array.CopyTo(newArray, 0);
-                    this.array = newArray;
+                    if (array.Length == 0)
+                    {
+                        this.array = new int[4];
+                    }
+                    else
+                    {
+                        int newLenght = array.Length * 2;
+                        int[] newArray = new int[newLenght];
+                        this.array.CopyTo(newArray, 0);
+                        this.array = newArray;
+                    }
                 }
                 this.array[length++] = item;
+                //adds it to the bloom filter
+                bloom = bloom | item;
             }
             public void Sort()
             {
@@ -72,6 +81,8 @@ namespace Physics2DDotNet.Detectors
             }
             public bool Contains(int item)
             {
+                //check the bloom filter to see if it is in it.
+                if ((bloom & item) != item) { return false; }
                 int min = 0;
                 int max = length - 1;
                 while (min <= max)
@@ -86,7 +97,7 @@ namespace Physics2DDotNet.Detectors
                     {
                         max = index - 1;
                     }
-                    else 
+                    else
                     {
                         return true;
                     }
@@ -96,6 +107,7 @@ namespace Physics2DDotNet.Detectors
             public void Clear()
             {
                 length = 0;
+                bloom = 0;
             }
         }
         sealed class StubComparer : IComparer<Stub>
@@ -111,7 +123,7 @@ namespace Physics2DDotNet.Detectors
         {
             public int beginCount;
             public IntList colliders = new IntList();
-            //public List<int> colliders = new List<int>();
+            public int collisions;
             public LinkedListNode<Wrapper> node;
             public Body body;
             public bool shouldAddNode;
@@ -136,6 +148,7 @@ namespace Physics2DDotNet.Detectors
             }
             public void Update()
             {
+                collisions = 0;
                 beginCount = -1;
                 colliders.Clear();
                 BoundingRectangle rect = body.Shape.Rectangle;
@@ -181,6 +194,7 @@ namespace Physics2DDotNet.Detectors
             this.xStubs = new List<Stub>();
             this.yStubs = new List<Stub>();
         }
+        
         protected internal override void AddBodyRange(List<Body> collection)
         {
             int wrappercount = collection.Count + wrappers.Count;
@@ -214,7 +228,6 @@ namespace Physics2DDotNet.Detectors
             yStubs.RemoveAll(StubIsRemoved);
         }
 
-
         private void Update()
         {
             for (int index = 0; index < wrappers.Count; ++index)
@@ -224,6 +237,7 @@ namespace Physics2DDotNet.Detectors
             xStubs.Sort(comparer);
             yStubs.Sort(comparer);
         }
+        
         public override void Detect(Scalar dt)
         {
             Update();
@@ -237,8 +251,11 @@ namespace Physics2DDotNet.Detectors
             Wrapper wrapper;
             Body body1, body2;
 
-            bool xSmall = lastXCount > lastYCount;
-            if (xSmall)
+            //this puts the axis that collided the least last round
+            //as the first axis to be tested. to reduce the number 
+            //of values added to Wrapper.colliders
+            bool ySmall = lastXCount > lastYCount;
+            if (ySmall)
             {
                 list1 = yStubs;
                 list2 = xStubs;
@@ -248,7 +265,7 @@ namespace Physics2DDotNet.Detectors
                 list1 = xStubs;
                 list2 = yStubs;
             }
-
+            //test the first axis.
             for (int index = 0; index < list1.Count; ++index)
             {
                 stub = list1[index];
@@ -265,8 +282,16 @@ namespace Physics2DDotNet.Detectors
                         if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
                             Body.CanCollide(body1, body2))
                         {
-                            node.Value.colliders.Add(body1.ID);
-                            wrapper.colliders.Add(body2.ID);
+                            if (body1.ID > body2.ID)
+                            {
+                                node.Value.colliders.Add(body1.ID);
+                            }
+                            else
+                            {
+                                wrapper.colliders.Add(body2.ID);
+                            }
+                            node.Value.collisions++;
+                            wrapper.collisions++;
                         }
                         node = node.Next;
                     }
@@ -287,13 +312,14 @@ namespace Physics2DDotNet.Detectors
                     }
                 }
             }
-
+            //if no collisions on the first axis exit.
             if (count1 == 0)
             {
-                if (xSmall) { lastYCount = 0; }
+                if (ySmall) { lastYCount = 0; }
                 else { lastXCount = 0; }
                 return;
             }
+            //tests the second axis.
             for (int index = 0; index < list2.Count; ++index)
             {
                 stub = list2[index];
@@ -301,7 +327,7 @@ namespace Physics2DDotNet.Detectors
                 if (stub.begin)
                 {
                     beginCount++;
-                    if (wrapper.colliders.Count == 0)
+                    if (wrapper.collisions == 0) //wrapper.colliders.Count == 0)
                     {
                         count2 += currentBodies.Count;
                         wrapper.beginCount = beginCount;
@@ -312,10 +338,21 @@ namespace Physics2DDotNet.Detectors
                         node = currentBodies.First;
                         while (node != null)
                         {
+                            body2 = node.Value.body;
                             count2++;
-                            if (node.Value.colliders.Contains(body1.ID))
+                            bool collided;
+                            if (body1.ID > body2.ID)
                             {
-                                this.OnCollision(dt, body1, node.Value.body);
+                                collided = node.Value.colliders.Contains(body1.ID);
+                            }
+                            else
+                            {
+                                collided = wrapper.colliders.Contains(body2.ID);
+                            }
+                            if (collided)//node.Value.colliders.Contains(body1.ID))
+                            {
+                                this.OnCollision(dt, body1, body2);
+                                //this.OnCollision(dt, body1, node.Value.body);
                             }
                             node = node.Next;
                         }
@@ -338,7 +375,7 @@ namespace Physics2DDotNet.Detectors
                 }
             }
 
-            if (xSmall)
+            if (ySmall)
             {
                 lastYCount = count1;
                 lastXCount = count2;

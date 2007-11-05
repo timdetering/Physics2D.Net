@@ -23,6 +23,10 @@ Changed: The physicsTimer so it no longer tries to abort the Physics thread when
 Changed: The physicsTimer to no longer use the Stopwatch class.
 fixed: a bug with PhysicsTimer.IsRunning that would cause it not to unpause.
 added: some more parameter checking.
+added: some minor speed improvements to sweep and prune.
+changed: made it so the first ID for a Body is 1.
+changed: PhysicsEngine to initialize all its fields in its constructor.
+
 
 AdvanceMath
 1.6.1.0:

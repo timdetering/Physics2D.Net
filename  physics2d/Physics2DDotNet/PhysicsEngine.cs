@@ -49,6 +49,12 @@ namespace Physics2DDotNet
 #endif
     public sealed class PhysicsEngine
     {
+        #region static/const fields
+        /// <summary>
+        /// This is the ID the first body added to the engine will get.
+        /// </summary>
+        const int firstBodyID = 1;
+        #endregion
         #region static methods
         private static void PreCheckItem(Joint item)
         {
@@ -115,7 +121,7 @@ namespace Physics2DDotNet
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
 #endif
-        object syncRoot = new object();
+        object syncRoot;
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
 #endif
@@ -144,6 +150,8 @@ namespace Physics2DDotNet
         #region constructors
         public PhysicsEngine()
         {
+            this.nextBodyID = firstBodyID;
+            this.syncRoot = new object();
             this.rwLock = new CFReaderWriterLock();
 
             this.joints = new List<Joint>();
@@ -494,7 +502,7 @@ namespace Physics2DDotNet
         }
         private void ClearAdded()
         {
-            nextBodyID = 0;
+            nextBodyID = firstBodyID;
             solver.Clear();
             broadPhase.Clear();
             foreach (Body body in bodies)
