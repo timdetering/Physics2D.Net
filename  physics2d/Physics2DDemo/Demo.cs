@@ -448,8 +448,10 @@ namespace Physics2DDemo
             engine = new PhysicsEngine();
 
             //sets the broadphase
-            engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
+            engine.BroadPhase = new Physics2DDotNet.Detectors.SingleSweepDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.BruteForceDetector();
+            
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
             solver.Iterations = 12;
@@ -1374,7 +1376,7 @@ namespace Physics2DDemo
 
             for (int x = 60; x < 80; x += 10)
             {
-                for (int y = -2000; y < 700; y += 12)
+                for (int y = -3000; y < 700; y += 12)
                 {
                     Body g = AddCircle(5, 7, 3, new ALVector2D(0, x, y));
                     g.State.Velocity.Angular = 1;

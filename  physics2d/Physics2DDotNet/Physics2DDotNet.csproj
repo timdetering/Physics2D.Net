@@ -41,6 +41,8 @@
     <Compile Include="DataTypes\MassInfo.cs" />
     <Compile Include="DataTypes\RemovedEventArgs.cs" />
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
+    <Compile Include="Detectors\BruteForceDetector.cs" />
+    <Compile Include="Detectors\SingleSweepDetector.cs" />
     <Compile Include="Ignorers\CollisionGroupIgnorer.cs" />
     <Compile Include="Ignorers\CollisionIgnorer.cs" />
     <Compile Include="Ignorers\CollisionObjectIgnorer.cs" />

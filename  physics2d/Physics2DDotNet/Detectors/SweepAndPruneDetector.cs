@@ -45,6 +45,9 @@ namespace Physics2DDotNet.Detectors
 #endif
     public sealed class SweepAndPruneDetector : BroadPhaseCollisionDetector
     {
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+        [Serializable]
+#endif
         sealed class IntList
         {
             static int[] Default = new int[0];
@@ -110,6 +113,9 @@ namespace Physics2DDotNet.Detectors
                 bloom = 0;
             }
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+        [Serializable]
+#endif
         sealed class StubComparer : IComparer<Stub>
         {
             public int Compare(Stub left, Stub right)
@@ -119,6 +125,9 @@ namespace Physics2DDotNet.Detectors
                 else { return ((left == right) ? (0) : ((left.begin) ? (-1) : (1))); }
             }
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+        [Serializable]
+#endif
         sealed class Wrapper
         {
             public int beginCount;
@@ -127,24 +136,26 @@ namespace Physics2DDotNet.Detectors
             public LinkedListNode<Wrapper> node;
             public Body body;
             public bool shouldAddNode;
-            Stub[] stubs;
+            Stub xBegin;
+            Stub xEnd;
+            Stub yBegin;
+            Stub yEnd;
             public Wrapper(Body body)
             {
                 this.body = body;
                 this.node = new LinkedListNode<Wrapper>(this);
-                stubs = new Stub[4];
-                stubs[0] = new Stub(this, true);  //x
-                stubs[1] = new Stub(this, false); //x
-                stubs[2] = new Stub(this, true);  //y
-                stubs[3] = new Stub(this, false); //y
+                xBegin = new Stub(this, true);  //x
+                xEnd = new Stub(this, false); //x
+                yBegin = new Stub(this, true);  //y
+                yEnd = new Stub(this, false); //y
             }
             public void AddStubs(List<Stub> xStubs, List<Stub> yStubs)
             {
-                xStubs.Add(stubs[0]);
-                xStubs.Add(stubs[1]);
+                xStubs.Add(xBegin);
+                xStubs.Add(xEnd);
 
-                yStubs.Add(stubs[2]);
-                yStubs.Add(stubs[3]);
+                yStubs.Add(yBegin);
+                yStubs.Add(yEnd);
             }
             public void Update()
             {
@@ -153,13 +164,17 @@ namespace Physics2DDotNet.Detectors
                 colliders.Clear();
                 BoundingRectangle rect = body.Shape.Rectangle;
                 shouldAddNode = rect.Min.X != rect.Max.X || rect.Min.Y != rect.Max.Y;
-                stubs[0].value = rect.Min.X;
-                stubs[1].value = rect.Max.X;
+                
+                xBegin.value = rect.Min.X;
+                xEnd.value = rect.Max.X;
 
-                stubs[2].value = rect.Min.Y;
-                stubs[3].value = rect.Max.Y;
+                yBegin.value = rect.Min.Y;
+                yEnd.value = rect.Max.Y;
             }
         }
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+        [Serializable]
+#endif
         sealed class Stub
         {
             public Wrapper wrapper;
@@ -387,4 +402,6 @@ namespace Physics2DDotNet.Detectors
             }
         }
     }
+
+
 }
