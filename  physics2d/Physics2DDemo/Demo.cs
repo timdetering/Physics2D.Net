@@ -800,7 +800,7 @@ namespace Physics2DDemo
         {
             float xmin = 200;
             float xmax = 800;
-            float ymin = 200;
+            float ymin = 550;
             float ymax = 700;
 
             float size = 32;
@@ -1141,7 +1141,7 @@ namespace Physics2DDemo
         void AddCircles_StressTest()
         {
 
-            float box = 500;
+            float box = 550;
             float xmin = 0;
             float xmax = box;
             float ymin = 0;
