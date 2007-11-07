@@ -448,9 +448,10 @@ namespace Physics2DDemo
             engine = new PhysicsEngine();
 
             //sets the broadphase
-            //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-            engine.BroadPhase = new Physics2DDotNet.Detectors.SingleSweepDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.BruteForceDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SingleSweepDetector();
+            engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
@@ -799,7 +800,7 @@ namespace Physics2DDemo
         {
             float xmin = 200;
             float xmax = 800;
-            float ymin = 560;
+            float ymin = 200;
             float ymax = 700;
 
             float size = 32;

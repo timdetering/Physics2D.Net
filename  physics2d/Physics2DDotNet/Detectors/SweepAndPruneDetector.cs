@@ -144,10 +144,10 @@ namespace Physics2DDotNet.Detectors
             {
                 this.body = body;
                 this.node = new LinkedListNode<Wrapper>(this);
-                xBegin = new Stub(this, true);  //x
-                xEnd = new Stub(this, false); //x
-                yBegin = new Stub(this, true);  //y
-                yEnd = new Stub(this, false); //y
+                xBegin = new Stub(this, true); 
+                xEnd = new Stub(this, false); 
+                yBegin = new Stub(this, true);  
+                yEnd = new Stub(this, false); 
             }
             public void AddStubs(List<Stub> xStubs, List<Stub> yStubs)
             {

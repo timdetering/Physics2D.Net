@@ -199,8 +199,12 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-
-
+            int test = 0;
+            int bob = 0;
+            bob += test++;
+            Console.WriteLine(bob);
+            
+            /*
 
             Vector2D[] vertexes1 = new Vector2D[]
             {
@@ -221,7 +225,7 @@ namespace ConsoleDriver
             polygons[1] = vertexes2;
             Console.WriteLine(MultiPartPolygon.GetCentroid(polygons));
             Console.WriteLine(MultiPartPolygon.GetArea(polygons));
-
+            */
             Console.WriteLine("Finished");
             Console.ReadLine();
         }

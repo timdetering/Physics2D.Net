@@ -37,13 +37,14 @@ using AdvanceMath.Geometry2D;
 namespace Physics2DDotNet.Detectors
 {
     /// <summary>
-    /// Faster then sweep and prune but stutters a bit.
+    /// Faster then sweep and prune and does not stutter like SingleSweep
     /// </summary>
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [Serializable]
 #endif
-    public sealed class SingleSweepDetector : BroadPhaseCollisionDetector
+    public sealed class SelectiveSweepDetector : BroadPhaseCollisionDetector
     {
+
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
 #endif
@@ -64,41 +65,50 @@ namespace Physics2DDotNet.Detectors
             public LinkedListNode<Wrapper> node;
             public Body body;
             public bool shouldAddNode;
-            Stub begin;
-            Stub end;
             public Scalar min;
             public Scalar max;
-
+            Stub xBegin;
+            Stub xEnd;
+            Stub yBegin;
+            Stub yEnd;
             public Wrapper(Body body)
             {
                 this.body = body;
                 this.node = new LinkedListNode<Wrapper>(this);
-                begin = new Stub(this, true);
-                end = new Stub(this, false);
+                xBegin = new Stub(this, true);  
+                xEnd = new Stub(this, false);
+                yBegin = new Stub(this, true); 
+                yEnd = new Stub(this, false); 
             }
-            public void AddStubs(List<Stub> stubs)
+            public void AddStubs(List<Stub> xStubs, List<Stub> yStubs)
             {
-                stubs.Add(begin);
-                stubs.Add(end);
+                xStubs.Add(xBegin);
+                xStubs.Add(xEnd);
+
+                yStubs.Add(yBegin);
+                yStubs.Add(yEnd);
             }
-            public void Update(bool doX)
+            public void Update()
             {
                 BoundingRectangle rect = body.Shape.Rectangle;
                 shouldAddNode = rect.Min.X != rect.Max.X || rect.Min.Y != rect.Max.Y;
-                if (doX)
-                {
-                    begin.value = rect.Min.X;
-                    end.value = rect.Max.X;
-                    min = rect.Min.Y;
-                    max = rect.Max.Y;
-                }
-                else
-                {
-                    min = rect.Min.X;
-                    max = rect.Max.X;
-                    begin.value = rect.Min.Y;
-                    end.value = rect.Max.Y;
-                }
+
+                xBegin.value = rect.Min.X;
+                xEnd.value = rect.Max.X;
+
+                yBegin.value = rect.Min.Y;
+                yEnd.value = rect.Max.Y;
+            }
+
+            public void SetX()
+            {
+                this.min = this.xBegin.value;
+                this.max = this.xEnd.value;
+            }
+            public void SetY()
+            {
+                this.min = this.yBegin.value;
+                this.max = this.yEnd.value;
             }
         }
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
@@ -127,14 +137,14 @@ namespace Physics2DDotNet.Detectors
             return !stub.wrapper.body.IsAdded;
         }
         List<Wrapper> wrappers;
-        List<Stub> stubs;
-        int lastXCount = 0;
-        int lastYCount = 0;
+        List<Stub> xStubs;
+        List<Stub> yStubs;
 
-        public SingleSweepDetector()
+        public SelectiveSweepDetector()
         {
             this.wrappers = new List<Wrapper>();
-            this.stubs = new List<Stub>();
+            this.xStubs = new List<Stub>();
+            this.yStubs = new List<Stub>();
         }
 
         protected internal override void AddBodyRange(List<Body> collection)
@@ -144,79 +154,71 @@ namespace Physics2DDotNet.Detectors
             {
                 wrappers.Capacity = wrappercount;
             }
-            int nodeCount = collection.Count * 2 + stubs.Count;
-            if (stubs.Capacity < nodeCount)
+            int nodeCount = collection.Count * 2 + xStubs.Count;
+            if (xStubs.Capacity < nodeCount)
             {
-                stubs.Capacity = nodeCount;
+                xStubs.Capacity = nodeCount;
+                yStubs.Capacity = nodeCount;
             }
             foreach (Body item in collection)
             {
                 Wrapper wrapper = new Wrapper(item);
                 wrappers.Add(wrapper);
-                wrapper.AddStubs(stubs);
+                wrapper.AddStubs(xStubs, yStubs);
             }
         }
         protected internal override void Clear()
         {
             wrappers.Clear();
-            stubs.Clear();
+            xStubs.Clear();
+            yStubs.Clear();
         }
         protected internal override void RemoveExpiredBodies()
         {
             wrappers.RemoveAll(WrapperIsRemoved);
-            stubs.RemoveAll(StubIsRemoved);
+            xStubs.RemoveAll(StubIsRemoved);
+            yStubs.RemoveAll(StubIsRemoved);
         }
 
-
-        int xUpdates = 0;
-        int yUpdates = 0;
-        public override void Detect(Scalar dt)
-        {
-            bool doX = ShouldDoX();
-
-            Update(doX);
-            int collisions = Detect(dt, doX);
-
-            if (doX)
-            {
-                lastXCount = collisions;
-                xUpdates++;
-            }
-            else
-            {
-                lastYCount = collisions;
-                yUpdates++;
-            }
-        }
-        bool ShouldDoX()
-        {
-            bool doX = lastXCount < lastYCount;
-            if (Math.Abs(xUpdates - yUpdates) > 7)
-            {
-                doX = !doX;
-                xUpdates = 0;
-                yUpdates = 0;
-            }
-            return doX;
-        }
-        private void Update(bool doX)
+        private void Update()
         {
             for (int index = 0; index < wrappers.Count; ++index)
             {
-                wrappers[index].Update(doX);
+                wrappers[index].Update();
             }
-            stubs.Sort(comparer);
+            xStubs.Sort(comparer);
+            yStubs.Sort(comparer);
+        }
+        private bool ShouldDoX()
+        {
+            int xCount = 0;
+            int xdepth = 0;
+            int yCount = 0;
+            int ydepth = 0;
+            for (int index = 0; index < xStubs.Count; index++)
+            {
+                if (xStubs[index].begin) { xCount += xdepth++; }
+                else { xdepth--; }
+                if (yStubs[index].begin) { yCount += ydepth++; }
+                else { ydepth--; }
+            }
+            return xCount < yCount;
         }
 
-        int Detect(Scalar dt, bool doX)
+        public override void Detect(Scalar dt)
         {
-            int collisions = 0;
+            Update();
+            bool doX = ShouldDoX();
+            DetectInternal(dt, doX);
+        }
+        private void DetectInternal(Scalar dt, bool doX)
+        {
+            List<Stub> stubs = (doX) ? (xStubs) : (yStubs);
             LinkedList<Wrapper> currentBodies = new LinkedList<Wrapper>();
             LinkedListNode<Wrapper> node;
             Stub stub;
             Wrapper wrapper1, wrapper2;
             Body body1, body2;
-
             for (int index = 0; index < stubs.Count; index++)
             {
                 stub = stubs[index];
@@ -224,11 +226,18 @@ namespace Physics2DDotNet.Detectors
 
                 if (stub.begin)
                 {
+                    if (doX)
+                    {
+                        wrapper1.SetY();
+                    }
+                    else
+                    {
+                        wrapper1.SetX();
+                    }
                     body1 = wrapper1.body;
                     node = currentBodies.First;
                     while (node != null)
                     {
-                        collisions++;
                         wrapper2 = node.Value;
                         body2 = wrapper2.body;
                         if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
@@ -253,10 +262,6 @@ namespace Physics2DDotNet.Detectors
                     }
                 }
             }
-            return collisions;
-
         }
     }
-
-
 }

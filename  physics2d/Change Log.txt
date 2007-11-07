@@ -29,6 +29,7 @@ changed: PhysicsEngine to initialize all its fields in its constructor.
 ADDED: SingleSweepDetector this broad phase kicks Sweep and Prunes butt! (inspired by the idea "the fastest code is code that is never executed")
 Added: BruteForceDetector this is the slowest possible broad phase for comparison purposes.
 added: The Serializable Attribute to more classes.
+Added: SelectiveSweepDetector, its more consistent and potentially faster then SingleSweepDetector 
 
 AdvanceMath
 1.6.1.0:
