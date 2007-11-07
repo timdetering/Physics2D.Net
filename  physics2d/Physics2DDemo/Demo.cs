@@ -768,7 +768,7 @@ namespace Physics2DDemo
             float spacing = .01f;
             float Xspacing = 1f;
 
-            float xmin = 400;
+            float xmin = 300;
             float xmax = 850;
             float ymin = 50;
             float ymax = 720 - size / 2;
@@ -1376,7 +1376,7 @@ namespace Physics2DDemo
 
             for (int x = 60; x < 80; x += 10)
             {
-                for (int y = -3000; y < 700; y += 12)
+                for (int y = -2000; y < 700; y += 12)
                 {
                     Body g = AddCircle(5, 7, 3, new ALVector2D(0, x, y));
                     g.State.Velocity.Angular = 1;
