@@ -31,9 +31,7 @@ using Scalar = System.Single;
 using System;
 using System.Runtime.InteropServices;
 using AdvanceMath.Design;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 
 namespace AdvanceMath
 {
@@ -43,9 +41,9 @@ namespace AdvanceMath
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     [StructLayout(LayoutKind.Sequential, Size = Vector2D.Size)]
-    [AdvBrowsableOrder("X,Y")]
+    [AdvBrowsableOrder("X,Y"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector2D>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector2D>))]
 #endif
     public struct Vector2D : IVector<Vector2D>
     {
@@ -797,19 +795,15 @@ namespace AdvanceMath
         /// This is the X value. (Usually represents a horizontal position or direction.)
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the X-Axis")]
-#endif
         public Scalar X;
         /// <summary>
         /// This is the Y value. (Usually represents a vertical position or direction.)
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Y-Axis")]
-#endif
         public Scalar Y;
         #endregion
         #region constructors
@@ -893,9 +887,7 @@ namespace AdvanceMath
         /// Gets or Sets the Magnitude (Length) of the Vector2D. 
         /// </summary>
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector"/></remarks>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Magnitude
         {
             get
@@ -924,9 +916,7 @@ namespace AdvanceMath
         /// If the Magnitude of the Vector is 1 then The 
         /// Angles {0,Math.PI/2,Math.PI/2,3*Math.PI/2} would have the vectors {(1,0),(0,1),(-1,0),(0,-1)} respectively.
         /// </remarks>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Angle
         {
             get

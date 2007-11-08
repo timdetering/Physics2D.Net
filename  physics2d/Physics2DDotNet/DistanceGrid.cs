@@ -39,9 +39,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// A class used by some Shape Objects for Narrow Phased collision.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class DistanceGrid
     {
         Scalar gridSpacing;

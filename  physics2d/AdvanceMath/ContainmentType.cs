@@ -33,9 +33,7 @@ using System;
 
 namespace AdvanceMath
 {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     [Flags]
     public enum ContainmentType
     {

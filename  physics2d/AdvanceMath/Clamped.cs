@@ -30,9 +30,7 @@ using Scalar = System.Single;
 #endif
 using System;
 using AdvanceMath.Design;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360  && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 
 namespace AdvanceMath
 {
@@ -40,10 +38,9 @@ namespace AdvanceMath
     /// A class that keeps a value clamped.
     /// </summary>
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [Serializable]
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Clamped>))]
 #endif
-    [AdvBrowsableOrder("Min,Value,Max")]
+    [AdvBrowsableOrder("Min,Value,Max"),Serializable]
     public sealed class Clamped : ICloneable, IComparable<Clamped>, IEquatable<Clamped>
     {
         [ParseMethod]
@@ -142,9 +139,7 @@ namespace AdvanceMath
        /// <summary>
        /// Gets and Sets the current value.
        /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [AdvBrowsable]
-#endif
         public Scalar Value
         {
             get { return this.value; }
@@ -156,9 +151,7 @@ namespace AdvanceMath
         /// <summary>
         /// Gets and Sets the minimum value.
         /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [AdvBrowsable]
-#endif
         public Scalar Min
         {
             get { return min; }
@@ -172,9 +165,7 @@ namespace AdvanceMath
         /// <summary>
         /// Gets and Sets the maximum value.
         /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [AdvBrowsable]
-#endif
         public Scalar Max
         {
             get { return max; }
@@ -188,9 +179,7 @@ namespace AdvanceMath
         /// <summary>
         /// Gets and Sets the percent with Min being 0 (0%) and Max being 1 (100%)
         /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Percent
         {
             get

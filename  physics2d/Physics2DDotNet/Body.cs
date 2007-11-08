@@ -39,9 +39,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// This is the Physical Body that collides in the engine.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class Body : IPhysicsEntity, IDuplicateable<Body>
     {
         #region static methods

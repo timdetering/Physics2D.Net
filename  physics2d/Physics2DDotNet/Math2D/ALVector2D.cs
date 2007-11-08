@@ -38,10 +38,10 @@ namespace Physics2DDotNet.Math2D
     /// <summary>
     /// Class Used to store a Linear Value along with an Angular Value. Like Position and Orientation. 
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Size = ALVector2D.Size)]
+    [StructLayout(LayoutKind.Sequential, Size = ALVector2D.Size), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<ALVector2D>))]
-    [AdvBrowsableOrder("Angular,Linear"), Serializable]
+    [AdvBrowsableOrder("Angular,Linear")]
 #endif
     public struct ALVector2D : IEquatable<ALVector2D>
     {

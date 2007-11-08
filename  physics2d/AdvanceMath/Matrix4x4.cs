@@ -32,16 +32,14 @@ using System;
 
 using System.Runtime.InteropServices;
 using AdvanceMath.Design;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 
 namespace AdvanceMath
 {
     [StructLayout(LayoutKind.Sequential, Size = Matrix4x4.Size)]
-    [AdvBrowsableOrder("Rx,Ry,Rz,Rw")]
+    [AdvBrowsableOrder("Rx,Ry,Rz,Rw"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix4x4>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix4x4>))]
 #endif
     public struct Matrix4x4 : IMatrix<Matrix4x4, Vector4D>
     {
@@ -1458,21 +1456,13 @@ namespace AdvanceMath
         #endregion
         #region fields
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar m00, m01, m02, m03;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar m10, m11, m12, m13;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar m20, m21, m22, m23;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar m30, m31, m32, m33;
 
         #endregion
@@ -1502,9 +1492,7 @@ namespace AdvanceMath
         #endregion
         #region Properties
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The First row of the Matrix4x4")]
-#endif
         public Vector4D Rx
         {
             get
@@ -1525,9 +1513,7 @@ namespace AdvanceMath
             }
         }
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The Second row of the Matrix4x4")]
-#endif
         public Vector4D Ry
         {
             get
@@ -1548,9 +1534,7 @@ namespace AdvanceMath
             }
         }
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The Third row of the Matrix4x4")]
-#endif
         public Vector4D Rz
         {
             get
@@ -1571,9 +1555,7 @@ namespace AdvanceMath
             }
         }
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The Forth row of the Matrix4x4")]
-#endif
         public Vector4D Rw
         {
             get
@@ -1593,9 +1575,7 @@ namespace AdvanceMath
                 m33 = value.W;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Vector4D Cx
         {
             get
@@ -1615,9 +1595,7 @@ namespace AdvanceMath
                 this.m30 = value.W;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Vector4D Cy
         {
             get
@@ -1637,9 +1615,7 @@ namespace AdvanceMath
                 this.m31 = value.W;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Vector4D Cz
         {
             get
@@ -1659,9 +1635,7 @@ namespace AdvanceMath
                 this.m32 = value.W;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Vector4D Cw
         {
             get

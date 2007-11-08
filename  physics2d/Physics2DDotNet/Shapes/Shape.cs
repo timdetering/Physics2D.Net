@@ -42,9 +42,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// A abstract class used to define the Shape of a Body.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public abstract class Shape : IDuplicateable<Shape>
     {
         #region static fields

@@ -8,6 +8,8 @@ Changed: LineSegment.GetDistance to be a little more optimized.
 Fixed: a bug with AdvanceMath.Design.AdvPropertyDescriptor.IsReadOnly.
 Fixed: a few problems pointed out by AeHNC in AdvanceMath.Design
 Removed: useless using statements
+Added: a few Faux Attributes for Compact Framework
+Changed: Redid how I did the compatibility with the Compact Framework to drastically reduce the number of #if statements. 
 
 Physics2D.Net
 NEXTVERSION:
@@ -30,6 +32,8 @@ ADDED: SingleSweepDetector this broad phase kicks Sweep and Prunes butt! (inspir
 Added: BruteForceDetector this is the slowest possible broad phase for comparison purposes.
 added: The Serializable Attribute to more classes.
 Added: SelectiveSweepDetector, its more consistent and potentially faster then SingleSweepDetector 
+Changed: Redid how I did the compatibility with the Compact Framework to drastically reduce the number of #if statements. 
+
 
 AdvanceMath
 1.6.1.0:

@@ -65,9 +65,7 @@ using Scalar = System.Single;
 using System;
 using System.Runtime.InteropServices;
 using AdvanceMath.Design;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 
 namespace AdvanceMath
 {
@@ -75,9 +73,9 @@ namespace AdvanceMath
     ///		Summary description for Quaternion.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    [AdvBrowsableOrder("W,X,Y,Z")]
+    [AdvBrowsableOrder("W,X,Y,Z"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Quaternion>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Quaternion>))]
 #endif
     public struct Quaternion
     {
@@ -185,24 +183,16 @@ namespace AdvanceMath
         #endregion
         #region fields
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
-#endif
         public Scalar X;
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
-#endif
         public Scalar Y;
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
-#endif
         public Scalar Z;
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
-#endif
         public Scalar W;
 
 
@@ -321,22 +311,14 @@ namespace AdvanceMath
                 //return new Vector3D(fTXZ + fTWY, fTYZ - fTWX, 1 - (fTXX + fTYY));
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar PitchInDegrees { get { return MathHelper.ToDegrees(Pitch); } set { Pitch = MathHelper.ToRadians(value); } }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar YawInDegrees { get { return MathHelper.ToDegrees(Yaw); } set { Yaw = MathHelper.ToRadians(value); } }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar RollInDegrees { get { return MathHelper.ToDegrees(Roll); } set { Roll = MathHelper.ToRadians(value); } }
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Pitch
         {
             set
@@ -354,9 +336,7 @@ namespace AdvanceMath
                 return MathHelper.Atan2(2 * X * W - 2 * Y * Z, 1 - 2 * X * X - 2 * Z * Z);
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Yaw
         {
             set
@@ -373,9 +353,7 @@ namespace AdvanceMath
                 return MathHelper.Atan2(2 * Y * W - 2 * X * Z, 1 - 2 * Y * Y - 2 * Z * Z);
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Roll
         {
             set

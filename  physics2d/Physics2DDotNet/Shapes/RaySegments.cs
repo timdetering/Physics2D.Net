@@ -43,9 +43,7 @@ namespace Physics2DDotNet
     /// A Ray Segment is a Ray that has a length. It can be used to represent 
     /// lasers or very fast projectiles.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [Serializable]
-#endif
     public struct RaySegment
     {
         public Ray RayInstance;
@@ -65,9 +63,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// The information of an intersection with another shape. 
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [Serializable]
-#endif
     public class RaySegmentIntersectionInfo
     {
         Scalar[] distances;
@@ -91,9 +87,7 @@ namespace Physics2DDotNet
     /// for when they intersect something. The Sequential Impulses Solver does not 
     /// handle collisions with this shape.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public class RaySegments : Shape
     {
         RaySegment[] originalSegments;

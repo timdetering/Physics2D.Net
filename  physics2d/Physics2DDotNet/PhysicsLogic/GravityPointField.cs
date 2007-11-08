@@ -36,9 +36,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// A PhysicsLogic to causes a Gravity a a certain point with zero dropoff.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class GravityPointField : PhysicsLogic
     {
         Vector2D location;

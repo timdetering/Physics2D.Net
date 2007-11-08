@@ -35,10 +35,10 @@ using AdvanceMath.Design;
 namespace AdvanceMath.Geometry2D
 {
 
-    [StructLayout(LayoutKind.Sequential, Size = BoundingCircle.Size)]
+    [StructLayout(LayoutKind.Sequential, Size = BoundingCircle.Size), Serializable]
     [AdvBrowsableOrder("Position,Radius")]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingCircle>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingCircle>))]
 #endif
     public struct BoundingCircle : IEquatable<BoundingCircle>
     {

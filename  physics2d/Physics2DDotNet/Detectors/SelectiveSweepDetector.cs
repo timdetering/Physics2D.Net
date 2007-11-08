@@ -39,27 +39,21 @@ namespace Physics2DDotNet.Detectors
     /// <summary>
     /// Faster then sweep and prune and does not stutter like SingleSweep
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [Serializable]
-#endif
     public sealed class SelectiveSweepDetector : BroadPhaseCollisionDetector
     {
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class StubComparer : IComparer<Stub>
         {
             public int Compare(Stub left, Stub right)
             {
                 if (left.value < right.value) { return -1; }
-                else if (left.value > right.value) { return 1; }
-                else { return ((left == right) ? (0) : ((left.begin) ? (-1) : (1))); }
+                if (left.value > right.value) { return 1; }
+                return ((left == right) ? (0) : ((left.begin) ? (-1) : (1)));
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class Wrapper
         {
             public LinkedListNode<Wrapper> node;
@@ -111,9 +105,7 @@ namespace Physics2DDotNet.Detectors
                 this.max = this.yEnd.value;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class Stub
         {
             public Wrapper wrapper;
@@ -215,15 +207,10 @@ namespace Physics2DDotNet.Detectors
         {
             List<Stub> stubs = (doX) ? (xStubs) : (yStubs);
             LinkedList<Wrapper> currentBodies = new LinkedList<Wrapper>();
-            LinkedListNode<Wrapper> node;
-            Stub stub;
-            Wrapper wrapper1, wrapper2;
-            Body body1, body2;
             for (int index = 0; index < stubs.Count; index++)
             {
-                stub = stubs[index];
-                wrapper1 = stub.wrapper;
-
+                Stub stub = stubs[index];
+                Wrapper wrapper1 = stub.wrapper;
                 if (stub.begin)
                 {
                     if (doX)
@@ -234,12 +221,13 @@ namespace Physics2DDotNet.Detectors
                     {
                         wrapper1.SetX();
                     }
-                    body1 = wrapper1.body;
-                    node = currentBodies.First;
-                    while (node != null)
+                    Body body1 = wrapper1.body;
+                    for (LinkedListNode<Wrapper> node = currentBodies.First;
+                        node != null;
+                        node = node.Next)
                     {
-                        wrapper2 = node.Value;
-                        body2 = wrapper2.body;
+                        Wrapper wrapper2 = node.Value;
+                        Body body2 = wrapper2.body;
                         if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
                             Body.CanCollide(body1, body2) &&
                             wrapper1.min <= wrapper2.max &&
@@ -247,7 +235,6 @@ namespace Physics2DDotNet.Detectors
                         {
                             OnCollision(dt, body1, body2);
                         }
-                        node = node.Next;
                     }
                     if (wrapper1.shouldAddNode)
                     {

@@ -38,8 +38,8 @@ namespace AdvanceMath.Geometry2D
     [StructLayout(LayoutKind.Sequential, Size = Ray.Size)]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Ray>))]
-    [AdvBrowsableOrder("Origin,Direction"), Serializable]
 #endif
+    [AdvBrowsableOrder("Origin,Direction"), Serializable]
     public struct Ray : IEquatable<Ray>
     {
         public const int Size = Vector2D.Size * 2;

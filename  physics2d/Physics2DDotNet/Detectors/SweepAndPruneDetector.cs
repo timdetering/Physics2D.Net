@@ -40,14 +40,10 @@ namespace Physics2DDotNet.Detectors
     /// <summary>
     /// The Sweep and Prune detector should be O(nlogn), but can be O(n^2) if everything is colliding.  
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class SweepAndPruneDetector : BroadPhaseCollisionDetector
     {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class IntList
         {
             static int[] Default = new int[0];
@@ -113,9 +109,7 @@ namespace Physics2DDotNet.Detectors
                 bloom = 0;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class StubComparer : IComparer<Stub>
         {
             public int Compare(Stub left, Stub right)
@@ -125,9 +119,7 @@ namespace Physics2DDotNet.Detectors
                 else { return ((left == right) ? (0) : ((left.begin) ? (-1) : (1))); }
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class Wrapper
         {
             public int beginCount;
@@ -172,9 +164,7 @@ namespace Physics2DDotNet.Detectors
                 yEnd.value = rect.Max.Y;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class Stub
         {
             public Wrapper wrapper;

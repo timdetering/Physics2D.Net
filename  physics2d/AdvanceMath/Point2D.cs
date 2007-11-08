@@ -30,9 +30,7 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Runtime.InteropServices;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 
 using AdvanceMath.Design ;
 namespace AdvanceMath
@@ -43,9 +41,9 @@ namespace AdvanceMath
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     [StructLayout(LayoutKind.Sequential, Size = Point2D.Size)]
-    [AdvBrowsableOrder("X,Y")]
+    [AdvBrowsableOrder("X,Y"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Point2D>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Point2D>))]
 #endif
     public struct Point2D : IEquatable<Point2D>
     {
@@ -192,19 +190,15 @@ namespace AdvanceMath
         /// This is the X value. (Usually represents a horizontal position or direction.)
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the X-Axis")]
-#endif
         public int X;
         /// <summary>
         /// This is the Y value. (Usually represents a vertical position or direction.)
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Y-Axis")]
-#endif
         public int Y;
         #endregion
         #region constructors

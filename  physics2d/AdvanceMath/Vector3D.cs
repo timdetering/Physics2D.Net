@@ -30,9 +30,7 @@ using Scalar = System.Single;
 using System;
 using System.Runtime.InteropServices;
 using AdvanceMath.Design;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 namespace AdvanceMath
 {
     /// <summary>
@@ -40,9 +38,9 @@ namespace AdvanceMath
     /// </summary>
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     [StructLayout(LayoutKind.Sequential, Size = Vector3D.Size)]
-    [AdvBrowsableOrder("X,Y,Z")]
+    [AdvBrowsableOrder("X,Y,Z"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector3D>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector3D>))]
 #endif
     public struct Vector3D : IVector<Vector3D>
     {
@@ -688,28 +686,22 @@ namespace AdvanceMath
         /// This is the X value.
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the X-Axis")]
-#endif
         public Scalar X;
         /// <summary>
         /// This is the Y value.
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Y-Axis")]
-#endif
         public Scalar Y;
         /// <summary>
         /// This is the Z value. 
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Z-Axis")]
-#endif
         public Scalar Z;
         #endregion
         #region constructors
@@ -775,9 +767,7 @@ namespace AdvanceMath
         /// Gets or Sets the Magnitude (Length) of the Vector3D. 
         /// </summary>
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector"/></remarks>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Magnitude
         {
             get

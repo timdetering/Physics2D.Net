@@ -41,9 +41,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// A Joint between 2 Bodies that will keep the Angles between the 2 bodies at a certain amount.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class AngleJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
         Solvers.SequentialImpulsesSolver solver;

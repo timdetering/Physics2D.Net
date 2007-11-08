@@ -35,10 +35,10 @@ using AdvanceMath.Design;
 
 namespace Physics2DDotNet.Math2D
 {
-    [StructLayout(LayoutKind.Sequential, Size = Matrix2D.Size)]
+    [StructLayout(LayoutKind.Sequential, Size = Matrix2D.Size), Serializable]
     [AdvBrowsableOrder("NormalMatrix,VertexMatrix")]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2D>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2D>))]
 #endif
     public struct Matrix2D
     {

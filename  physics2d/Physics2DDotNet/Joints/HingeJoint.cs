@@ -46,9 +46,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// A Joint Between 2 Bodies that will pivot around an Anchor.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class HingeJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
         Solvers.SequentialImpulsesSolver solver;

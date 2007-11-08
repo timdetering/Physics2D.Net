@@ -33,9 +33,7 @@ using Scalar = System.Single;
 using System;
 using System.Runtime.InteropServices;
 using AdvanceMath.Design;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 
 
 // NOTE.  The (x,y) coordinate system is assumed to be right-handed.
@@ -51,9 +49,9 @@ namespace AdvanceMath
     /// A 2x2 matrix which can represent rotations for 2D vectors.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Size = Matrix2x2.Size)]
-    [AdvBrowsableOrder("Rx,Ry")]
+    [AdvBrowsableOrder("Rx,Ry"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2x2>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2x2>))]
 #endif
     public struct Matrix2x2 : IMatrix<Matrix2x2, Vector2D>
     {
@@ -476,13 +474,9 @@ namespace AdvanceMath
         #region fields
         // | m00 m01 |
         // | m10 m11 |
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar m00, m01;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar m10, m11;
         #endregion
         #region Constructors
@@ -518,9 +512,7 @@ namespace AdvanceMath
         }
         #endregion
         #region Properties
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Vector2D Cx
         {
             get
@@ -533,9 +525,7 @@ namespace AdvanceMath
                 this.m10 = value.Y;
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Vector2D Cy
         {
             get
@@ -552,9 +542,7 @@ namespace AdvanceMath
         /// The X Row or row zero.
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The First row of the Matrix2x2")]
-#endif
         public Vector2D Rx
         {
             get
@@ -574,9 +562,7 @@ namespace AdvanceMath
         /// The Y Row or row one.
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [System.ComponentModel.Description("The Second row of the Matrix2x2")]
-#endif
         public Vector2D Ry
         {
             get

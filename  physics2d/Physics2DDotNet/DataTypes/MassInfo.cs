@@ -43,9 +43,9 @@ namespace Physics2DDotNet
     /// This class Stores mass information and Moment of Inertia Together since they are very closly related.
     /// </summary>
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>)),Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>))]
 #endif
-    [AdvBrowsableOrder("Mass,MomentofInertia")]
+    [AdvBrowsableOrder("Mass,MomentofInertia"), Serializable]
     public sealed class MassInfo 
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         : IDeserializationCallback
@@ -104,17 +104,11 @@ namespace Physics2DDotNet
         #region fields
         private Scalar mass;
         private Scalar momentofInertia;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         private Scalar massInv;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         private Scalar momentofInertiaInv;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         private Scalar accelerationDueToGravity;
         #endregion
         #region constructors

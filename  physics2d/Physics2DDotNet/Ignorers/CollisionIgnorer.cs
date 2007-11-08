@@ -36,9 +36,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// Base class for Collision Ignorers to impliment.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public abstract class CollisionIgnorer
     {
         bool isInverted;

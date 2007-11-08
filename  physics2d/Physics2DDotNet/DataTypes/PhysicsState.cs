@@ -42,10 +42,10 @@ namespace Physics2DDotNet
     /// <summary>
     /// This class holds the variables usually changed mulitple times  each update like the postion of an object.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Size = PhysicsState.Size)]
+    [StructLayout(LayoutKind.Sequential, Size = PhysicsState.Size), Serializable]
     [AdvBrowsableOrder("Position,Velocity,Acceleration,ForceAccumulator")]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360  
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<PhysicsState>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<PhysicsState>))]
 #endif
     public sealed class PhysicsState
     {
@@ -72,9 +72,7 @@ namespace Physics2DDotNet
         /// <remarks>
         /// <seealso href="http://en.wikipedia.org/wiki/Acceleration"/>
         /// </remarks>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         [AdvBrowsable]
         public ALVector2D Acceleration;
         /// <summary>
@@ -84,9 +82,7 @@ namespace Physics2DDotNet
         /// <seealso href="http://en.wikipedia.org/wiki/Torque"/>
         /// <seealso href="http://en.wikipedia.org/wiki/Force"/>
         /// </remarks>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         [AdvBrowsable]
         public ALVector2D ForceAccumulator;
         public PhysicsState()

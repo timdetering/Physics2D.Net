@@ -30,9 +30,7 @@ using Scalar = System.Single;
 using System;
 using System.Runtime.InteropServices;
 using AdvanceMath.Design;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Xml.Serialization;
-#endif
 namespace AdvanceMath
 {
     /// <summary>
@@ -41,9 +39,9 @@ namespace AdvanceMath
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     //[StructLayout(LayoutKind.Sequential), Serializable]
     [StructLayout(LayoutKind.Sequential, Size = Vector4D.Size)]
-    [AdvBrowsableOrder("X,Y,Z,W")]
+    [AdvBrowsableOrder("X,Y,Z,W"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector4D>)), Serializable]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector4D>))]
 #endif
     public struct Vector4D : IVector<Vector4D>
     {
@@ -706,37 +704,29 @@ namespace AdvanceMath
         /// This is the X value. 
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the X-Axis")]
-#endif
         public Scalar X;
         /// <summary>
         /// This is the Y value. 
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Y-Axis")]
-#endif
         public Scalar Y;
         /// <summary>
         /// This is the Z value. 
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the Z-Axis")]
-#endif
         public Scalar Z;
         /// <summary>
         /// This is the W value. 
         /// </summary>
         [AdvBrowsable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlAttribute]
         [System.ComponentModel.Description("The Magnitude on the W-Axis")]
-#endif
         public Scalar W;
 
         #endregion
@@ -805,9 +795,7 @@ namespace AdvanceMath
         /// Gets or Sets the Magnitude (Length) of the Vector4D. 
         /// </summary>
         /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector"/></remarks>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [XmlIgnore]
-#endif
         public Scalar Magnitude
         {
             get

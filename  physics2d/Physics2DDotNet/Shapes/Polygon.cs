@@ -140,9 +140,7 @@ namespace Physics2DDotNet
         }
     }
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class Polygon : Shape
     {
         #region static methods

@@ -36,9 +36,7 @@ using AdvanceMath.Geometry2D;
 
 namespace Physics2DDotNet.Detectors
 {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [Serializable]
-#endif
     public sealed class BruteForceDetector : BroadPhaseCollisionDetector
     {
         public override void Detect(float dt)

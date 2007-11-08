@@ -44,9 +44,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// The Engine that will Apply Physics to object added to it.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class PhysicsEngine
     {
         #region static/const fields
@@ -118,17 +116,11 @@ namespace Physics2DDotNet
         #endregion
         #region fields
         private int nextBodyID;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         object syncRoot;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         CFReaderWriterLock rwLock;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
         [NonSerialized]
-#endif
         internal bool inUpdate;
 
         private List<PhysicsLogic> logics;

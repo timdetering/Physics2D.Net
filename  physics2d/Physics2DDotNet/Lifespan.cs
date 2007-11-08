@@ -34,9 +34,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// A object that describes the time a object will remain in the Physics engine.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class Lifespan : IDuplicateable<Lifespan>
     {
         #region fields

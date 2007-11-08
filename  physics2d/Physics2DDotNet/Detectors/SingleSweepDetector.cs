@@ -39,14 +39,10 @@ namespace Physics2DDotNet.Detectors
     /// <summary>
     /// Faster then sweep and prune but stutters a bit.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [Serializable]
-#endif
     public sealed class SingleSweepDetector : BroadPhaseCollisionDetector
     {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class StubComparer : IComparer<Stub>
         {
             public int Compare(Stub left, Stub right)
@@ -56,9 +52,7 @@ namespace Physics2DDotNet.Detectors
                 else { return ((left == right) ? (0) : ((left.begin) ? (-1) : (1))); }
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class Wrapper
         {
             public LinkedListNode<Wrapper> node;
@@ -101,9 +95,7 @@ namespace Physics2DDotNet.Detectors
                 }
             }
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
         [Serializable]
-#endif
         sealed class Stub
         {
             public Wrapper wrapper;

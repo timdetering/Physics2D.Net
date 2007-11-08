@@ -36,9 +36,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// A PhysicsLogic to causes a Body to have a realistic pull of Gravity with a exponential drop-off. 
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public sealed class GravityPointMass : PhysicsLogic
     {
         Scalar metersPerDistanceUnit;

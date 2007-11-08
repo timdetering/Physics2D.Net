@@ -33,9 +33,7 @@ using System.Collections.Generic;
 
 namespace Physics2DDotNet.Detectors
 {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public abstract class BroadPhaseCollisionDetector
     {
         protected static void SetTag(Body body, object tag)

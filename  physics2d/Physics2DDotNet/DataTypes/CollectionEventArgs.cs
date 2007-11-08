@@ -38,9 +38,7 @@ namespace Physics2DDotNet
     /// a generic EventArgs for read only collections.
     /// </summary>
     /// <typeparam name="T">The type of the items on the collection. </typeparam>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public class CollectionEventArgs<T> : EventArgs
     {
         ReadOnlyCollection<T> collection;

@@ -36,9 +36,7 @@ namespace Physics2DDotNet
     /// A collision ignorer that uses reference comparison. 
     /// All Bodies with the same instance of this ignorer then they will not collide.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [Serializable]
-#endif
     public class CollisionObjectIgnorer : CollisionIgnorer
     {
         protected override bool CanCollide(Body other)
