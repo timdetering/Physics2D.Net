@@ -37,11 +37,15 @@ namespace Physics2DDotNet
     /// All Bodies with the same instance of this ignorer then they will not collide.
     /// </summary>
     [Serializable]
-    public class CollisionObjectIgnorer : CollisionIgnorer
+    public class ObjectIgnorer : Ignorer
     {
+        public override bool BothNeeded
+        {
+            get { return false; }
+        }
         protected override bool CanCollide(Body other)
         {
-            return other.Ignorer != this;
+            return other.CollisionIgnorer != this;
         }
     }
 }

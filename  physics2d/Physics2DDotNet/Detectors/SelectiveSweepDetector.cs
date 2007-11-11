@@ -69,10 +69,10 @@ namespace Physics2DDotNet.Detectors
             {
                 this.body = body;
                 this.node = new LinkedListNode<Wrapper>(this);
-                xBegin = new Stub(this, true);  
+                xBegin = new Stub(this, true);
                 xEnd = new Stub(this, false);
-                yBegin = new Stub(this, true); 
-                yEnd = new Stub(this, false); 
+                yBegin = new Stub(this, true);
+                yEnd = new Stub(this, false);
             }
             public void AddStubs(List<Stub> xStubs, List<Stub> yStubs)
             {
@@ -85,6 +85,8 @@ namespace Physics2DDotNet.Detectors
             public void Update()
             {
                 BoundingRectangle rect = body.Shape.Rectangle;
+                //if it is a single point in space
+                //then dont even add it to the link list.
                 shouldAddNode = rect.Min.X != rect.Max.X || rect.Min.Y != rect.Max.Y;
 
                 xBegin.value = rect.Min.X;
@@ -172,6 +174,9 @@ namespace Physics2DDotNet.Detectors
             yStubs.RemoveAll(StubIsRemoved);
         }
 
+        /// <summary>
+        /// updates all the nodes to their new values and sorts the lists
+        /// </summary>
         private void Update()
         {
             for (int index = 0; index < wrappers.Count; ++index)
@@ -181,6 +186,11 @@ namespace Physics2DDotNet.Detectors
             xStubs.Sort(comparer);
             yStubs.Sort(comparer);
         }
+
+        /// <summary>
+        /// Finds how many collisions there are on the x and y and returns if
+        /// the x axis has the least
+        /// </summary>
         private bool ShouldDoX()
         {
             int xCount = 0;
@@ -191,6 +201,7 @@ namespace Physics2DDotNet.Detectors
             {
                 if (xStubs[index].begin) { xCount += xdepth++; }
                 else { xdepth--; }
+
                 if (yStubs[index].begin) { yCount += ydepth++; }
                 else { ydepth--; }
             }
@@ -200,8 +211,7 @@ namespace Physics2DDotNet.Detectors
         public override void Detect(Scalar dt)
         {
             Update();
-            bool doX = ShouldDoX();
-            DetectInternal(dt, doX);
+            DetectInternal(dt, ShouldDoX());
         }
         private void DetectInternal(Scalar dt, bool doX)
         {
@@ -213,14 +223,10 @@ namespace Physics2DDotNet.Detectors
                 Wrapper wrapper1 = stub.wrapper;
                 if (stub.begin)
                 {
-                    if (doX)
-                    {
-                        wrapper1.SetY();
-                    }
-                    else
-                    {
-                        wrapper1.SetX();
-                    }
+                    //set the min and max values
+                    if (doX) { wrapper1.SetY(); }
+                    else { wrapper1.SetX(); }
+
                     Body body1 = wrapper1.body;
                     for (LinkedListNode<Wrapper> node = currentBodies.First;
                         node != null;
@@ -228,10 +234,9 @@ namespace Physics2DDotNet.Detectors
                     {
                         Wrapper wrapper2 = node.Value;
                         Body body2 = wrapper2.body;
-                        if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
-                            Body.CanCollide(body1, body2) &&
-                            wrapper1.min <= wrapper2.max &&
-                            wrapper2.min <= wrapper1.max)
+                        if (wrapper1.min <= wrapper2.max && //tests the other axis
+                            wrapper2.min <= wrapper1.max &&
+                            Body.CanCollide(body1, body2))
                         {
                             OnCollision(dt, body1, body2);
                         }

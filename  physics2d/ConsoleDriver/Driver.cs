@@ -199,6 +199,13 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
+            for (float angle = 0; angle < MathHelper.TWO_PI; angle += .2f)
+            {
+                Vector2D b = Vector2D.FromLengthAndAngle(1,angle);
+                Console.WriteLine("{0} == {1}", angle, b.Angle);
+            }
+
+
             int test = 0;
             int bob = 0;
             bob += test++;

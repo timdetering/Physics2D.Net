@@ -34,19 +34,42 @@ using System.Collections.Generic;
 namespace Physics2DDotNet
 {
     /// <summary>
-    /// A collision ignorer that uses group numbers to do collision ignoring.
-    /// If 2 objects are members of the same group then they will not collide.
+    /// A collection that stores ints that represent groups
     /// </summary>
     [Serializable]
-    public class CollisionGroupIgnorer : CollisionIgnorer, ICollection<int>, ICloneable
+    public class GroupCollection : ICollection<int>
     {
+        public static bool Intersect(GroupCollection groups1, GroupCollection groups2)
+        {
+            List<int> g1 = groups1.groups;
+            List<int> g2 = groups2.groups;
+            int index1 = 0;
+            int index2 = 0;
+            while (index1 < g1.Count && index2 < g2.Count)
+            {
+                if (g1[index1] == g2[index2])
+                {
+                    return true;
+                }
+                else if (g1[index1] < g2[index2])
+                {
+                    index1++;
+                }
+                else
+                {
+                    index2++;
+                }
+            }
+            return false;
+        }
+
         List<int> groups = new List<int>();
 
-        public CollisionGroupIgnorer()
+        public GroupCollection()
         {
             groups = new List<int>();
         }
-        protected CollisionGroupIgnorer(CollisionGroupIgnorer copy):base(copy)
+        public GroupCollection(GroupCollection copy)
         {
             this.groups = new List<int>(copy.groups);
         }
@@ -70,17 +93,20 @@ namespace Physics2DDotNet
         /// <returns>false if the ignorer was already part of the group; otherwise false.</returns>
         public bool Add(int item)
         {
-            if (!Contains(item))
+            for (int index = 0; index < groups.Count; ++index)
             {
-                groups.Add(item);
-                if (groups.Count > 1 && 
-                    item < groups[groups.Count - 2])
+                if (groups[index] == item)
                 {
-                    groups.Sort();
+                    return false;
                 }
-                return true;
+                if (groups[index] < item)
+                {
+                    groups.Insert(index, item);
+                    return true;
+                }
             }
-            return false;
+            groups.Add(item);
+            return true;
         }
         /// <summary>
         /// adds an array of group ids.
@@ -248,44 +274,6 @@ namespace Physics2DDotNet
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-        public virtual object Clone()
-        {
-            return new CollisionGroupIgnorer(this);
-        }
-        public bool CanCollide(CollisionGroupIgnorer other)
-        {
-            if (other == null) { throw new ArgumentNullException("other"); }
-            return CanCollideInternal(other);
-        }
-        private bool CanCollideInternal(CollisionGroupIgnorer other)
-        {
-            List<int> otherGroup = other.groups;
-            int index1 = 0;
-            int index2 = 0;
-            while (index1 < groups.Count && index2 < otherGroup.Count)
-            {
-                if (groups[index1] == otherGroup[index2])
-                {
-                    return false;
-                }
-                else if (groups[index1] < otherGroup[index2])
-                {
-                    index1++;
-                }
-                else
-                {
-                    index2++;
-                }
-            }
-            return true;
-        }
-        protected override bool CanCollide(Body other)
-        {
-            CollisionGroupIgnorer value = other.Ignorer as CollisionGroupIgnorer;
-            return
-                value == null ||
-                CanCollideInternal(value);
         }
     }
 }

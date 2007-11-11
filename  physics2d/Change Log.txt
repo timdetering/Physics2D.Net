@@ -10,6 +10,7 @@ Fixed: a few problems pointed out by AeHNC in AdvanceMath.Design
 Removed: useless using statements
 Added: a few Faux Attributes for Compact Framework
 Changed: Redid how I did the compatibility with the Compact Framework to drastically reduce the number of #if statements. 
+changed: Vector2D.GetAngle to use a more accepted approuch.
 
 Physics2D.Net
 NEXTVERSION:
@@ -33,7 +34,12 @@ Added: BruteForceDetector this is the slowest possible broad phase for compariso
 added: The Serializable Attribute to more classes.
 Added: SelectiveSweepDetector, its more consistent and potentially faster then SingleSweepDetector 
 Changed: Redid how I did the compatibility with the Compact Framework to drastically reduce the number of #if statements. 
-
+BREAKING: Changed: renamed all the ignorers to not hav eth word Collision in front of them.
+Added: GroupCollection. which holds most of the logic GroupIgnorer did.
+BREAKING: Changed: GroupIgnorer so that it uses the new GroupsCollection.
+BREAKING: Changed: renamed Body.Ignorer to Body.CollisionIgnorer
+Added: AdvGroupIgnorer which has 2 GroupCollections one of the group its part of one of the groups it ignores.
+Added: Body.EventIgnorer. this is to allow ignoring of collision events
 
 AdvanceMath
 1.6.1.0:

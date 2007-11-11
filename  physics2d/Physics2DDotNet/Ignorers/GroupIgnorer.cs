@@ -30,36 +30,54 @@ using Scalar = System.Single;
 #endif
 using System;
 
-
 namespace Physics2DDotNet
 {
+
+
+
     /// <summary>
-    /// Base class for Collision Ignorers to impliment.
+    /// A collision ignorer that uses group numbers to do collision ignoring.
+    /// If 2 objects are members of the same group then they will not collide.
     /// </summary>
     [Serializable]
-    public abstract class CollisionIgnorer
+    public class GroupIgnorer : Ignorer, ICloneable
     {
-        bool isInverted;
-
-        protected CollisionIgnorer() { }
-        protected CollisionIgnorer(CollisionIgnorer copy)
+        GroupCollection groups;
+        public GroupIgnorer()
         {
-            this.isInverted = copy.isInverted;
+            this.groups = new GroupCollection();
         }
-        /// <summary>
-        /// Get and sets if the result of this ignorer is inverted.
-        /// </summary>
-        public bool IsInverted
+        protected GroupIgnorer(GroupIgnorer copy)
+            : base(copy)
         {
-            get { return isInverted; }
-            set { isInverted = value; }
+            this.groups = new GroupCollection(copy.groups);
         }
-
-        internal bool CanCollideInternal(Body other)
+        public override bool BothNeeded
         {
-            return isInverted ^ CanCollide(other);
+            get { return false; }
         }
-        protected abstract bool CanCollide(Body other);
-        public virtual void UpdateTime(Scalar dt) { }
+        public GroupCollection Groups { get { return groups; } }
+        public bool CanCollide(GroupIgnorer other)
+        {
+            if (other == null) { throw new ArgumentNullException("other"); }
+            return CanCollideInternal(other);
+        }
+        private bool CanCollideInternal(GroupIgnorer other)
+        {
+            return !GroupCollection.Intersect(groups, other.groups);
+        }
+        protected override bool CanCollide(Body other)
+        {
+            GroupIgnorer value = other.CollisionIgnorer as GroupIgnorer;
+            return
+                value == null ||
+                CanCollideInternal(value);
+        }
+        public virtual object Clone()
+        {
+            return new GroupIgnorer(this);
+        }
     }
+
+
 }

@@ -166,7 +166,7 @@ namespace Physics2DDotNet
         private DistanceGrid grid; 
 
         #region constructors
-
+        [CLSCompliant(false)]
         public MultiPartPolygon(Vector2D[][] polygons, Scalar gridSpacing)
             : this(polygons, gridSpacing, InertiaOfMultiPartPolygon(polygons)) { }
 

@@ -263,69 +263,14 @@ namespace AdvanceMath
         /// <returns>The <see cref="Angle"/> in radians of the Vector2D.</returns>
         public static Scalar GetAngle(Vector2D source)
         {
-            if (source.X == 0)
-            {
-                if (source.Y > 0)
-                {
-                    return MathHelper.HALF_PI;
-                }
-                else if (source.Y == 0)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return MathHelper.HALF_THREE_PI;
-                }
-            }
-            else if (source.X > 0)
-            {
-                if (source.Y < 0)
-                {
-                    return MathHelper.Atan(source.Y / source.X) + MathHelper.TWO_PI;
-                }
-                else
-                {
-                    return MathHelper.Atan(source.Y / source.X);
-                }
-            }
-            else
-            {
-                return MathHelper.Atan(source.Y / source.X) + MathHelper.PI;
-            }
+            Scalar result = MathHelper.Atan2(source.Y, source.X);
+            if (result < 0) { result += MathHelper.TWO_PI; }
+            return result;
         }
         public static void GetAngle(ref Vector2D source, out Scalar result)
         {
-            if (source.X == 0)
-            {
-                if (source.Y > 0)
-                {
-                    result = MathHelper.HALF_PI;
-                }
-                else if (source.Y == 0)
-                {
-                    result = 0;
-                }
-                else
-                {
-                    result = MathHelper.HALF_THREE_PI;
-                }
-            }
-            else if (source.X > 0)
-            {
-                if (source.Y < 0)
-                {
-                    result = MathHelper.Atan(source.Y / source.X) + MathHelper.TWO_PI;
-                }
-                else
-                {
-                    result = MathHelper.Atan(source.Y / source.X);
-                }
-            }
-            else
-            {
-                result = MathHelper.Atan(source.Y / source.X) + MathHelper.PI;
-            }
+            result = MathHelper.Atan2(source.Y, source.X);
+            if (result < 0) { result += MathHelper.TWO_PI; }
         }
         /// <summary>
         /// Adds 2 Vectors2Ds.

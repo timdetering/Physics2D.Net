@@ -393,5 +393,4 @@ namespace Physics2DDotNet.Detectors
         }
     }
 
-
 }

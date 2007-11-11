@@ -55,11 +55,12 @@ namespace Physics2DDotNet
             return
                 body1.isCollidable &&
                 body2.isCollidable &&
-                (body1.ignorer == null ||
-                (body1.ignorer.CanCollideInternal(body2)))
+                (body1.collisionIgnorer == null ||
+                (body1.collisionIgnorer.CanCollideInternal(body2)))
                 &&
-                (body2.ignorer == null ||
-                (body2.ignorer.CanCollideInternal(body1)));
+                (body2.collisionIgnorer == null ||
+                !body2.collisionIgnorer.BothNeeded ||
+                (body2.collisionIgnorer.CanCollideInternal(body1)));
         }
         #endregion
         #region events
@@ -105,7 +106,8 @@ namespace Physics2DDotNet
         MassInfo massInfo;
         Coefficients coefficients;
         Lifespan lifetime;
-        CollisionIgnorer ignorer;
+        Ignorer eventIgnorer;
+        Ignorer collisionIgnorer;
         int id = -1;
         internal int jointCount;
         internal bool isChecked;
@@ -180,13 +182,13 @@ namespace Physics2DDotNet
             this.massInfo = copy.massInfo;
             this.coefficients = copy.coefficients;
             this.lifetime = copy.lifetime.Duplicate();
-            if (copy.ignorer is ICloneable)
+            if (copy.collisionIgnorer is ICloneable)
             {
-                this.ignorer = (CollisionIgnorer)((ICloneable)copy.ignorer).Clone();
+                this.collisionIgnorer = (Ignorer)((ICloneable)copy.collisionIgnorer).Clone();
             }
             else
             {
-                this.ignorer = copy.ignorer;
+                this.collisionIgnorer = copy.collisionIgnorer;
             }
             if (copy.tag is ICloneable)
             {
@@ -266,10 +268,18 @@ namespace Physics2DDotNet
         /// <summary>
         /// Gets and Sets the Ignore object that decides what collisons to ignore.
         /// </summary>
-        public CollisionIgnorer Ignorer
+        public Ignorer CollisionIgnorer
         {
-            get { return ignorer; }
-            set { ignorer = value; }
+            get { return collisionIgnorer; }
+            set { collisionIgnorer = value; }
+        }
+        /// <summary>
+        /// Gets and Sets the Ignore object that decides what collison events to ignore.
+        /// </summary>
+        public Ignorer EventIgnorer
+        {
+            get { return eventIgnorer; }
+            set { eventIgnorer = value; }
         }
         /// <summary>
         /// Gets and Sets the Coefficients for the class.
@@ -464,7 +474,7 @@ namespace Physics2DDotNet
         {
             lifetime.Update(dt);
             shape.UpdateTime(dt);
-            if (ignorer != null) { ignorer.UpdateTime(dt); }
+            if (collisionIgnorer != null) { collisionIgnorer.UpdateTime(dt); }
             if (Updated != null) { Updated(this, new UpdatedEventArgs(dt)); }
         }
 
@@ -578,14 +588,18 @@ namespace Physics2DDotNet
 
         internal void OnCollision(Body other, ReadOnlyCollection<IContactInfo> contacts)
         {
-            if (Collided != null)
+            if (Collided != null &&
+                (eventIgnorer == null ||
+                eventIgnorer.CanCollideInternal(other)))
             {
                 Collided(this, new CollisionEventArgs(other, contacts));
             }
         }
         internal void OnCollision(Body other, object customIntersectionInfo)
         {
-            if (Collided != null)
+            if (Collided != null &&
+                (eventIgnorer == null ||
+                eventIgnorer.CanCollideInternal(other)))
             {
                 Collided(this, new CollisionEventArgs(other, customIntersectionInfo));
             }

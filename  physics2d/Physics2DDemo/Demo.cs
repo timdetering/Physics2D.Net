@@ -425,7 +425,7 @@ namespace Physics2DDemo
                 5,
                 coefficients.Duplicate(),
                 new Lifespan(10));
-            weapon.Ignorer = avatarBodies[0].Ignorer;
+            weapon.CollisionIgnorer = avatarBodies[0].CollisionIgnorer;
             weapon.Collided += weapon_Collided;
             AddGlObject(weapon);
             engine.AddBody(weapon);
@@ -550,7 +550,7 @@ namespace Physics2DDemo
             Polygon shape = new Polygon(vertexes, 4);
             shape.Tag = sprite;
 
-            CollisionObjectIgnorer ignorer = new CollisionObjectIgnorer();
+            ObjectIgnorer ignorer = new ObjectIgnorer();
             Body a = new Body(new PhysicsState(new ALVector2D(0, 0, 0)),
                 shape,
                 300,//new MassInfo(40, float.PositiveInfinity),
@@ -561,7 +561,7 @@ namespace Physics2DDemo
             avatarOffsets = new List<Vector2D>();
             avatarJoints = new List<Joint>();
             avatarBodies.Add(a);
-            a.Ignorer = ignorer;
+            a.CollisionIgnorer = ignorer;
 
 
 
@@ -596,7 +596,7 @@ namespace Physics2DDemo
                     new Lifespan());
                 HingeJoint joint = new HingeJoint(a, wheel, offset, new Lifespan());
                 joint.Softness = .1f;
-                wheel.Ignorer = ignorer;
+                wheel.CollisionIgnorer = ignorer;
 
                 if (lastWheel != null)
                 {
