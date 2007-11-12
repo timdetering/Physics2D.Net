@@ -40,6 +40,11 @@ BREAKING: Changed: GroupIgnorer so that it uses the new GroupsCollection.
 BREAKING: Changed: renamed Body.Ignorer to Body.CollisionIgnorer
 Added: AdvGroupIgnorer which has 2 GroupCollections one of the group its part of one of the groups it ignores.
 Added: Body.EventIgnorer. this is to allow ignoring of collision events
+Added: a bunch of static Methods to MultiPartPolygon.
+Added: CreateFromBitmap to MultiPartPolygon. This will return multiple polygons :)
+Added: IBitmap and ArrayBitmap that are parameters to the CreateFromBitmap method
+Changed: made it so the CreateFromBitmap method can take a interface to allow for custom Bitmap conversions to not require a large boolean array.
+
 
 AdvanceMath
 1.6.1.0:

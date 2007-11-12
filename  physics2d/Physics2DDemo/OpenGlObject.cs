@@ -51,13 +51,56 @@ namespace Physics2DDemo
         Vector2D offset;
 
 
-        Vector2D[] vertexes;
+        Vector2D[][] vertexes;
 
         public Sprite(string path):this(new Surface(path))
         {
 
         }
         public Sprite(Surface surface2)
+        {
+            this.surface = surface2;
+            texture = new SurfaceGl(surface, true);
+            texture.WrapS = WrapOption.GL_CLAMP;
+            texture.WrapT = WrapOption.GL_CLAMP;
+            //texture.MagFilter = MagnificationOption.GL_LINEAR;
+            //texture.MinFilter = MinifyingOption.GL_LINEAR_MIPMAP_LINEAR;
+            int blank = surface.TransparentColor.ToArgb();
+            bool[,] bitmap = new bool[surface.Width, surface.Height];
+            Color[,] pixels = surface.GetColors(new System.Drawing.Rectangle(0, 0, surface.Width, surface.Height));
+
+            for (int x = 0; x < bitmap.GetLength(0); ++x)
+            {
+                for (int y = 0; y < bitmap.GetLength(1); ++y)
+                {
+                    bitmap[x, y] = pixels[x, y].A != 0;
+                }
+            }
+            vertexes = MultiPartPolygon.CreateFromBitmap(bitmap);
+            Console.WriteLine("Before {0}", GetCount);
+            vertexes = MultiPartPolygon.Reduce(vertexes, 1);
+            vertexes = MultiPartPolygon.Reduce(vertexes, 2);
+            vertexes = MultiPartPolygon.Reduce(vertexes, 3);
+            Console.WriteLine("After {0}", GetCount);
+            vertexes = MultiPartPolygon.Subdivide(vertexes, 10);
+            Console.WriteLine("Subdivide {0}", GetCount);
+            offset = MultiPartPolygon.GetCentroid(vertexes);
+            vertexes = MultiPartPolygon.MakeCentroidOrigin(vertexes);
+        }
+        private int GetCount
+        {
+            get
+            {
+                int result = 0;
+                foreach (Vector2D[] array in vertexes)
+                {
+                    result += array.Length;
+                }
+                return result;
+            }
+
+        }
+      /*  public Sprite(Surface surface2)
         {
             this.surface =  surface2 ;
             texture = new SurfaceGl(surface, true);
@@ -86,7 +129,7 @@ namespace Physics2DDemo
             Console.WriteLine("Subdivide {0}", vertexes.Length);
             offset = Polygon.GetCentroid(vertexes);
             vertexes = Polygon.MakeCentroidOrigin(vertexes);
-        }
+        }*/
         public Vector2D Offset
         {
             get { return offset; }
@@ -95,7 +138,7 @@ namespace Physics2DDemo
         {
             get { return texture; }
         }
-        public Vector2D[] Vertexes
+        public Vector2D[][] Polygons
         {
             get { return vertexes; }
         }
@@ -236,21 +279,23 @@ namespace Physics2DDemo
                 s.Draw();
                 if (DrawLinesAndNormalsForSprites)
                 {
-                    Vector2D[] vertexes = s.Vertexes;
-                    Gl.glLineWidth(1);
-                    Gl.glBegin(Gl.GL_LINES);
-                    Vector2D v1 = vertexes[vertexes.Length - 1];
-                    Vector2D v2;
-                    for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
+                    foreach (Vector2D[] vertexes in s.Polygons)
                     {
-                        v2 = vertexes[index];
-                        Gl.glColor3f(1, 1, 1);
-                        Gl.glVertex2f(v1.X, v1.Y);
-                        Gl.glColor3f(1, 0, 0);
-                        Gl.glVertex2f(v2.X, v2.Y);
-                        DrawNormal(ref v1, ref v2);
+                        Gl.glLineWidth(1);
+                        Gl.glBegin(Gl.GL_LINES);
+                        Vector2D v1 = vertexes[vertexes.Length - 1];
+                        Vector2D v2;
+                        for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
+                        {
+                            v2 = vertexes[index];
+                            Gl.glColor3f(1, 1, 1);
+                            Gl.glVertex2f(v1.X, v1.Y);
+                            Gl.glColor3f(1, 0, 0);
+                            Gl.glVertex2f(v2.X, v2.Y);
+                            DrawNormal(ref v1, ref v2);
+                        }
+                        Gl.glEnd();
                     }
-                    Gl.glEnd();
                 }
             }
             else if (entity.Shape is Physics2DDotNet.Particle)

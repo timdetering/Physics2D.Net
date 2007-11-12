@@ -238,6 +238,9 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.Y:
                     DemoY();
                     break;
+                case SdlDotNet.Input.Key.U:
+                    DemoU();
+                    break;
                 case SdlDotNet.Input.Key.LeftArrow:
                     torque += torqueMag;
                     //force += new Vector2D(-forceMag, 0);
@@ -477,9 +480,10 @@ namespace Physics2DDemo
 
         void CreateBomb()
         {
+             
             Sprite sprite = GetSprite("rocket.png");
-            Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 10);
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = MultiPartPolygon.Subdivide(sprite.Polygons, 10);
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             bomb = new Body(new PhysicsState(new ALVector2D(0,500,-60)),
@@ -513,9 +517,11 @@ namespace Physics2DDemo
                 else
                 {
                     Sprite sprite = GetLetter(c);
-                    Vector2D[] vertexes = Polygon.Subdivide(sprite.Vertexes, 3);
-                    BoundingRectangle rect = BoundingRectangle.FromVectors(sprite.Vertexes);
-                    Polygon shape = new Polygon(vertexes, Math.Min(Math.Min((rect.Max.X - rect.Min.X) / 8, (rect.Max.Y - rect.Min.Y) / 8), 3));
+                    Vector2D[][] vertexes = MultiPartPolygon.Subdivide(sprite.Polygons, 3);
+                    BoundingRectangle rect = BoundingRectangle.FromVectors(sprite.Polygons[0]);
+                    MultiPartPolygon shape = new MultiPartPolygon(
+                        vertexes,
+                        Math.Min(Math.Min((rect.Max.X - rect.Min.X) / 8, (rect.Max.Y - rect.Min.Y) / 8), 3));
                     shape.Tag = sprite;
                     Body b = AddShape(shape, 40, new ALVector2D(0, position + sprite.Offset));
                     maxy = Math.Max(maxy, sprite.Texture.Surface.Height);
@@ -546,8 +552,8 @@ namespace Physics2DDemo
         void CreateAvatar()
         {
             Sprite sprite = GetSprite("tank.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             ObjectIgnorer ignorer = new ObjectIgnorer();
@@ -572,7 +578,7 @@ namespace Physics2DDemo
             BoundingRectangle rect  = shape.Rectangle;
             Scalar y = (rect.Max.Y +4)  ;
             Body lastWheel = null ;
-            BoundingPolygon polygon = new BoundingPolygon(vertexes);
+            BoundingPolygon polygon = new BoundingPolygon(vertexes[0]);
 
             Ray ray2 = new Ray(new Vector2D(rect.Max.X, y), -Vector2D.YAxis);
             Scalar y3 = y - polygon.Intersects(ray2);
@@ -783,8 +789,8 @@ namespace Physics2DDemo
 
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             for (float y = ymax; y >= ymin; y -= (spacing + size))
@@ -810,8 +816,8 @@ namespace Physics2DDemo
             float offsetchange = .9f;
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             for (float x = xmin; x < xmax; x += spacing + Xspacing + size)
@@ -888,8 +894,8 @@ namespace Physics2DDemo
             float offsetchange = .9f;
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             for (float y = maxY; y > minY; y -= spacing)
@@ -952,8 +958,8 @@ namespace Physics2DDemo
 
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite; 
             float minY = 100;
             float maxY = 400 - size / 2;
@@ -1055,8 +1061,8 @@ namespace Physics2DDemo
             float ymax = 90000;
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape =new  MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             for (float y = ymax; y >= ymin; y -= (spacing + size))
@@ -1079,8 +1085,8 @@ namespace Physics2DDemo
             float spacing = 2;
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
             List<Body> bodies = new List<Body>();
             for (float x = xmin; x < xmax; x += spacing + size)
@@ -1115,8 +1121,8 @@ namespace Physics2DDemo
             float spacing = 2;
 
             Sprite sprite = GetSprite("block.png");
-            Vector2D[] vertexes = sprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = sprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = sprite;
             List<Body> bodies = new List<Body>();
             for (float x = xmin; x < xmax; x += spacing + size)
@@ -1182,8 +1188,8 @@ namespace Physics2DDemo
 
             Sprite blockSprite = GetSprite("fighter.png");
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            Vector2D[] vertexes = blockSprite.Vertexes;
-            Polygon shape = new Polygon(vertexes, 4);
+            Vector2D[][] vertexes = blockSprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = blockSprite;
             for (int i = 128 * 3; i > -128; i -= 128)
             {
@@ -1468,7 +1474,52 @@ namespace Physics2DDemo
             AddCircles_StressTest();
             waitHandle.Set();
         }
+        void DemoU()
+        {
+            waitHandle.Reset();
+            Reset(false);
+            AddGravityField();
+            Sprite backSprite = GetSprite("physicsplayGround.png");
+            Vector2D[][] polygons = backSprite.Polygons;
+            //MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            //Body b = AddShape(shape, 40, new ALVector2D(0, backSprite.Offset));
+            foreach (Vector2D[] vertexes in polygons)
+            {
+                Polygon shape = new Polygon(vertexes, 4);
+                Body b = AddShape(shape, float.PositiveInfinity, new ALVector2D(0, backSprite.Offset));
+                b.IgnoresGravity = true;
+            }
+            for (int x = 440; x < 480; x += 10)
+            {
+                for (int y = -2000; y < 0; y += 12)
+                {
+                    Body g = AddCircle(5, 7, 3, new ALVector2D(0, x + rand.Next(-400,400), y));
+                    g.State.Velocity.Angular = 1;
+                    g.Updated += new EventHandler<UpdatedEventArgs>(g_Updated);
+                    //  g.State.Velocity.Linear = new Vector2D(0, 500);
+                }
+            }
+            for (int x = 490; x < 510; x += 10)
+            {
+                for (int y = -550; y < -500; y += 12)
+                {
+                    Body g = AddRectangle(10, 20, 10, new ALVector2D(0, x + rand.Next(-400, 400), y));
+                    g.State.Velocity.Angular = 1;
+                    g.Updated += new EventHandler<UpdatedEventArgs>(g_Updated);
+                    //  g.State.Velocity.Linear = new Vector2D(0, 500);
+                }
+            }
+            waitHandle.Set();
+        }
 
+        void g_Updated(object sender, UpdatedEventArgs e)
+        {
+            Body b = (Body)sender;
+            if (b.State.Position.Linear.Y > 900)
+            {
+                b.State.Position.Linear.Y = -100;
+            }
+        }
 
 
         public static Vector2D GetOrbitVelocity(Vector2D PosOfAccelPoint, Vector2D PosofShip, float AccelDoToGravity)

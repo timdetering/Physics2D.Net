@@ -40,6 +40,18 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class MultiPartPolygon : Shape
     {
+
+        public static Vector2D[][] CreateFromBitmap(bool[,] bitmap)
+        {
+            return CreateFromBitmap(new ArrayBitmap(bitmap));
+        }
+        public static Vector2D[][] CreateFromBitmap(IBitmap bitmap)
+        {
+            if (bitmap == null) { throw new ArgumentNullException("bitmap"); }
+            if (bitmap.Width < 2 || bitmap.Height < 2) { throw new ArgumentOutOfRangeException("bitmap"); }
+            return BitmapHelper.CreateManyFromBitmap(bitmap);
+        }
+
         private static Vector2D[] ConcatVertexes(Vector2D[][] polygons)
         {
             if (polygons == null) { throw new ArgumentNullException("polygons"); }
@@ -156,6 +168,34 @@ namespace Physics2DDotNet
             for (int index = 0; index < polygons.Length; ++index)
             {
                 result[index] = OperationHelper.ArrayRefOp<Vector2D, Vector2D, Vector2D>(polygons[index], ref centroid, Vector2D.Subtract);
+            }
+            return result;
+        }
+
+
+        public static Vector2D[][] Reduce(Vector2D[][] polygons)
+        {
+            return Reduce(polygons, 0);
+        }
+        public static Vector2D[][] Reduce(Vector2D[][] polygons, Scalar areaTolerance)
+        {
+            Vector2D[][] result = new Vector2D[polygons.Length][];
+            for (int index = 0; index < polygons.Length; ++index)
+            {
+                result[index] = Polygon.Reduce(polygons[index]);
+            }
+            return result;
+        }
+        public static Vector2D[][] Subdivide(Vector2D[][] polygons, Scalar maxLength)
+        {
+            return Subdivide(polygons, maxLength, true);
+        }
+        public static Vector2D[][] Subdivide(Vector2D[][] polygons, Scalar maxLength, bool loop)
+        {
+            Vector2D[][] result = new Vector2D[polygons.Length][];
+            for (int index = 0; index < polygons.Length; ++index)
+            {
+                result[index] = Polygon.Subdivide(polygons[index], maxLength, loop);
             }
             return result;
         }

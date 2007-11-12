@@ -38,108 +38,6 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-
-    static class BitmapHelper
-    {
-        static readonly Point2D[] bitmapPoints = new Point2D[]{
-            new Point2D (1,1),
-            new Point2D (0,1),
-            new Point2D (-1,1),
-            new Point2D (-1,0),
-            new Point2D (-1,-1),
-            new Point2D (0,-1),
-            new Point2D (1,-1),
-            new Point2D (1,0),
-        };
-        public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
-        {
-            Point2D first = GetFirst(bitmap);
-            Point2D current = first;
-            Point2D last = first - new Point2D(0, 1);
-            List<Point2D> result = new List<Point2D>();
-            do
-            {
-                result.Add(current);
-                current = GetNextVertex(bitmap, current, last);
-                last = result[result.Count-1];
-            } while (current != first);
-            if (result.Count < 3) { throw new ArgumentException("TODO", "bitmap"); }
-            return Reduce(result);
-        }
-        private static Point2D GetFirst(bool[,] bitmap)
-        {
-            for (int x = bitmap.GetLength(0) - 1; x > -1; --x)
-            {
-                for (int y = 0; y < bitmap.GetLength(1); ++y)
-                {
-                    if (bitmap[x, y])
-                    {
-                        return new Point2D(x, y);
-                    }
-                }
-            }
-            throw new ArgumentException("TODO", "bitmap");
-        }
-        private static Point2D GetNextVertex(bool[,] bitmap, Point2D current, Point2D last)
-        {
-            int offset = 0;
-            Point2D point;
-            for (int index = 0; index < bitmapPoints.Length; ++index)
-            {
-                Point2D.Add(ref current, ref bitmapPoints[index], out point);
-                if (Point2D.Equals(ref point, ref last))
-                {
-                    offset = index + 1;
-                    break;
-                }
-            }
-            for (int index = 0; index < bitmapPoints.Length; ++index)
-            {
-                Point2D.Add(
-                    ref current,
-                    ref bitmapPoints[(index + offset) % bitmapPoints.Length],
-                    out point);
-                if (point.X >= 0 && point.X < bitmap.GetLength(0) &&
-                    point.Y >= 0 && point.Y < bitmap.GetLength(1) &&
-                    bitmap[point.X, point.Y])
-                {
-                    return point;
-                }
-            }
-            throw new ArgumentException("TODO", "bitmap");
-        }
-        private static Vector2D[] Reduce(List<Point2D> list)
-        {
-            List<Vector2D> result = new List<Vector2D>(list.Count);
-            Point2D p1 = list[list.Count - 2];
-            Point2D p2 = list[list.Count - 1];
-            Point2D p3;
-            for (int index = 0; index < list.Count; ++index, p2 = p3)
-            {
-                if (index == list.Count - 1)
-                {
-                    if (result.Count == 0) { throw new ArgumentException("Bad Polygon"); }
-                    p3.X = (int)result[0].X;
-                    p3.Y = (int)result[0].Y;
-                }
-                else { p3 = list[index]; }
-                if (!IsInLine(ref p1, ref p2, ref p3))
-                {
-                    result.Add(new Vector2D(p2.X, p2.Y));
-                    p1 = p2;
-                }
-            }
-            return result.ToArray();
-        }
-        private static bool IsInLine(ref Point2D p1, ref Point2D p2, ref Point2D p3)
-        {
-            int slope1 = (p1.Y - p2.Y);
-            int slope2 = (p2.Y - p3.Y);
-            return 0 == slope1 && 0 == slope2 ||
-               ((p1.X - p2.X) / (Scalar)slope1) == ((p2.X - p3.X) / (Scalar)slope2);
-        }
-    }
-
     [Serializable]
     public sealed class Polygon : Shape
     {
@@ -155,10 +53,15 @@ namespace Physics2DDotNet
         /// <returns>A Vector2D[] representing the bitmap.</returns>
         public static Vector2D[] CreateFromBitmap(bool[,] bitmap)
         {
+            return CreateFromBitmap(new ArrayBitmap(bitmap));
+        }
+        public static Vector2D[] CreateFromBitmap(IBitmap bitmap)
+        {
             if (bitmap == null) { throw new ArgumentNullException("bitmap"); }
-            if (bitmap.GetLength(0) < 2 || bitmap.GetLength(1) < 2) { throw new ArgumentOutOfRangeException("bitmap"); }
+            if (bitmap.Width < 2 || bitmap.Height < 2) { throw new ArgumentOutOfRangeException("bitmap"); }
             return BitmapHelper.CreateFromBitmap(bitmap);
         }
+
         /// <summary>
         /// creates vertexes that describe a Rectangle.
         /// </summary>
