@@ -156,29 +156,6 @@ namespace Physics2DDotNet
             }
             scans[x] = newScan;
         }
-        bool Contains(List<Point2D> points, int x, int y)
-        {
-            return false;
-        }
-        /* public bool Contains(Point2D point)
-         {
-             int scanIndex = point.X - xMin;
-             if (scanIndex < 0 || scanIndex >= scans.Length) { return false; }
-             List<int> scan = scans[scanIndex];
-             for (int index = 0; index < scan.Count; ++index)
-             {
-                 int scanY = scan[index];
-                 if (point.Y == scanY)
-                 {
-                     return true;
-                 }
-                 if (point.Y < scanY)
-                 {
-                     return (index & 1) == 1;
-                 }
-             }
-             return false;
-         }*/
         public bool TryGetSkip(Point2D point, out int nextY)
         {
             int scanIndex = point.X - xMin;

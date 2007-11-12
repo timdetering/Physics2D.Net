@@ -108,20 +108,15 @@ namespace AdvanceMath.Geometry2D
 
         public static void GetDistance(ref Vector2D vertex1, ref Vector2D vertex2, ref Vector2D point, out Scalar result)
         {
-            Scalar edgeLength, nProj, tProj;
-            Vector2D edge, local;//, normal;
+            Scalar edgeLength;
+            Vector2D edge, local;
 
             Vector2D.Subtract(ref point, ref vertex2, out local);
             Vector2D.Subtract(ref vertex1, ref vertex2, out edge);
             Vector2D.Normalize(ref edge, out edgeLength, out edge);
 
-            //Vector2D.GetRightHandNormal(ref edge, out normal);
-           // Vector2D.Dot(ref local, ref normal, out nProj);
-           // Vector2D.Dot(ref local, ref edge, out tProj);
-
-            nProj = local.Y * edge.X - local.X * edge.Y;
-            tProj = local.X * edge.X + local.Y * edge.Y;
-
+            Scalar nProj = local.Y * edge.X - local.X * edge.Y;
+            Scalar tProj = local.X * edge.X + local.Y * edge.Y;
             if (tProj < 0)
             {
                 result = MathHelper.Sqrt(tProj * tProj + nProj * nProj);
@@ -136,6 +131,32 @@ namespace AdvanceMath.Geometry2D
                 result = Math.Abs(nProj);
             }
         }
+        public static void GetDistanceSq(ref Vector2D vertex1, ref Vector2D vertex2, ref Vector2D point, out Scalar result)
+        {
+            Scalar edgeLength;
+            Vector2D edge, local;
+
+            Vector2D.Subtract(ref point, ref vertex2, out local);
+            Vector2D.Subtract(ref vertex1, ref vertex2, out edge);
+            Vector2D.Normalize(ref edge, out edgeLength, out edge);
+
+            Scalar nProj = local.Y * edge.X - local.X * edge.Y;
+            Scalar tProj = local.X * edge.X + local.Y * edge.Y;
+            if (tProj < 0)
+            {
+                result = tProj * tProj + nProj * nProj;
+            }
+            else if (tProj > edgeLength)
+            {
+                tProj -= edgeLength;
+                result = tProj * tProj + nProj * nProj;
+            }
+            else
+            {
+                result = nProj * nProj;
+            }
+        }
+
         [AdvBrowsable]
         public Vector2D Vertex1;
         [AdvBrowsable]

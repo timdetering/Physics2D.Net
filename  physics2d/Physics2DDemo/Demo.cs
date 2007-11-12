@@ -1485,7 +1485,7 @@ namespace Physics2DDemo
             //Body b = AddShape(shape, 40, new ALVector2D(0, backSprite.Offset));
             foreach (Vector2D[] vertexes in polygons)
             {
-                Polygon shape = new Polygon(vertexes, 4);
+                Polygon shape = new Polygon(vertexes, 10);
                 Body b = AddShape(shape, float.PositiveInfinity, new ALVector2D(0, backSprite.Offset));
                 b.IgnoresGravity = true;
             }

@@ -11,6 +11,7 @@ Removed: useless using statements
 Added: a few Faux Attributes for Compact Framework
 Changed: Redid how I did the compatibility with the Compact Framework to drastically reduce the number of #if statements. 
 changed: Vector2D.GetAngle to use a more accepted approuch.
+Changed: BoundingPolygon.GetDistance to potentially be faster
 
 Physics2D.Net
 NEXTVERSION:

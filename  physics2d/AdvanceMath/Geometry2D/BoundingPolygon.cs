@@ -164,25 +164,28 @@ namespace AdvanceMath.Geometry2D
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes"); }
             int count = 0; //intersection count
-            bool t1;
-            Vector2D v1, v2;
-            Scalar temp,distance,goodDistance;
-            v1 = vertexes[vertexes.Length - 1];
-            goodDistance = Scalar.PositiveInfinity;
+            Vector2D v1 = vertexes[vertexes.Length - 1];
+            Vector2D v2;
+            Scalar goodDistance = Scalar.PositiveInfinity;
             for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
             {
                 v2 = vertexes[index];
-                t1 = (v1.Y <= point.Y);
+                bool t1 = (v1.Y <= point.Y);
                 if (t1 ^ (v2.Y <= point.Y))
                 {
-                    temp = ((point.Y - v1.Y) * (v2.X - v1.X) - (point.X - v1.X) * (v2.Y - v1.Y));
+                    Scalar temp = ((point.Y - v1.Y) * (v2.X - v1.X) - (point.X - v1.X) * (v2.Y - v1.Y));
                     if (t1) { if (temp > 0) { count++; } }
                     else { if (temp < 0) { count--; } }
                 }
-                LineSegment.GetDistance(ref v1, ref v2, ref point, out distance);
+                Scalar distance;
+                LineSegment.GetDistanceSq(ref v1, ref v2, ref point, out distance);
                 if (distance < goodDistance) { goodDistance = distance; }
             }
-            result = (count != 0) ? (-goodDistance) : (goodDistance);
+            result = MathHelper.Sqrt(goodDistance);
+            if (count != 0)
+            {
+                result = -result;
+            }
         }
 
 
