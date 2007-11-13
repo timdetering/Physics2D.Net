@@ -197,10 +197,9 @@ namespace Physics2DDotNet
         }
         public static Vector2D[][] CreateManyFromBitmap(IBitmap bitmap)
         {
-            Point2D first;
             List<BitMapSkipper> skippers = new List<BitMapSkipper>();
             List<Vector2D[]> result = new List<Vector2D[]>();
-            while (TryGetFirst(bitmap, skippers, out first))
+            foreach(Point2D first in GetFirsts(bitmap,skippers))
             {
                 List<Point2D> points = CreateFromBitmap(bitmap, first);
                 BitMapSkipper skipper = new BitMapSkipper(bitmap, points);
@@ -237,7 +236,7 @@ namespace Physics2DDotNet
             }
             throw new ArgumentException("TODO", "bitmap");
         }
-        private static bool TryGetFirst(IBitmap bitmap, List<BitMapSkipper> skippers, out Point2D result)
+        private static IEnumerable<Point2D> GetFirsts(IBitmap bitmap, List<BitMapSkipper> skippers)
         {
             for (int x = bitmap.Width - 1; x > -1; --x)
             {
@@ -246,7 +245,7 @@ namespace Physics2DDotNet
                     if (bitmap[x, y])
                     {
                         bool contains = false;
-                        result = new Point2D(x, y);
+                        Point2D result = new Point2D(x, y);
                         for (int index = 0; index < skippers.Count; ++index)
                         {
                             int nextY;
@@ -259,13 +258,11 @@ namespace Physics2DDotNet
                         }
                         if (!contains)
                         {
-                            return true;
+                            yield return result;
                         }
                     }
                 }
             }
-            result = Point2D.Zero;
-            return false;
         }
         private static Point2D GetNextVertex(IBitmap bitmap, Point2D current, Point2D last)
         {
