@@ -73,7 +73,7 @@ namespace Physics2DDemo
             {
                 for (int y = 0; y < bitmap.GetLength(1); ++y)
                 {
-                    bitmap[x, y] = pixels[x, y].A != 0;
+                    bitmap[x, y] = !(pixels[x, y].A == 0 || pixels[x, y].ToArgb() == blank);
                 }
             }
             vertexes = MultiPartPolygon.CreateFromBitmap(bitmap);

@@ -372,6 +372,8 @@ namespace Physics2DDotNet.Solvers
                     // Initialize bias impulse to zero.
                     c.Pnb = 0;
                 }
+                    body1.ApplyProxy();
+                    body2.ApplyProxy();
             }
             public void Apply()
             {
@@ -405,7 +407,7 @@ namespace Physics2DDotNet.Solvers
                     Scalar dPn;
                     if (parent.splitImpulse)
                     {
-                        dPn = c.massNormal * ( - vn);
+                        dPn = c.massNormal * (-vn);
                     }
                     else
                     {
@@ -543,6 +545,8 @@ namespace Physics2DDotNet.Solvers
                         ref mass2Inv,
                         ref I2Inv);
                 }
+                body1.ApplyProxy();
+                body2.ApplyProxy();
             }
             public bool Collided
             {

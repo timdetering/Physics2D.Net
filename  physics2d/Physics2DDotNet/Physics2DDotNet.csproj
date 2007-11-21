@@ -43,7 +43,7 @@
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Detectors\BruteForceDetector.cs" />
     <Compile Include="Detectors\SelectiveSweepDetector.cs" />
-    <Compile Include="Detectors\SingleSweepDetector.cs" />
+    <Compile Include="Detectors\FrameCoherentSAPDetector.cs" />
     <Compile Include="Ignorers\AdvGroupIgnorer.cs" />
     <Compile Include="Ignorers\GroupCollection.cs" />
     <Compile Include="Ignorers\GroupIgnorer.cs" />

@@ -66,6 +66,9 @@ namespace Physics2DDemo
             Gl.glOrtho(0, width, height,0 , -1, 1);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
+            
+
+
             if (ReShape != null) { ReShape(this,EventArgs.Empty); }
         }
 

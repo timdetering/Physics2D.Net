@@ -20,7 +20,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 #endregion
-
+  // Contributor: Andrew D. Jones
 
 
 
@@ -256,4 +256,8 @@ namespace Physics2DDotNet.Detectors
             }
         }
     }
+
+
+
+
 }

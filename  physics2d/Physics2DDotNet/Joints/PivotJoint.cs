@@ -154,6 +154,8 @@ namespace Physics2DDotNet
             {
                 accumulatedImpulse = Vector2D.Zero;
             }
+                body.ApplyProxy();
+
         }
         void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
         {
@@ -176,6 +178,8 @@ namespace Physics2DDotNet
 
 
             Vector2D.Add(ref accumulatedImpulse, ref impulse, out accumulatedImpulse);
+                body.ApplyProxy();
+
         }
     }
 }

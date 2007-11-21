@@ -77,13 +77,13 @@ namespace Physics2DDemo
         Vector2D sparkPoint;
         List<Body> avatarBodies;
 
-         Font font;
+        Font font;
+        Font font2;
         #endregion
         #region constructor
         public Demo()
         {
-            font = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 40);
-            font.Bold = true;
+
             Events.MouseButtonDown += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonDown);
             Events.MouseButtonUp += new EventHandler<SdlDotNet.Input.MouseButtonEventArgs>(Events_MouseButtonUp);
             Events.KeyboardDown += new EventHandler<SdlDotNet.Input.KeyboardEventArgs>(Events_KeyboardDown);
@@ -92,8 +92,15 @@ namespace Physics2DDemo
             waitHandle = new ManualResetEvent(true);
             objects = new List<OpenGlObject>();
 
-            pauseSprite = new SurfaceGl(font.Render("PAUSED", System.Drawing.Color.White, System.Drawing.Color.Black, true));
 
+
+            font = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 40);
+            font.Bold = true;
+            font2 = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 15);
+            font2.Bold = true;
+            pauseSprite = new SurfaceGl(font.Render("PAUSED", System.Drawing.Color.White, System.Drawing.Color.Black, true));
+            upsSprite = new SurfaceGl(font2.Render("UPS:", System.Drawing.Color.White, System.Drawing.Color.Black, true));
+            CreateNumbers();
 
             CreateEngine();
             timer = new PhysicsTimer(Update, .010f);
@@ -103,6 +110,16 @@ namespace Physics2DDemo
             CreateAvatar();
             CreateClipper();
             Demo1();
+        }
+        SurfaceGl upsSprite;
+        SurfaceGl[] numberSprites;
+        public  void CreateNumbers()
+        {
+            numberSprites = new SurfaceGl[10];
+            for (int index = 0; index < numberSprites.Length; ++index)
+            {
+                numberSprites[index] = new SurfaceGl(font2.Render(index.ToString(), System.Drawing.Color.White, System.Drawing.Color.Black, true));
+            }
         }
         #endregion
         #region methods
@@ -240,6 +257,12 @@ namespace Physics2DDemo
                     break;
                 case SdlDotNet.Input.Key.U:
                     DemoU();
+                    break;
+                case SdlDotNet.Input.Key.I:
+                    DemoI();
+                    break;
+                case SdlDotNet.Input.Key.O:
+                    DemoO();
                     break;
                 case SdlDotNet.Input.Key.LeftArrow:
                     torque += torqueMag;
@@ -395,6 +418,7 @@ namespace Physics2DDemo
         void clipper_Collided(object sender, CollisionEventArgs e)
         {
             OpenGlObject o = (OpenGlObject)e.Other.Tag;
+            if (o == null) { return; }
             o.collided = true;
         }
         void clipper_Updated(object sender, UpdatedEventArgs e)
@@ -453,8 +477,8 @@ namespace Physics2DDemo
             //sets the broadphase
             //engine.BroadPhase = new Physics2DDotNet.Detectors.BruteForceDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-            //engine.BroadPhase = new Physics2DDotNet.Detectors.SingleSweepDetector();
             engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
             
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
@@ -844,6 +868,12 @@ namespace Physics2DDemo
             engine.AddBody(e);
             return e;
         }
+        Body AddBody(Body e)
+        {
+            AddGlObject(e);
+            engine.AddBody(e);
+            return e;
+        }
         Body AddRectangle(float height, float width, float mass, ALVector2D position)
         {
             Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(height, width);
@@ -878,6 +908,46 @@ namespace Physics2DDemo
             return e;
 
         }
+
+        Body AddRectangle(BoundingRectangle rect, Scalar mass)
+        {
+            Scalar width = rect.Max.X - rect.Min.X;
+            Scalar heigth = rect.Max.Y - rect.Min.Y;
+            Vector2D pos = rect.Min + new Vector2D(width / 2, heigth / 2);
+            return AddRectangle(heigth, width, mass, new ALVector2D(0, pos));
+        }
+
+        List<Body> AddShell(BoundingRectangle rect, Scalar thickness, Scalar mass)
+        {
+            List<Body> result = new List<Body>();
+
+            result.Add(AddRectangle(
+                new BoundingRectangle(
+                    rect.Min,
+                    new Vector2D(rect.Max.X - thickness, rect.Min.Y + thickness)),
+                mass));
+            result.Add(AddRectangle(
+                new BoundingRectangle(
+                    new Vector2D(rect.Max.X - thickness, rect.Min.Y),
+                    new Vector2D(rect.Max.X, rect.Max.Y - thickness)
+                    ),
+                mass));
+            result.Add(AddRectangle(
+                new BoundingRectangle(
+                    new Vector2D(rect.Min.X + thickness, rect.Max.Y - thickness),
+                    rect.Max),
+                mass));
+
+            result.Add(AddRectangle(
+                new BoundingRectangle(
+                    new Vector2D(rect.Min.X, rect.Min.Y + thickness),
+                    new Vector2D(rect.Min.X + thickness, rect.Max.Y)
+                    ),
+                mass));
+
+            return result;
+        }
+        
         void RemoveBombEvents()
         {
             bomb.Removed -= bomb_Removed;
@@ -924,7 +994,7 @@ namespace Physics2DDemo
                     new Particle(),
                     1f,
                    new Coefficients(1,.5f,.5f),// coefficients.Duplicate(),
-                    new Lifespan(.9f));
+                    new Lifespan(99.9f));
                 Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((float)rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
                 particle.State.Velocity.Linear = direction * rand.Next(200, 1001) + velocity;
@@ -1185,9 +1255,9 @@ namespace Physics2DDemo
             waitHandle.Reset();
             Reset();
             AddGravityField();
+            AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
 
             Sprite blockSprite = GetSprite("fighter.png");
-            AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             Vector2D[][] vertexes = blockSprite.Polygons;
             MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
             shape.Tag = blockSprite;
@@ -1201,6 +1271,13 @@ namespace Physics2DDemo
               matrix.m22 = .98f;
               b.Transformation = matrix;*/
             }
+
+           /* Body body1 = AddShape(shape, 40, new ALVector2D(0, new Vector2D(400, 300)));
+            Body body2 = AddShape(shape, 40, new ALVector2D(0, new Vector2D(500, 400)));
+            Body body3 = AddShape(shape, 40, new ALVector2D(0, new Vector2D(400, 500)));
+            Body.AddProxy(body1, body2, Matrix2x2.FromRotation(MathHelper.HALF_PI));
+            Body.AddProxy(body3, body2, Matrix2x2.FromRotation(-MathHelper.HALF_PI));*/
+
 
             Body ball = AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             ball.Transformation *= Matrix3x3.FromScale(new Vector2D(1, .8f));
@@ -1495,7 +1572,7 @@ namespace Physics2DDemo
                 {
                     Body g = AddCircle(5, 7, 3, new ALVector2D(0, x + rand.Next(-400,400), y));
                     g.State.Velocity.Angular = 1;
-                    g.Updated += new EventHandler<UpdatedEventArgs>(g_Updated);
+                    g.Updated += new EventHandler<UpdatedEventArgs>(DemoU_Body_Updated);
                     //  g.State.Velocity.Linear = new Vector2D(0, 500);
                 }
             }
@@ -1505,14 +1582,222 @@ namespace Physics2DDemo
                 {
                     Body g = AddRectangle(10, 20, 10, new ALVector2D(0, x + rand.Next(-400, 400), y));
                     g.State.Velocity.Angular = 1;
-                    g.Updated += new EventHandler<UpdatedEventArgs>(g_Updated);
+                    g.Updated += new EventHandler<UpdatedEventArgs>(DemoU_Body_Updated);
                     //  g.State.Velocity.Linear = new Vector2D(0, 500);
                 }
             }
             waitHandle.Set();
         }
+        void DemoI()
+        {
+            waitHandle.Reset();
+            Reset(false);
+            Sprite blockSprite = GetSprite("fighter.png");
+            Vector2D[][] vertexes = blockSprite.Polygons;
+            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            shape.Tag = blockSprite;
 
-        void g_Updated(object sender, UpdatedEventArgs e)
+            for (float x = 100; x < 900; x += 200)
+            {
+                for (float y = 100; y < 900; y += 200)
+                {
+                    Body c = AddShape(shape, 40, new ALVector2D(0, new Vector2D(x,y)));
+                    c.Updated += new EventHandler<UpdatedEventArgs>(DemoI_Body_Updated);
+                }
+            }
+            waitHandle.Set();
+
+
+           // this.clippersShape.Rectangle 
+        }
+
+
+        void DemoO()
+        {
+            waitHandle.Reset();
+            Reset(false);
+            BoundingRectangle rect = this.clippersShape.Rectangle;
+            rect.Min.X -= 75;
+            rect.Min.Y -= 75;
+            rect.Max.X += 75;
+            rect.Max.Y += 75;
+            AddShell(rect,100,Scalar.PositiveInfinity);
+            rect.Min.X += 100;
+            rect.Min.Y += 100;
+            rect.Max.X -= 100;
+            rect.Max.Y -= 100;
+
+
+            float spacing = 10;
+            for (float x = rect.Min.X; x < rect.Max.X; x += spacing)
+            {
+                for (float y = rect.Min.Y; y < rect.Max.Y; y += spacing)
+                {
+                    Scalar radius = rand.Next(2,5);
+                    Body circle =AddCircle(radius, 10, radius * 2, new ALVector2D(0, x, y));
+                    circle.State.Velocity.Linear.X = rand.Next(-500, 501);
+                    circle.State.Velocity.Linear.Y = rand.Next(-500, 501);
+                }
+            }
+
+            waitHandle.Set();
+        }
+        const int Min = 0;
+        const int Non = 1;
+        const int Max = 2;
+
+        static void FillRect(int[,] has, BoundingRectangle clip, BoundingRectangle other)
+        {
+            ContainmentType inter = clip.Contains(other);
+            if (inter == ContainmentType.Contains)
+            {
+                has[Non, Non]++;
+            }
+            else
+            {
+                has[Non, Non]++;
+                bool hasMin = false;
+                bool hasMax = false;
+                if (other.Min.X < clip.Min.X)
+                {
+                    hasMin = true;
+                    has[Min, Non]++;
+                }
+                else if (other.Max.X > clip.Max.X)
+                {
+                    hasMax = true;
+                    has[Max, Non]++;
+                }
+
+                if (other.Min.Y < clip.Min.Y)
+                {
+                    has[Non, Min]++;
+                    if (hasMax)
+                    {
+                        has[Max, Min]++;
+                    }
+                    else if (hasMin)
+                    {
+                        has[Min, Min]++;
+                    }
+                }
+                else if (other.Max.Y > clip.Max.Y)
+                {
+                    has[Non, Max]++;
+                    if (hasMax)
+                    {
+                        has[Max, Max]++;
+                    }
+                    else if (hasMin)
+                    {
+                        has[Min, Max]++;
+                    }
+                }
+            }
+        }
+
+        void DemoI_Body_Updated(object sender, UpdatedEventArgs e)
+        {
+            Body b = (Body)sender;
+            BoundingRectangle clip  = this.clippersShape.Rectangle;
+            BoundingRectangle mainRect =b.Shape.Rectangle;
+            ContainmentType inter = clip.Contains( mainRect);
+            if (inter == ContainmentType.Intersects)
+            {
+                Scalar yDiff = clip.Max.Y - clip.Min.Y;
+                Scalar xDiff = clip.Max.X - clip.Min.X;
+
+                int[,] has = new int[3, 3];
+                bool[,] needs = new bool[3, 3];
+
+                int[,] needsTemp = new int[3, 3];
+                FillRect(needsTemp, clip, mainRect);
+                for (int x = 0; x < 3; ++x)
+                {
+                    for (int y = 0; y < 3; ++y)
+                    {
+                        if (needsTemp[x, y] > 0)
+                        {
+                            needs[(-(x - Non) + Non), (-(y - Non) + Non)] = true;
+                        }
+                    }
+                }
+
+
+
+                if (mainRect.Min.X < clip.Min.X)
+                {
+                    needs[Max, Non] = true;
+                }
+                else if (mainRect.Max.X > clip.Max.X)
+                {
+                    needs[Min, Non] = true;
+                }
+                if (mainRect.Min.Y < clip.Min.Y)
+                {
+                    needs[Non,Max] = true;
+                }
+                else if (mainRect.Max.Y > clip.Max.Y)
+                {
+                    needs[Non, Min] = true;
+                }
+                FillRect(has, clip, mainRect);
+                foreach (BodyProxy proxy in b.Proxies)
+                {
+                    BoundingRectangle rect = proxy.Body.Shape.Rectangle;
+                    FillRect(has, clip, rect);
+                   
+                }
+                for (int x = 0; x < 3; ++x)
+                {
+                    for (int y = 0; y < 3; ++y)
+                    {
+                        bool add = false;
+                        if (x != Non || y != Non)
+                        {
+                            if (needs[x, y] && has[x, y] == 0)
+                            {
+                                add = true;
+                            }
+                        }
+                        if (add)
+                        {
+                            Body prox = b.Duplicate();
+                            prox.Updated += new EventHandler<UpdatedEventArgs>(DemoI_Body_Updated);
+                            prox.Collided += new EventHandler<CollisionEventArgs>(DemoI_Body_Collided);
+                            prox.State.Position.Linear.X -= xDiff * (Non-x );
+                            prox.State.Position.Linear.Y -= yDiff * (Non-y );
+                            AddBody(prox);
+                            Body.AddProxy(b, prox, Matrix2x2.Identity);
+                        }
+                    }
+                }
+            }
+            else if (inter == ContainmentType.Disjoint)
+            {
+                b.Lifetime.IsExpired = true;
+            }
+        }
+
+        void DemoI_Body_Collided(object sender, CollisionEventArgs e)
+        {
+            Body b = (Body)sender;
+            foreach( BodyProxy prox in  b.Proxies)
+            {
+                if (e.Other == prox.Body)
+                {
+                    if (b.ID > e.Other.ID)
+                    {
+                        b.Lifetime.IsExpired = true;
+                    }
+                    else
+                    {
+                        e.Other.Lifetime.IsExpired = true;
+                    }
+                }
+            }  
+        }
+        void DemoU_Body_Updated(object sender, UpdatedEventArgs e)
         {
             Body b = (Body)sender;
             if (b.State.Position.Linear.Y > 900)
@@ -1535,11 +1820,23 @@ namespace Physics2DDemo
             return orbitvelocity;
         }
 
+
+        double time = 0;
+        int updates = 0;
+        DateTime last = DateTime.Now;
         public void Update(float dt)
         {
             engine.Update(dt);
             updated = true;
             waitHandle.WaitOne();
+
+
+
+
+
+            updates++;
+
+
         }
 
 
@@ -1557,6 +1854,12 @@ namespace Physics2DDemo
                 {
                     obj.Invalidate();
                 }
+            }
+            pauseSprite.Refresh();
+            upsSprite.Refresh();
+            for (int index = 0; index < numberSprites.Length; ++index)
+            {
+                numberSprites[index].Refresh();
             }
         }
         void noth(object o) { }
@@ -1599,7 +1902,7 @@ namespace Physics2DDemo
                     objects[index].Draw();
                 }
             }
-            if (timer.State == TimerState.Slow || timer.State == TimerState.Fast)
+          /*  if (timer.State == TimerState.Slow || timer.State == TimerState.Fast)
             {
                 Gl.glLoadIdentity();
                 Gl.glBegin(Gl.GL_QUADS);
@@ -1616,19 +1919,75 @@ namespace Physics2DDemo
                 Gl.glVertex2f(10, 10);
                 Gl.glVertex2f(0, 10);
                 Gl.glEnd();
-            }
+            }*/
+            DrawUPS();
             if (timer.State == TimerState.Paused)
             {
-                Gl.glLoadIdentity();
-                BoundingRectangle rect = this.clippersShape.Rectangle;
-                Gl.glEnable(Gl.GL_TEXTURE_2D);
-                Gl.glEnable(Gl.GL_BLEND);
-                Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
-                Gl.glColor3f(1, 1, 1);
-                pauseSprite.Draw((rect.Max.X- rect.Min.X) / 2 - pauseSprite.Surface.Width / 2, (rect.Max.Y - rect.Min.Y) / 2 - pauseSprite.Surface.Height / 2);
-                Gl.glDisable(Gl.GL_TEXTURE_2D);
-                Gl.glDisable(Gl.GL_BLEND);
+                DrawPaused();
             }
+        }
+        int lastups = 0;
+        private void DrawUPS()
+        {
+            DateTime now = DateTime.Now;
+            TimeSpan diff = now.Subtract(last);
+            time += diff.TotalSeconds;
+            last = now;
+            int ups = (int)(updates / time);
+            if (ups < 0) { ups = 0; }
+            ups = (ups + lastups) / 2;
+            lastups = ups;
+            if (time > 1)
+            {
+                // Console.WriteLine("Updates/Second: {0}", updates / time);
+                updates = 0;
+                time = 0;
+            }
+            Gl.glLoadIdentity();
+            int sep = 4;
+            string val = ups.ToString();
+
+
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
+            Gl.glEnable(Gl.GL_BLEND);
+            Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
+            /*if (timer.State == TimerState.Slow)
+            {
+                Gl.glColor3f(.5f, 0, 0);
+            }
+            else if(timer.State == TimerState.Fast)
+            {
+                Gl.glColor3f(0, .5f, 0);
+            }*/
+            Gl.glColor3f(1, 0, 0);
+
+            int y = 0;
+
+            upsSprite.Draw(10, y);
+            int pos = sep + upsSprite.TextureWidth;
+            for (int index = 0; index < val.Length; ++index)
+            {
+                int numIndex = val[index] - '0';
+                SurfaceGl spr = numberSprites[numIndex];
+
+                spr.Draw(pos, y);
+                pos += sep + spr.TextureWidth;
+            }
+
+            Gl.glDisable(Gl.GL_TEXTURE_2D);
+            Gl.glDisable(Gl.GL_BLEND);
+        }
+        private void DrawPaused()
+        {
+            Gl.glLoadIdentity();
+            BoundingRectangle rect = this.clippersShape.Rectangle;
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
+            Gl.glEnable(Gl.GL_BLEND);
+            Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
+            Gl.glColor3f(1, 1, 1);
+            pauseSprite.Draw((rect.Max.X - rect.Min.X) / 2 - pauseSprite.Surface.Width / 2, (rect.Max.Y - rect.Min.Y) / 2 - pauseSprite.Surface.Height / 2);
+            Gl.glDisable(Gl.GL_TEXTURE_2D);
+            Gl.glDisable(Gl.GL_BLEND);
         }
         #endregion
     }
