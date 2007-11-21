@@ -477,8 +477,8 @@ namespace Physics2DDemo
             //sets the broadphase
             //engine.BroadPhase = new Physics2DDotNet.Detectors.BruteForceDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-            engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
-            //engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
             
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
@@ -994,7 +994,7 @@ namespace Physics2DDemo
                     new Particle(),
                     1f,
                    new Coefficients(1,.5f,.5f),// coefficients.Duplicate(),
-                    new Lifespan(99.9f));
+                    new Lifespan(.9f));
                 Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((float)rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
                 particle.State.Velocity.Linear = direction * rand.Next(200, 1001) + velocity;
