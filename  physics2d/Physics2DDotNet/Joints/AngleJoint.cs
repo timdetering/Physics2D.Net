@@ -44,7 +44,7 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class AngleJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
-        Solvers.SequentialImpulsesSolver solver;
+        //Solvers.SequentialImpulsesSolver solver;
         Body body1;
         Body body2;
         Scalar angle;
@@ -88,7 +88,7 @@ namespace Physics2DDotNet
         }
         protected override void OnAdded()
         {
-            this.solver = (Solvers.SequentialImpulsesSolver)Engine.Solver;
+           // this.solver = (Solvers.SequentialImpulsesSolver)Engine.Solver;
         }
         void Solvers.ISequentialImpulsesJoint.PreStep(Scalar dtInv)
         {

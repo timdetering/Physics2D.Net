@@ -41,8 +41,8 @@ namespace Physics2DDotNet.Math2D
     [StructLayout(LayoutKind.Sequential, Size = ALVector2D.Size), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<ALVector2D>))]
-    [AdvBrowsableOrder("Angular,Linear")]
 #endif
+    [AdvBrowsableOrder("Angular,Linear")]
     public struct ALVector2D : IEquatable<ALVector2D>
     {
         public static ALVector2D Parse(string text)

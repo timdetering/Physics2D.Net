@@ -33,23 +33,18 @@ using System;
 using AdvanceMath;
 using AdvanceMath.Design;
 using Physics2DDotNet.Math2D;
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
 using System.Runtime.Serialization;
-#endif
 namespace Physics2DDotNet
 {
 
     /// <summary>
     /// This class Stores mass information and Moment of Inertia Together since they are very closly related.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>))]
 #endif
     [AdvBrowsableOrder("Mass,MomentofInertia"), Serializable]
-    public sealed class MassInfo 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-        : IDeserializationCallback
-#endif
+    public sealed class MassInfo : IDeserializationCallback
     {
 
         #region static methods
@@ -171,7 +166,7 @@ namespace Physics2DDotNet
         }
         #endregion
         #region IDeserializationCallback Members
-        public void OnDeserialization(object sender)
+        void IDeserializationCallback.OnDeserialization(object sender)
         {
             this.massInv = 1 / this.mass;
             this.momentofInertiaInv = 1 / this.momentofInertia;

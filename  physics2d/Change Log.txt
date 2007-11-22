@@ -49,6 +49,9 @@ Changed: Made Major Speed improvment to the MultiPartPolygon.CreateFromBitmap me
 Added: Proxying. Body.*Proxy*, A system to make 2 object appear to be the same. can be used for asteroids style game or a 2D version of portal.
 Added: FrameCoherentSAPDetector. SAP = sweep and prune. Its good for very static enviroments. Contributed by Andrew D.Jones
 Removed: SingleSweepDetector since SelectiveSweepDetector is better.
+Changed: made a few changes suggested by FXcop. Including a few bug fixes.
+Renamed: MultiPartPolygon to MultipartPolygon because of FXcop.
+Changed: did a global Search and replace for float to Scalar. 
 
 AdvanceMath
 1.6.1.0:

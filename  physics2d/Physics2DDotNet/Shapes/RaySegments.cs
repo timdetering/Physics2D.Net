@@ -96,6 +96,7 @@ namespace Physics2DDotNet
         public RaySegments(params RaySegment[] segments)
             : base(Empty, 1)
         {
+            if (segments == null) { throw new ArgumentNullException("segments"); }
             this.originalSegments = segments;
             this.segments = (RaySegment[])segments.Clone();
         }
@@ -210,7 +211,7 @@ namespace Physics2DDotNet
             }
             return intersects;
         }
-        bool TryGetCustomIntersection(MultiPartPolygon polygon, out RaySegmentIntersectionInfo info)
+        bool TryGetCustomIntersection(MultipartPolygon polygon, out RaySegmentIntersectionInfo info)
         {
             bool intersects = false;
             Scalar[] result = new Scalar[segments.Length];
@@ -256,13 +257,13 @@ namespace Physics2DDotNet
             bool intersects = false;
             RaySegmentIntersectionInfo info = null;
             Polygon polygon;
-            MultiPartPolygon multiPolygon;
+            MultipartPolygon multiPolygon;
             Circle circle;
             if ((polygon = other.Shape as Polygon) != null)
             {
                 intersects = TryGetCustomIntersection(polygon, out info);
             }
-            else if ((multiPolygon = other.Shape as MultiPartPolygon) != null)
+            else if ((multiPolygon = other.Shape as MultipartPolygon) != null)
             {
                 intersects = TryGetCustomIntersection(multiPolygon, out info);
             }

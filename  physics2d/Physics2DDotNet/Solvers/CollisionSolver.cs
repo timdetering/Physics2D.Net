@@ -35,9 +35,8 @@ using System.Collections.ObjectModel;
 
 namespace Physics2DDotNet.Solvers
 {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+
     [Serializable]
-#endif
     public abstract class CollisionSolver
     {
         protected static void SetTag(Body body, object tag)

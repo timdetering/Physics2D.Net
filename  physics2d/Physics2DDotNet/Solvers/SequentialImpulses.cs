@@ -42,6 +42,7 @@ using Physics2DDotNet.Math2D;
 namespace Physics2DDotNet.Solvers
 {
 
+    [Serializable]
     sealed class SequentialImpulsesTag
     {
         public ALVector2D biasVelocity;
@@ -51,9 +52,10 @@ namespace Physics2DDotNet.Solvers
             this.body = body;
         }
     }
-
+    [Serializable]
     public sealed class SequentialImpulsesSolver : CollisionSolver
     {
+        [Serializable]
         sealed class Contact : IContactInfo
         {
             public int id;
@@ -96,6 +98,7 @@ namespace Physics2DDotNet.Solvers
                 get { return (id < 0) ? (arbiter.body2) : (arbiter.body1); }
             }
         }
+        [Serializable]
         sealed class Arbiter 
         {
             static Contact[]  Empty = new Contact[0];
@@ -571,9 +574,6 @@ namespace Physics2DDotNet.Solvers
         }
 
 
-
-
-
         Dictionary<long, Arbiter> arbiters;
         List<ISequentialImpulsesJoint> siJoints;
         List<SequentialImpulsesTag> tags;
@@ -582,14 +582,9 @@ namespace Physics2DDotNet.Solvers
         bool warmStarting = true;
         bool positionCorrection = true;
 
-
-
         Scalar biasFactor = 0.7f;
         Scalar allowedPenetration = 0.1f;
         int iterations = 12;
-
-
-
 
         public SequentialImpulsesSolver()
         {
@@ -772,7 +767,7 @@ namespace Physics2DDotNet.Solvers
         {
             if (!(joint is ISequentialImpulsesJoint))
             {
-                throw new ArgumentException("The joint must impliment ISequentialImpulsesJoint to be added to this solver.");
+                throw new ArgumentException("The joint must implement ISequentialImpulsesJoint to be added to this solver.");
             }
         }
     }

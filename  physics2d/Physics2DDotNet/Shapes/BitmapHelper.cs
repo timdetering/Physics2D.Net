@@ -83,7 +83,7 @@ namespace Physics2DDotNet
             FromVectors(points);
             CreateScans();
             FillScans(points);
-            FormatScans(bitmap, points);
+            FormatScans(bitmap);
         }
 
         void FromVectors(List<Point2D> points)
@@ -123,15 +123,15 @@ namespace Physics2DDotNet
             }
         }
 
-        void FormatScans(IBitmap bitmap, List<Point2D> points)
+        void FormatScans(IBitmap bitmap)
         {
             for (int index = 0; index < scans.Length; ++index)
             {
                 scans[index].Sort();
-                FormatScan(bitmap, points, index);
+                FormatScan(bitmap, index);
             }
         }
-        void FormatScan(IBitmap bitmap, List<Point2D> points, int x)
+        void FormatScan(IBitmap bitmap, int x)
         {
             List<int> scan = scans[x];
             List<int> newScan = new List<int>();

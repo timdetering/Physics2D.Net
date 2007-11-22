@@ -37,36 +37,7 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
-    /// <summary>
-    /// This is a Proxy. That keeps 2 bodies velocities synchronized. 
-    /// </summary>
-    [Serializable]
-    public sealed class BodyProxy
-    {
-        internal Body body;
-        internal Matrix2x2 transformation = Matrix2x2.Identity;
-        internal LinkedListNode<BodyProxy> node;
-        internal BodyProxy invertedTwin;
-        internal BodyProxy(Body body, Matrix2x2 transformaiton)
-        {
-            this.body = body;
-            this.transformation = transformaiton;
-            this.node = new LinkedListNode<BodyProxy>(this);
-        }
-        /// <summary>
-        /// This is the other body to be Synchronized with.
-        /// </summary>
-        public Body Body { get { return body; } }
-        /// <summary>
-        /// This is how the Velocity will be transformed when syncronized.
-        /// </summary>
-        public Matrix2x2 Transformation { get { return transformation; } }
-        /// <summary>
-        /// This is the inverted twin of this velocity. It's matrix will be invert of this one's.
-        /// And its body will be the body that contains this.
-        /// </summary>
-        public BodyProxy InvertedTwin { get { return invertedTwin; } }
-    }
+
 
     /// <summary>
     /// This is the Physical Body that collides in the engine.
@@ -187,7 +158,7 @@ namespace Physics2DDotNet
         bool isCollidable;
         bool isTransformed;
 
-        LinkedList<BodyProxy> proxies = new LinkedList<BodyProxy>();
+        internal LinkedList<BodyProxy> proxies = new LinkedList<BodyProxy>();
 
 
 

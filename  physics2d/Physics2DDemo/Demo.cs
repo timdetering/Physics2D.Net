@@ -309,7 +309,7 @@ namespace Physics2DDemo
             seg.Length = 300;
             seg.RayInstance = new Ray(Vector2D.Zero, Vector2D.Normalize(Vector2D.XYAxis + Vector2D.XAxis));
             segments.Add(seg);
-            distances = new float[segments.Count];
+            distances = new Scalar[segments.Count];
             Lazer = new Body(new PhysicsState(), new RaySegments(segments.ToArray()), 1, new Coefficients(1, 1, 1), new Lifespan());
             AddGlObject(Lazer);
             engine.AddBody(Lazer);
@@ -320,7 +320,7 @@ namespace Physics2DDemo
         }
 
 
-        float[] distances;
+        Scalar[] distances;
         void Lazer_Collided(object sender, CollisionEventArgs e)
         {
             RaySegmentIntersectionInfo info = (RaySegmentIntersectionInfo)e.CustomCollisionInfo;
@@ -369,7 +369,7 @@ namespace Physics2DDemo
         void bomb_Removed(object sender, RemovedEventArgs e)
         {
             Vector2D position = new Vector2D(rand.Next(0, 1400), 0);
-            float velocityMag = rand.Next(1000, 2000);
+            Scalar velocityMag = rand.Next(1000, 2000);
             Vector2D velocity = Vector2D.SetMagnitude(bombTarget - position, velocityMag);
             bomb.Lifetime = new Lifespan();
             bomb.State.Position.Linear = position;
@@ -477,8 +477,8 @@ namespace Physics2DDemo
             //sets the broadphase
             //engine.BroadPhase = new Physics2DDotNet.Detectors.BruteForceDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-            //engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
-            engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
+            engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
             
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
@@ -506,8 +506,8 @@ namespace Physics2DDemo
         {
              
             Sprite sprite = GetSprite("rocket.png");
-            Vector2D[][] vertexes = MultiPartPolygon.Subdivide(sprite.Polygons, 10);
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            Vector2D[][] vertexes = MultipartPolygon.Subdivide(sprite.Polygons, 10);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             bomb = new Body(new PhysicsState(new ALVector2D(0,500,-60)),
@@ -541,9 +541,9 @@ namespace Physics2DDemo
                 else
                 {
                     Sprite sprite = GetLetter(c);
-                    Vector2D[][] vertexes = MultiPartPolygon.Subdivide(sprite.Polygons, 3);
+                    Vector2D[][] vertexes = MultipartPolygon.Subdivide(sprite.Polygons, 3);
                     BoundingRectangle rect = BoundingRectangle.FromVectors(sprite.Polygons[0]);
-                    MultiPartPolygon shape = new MultiPartPolygon(
+                    MultipartPolygon shape = new MultipartPolygon(
                         vertexes,
                         Math.Min(Math.Min((rect.Max.X - rect.Min.X) / 8, (rect.Max.Y - rect.Min.Y) / 8), 3));
                     shape.Tag = sprite;
@@ -577,13 +577,13 @@ namespace Physics2DDemo
         {
             Sprite sprite = GetSprite("tank.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
             ObjectIgnorer ignorer = new ObjectIgnorer();
             Body a = new Body(new PhysicsState(new ALVector2D(0, 0, 0)),
                 shape,
-                300,//new MassInfo(40, float.PositiveInfinity),
+                300,//new MassInfo(40, Scalar.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
             a.Updated += new EventHandler<UpdatedEventArgs>(avatar_Updated);
@@ -729,19 +729,19 @@ namespace Physics2DDemo
             Body line = new Body(
                 new PhysicsState(position),
                 new Physics2DDotNet.Polygon(Physics2DDotNet.Polygon.CreateRectangle(60, 2000), 40),
-                new MassInfo(float.PositiveInfinity, float.PositiveInfinity),
+                new MassInfo(Scalar.PositiveInfinity, Scalar.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
             line.IgnoresGravity = true;
             AddGlObject(line);
             engine.AddBody(line);
         }
-        void AddLine(Vector2D point1, Vector2D point2, float thickness)
+        void AddLine(Vector2D point1, Vector2D point2, Scalar thickness)
         {
             Vector2D line = point1 - point2;
             Vector2D avg = (point1 + point2) * .5f;
-            float length = line.Magnitude;
-            float angle = line.Angle;
+            Scalar length = line.Magnitude;
+            Scalar angle = line.Angle;
 
             Scalar Hd2 = thickness * .5f;
             Scalar Wd2 = length * .5f;
@@ -765,7 +765,7 @@ namespace Physics2DDemo
             Body body = new Body(
                 new PhysicsState(new ALVector2D(angle, avg)),
               new Polygon(vertexes.ToArray(), thickness / 4),  //new Physics2DDotNet.Line(vertexes, thickness, thickness / 2),
-                new MassInfo(float.PositiveInfinity, float.PositiveInfinity),
+                new MassInfo(Scalar.PositiveInfinity, Scalar.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
             body.Shape.IgnoreVertexes = true;
@@ -773,11 +773,11 @@ namespace Physics2DDemo
             AddGlObject(body);
             engine.AddBody(body);
         }
-        List<Body> AddChain(Vector2D position, float boxLenght, float boxWidth, float boxMass, float spacing, float length)
+        List<Body> AddChain(Vector2D position, Scalar boxLenght, Scalar boxWidth, Scalar boxMass, Scalar spacing, Scalar length)
         {
             List<Body> bodies = new List<Body>();
             Body last = null;
-            for (float x = 0; x < length; x += boxLenght + spacing, position.X += boxLenght + spacing)
+            for (Scalar x = 0; x < length; x += boxLenght + spacing, position.X += boxLenght + spacing)
             {
                 Body current = AddRectangle(boxWidth, boxLenght, boxMass, new ALVector2D(0, position));
                 bodies.Add(current);
@@ -795,16 +795,16 @@ namespace Physics2DDemo
         {
 
 
-            float size = 32;
-            float spacing = .01f;
-            float Xspacing = 1f;
+            Scalar size = 32;
+            Scalar spacing = .01f;
+            Scalar Xspacing = 1f;
 
-            float xmin = 300;
-            float xmax = 850;
-            float ymin = 50;
-            float ymax = 720 - size / 2;
-            float step = (size + spacing + Xspacing) / 2;
-            float currentStep = 0;
+            Scalar xmin = 300;
+            Scalar xmax = 850;
+            Scalar ymin = 50;
+            Scalar ymax = 720 - size / 2;
+            Scalar step = (size + spacing + Xspacing) / 2;
+            Scalar currentStep = 0;
 
 
           /* Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(size, size);
@@ -814,12 +814,12 @@ namespace Physics2DDemo
 
             Sprite sprite = GetSprite("block.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
-            for (float y = ymax; y >= ymin; y -= (spacing + size))
+            for (Scalar y = ymax; y >= ymin; y -= (spacing + size))
             {
-                for (float x = xmin + currentStep; x < (xmax - currentStep); x += spacing + Xspacing + size)
+                for (Scalar x = xmin + currentStep; x < (xmax - currentStep); x += spacing + Xspacing + size)
                 {
                     AddShape(shape, 20, new ALVector2D(0, new Vector2D(x, y)));
                 }
@@ -828,25 +828,25 @@ namespace Physics2DDemo
         }
         void AddTowers()
         {
-            float xmin = 200;
-            float xmax = 800;
-            float ymin = 550;
-            float ymax = 700;
+            Scalar xmin = 200;
+            Scalar xmax = 800;
+            Scalar ymin = 550;
+            Scalar ymax = 700;
 
-            float size = 32;
-            float spacing = 1;
-            float Xspacing = 20;
-            float offset = 0;
-            float offsetchange = .9f;
+            Scalar size = 32;
+            Scalar spacing = 1;
+            Scalar Xspacing = 20;
+            Scalar offset = 0;
+            Scalar offsetchange = .9f;
 
             Sprite sprite = GetSprite("block.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
-            for (float x = xmin; x < xmax; x += spacing + Xspacing + size)
+            for (Scalar x = xmin; x < xmax; x += spacing + Xspacing + size)
             {
-                for (float y = ymax; y > ymin; y -= spacing + size)
+                for (Scalar y = ymax; y > ymin; y -= spacing + size)
                 {
                     AddShape(shape, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
 
@@ -855,7 +855,7 @@ namespace Physics2DDemo
                 }
             }
         }
-        Body AddShape(Shape shape, float mass, ALVector2D position)
+        Body AddShape(Shape shape, Scalar mass, ALVector2D position)
         {
             Body e =
                 new Body(
@@ -874,7 +874,7 @@ namespace Physics2DDemo
             engine.AddBody(e);
             return e;
         }
-        Body AddRectangle(float height, float width, float mass, ALVector2D position)
+        Body AddRectangle(Scalar height, Scalar width, Scalar mass, ALVector2D position)
         {
             Vector2D[] vertices = Physics2DDotNet.Polygon.CreateRectangle(height, width);
             vertices = Physics2DDotNet.Polygon.Subdivide(vertices, (height + width) / 6);
@@ -892,7 +892,7 @@ namespace Physics2DDemo
             return e;
 
         }
-        Body AddCircle(float radius, int vertexCount, float mass, ALVector2D position)
+        Body AddCircle(Scalar radius, int vertexCount, Scalar mass, ALVector2D position)
         {
 
             Shape circleShape = new Physics2DDotNet.Circle(radius, vertexCount); ;
@@ -954,21 +954,21 @@ namespace Physics2DDemo
         }
         void AddTower()
         {
-            float size = 32;
-            float x = 500;
-            float spacing = size + 2;
+            Scalar size = 32;
+            Scalar x = 500;
+            Scalar spacing = size + 2;
 
-            float minY = 430;
-            float maxY = 720 - size / 2;
-            float offset = 0;
-            float offsetchange = .9f;
+            Scalar minY = 430;
+            Scalar maxY = 720 - size / 2;
+            Scalar offset = 0;
+            Scalar offsetchange = .9f;
 
             Sprite sprite = GetSprite("block.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
-            for (float y = maxY; y > minY; y -= spacing)
+            for (Scalar y = maxY; y > minY; y -= spacing)
             {
                 AddShape(shape, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
                 //AddRectangle(size, size, 20, new ALVector2D(0, new Vector2D(x + offset, y)));
@@ -986,7 +986,7 @@ namespace Physics2DDemo
         void AddParticles(Vector2D position,Vector2D velocity, int count)
         {
             Body[] particles = new Body[count];
-            float angle = MathHelper.TWO_PI / count;
+            Scalar angle = MathHelper.TWO_PI / count;
             for (int index = 0; index < count; ++index)
             {
                 Body particle = new Body(
@@ -995,7 +995,7 @@ namespace Physics2DDemo
                     1f,
                    new Coefficients(1,.5f,.5f),// coefficients.Duplicate(),
                     new Lifespan(.9f));
-                Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((float)rand.NextDouble() - .5f) * angle);
+                Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((Scalar)rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
                 particle.State.Velocity.Linear = direction * rand.Next(200, 1001) + velocity;
                 particles[index] = particle;
@@ -1021,19 +1021,19 @@ namespace Physics2DDemo
 
         void AddTower2()
         {
-            float size = 32;
-            float x = 500;
-            float spacing = size + 2;
+            Scalar size = 32;
+            Scalar x = 500;
+            Scalar spacing = size + 2;
 
 
 
             Sprite sprite = GetSprite("block.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite; 
-            float minY = 100;
-            float maxY = 400 - size / 2;
-            for (float y = maxY; y > minY; y -= spacing)
+            Scalar minY = 100;
+            Scalar maxY = 400 - size / 2;
+            for (Scalar y = maxY; y > minY; y -= spacing)
             {
                 AddShape(shape, 20, new ALVector2D(rand.Next(-10, 0) * .1f, new Vector2D(x + rand.Next(-90, 90) * .1f, y)));
             }
@@ -1041,11 +1041,11 @@ namespace Physics2DDemo
         List<Body> AddRagDoll(Vector2D location)
         {
             List<Body> result = new List<Body>();
-            float mass = 10;
+            Scalar mass = 10;
             Body head = AddCircle(12, 9, mass, new ALVector2D(0, location + new Vector2D(0, 0)));
 
-            float Ld2 = 50 / 2;
-            float Wd2 = 25 / 2;
+            Scalar Ld2 = 50 / 2;
+            Scalar Wd2 = 25 / 2;
             Vector2D[] vertexes = new Vector2D[]
             {
                 new Vector2D(Wd2, 0),
@@ -1124,18 +1124,18 @@ namespace Physics2DDemo
         void AddDiaganol_StressTest()
         {
 
-            float size = 32;
-            float spacing = 3f;
+            Scalar size = 32;
+            Scalar spacing = 3f;
 
-            float ymin = -90000;
-            float ymax = 90000;
+            Scalar ymin = -90000;
+            Scalar ymax = 90000;
 
             Sprite sprite = GetSprite("block.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape =new  MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape =new  MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
 
-            for (float y = ymax; y >= ymin; y -= (spacing + size))
+            for (Scalar y = ymax; y >= ymin; y -= (spacing + size))
             {
                 
                     AddShape(shape, 20, new ALVector2D(0, new Vector2D(y, y)));
@@ -1145,23 +1145,23 @@ namespace Physics2DDemo
         void AddTowers_StressTest()
         {
 
-            float box = 900;
-            float xmin = -box;
-            float xmax = box;
-            float ymin = -box;
-            float ymax = box;
+            Scalar box = 900;
+            Scalar xmin = -box;
+            Scalar xmax = box;
+            Scalar ymin = -box;
+            Scalar ymax = box;
 
-            float size = 32;
-            float spacing = 2;
+            Scalar size = 32;
+            Scalar spacing = 2;
 
             Sprite sprite = GetSprite("block.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
             List<Body> bodies = new List<Body>();
-            for (float x = xmin; x < xmax; x += spacing + size)
+            for (Scalar x = xmin; x < xmax; x += spacing + size)
             {
-                for (float y = ymax; y > ymin; y -= spacing + size)
+                for (Scalar y = ymax; y > ymin; y -= spacing + size)
                 {
                     Body e =
                     new Body(
@@ -1181,27 +1181,27 @@ namespace Physics2DDemo
         void AddRandom_StressTest()
         {
 
-            float box = 900;
-            float xmin = -box;
-            float xmax = box;
-            float ymin = -box;
-            float ymax = box;
+            Scalar box = 900;
+            Scalar xmin = -box;
+            Scalar xmax = box;
+            Scalar ymin = -box;
+            Scalar ymax = box;
 
-            float size = 32;
-            float spacing = 2;
+            Scalar size = 32;
+            Scalar spacing = 2;
 
             Sprite sprite = GetSprite("block.png");
             Vector2D[][] vertexes = sprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = sprite;
             List<Body> bodies = new List<Body>();
-            for (float x = xmin; x < xmax; x += spacing + size)
+            for (Scalar x = xmin; x < xmax; x += spacing + size)
             {
-                for (float y = ymax; y > ymin; y -= spacing + size)
+                for (Scalar y = ymax; y > ymin; y -= spacing + size)
                 {
                     Body e =
                     new Body(
-                         new PhysicsState(new ALVector2D(0, new Vector2D(x + (float)rand.NextDouble() * 900000, y + (float)rand.NextDouble() * 900000))),
+                         new PhysicsState(new ALVector2D(0, new Vector2D(x + (Scalar)rand.NextDouble() * 900000, y + (Scalar)rand.NextDouble() * 900000))),
                          shape,
                          20,
                          coefficients.Duplicate(),
@@ -1217,21 +1217,21 @@ namespace Physics2DDemo
         void AddCircles_StressTest()
         {
 
-            float box = 550;
-            float xmin = 0;
-            float xmax = box;
-            float ymin = 0;
-            float ymax = box;
+            Scalar box = 550;
+            Scalar xmin = 0;
+            Scalar xmax = box;
+            Scalar ymin = 0;
+            Scalar ymax = box;
 
-            float size = 15;
-            float spacing = 2;
+            Scalar size = 15;
+            Scalar spacing = 2;
 
            // Particle shape = new Particle(); 
             Circle shape = new Circle(7, 10);
             List<Body> bodies = new List<Body>();
-            for (float x = xmin; x < xmax; x += spacing + size)
+            for (Scalar x = xmin; x < xmax; x += spacing + size)
             {
-                for (float y = ymax; y > ymin; y -= spacing + size)
+                for (Scalar y = ymax; y > ymin; y -= spacing + size)
                 {
                     Body e =
                     new Body(
@@ -1259,7 +1259,7 @@ namespace Physics2DDemo
 
             Sprite blockSprite = GetSprite("fighter.png");
             Vector2D[][] vertexes = blockSprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = blockSprite;
             for (int i = 128 * 3; i > -128; i -= 128)
             {
@@ -1334,7 +1334,7 @@ namespace Physics2DDemo
             List<Body> chain = AddChain(new Vector2D(400, 50), 100, 30, 200, 20, 800);
             Vector2D point = new Vector2D(300, 50);
 
-            Body Anchor = AddCircle(30, 18, float.PositiveInfinity, new ALVector2D(0, point));
+            Body Anchor = AddCircle(30, 18, Scalar.PositiveInfinity, new ALVector2D(0, point));
             Anchor.IgnoresGravity = true;
             HingeJoint joint = new HingeJoint(chain[0], Anchor, point, new Lifespan());
             engine.AddJoint(joint);
@@ -1346,8 +1346,8 @@ namespace Physics2DDemo
             Reset();
             engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
             AddTowers();
-            float y = 0;
-            for (float x = 200; x < 500; x += 100, y -= 100)
+            Scalar y = 0;
+            for (Scalar x = 200; x < 500; x += 100, y -= 100)
             {
                 AddRagDoll(new Vector2D(x, y));
             }
@@ -1359,20 +1359,20 @@ namespace Physics2DDemo
             Reset();
             AddGravityField();
 
-            float boxlength = 50;
-            float spacing = 4;
-            float anchorLenght = 30;
-            float anchorGap = (boxlength / 2) + spacing + (anchorLenght / 2);
+            Scalar boxlength = 50;
+            Scalar spacing = 4;
+            Scalar anchorLenght = 30;
+            Scalar anchorGap = (boxlength / 2) + spacing + (anchorLenght / 2);
             List<Body> chain = AddChain(new Vector2D(200, 500), boxlength, 20, 200, spacing, 600);
 
             Vector2D point2 = new Vector2D(chain[chain.Count - 1].State.Position.Linear.X + anchorGap, 500);
-            Body end2 = AddCircle(anchorLenght / 2, 14, float.PositiveInfinity, new ALVector2D(0, point2));
+            Body end2 = AddCircle(anchorLenght / 2, 14, Scalar.PositiveInfinity, new ALVector2D(0, point2));
             end2.IgnoresGravity = true;
             HingeJoint joint2 = new HingeJoint(chain[chain.Count - 1], end2, point2, new Lifespan());
             engine.AddJoint(joint2);
 
             Vector2D point1 = new Vector2D(chain[0].State.Position.Linear.X - anchorGap, 500);
-            Body end1 = AddCircle(anchorLenght/2, 14, float.PositiveInfinity, new ALVector2D(0, point1));
+            Body end1 = AddCircle(anchorLenght/2, 14, Scalar.PositiveInfinity, new ALVector2D(0, point1));
             end1.IgnoresGravity = true;
             HingeJoint joint1 = new HingeJoint(chain[0], end1, point1, new Lifespan());
             engine.AddJoint(joint1);
@@ -1451,9 +1451,9 @@ namespace Physics2DDemo
             Coefficients o = coefficients;
             coefficients = new Coefficients(1, .5f, .5f);
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
-            Body b1 = AddRectangle(750, 100, float.PositiveInfinity, new ALVector2D(0, 0, 750 / 2));
+            Body b1 = AddRectangle(750, 100, Scalar.PositiveInfinity, new ALVector2D(0, 0, 750 / 2));
             b1.IgnoresGravity = true;
-            Body b2 = AddRectangle(750, 100, float.PositiveInfinity, new ALVector2D(0, 1024, 750 / 2));
+            Body b2 = AddRectangle(750, 100, Scalar.PositiveInfinity, new ALVector2D(0, 1024, 750 / 2));
             b2.IgnoresGravity = true;
             coefficients = new Coefficients(.7f, .05f, .05f);
 
@@ -1479,18 +1479,18 @@ namespace Physics2DDemo
             // AddClipper();
 
             Vector2D gravityCenter = new Vector2D(500, 500);
-            float gravityPower = 200;
+            Scalar gravityPower = 200;
             engine.AddLogic(new GravityPointField(gravityCenter, gravityPower, new Lifespan()));
             AddRagDoll(gravityCenter + new Vector2D(0, -20));
-            float length = 41;
-            float size = 8
+            Scalar length = 41;
+            Scalar size = 8
                 ;
             bool reverse = false;
-            for (float distance = 250; distance < 650; length += 10, size *= 2, distance += 60 + length)
+            for (Scalar distance = 250; distance < 650; length += 10, size *= 2, distance += 60 + length)
             {
 
-                float da = MathHelper.TWO_PI / size;// ((MathHelper.TWO_PI * distance) / size);
-                float l2 = length / 2;
+                Scalar da = MathHelper.TWO_PI / size;// ((MathHelper.TWO_PI * distance) / size);
+                Scalar l2 = length / 2;
                 // da /= 2;
                 Vector2D[] vertexes = new Vector2D[]
                 {
@@ -1504,7 +1504,7 @@ namespace Physics2DDemo
                 vertexes = Polygon.Subdivide(vertexes2, 5);
 
                 Polygon shape = new Polygon(vertexes, 1.5f);
-                for (float angle = 0; angle < MathHelper.TWO_PI; angle += da)
+                for (Scalar angle = 0; angle < MathHelper.TWO_PI; angle += da)
                 {
                     Vector2D position = Vector2D.FromLengthAndAngle(distance, angle) + gravityCenter;
                     Body body = AddShape(shape, (size * length) / 10, new ALVector2D(angle, position));
@@ -1563,7 +1563,7 @@ namespace Physics2DDemo
             foreach (Vector2D[] vertexes in polygons)
             {
                 Polygon shape = new Polygon(vertexes, 10);
-                Body b = AddShape(shape, float.PositiveInfinity, new ALVector2D(0, backSprite.Offset));
+                Body b = AddShape(shape, Scalar.PositiveInfinity, new ALVector2D(0, backSprite.Offset));
                 b.IgnoresGravity = true;
             }
             for (int x = 440; x < 480; x += 10)
@@ -1594,12 +1594,12 @@ namespace Physics2DDemo
             Reset(false);
             Sprite blockSprite = GetSprite("fighter.png");
             Vector2D[][] vertexes = blockSprite.Polygons;
-            MultiPartPolygon shape = new MultiPartPolygon(vertexes, 4);
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
             shape.Tag = blockSprite;
 
-            for (float x = 100; x < 900; x += 200)
+            for (Scalar x = 100; x < 900; x += 200)
             {
-                for (float y = 100; y < 900; y += 200)
+                for (Scalar y = 100; y < 900; y += 200)
                 {
                     Body c = AddShape(shape, 40, new ALVector2D(0, new Vector2D(x,y)));
                     c.Updated += new EventHandler<UpdatedEventArgs>(DemoI_Body_Updated);
@@ -1628,10 +1628,10 @@ namespace Physics2DDemo
             rect.Max.Y -= 100;
 
 
-            float spacing = 10;
-            for (float x = rect.Min.X; x < rect.Max.X; x += spacing)
+            Scalar spacing = 10;
+            for (Scalar x = rect.Min.X; x < rect.Max.X; x += spacing)
             {
-                for (float y = rect.Min.Y; y < rect.Max.Y; y += spacing)
+                for (Scalar y = rect.Min.Y; y < rect.Max.Y; y += spacing)
                 {
                     Scalar radius = rand.Next(2,5);
                     Body circle =AddCircle(radius, 10, radius * 2, new ALVector2D(0, x, y));
@@ -1807,15 +1807,15 @@ namespace Physics2DDemo
         }
 
 
-        public static Vector2D GetOrbitVelocity(Vector2D PosOfAccelPoint, Vector2D PosofShip, float AccelDoToGravity)
+        public static Vector2D GetOrbitVelocity(Vector2D PosOfAccelPoint, Vector2D PosofShip, Scalar AccelDoToGravity)
         {
-            float MyOrbitConstant = 0.63661977236758134307553505349036f; //(area under 1/4 of a sin wave)/(PI/2)
+            Scalar MyOrbitConstant = 0.63661977236758134307553505349036f; //(area under 1/4 of a sin wave)/(PI/2)
 
             Vector2D distance = PosOfAccelPoint - PosofShip;
-            float distanceMag = distance.Magnitude;
+            Scalar distanceMag = distance.Magnitude;
             Vector2D distanceNorm = distance * (1 / distanceMag);
 
-            float VelocityForOrbit = MathHelper.Sqrt(2 * MyOrbitConstant * AccelDoToGravity * distanceMag);
+            Scalar VelocityForOrbit = MathHelper.Sqrt(2 * MyOrbitConstant * AccelDoToGravity * distanceMag);
             Vector2D orbitvelocity = distanceNorm.RightHandNormal * VelocityForOrbit;
             return orbitvelocity;
         }
@@ -1824,7 +1824,7 @@ namespace Physics2DDemo
         double time = 0;
         int updates = 0;
         DateTime last = DateTime.Now;
-        public void Update(float dt)
+        public void Update(Scalar dt)
         {
             engine.Update(dt);
             updated = true;

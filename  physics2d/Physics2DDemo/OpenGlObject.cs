@@ -39,7 +39,11 @@ using Tao.OpenGl;
 using Tao.Sdl;
 using Color = System.Drawing.Color;
 
-
+#if UseDouble
+using Scalar = System.Double;
+#else
+using Scalar = System.Single;
+#endif
 namespace Physics2DDemo
 {
     class Sprite
@@ -76,16 +80,16 @@ namespace Physics2DDemo
                     bitmap[x, y] = !(pixels[x, y].A == 0 || pixels[x, y].ToArgb() == blank);
                 }
             }
-            vertexes = MultiPartPolygon.CreateFromBitmap(bitmap);
+            vertexes = MultipartPolygon.CreateFromBitmap(bitmap);
             Console.WriteLine("Before {0}", GetCount);
-            vertexes = MultiPartPolygon.Reduce(vertexes, 1);
-            vertexes = MultiPartPolygon.Reduce(vertexes, 2);
-            vertexes = MultiPartPolygon.Reduce(vertexes, 3);
+            vertexes = MultipartPolygon.Reduce(vertexes, 1);
+            vertexes = MultipartPolygon.Reduce(vertexes, 2);
+            vertexes = MultipartPolygon.Reduce(vertexes, 3);
             Console.WriteLine("After {0}", GetCount);
-            vertexes = MultiPartPolygon.Subdivide(vertexes, 10);
+            vertexes = MultipartPolygon.Subdivide(vertexes, 10);
             Console.WriteLine("Subdivide {0}", GetCount);
-            offset = MultiPartPolygon.GetCentroid(vertexes);
-            vertexes = MultiPartPolygon.MakeCentroidOrigin(vertexes);
+            offset = MultipartPolygon.GetCentroid(vertexes);
+            vertexes = MultipartPolygon.MakeCentroidOrigin(vertexes);
         }
         private int GetCount
         {
@@ -170,7 +174,7 @@ namespace Physics2DDemo
         public bool collided = true;
         public bool shouldDraw = true;
 
-        float[] matrix = new float[16];
+        Scalar[] matrix = new Scalar[16];
         Body entity;
         int list = -1;
         bool removed;
@@ -180,7 +184,7 @@ namespace Physics2DDemo
             get { return removed; }
         }
 
-        float[] distances;
+        Scalar[] distances;
         List<Vector2D> points;
         public OpenGlObject(Body entity)
         {
@@ -194,7 +198,7 @@ namespace Physics2DDemo
             {
                 RaySegments se = (RaySegments)entity.Shape;
                 entity.Collided += new EventHandler<CollisionEventArgs>(entity_Collided);
-                distances = new float[se.Segments.Length];
+                distances = new Scalar[se.Segments.Length];
                 entity.Updated += new EventHandler<UpdatedEventArgs>(entity_Updated);
             }
             else if (DrawCollisionPoints && !(entity.Shape is Particle))
@@ -256,7 +260,7 @@ namespace Physics2DDemo
 
         void DrawNormal(ref Vector2D vertex1, ref Vector2D vertex2)
         {
-            float edgeLength;
+            Scalar edgeLength;
             Vector2D tangent, normal;
 
             Vector2D.Subtract(ref vertex1, ref vertex2, out tangent);
@@ -306,7 +310,7 @@ namespace Physics2DDemo
                 //Gl.glColor3d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
                 foreach (Vector2D vector in entity.Shape.OriginalVertices)
                 {
-                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
+                    Gl.glVertex2f((Scalar)vector.X, (Scalar)vector.Y);
                 }
                 Gl.glEnd();
             }
@@ -320,7 +324,7 @@ namespace Physics2DDemo
                     Gl.glColor3f(1, 0, 1);
                     RaySegment ray = collection.Segments[index];
                     Gl.glVertex2f(ray.RayInstance.Origin.X, ray.RayInstance.Origin.Y);
-                    float length;
+                    Scalar length;
                     if (distances[index] == -1)
                     {
                         length = ray.Length;
@@ -352,7 +356,7 @@ namespace Physics2DDemo
                         Gl.glColor3f(1, 1, 1);
                         second = false;
                     }
-                    Gl.glVertex2f((float)vector.X, (float)vector.Y);
+                    Gl.glVertex2f((Scalar)vector.X, (Scalar)vector.Y);
                 }
                 Gl.glEnd();
             }

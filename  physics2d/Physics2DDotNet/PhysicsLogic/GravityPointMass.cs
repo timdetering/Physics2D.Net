@@ -58,7 +58,7 @@ namespace Physics2DDotNet
         public GravityPointMass(Body body, Scalar metersPerDistanceUnit, Lifespan lifetime)
             : base(lifetime)
         {
-            if (body == null) { throw new ArgumentNullException("source"); }
+            if (body == null) { throw new ArgumentNullException("body"); }
             if (metersPerDistanceUnit <= 0) { throw new ArgumentOutOfRangeException("metersPerDistanceUnit"); }
             this.body = body;
             this.metersPerDistanceUnit = metersPerDistanceUnit;

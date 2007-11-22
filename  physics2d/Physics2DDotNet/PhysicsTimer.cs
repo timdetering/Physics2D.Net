@@ -90,7 +90,7 @@ namespace Physics2DDotNet
         public PhysicsTimer(PhysicsCallback callback, Scalar targetInterval)
         {
             if (callback == null) { throw new ArgumentNullException("callback"); }
-            if (targetInterval <= 0) { throw new ArgumentOutOfRangeException("targetDt"); }
+            if (targetInterval <= 0) { throw new ArgumentOutOfRangeException("targetInterval"); }
             this.targetInterval = targetInterval;
             this.callback = callback;
             this.waitHandle = new AutoResetEvent(true);

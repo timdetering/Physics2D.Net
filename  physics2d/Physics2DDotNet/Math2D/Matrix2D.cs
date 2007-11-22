@@ -37,10 +37,10 @@ namespace Physics2DDotNet.Math2D
 {
     [StructLayout(LayoutKind.Sequential, Size = Matrix2D.Size), Serializable]
     [AdvBrowsableOrder("NormalMatrix,VertexMatrix")]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2D>))]
 #endif
-    public struct Matrix2D
+    public struct Matrix2D : IEquatable<Matrix2D>
     {
         public const int Size = Matrix2x2.Size + Matrix3x3.Size;
 
@@ -58,7 +58,7 @@ namespace Physics2DDotNet.Math2D
             FromALVector2D(ref source, out result);
             return result;
         }
-        public static void FromALVector2D(ref ALVector2D source,out Matrix2D result)
+        public static void FromALVector2D(ref ALVector2D source, out Matrix2D result)
         {
             Matrix2x2.FromRotation(ref source.Angular, out result.NormalMatrix);
             Matrix3x3.FromTranslate2D(ref source.Linear, out result.VertexMatrix);
@@ -111,7 +111,7 @@ namespace Physics2DDotNet.Math2D
             Multiply(ref left, ref right, out result);
             return result;
         }
-        public static void Multiply(ref Matrix3x3 left,ref Matrix2D right,out Matrix2D result)
+        public static void Multiply(ref Matrix3x3 left, ref Matrix2D right, out Matrix2D result)
         {
             result.NormalMatrix = right.NormalMatrix;
             Matrix3x3.Multiply(ref left, ref right.VertexMatrix, out result.VertexMatrix);
@@ -165,11 +165,48 @@ namespace Physics2DDotNet.Math2D
             Multiply(ref left, ref right, out result);
             return result;
         }
-        public static void Multiply(ref Matrix2D left,ref Matrix2D right, out Matrix2D result)
+        public static void Multiply(ref Matrix2D left, ref Matrix2D right, out Matrix2D result)
         {
             Matrix2x2.Multiply(ref left.NormalMatrix, ref right.NormalMatrix, out result.NormalMatrix);
             Matrix3x3.Multiply(ref left.VertexMatrix, ref right.VertexMatrix, out result.VertexMatrix);
         }
+        #endregion
+
+
+        #region Overrides
+        public override int GetHashCode()
+        {
+            return this.NormalMatrix.GetHashCode() ^ this.VertexMatrix.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            return (obj is Matrix2D) && Equals((Matrix2D)obj);
+        }
+        public bool Equals(Matrix2D other)
+        {
+            return Equals(ref this, ref other);
+        }
+        public static bool Equals(Matrix2D left, Matrix2D right)
+        {
+            return
+                Matrix2x2.Equals(ref left.NormalMatrix, ref right.NormalMatrix) &&
+                Matrix3x3.Equals(ref left.VertexMatrix, ref right.VertexMatrix);
+        }
+        [CLSCompliant(false)]
+        public static bool Equals(ref Matrix2D left, ref Matrix2D right)
+        {
+            return
+                Matrix2x2.Equals(ref left.NormalMatrix, ref right.NormalMatrix) &&
+                Matrix3x3.Equals(ref left.VertexMatrix, ref right.VertexMatrix);
+        }
+        public static bool operator ==(Matrix2D left, Matrix2D right)
+        {
+            return Equals(ref left, ref right);
+        }
+        public static bool operator !=(Matrix2D left, Matrix2D right)
+        {
+            return !Equals(ref left, ref right);
+        } 
         #endregion
     }
 }

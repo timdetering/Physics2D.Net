@@ -39,7 +39,7 @@ namespace Physics2DDotNet.Detectors
     [Serializable]
     public sealed class BruteForceDetector : BroadPhaseCollisionDetector
     {
-        public override void Detect(float dt)
+        public override void Detect(Scalar dt)
         {
             Body body1, body2;
             for (int index1 = 0; index1 < this.Bodies.Count; index1++)

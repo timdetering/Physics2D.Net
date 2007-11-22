@@ -171,9 +171,9 @@ namespace Physics2DDotNet.Detectors
         sealed class Extent
         {
             public bool isMin;
-            public float value;
+            public Scalar value;
             public ExtentInfo info;
-            public Extent(ExtentInfo info, float value, bool isMin)
+            public Extent(ExtentInfo info, Scalar value, bool isMin)
             {
                 this.info = info;
                 this.value = value;
@@ -421,7 +421,7 @@ namespace Physics2DDotNet.Detectors
             public List<Body> overlaps;
             public LinkedList<Body> underConsideration;
 
-            public ExtentInfo(Body g, float min, float max)
+            public ExtentInfo(Body g, Scalar min, Scalar max)
             {
                 this.body = g;
                 this.underConsideration = new LinkedList<Body>();
@@ -479,7 +479,7 @@ namespace Physics2DDotNet.Detectors
         ExtentInfoList xInfoList;
         ExtentInfoList yInfoList;
         CollisionPairDictionary collisionPairs;
-        //static public float fTol = 1.5f; //.01f;
+        //static public Scalar fTol = 1.5f; //.01f;
         Scalar dt;
 
         public FrameCoherentSAPDetector()
@@ -512,7 +512,7 @@ namespace Physics2DDotNet.Detectors
             }
         }
 
-        public override void Detect(float dt)
+        public override void Detect(Scalar dt)
         {
             this.dt = dt;
             this.Run();

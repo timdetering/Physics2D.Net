@@ -31,7 +31,7 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.Generic;
-
+using System.Runtime.Serialization;
 using AdvanceMath.Geometry2D;
 
 namespace Physics2DDotNet.Detectors
@@ -42,7 +42,6 @@ namespace Physics2DDotNet.Detectors
     [Serializable]
     public sealed class SelectiveSweepDetector : BroadPhaseCollisionDetector
     {
-
         [Serializable]
         sealed class StubComparer : IComparer<Stub>
         {
@@ -54,8 +53,9 @@ namespace Physics2DDotNet.Detectors
             }
         }
         [Serializable]
-        sealed class Wrapper
+        sealed class Wrapper : IDeserializationCallback
         {
+            [NonSerialized]
             public LinkedListNode<Wrapper> node;
             public Body body;
             public bool shouldAddNode;
@@ -105,6 +105,10 @@ namespace Physics2DDotNet.Detectors
             {
                 this.min = this.yBegin.value;
                 this.max = this.yEnd.value;
+            }
+            void IDeserializationCallback.OnDeserialization(object sender)
+            {
+                this.node = new LinkedListNode<Wrapper>(this);
             }
         }
         [Serializable]

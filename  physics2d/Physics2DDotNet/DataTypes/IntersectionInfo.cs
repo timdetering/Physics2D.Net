@@ -37,7 +37,7 @@ namespace Physics2DDotNet
     [Serializable]
     public struct IntersectionInfo
     {
-        public static IntersectionInfo Zero = new IntersectionInfo();
+        public static readonly IntersectionInfo Zero = new IntersectionInfo();
         public Vector2D Position;
         public Vector2D Normal;
         public Scalar Distance;

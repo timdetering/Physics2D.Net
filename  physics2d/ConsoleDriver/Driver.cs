@@ -47,6 +47,12 @@ using System.Diagnostics;
 using AdvanceMath.Design;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
+
+#if UseDouble
+using Scalar = System.Double;
+#else
+using Scalar = System.Single;
+#endif
 namespace ConsoleDriver
 {
 
@@ -199,7 +205,7 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-            for (float angle = 0; angle < MathHelper.TWO_PI; angle += .2f)
+            for (Scalar angle = 0; angle < MathHelper.TWO_PI; angle += .2f)
             {
                 Vector2D b = Vector2D.FromLengthAndAngle(1,angle);
                 Console.WriteLine("{0} == {1}", angle, b.Angle);

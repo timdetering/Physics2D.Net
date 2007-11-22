@@ -65,7 +65,7 @@ namespace Physics2DDotNet
         public PivotJoint(Body body, Vector2D anchor, Lifespan lifetime)
             : base(lifetime)
         {
-            if (body == null) { throw new ArgumentNullException("body1"); }
+            if (body == null) { throw new ArgumentNullException("body"); }
             this.body = body;
             this.anchor = anchor;
             body.ApplyMatrix();

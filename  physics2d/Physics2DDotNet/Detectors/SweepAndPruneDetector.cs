@@ -33,7 +33,7 @@ using System;
 using System.Collections.Generic;
 
 using AdvanceMath.Geometry2D;
-
+using System.Runtime.Serialization;
 namespace Physics2DDotNet.Detectors
 {
 
@@ -120,11 +120,12 @@ namespace Physics2DDotNet.Detectors
             }
         }
         [Serializable]
-        sealed class Wrapper
+        sealed class Wrapper : IDeserializationCallback
         {
             public int beginCount;
             public IntList colliders = new IntList();
             public int collisions;
+            [NonSerialized]
             public LinkedListNode<Wrapper> node;
             public Body body;
             public bool shouldAddNode;
@@ -162,6 +163,11 @@ namespace Physics2DDotNet.Detectors
 
                 yBegin.value = rect.Min.Y;
                 yEnd.value = rect.Max.Y;
+            }
+
+            void IDeserializationCallback.OnDeserialization(object sender)
+            {
+                this.node = new LinkedListNode<Wrapper>(this);
             }
         }
         [Serializable]

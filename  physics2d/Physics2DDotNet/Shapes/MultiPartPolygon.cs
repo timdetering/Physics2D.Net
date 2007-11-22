@@ -37,8 +37,11 @@ using Physics2DDotNet.Math2D;
 
 namespace Physics2DDotNet
 {
+    /// <summary>
+    /// A shape that contains multiple polygons.
+    /// </summary>
     [Serializable]
-    public sealed class MultiPartPolygon : Shape
+    public sealed class MultipartPolygon : Shape
     {
 
         public static Vector2D[][] CreateFromBitmap(bool[,] bitmap)
@@ -182,7 +185,7 @@ namespace Physics2DDotNet
             Vector2D[][] result = new Vector2D[polygons.Length][];
             for (int index = 0; index < polygons.Length; ++index)
             {
-                result[index] = Polygon.Reduce(polygons[index]);
+                result[index] = Polygon.Reduce(polygons[index], areaTolerance);
             }
             return result;
         }
@@ -207,10 +210,10 @@ namespace Physics2DDotNet
 
         #region constructors
         [CLSCompliant(false)]
-        public MultiPartPolygon(Vector2D[][] polygons, Scalar gridSpacing)
+        public MultipartPolygon(Vector2D[][] polygons, Scalar gridSpacing)
             : this(polygons, gridSpacing, InertiaOfMultiPartPolygon(polygons)) { }
 
-        public MultiPartPolygon(Vector2D[][] polygons, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
+        public MultipartPolygon(Vector2D[][] polygons, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
             : base(ConcatVertexes(polygons), momentOfInertiaMultiplier)
         {
             if (gridSpacing <= 0) { throw new ArgumentOutOfRangeException("gridSpacing"); }
@@ -218,7 +221,7 @@ namespace Physics2DDotNet
             this.grid = new DistanceGrid(this, gridSpacing);
         }
         
-        private MultiPartPolygon(MultiPartPolygon copy)
+        private MultipartPolygon(MultipartPolygon copy)
             : base(copy)
         {
             this.grid = copy.grid;
@@ -286,7 +289,7 @@ namespace Physics2DDotNet
         }
         public override Shape Duplicate()
         {
-            return new MultiPartPolygon(this);
+            return new MultipartPolygon(this);
         }
     }
 }

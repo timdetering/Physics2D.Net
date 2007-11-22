@@ -70,6 +70,23 @@ namespace System
             public DescriptionAttribute(string description) { }
         }
     }
-
+    namespace Runtime.Serialization
+    {
+        [ComVisible(true)]
+        public interface IDeserializationCallback
+        {
+            void OnDeserialization(object sender);
+        }
+    
+        [Serializable]
+        [ComVisible(true)]
+        public class SerializationException : SystemException
+        {
+            public SerializationException() { }
+            public SerializationException(string message) : base(message) { }
+            public SerializationException(string message, Exception innerException) : base(message, innerException) { }
+        }
+    }
 #endif
+
 }
