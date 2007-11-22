@@ -264,6 +264,12 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.O:
                     DemoO();
                     break;
+                case SdlDotNet.Input.Key.F5:
+                    Save();
+                    break;
+                case SdlDotNet.Input.Key.F6:
+                    Load();
+                    break;
                 case SdlDotNet.Input.Key.LeftArrow:
                     torque += torqueMag;
                     //force += new Vector2D(-forceMag, 0);
@@ -1249,6 +1255,33 @@ namespace Physics2DDemo
             engine.AddBodyRange(bodies);
         }
 
+
+        BinaryFormatter formater = new BinaryFormatter();
+        MemoryStream savedEngine = new MemoryStream();
+        void Save()
+        {
+            bomb.Removed -= bomb_Removed;
+            bomb.Lifetime.IsExpired = true;
+            engine.Update(0);
+            waitHandle.Reset();
+           /* foreach (Body b in engine.Bodies)
+            {
+                b.Updated -=
+            }*/
+            formater.Serialize(savedEngine, engine);
+            waitHandle.Set();
+        }
+        void Load()
+        {
+            waitHandle.Reset();
+            engine.Clear();
+            engine = (PhysicsEngine)formater.Deserialize(savedEngine);
+            foreach (Body b in engine.Bodies)
+            {
+                AddGlObject(b);
+            }
+            waitHandle.Set();
+        }
 
         void Demo1()
         {

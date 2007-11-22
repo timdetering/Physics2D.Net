@@ -205,17 +205,29 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-            for (Scalar angle = 0; angle < MathHelper.TWO_PI; angle += .2f)
-            {
-                Vector2D b = Vector2D.FromLengthAndAngle(1,angle);
-                Console.WriteLine("{0} == {1}", angle, b.Angle);
-            }
+            PhysicsEngine engine = new PhysicsEngine();
+            engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            engine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            Body b1 = new Body(new PhysicsState(),new Circle(7,7),5,new Coefficients(1,0,0),new Lifespan());
+            Body b2 = new Body(new PhysicsState(),new Circle(7,7),5,new Coefficients(1,0,0),new Lifespan());
+            engine.AddBody(b1);
+            engine.AddBody(b2);
+            engine.AddJoint(new HingeJoint(b1, b2, Vector2D.Zero, new Lifespan()));
+            engine.Update(0);
+            Body.AddProxy(b1, b2, Matrix2x2.Identity);
+          //  b1.RemoveFromProxy();
+
+            BinaryFormatter formatter = new BinaryFormatter();
+            MemoryStream stream = new MemoryStream();
+            formatter.Serialize(stream, engine);
+            stream.Seek(0, SeekOrigin.Begin);
+            PhysicsEngine engine2 = (PhysicsEngine)formatter.Deserialize(stream);
 
 
-            int test = 0;
-            int bob = 0;
-            bob += test++;
-            Console.WriteLine(bob);
+
+
+
+            Console.WriteLine();
             
             /*
 
