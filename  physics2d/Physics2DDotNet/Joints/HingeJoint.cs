@@ -110,8 +110,8 @@ namespace Physics2DDotNet
 
             Scalar mass1Inv = body1.Mass.MassInv;
             Scalar mass2Inv = body2.Mass.MassInv;
-            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
-            Scalar inertia2Inv = body2.Mass.MomentofInertiaInv;
+            Scalar inertia1Inv = body1.Mass.MomentOfInertiaInv;
+            Scalar inertia2Inv = body2.Mass.MomentOfInertiaInv;
 
             // Pre-compute anchors, mass matrix, and bias.
             Matrix2x2 matrix1 = body1.Shape.Matrix.NormalMatrix;
@@ -185,8 +185,8 @@ namespace Physics2DDotNet
 
             Scalar mass1Inv = body1.Mass.MassInv;
             Scalar mass2Inv = body2.Mass.MassInv;
-            Scalar inertia1Inv = body1.Mass.MomentofInertiaInv;
-            Scalar inertia2Inv = body2.Mass.MomentofInertiaInv;
+            Scalar inertia1Inv = body1.Mass.MomentOfInertiaInv;
+            Scalar inertia2Inv = body2.Mass.MomentOfInertiaInv;
 
 
             Vector2D dv;

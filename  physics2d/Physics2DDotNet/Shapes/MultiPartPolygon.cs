@@ -257,26 +257,26 @@ namespace Physics2DDotNet
             BoundingRectangle.FromVectors(base.vertexes, out rect);
         }
 
-        public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             Vector2D local;
-            Vector2D.Transform(ref matrix2DInv.VertexMatrix, ref vector, out local);
+            Vector2D.Transform(ref matrix2DInv.VertexMatrix, ref point, out local);
             if (grid.TryGetIntersection(local, out info))
             {
                 Vector2D.Transform(ref matrix2D.NormalMatrix, ref info.Normal, out info.Normal);
-                info.Position = vector;
+                info.Position = point;
                 return true;
             }
             return false;
         }
 
-        public override void GetDistance(ref Vector2D vector, out Scalar result)
+        public override void GetDistance(ref Vector2D point, out Scalar result)
         {
             result = Scalar.MaxValue;
             Scalar temp;
             for (int index = 0; index < polygons.Length; ++index)
             {
-                BoundingPolygon.GetDistance(polygons[index], ref vector, out temp);
+                BoundingPolygon.GetDistance(polygons[index], ref point, out temp);
                 if (temp < result)
                 {
                     result = temp;

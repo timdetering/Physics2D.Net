@@ -45,7 +45,6 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class Body : IPhysicsEntity, IDuplicateable<Body>
     {
-
         #region static methods
         private static MassInfo GetMassInfo(Scalar mass, Shape shape)
         {
@@ -457,7 +456,7 @@ namespace Physics2DDotNet
                 Vector2D.GetMagnitude(ref state.Velocity.Linear,out velocityMag);
                 return
                     .5f * (velocityMag * velocityMag * massInfo.Mass +
-                    state.Velocity.Angular * state.Velocity.Angular * massInfo.MomentofInertia);
+                    state.Velocity.Angular * state.Velocity.Angular * massInfo.MomentOfInertia);
 
             }
         }
@@ -570,7 +569,7 @@ namespace Physics2DDotNet
                 }
                 state.Acceleration.Linear.X += state.ForceAccumulator.Linear.X * massInv;
                 state.Acceleration.Linear.Y += state.ForceAccumulator.Linear.Y * massInv;
-                state.Acceleration.Angular += state.ForceAccumulator.Angular * massInfo.MomentofInertiaInv;
+                state.Acceleration.Angular += state.ForceAccumulator.Angular * massInfo.MomentOfInertiaInv;
             }
             state.Velocity.Linear.X += state.Acceleration.Linear.X * dt;
             state.Velocity.Linear.Y += state.Acceleration.Linear.Y * dt;
@@ -645,7 +644,7 @@ namespace Physics2DDotNet
         public void ApplyImpulse(ref Vector2D impulse, ref Vector2D position)
         {
             Scalar massInv = massInfo.MassInv;
-            Scalar IInv = massInfo.MomentofInertia;
+            Scalar IInv = massInfo.MomentOfInertia;
             PhysicsHelper.AddImpulse(ref state.Velocity, ref impulse, ref position, ref massInv, ref IInv);
         }
 

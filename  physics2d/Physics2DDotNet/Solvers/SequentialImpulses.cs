@@ -257,14 +257,14 @@ namespace Physics2DDotNet.Solvers
                 Contact contact;
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
-                    Vector2D vector = vertexes[index];
-                    targetArea.Contains(ref vector, out contains);
+                    Vector2D vertex = vertexes[index];
+                    targetArea.Contains(ref vertex, out contains);
                     int Id = (inverse) ? (index) : ((-vertexes.Length + index));
 
                     while (node != null && node.Value.id < Id) { node = node.Next; }
 
                     if (contains != ContainmentType.Contains ||
-                        !b1.Shape.TryGetIntersection(vector, out info))
+                        !b1.Shape.TryGetIntersection(vertex, out info))
                     {
                         if (node != null && node.Value.id == Id)
                         {
@@ -300,7 +300,7 @@ namespace Physics2DDotNet.Solvers
                         }
                         contact.normal = info.Normal;
                         contact.distance = info.Distance;
-                        contact.position = vector;
+                        contact.position = vertex;
                         if (inverse)
                         {
                             Vector2D.Negate(ref contact.normal, out contact.normal);
@@ -312,9 +312,9 @@ namespace Physics2DDotNet.Solvers
             {
 
                 Scalar mass1Inv = body1.Mass.MassInv;
-                Scalar I1Inv = body1.Mass.MomentofInertiaInv;
+                Scalar I1Inv = body1.Mass.MomentOfInertiaInv;
                 Scalar mass2Inv = body2.Mass.MassInv;
-                Scalar I2Inv = body2.Mass.MomentofInertiaInv;
+                Scalar I2Inv = body2.Mass.MomentOfInertiaInv;
 
                 for (int index = 0; index < contactsArray.Length; ++index)
                 {
@@ -384,9 +384,9 @@ namespace Physics2DDotNet.Solvers
                 Body b2 = body2;
 
                 Scalar mass1Inv = b1.Mass.MassInv;
-                Scalar I1Inv = b1.Mass.MomentofInertiaInv;
+                Scalar I1Inv = b1.Mass.MomentOfInertiaInv;
                 Scalar mass2Inv = b2.Mass.MassInv;
-                Scalar I2Inv = b2.Mass.MomentofInertiaInv;
+                Scalar I2Inv = b2.Mass.MomentOfInertiaInv;
 
                 PhysicsState state1 = b1.State;
                 PhysicsState state2 = b2.State;

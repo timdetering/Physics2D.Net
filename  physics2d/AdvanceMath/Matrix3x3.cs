@@ -1197,10 +1197,10 @@ namespace AdvanceMath
             this.m10 = yAxis.X; this.m11 = yAxis.Y; this.m12 = yAxis.Z;
             this.m20 = zAxis.X; this.m21 = zAxis.Y; this.m22 = zAxis.Z;
         }
-        public Matrix3x3(Scalar[] vals) : this(vals, 0) { }
-        public Matrix3x3(Scalar[] vals, int index)
+        public Matrix3x3(Scalar[] values) : this(values, 0) { }
+        public Matrix3x3(Scalar[] values, int index)
         {
-            Copy(vals, index, out this);
+            Copy(values, index, out this);
         }
         #endregion
         #region Properties

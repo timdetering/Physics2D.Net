@@ -283,11 +283,11 @@ namespace Physics2DDotNet
                 Vector2D.Transform(ref matrix.NormalMatrix,ref originalSegments[index].RayInstance.Direction, out segments[index].RayInstance.Direction);
             }
         }
-        public override void GetDistance(ref Vector2D vector, out Scalar result)
+        public override void GetDistance(ref Vector2D point, out Scalar result)
         {
             throw new NotSupportedException();
         }
-        public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             throw new NotSupportedException();
         }

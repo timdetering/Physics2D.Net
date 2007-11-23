@@ -134,12 +134,6 @@ namespace Physics2DDotNet
                 rect.Min.Y = position.Y - radius;
             }
         }
-        public override void Set(Shape shape)
-        {
-            Circle other = shape as Circle;
-            if (other == null) { throw new ArgumentException("the parameter must be a shape", "shape"); }
-            this.position = other.position;
-        }
         public override void GetDistance(ref Vector2D point,out Scalar result)
         {
             Vector2D temp;
@@ -147,11 +141,11 @@ namespace Physics2DDotNet
             Vector2D.GetMagnitude(ref temp, out result);
             result -= radius;
         }
-        public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
-            info.Position = vector;
-            Vector2D.Transform(ref this.matrix2DInv.VertexMatrix, ref vector, out  vector);
-            Vector2D.Normalize(ref vector, out info.Distance, out info.Normal);
+            info.Position = point;
+            Vector2D.Transform(ref this.matrix2DInv.VertexMatrix, ref point, out  point);
+            Vector2D.Normalize(ref point, out info.Distance, out info.Normal);
             Vector2D.Transform(ref this.matrix2D.NormalMatrix, ref info.Normal, out  info.Normal);
             info.Distance -= radius;
             return info.Distance <= 0;

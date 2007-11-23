@@ -1487,8 +1487,8 @@ namespace AdvanceMath
             m20 = zAxis.X; m21 = zAxis.Y; m22 = zAxis.Z; m23 = zAxis.W;
             m30 = wAxis.X; m31 = wAxis.Y; m32 = wAxis.Z; m33 = wAxis.W;
         }
-        public Matrix4x4(Scalar[] vals) : this(vals, 0) { }
-        public Matrix4x4(Scalar[] vals, int index) { Copy(vals, index, out this); }
+        public Matrix4x4(Scalar[] values) : this(values, 0) { }
+        public Matrix4x4(Scalar[] values, int index) { Copy(values, index, out this); }
         #endregion
         #region Properties
         [AdvBrowsable]

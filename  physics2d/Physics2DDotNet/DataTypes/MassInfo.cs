@@ -98,11 +98,11 @@ namespace Physics2DDotNet
         #endregion
         #region fields
         private Scalar mass;
-        private Scalar momentofInertia;
+        private Scalar momentOfInertia;
         [NonSerialized]
         private Scalar massInv;
         [NonSerialized]
-        private Scalar momentofInertiaInv;
+        private Scalar momentOfInertiaInv;
         [NonSerialized]
         private Scalar accelerationDueToGravity;
         #endregion
@@ -111,7 +111,7 @@ namespace Physics2DDotNet
         [InstanceConstructor("Mass,MomentofInertia")]
         public MassInfo(Scalar mass, Scalar momentOfInertia)
         {
-            this.MomentofInertia = momentOfInertia;
+            this.MomentOfInertia = momentOfInertia;
             this.Mass = mass;
         }
         #endregion
@@ -131,16 +131,16 @@ namespace Physics2DDotNet
             }
         }
         [AdvBrowsable]
-        public Scalar MomentofInertia
+        public Scalar MomentOfInertia
         {
             get
             {
-                return momentofInertia;
+                return momentOfInertia;
             }
             set
             {
-                this.momentofInertia = value;
-                this.momentofInertiaInv = 1 / value;
+                this.momentOfInertia = value;
+                this.momentOfInertiaInv = 1 / value;
             }
         }
         public Scalar MassInv
@@ -150,11 +150,11 @@ namespace Physics2DDotNet
                 return massInv;
             }
         }
-        public Scalar MomentofInertiaInv
+        public Scalar MomentOfInertiaInv
         {
             get
             {
-                return momentofInertiaInv;
+                return momentOfInertiaInv;
             }
         }
         public Scalar AccelerationDueToGravity
@@ -169,7 +169,7 @@ namespace Physics2DDotNet
         void IDeserializationCallback.OnDeserialization(object sender)
         {
             this.massInv = 1 / this.mass;
-            this.momentofInertiaInv = 1 / this.momentofInertia;
+            this.momentOfInertiaInv = 1 / this.momentOfInertia;
             this.accelerationDueToGravity = this.mass * PhysicsHelper.GravitationalConstant;
         }
         #endregion

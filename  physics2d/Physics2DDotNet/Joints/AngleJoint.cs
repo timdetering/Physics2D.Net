@@ -94,13 +94,13 @@ namespace Physics2DDotNet
         {
             Scalar difference = MathHelper.ClampAngle(body1.State.Position.Angular - body2.State.Position.Angular) - angle;
             bias = -biasFactor * dtInv * difference;
-            M = (1 - softness) / (body1.Mass.MomentofInertiaInv + body2.Mass.MomentofInertiaInv);
+            M = (1 - softness) / (body1.Mass.MomentOfInertiaInv + body2.Mass.MomentOfInertiaInv);
         }
         void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
         {
             Scalar angularImpulse = M * (bias + (body2.State.Velocity.Angular - body1.State.Velocity.Angular));
-            body1.State.Velocity.Angular += body1.Mass.MomentofInertiaInv * angularImpulse;
-            body2.State.Velocity.Angular -= body2.Mass.MomentofInertiaInv * angularImpulse;
+            body1.State.Velocity.Angular += body1.Mass.MomentOfInertiaInv * angularImpulse;
+            body2.State.Velocity.Angular -= body2.Mass.MomentOfInertiaInv * angularImpulse;
         }
     }
 }

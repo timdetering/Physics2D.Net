@@ -52,6 +52,8 @@ Removed: SingleSweepDetector since SelectiveSweepDetector is better.
 Changed: made a few changes suggested by FXcop. Including a few bug fixes.
 Renamed: MultiPartPolygon to MultipartPolygon because of FXcop.
 Changed: did a global Search and replace for float to Scalar. 
+changed: some things to fix serialization
+
 
 AdvanceMath
 1.6.1.0:

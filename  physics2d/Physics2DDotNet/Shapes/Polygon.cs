@@ -290,14 +290,14 @@ namespace Physics2DDotNet
         {
             BoundingPolygon.GetDistance(vertexes, ref point, out result);
         }
-        public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             Vector2D local;
-            Vector2D.Transform(ref matrix2DInv.VertexMatrix, ref vector, out local);
+            Vector2D.Transform(ref matrix2DInv.VertexMatrix, ref point, out local);
             if (grid.TryGetIntersection(local, out info))
             {
                 Vector2D.Transform(ref matrix2D.NormalMatrix, ref info.Normal, out info.Normal);
-                info.Position = vector;
+                info.Position = point;
                 return true;
             }
             return false;

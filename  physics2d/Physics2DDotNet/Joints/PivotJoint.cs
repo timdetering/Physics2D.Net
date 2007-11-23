@@ -102,7 +102,7 @@ namespace Physics2DDotNet
         {
 
             Scalar mass1Inv = body.Mass.MassInv;
-            Scalar inertia1Inv = body.Mass.MomentofInertiaInv;
+            Scalar inertia1Inv = body.Mass.MomentOfInertiaInv;
 
             // Pre-compute anchors, mass matrix, and bias.
             Matrix2x2 matrix1 = body.Shape.Matrix.NormalMatrix;
@@ -160,7 +160,7 @@ namespace Physics2DDotNet
         void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
         {
             Scalar mass1Inv = body.Mass.MassInv;
-            Scalar inertia1Inv = body.Mass.MomentofInertiaInv;
+            Scalar inertia1Inv = body.Mass.MomentOfInertiaInv;
 
             Vector2D dv;
             PhysicsHelper.GetRelativeVelocity(ref body.State.Velocity, ref r1, out dv);

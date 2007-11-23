@@ -84,7 +84,7 @@ namespace Physics2DDotNet
             rect.Max = vertexes[0];
             rect.Min = vertexes[0];
         }
-        public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             throw new NotSupportedException();
         }

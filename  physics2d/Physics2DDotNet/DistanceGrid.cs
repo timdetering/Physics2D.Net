@@ -67,27 +67,27 @@ namespace Physics2DDotNet
             {
                 this.nodes[index] = new Scalar[ySize];
             }
-            Vector2D vector;
-            vector.X = rect.Min.X;
-            for (int x = 0; x < xSize; ++x, vector.X += gridSpacing)
+            Vector2D point;
+            point.X = rect.Min.X;
+            for (int x = 0; x < xSize; ++x, point.X += gridSpacing)
             {
-                vector.Y = rect.Min.Y;
-                for (int y = 0; y < ySize; ++y, vector.Y += gridSpacing)
+                point.Y = rect.Min.Y;
+                for (int y = 0; y < ySize; ++y, point.Y += gridSpacing)
                 {
-                    shape.GetDistance(ref vector, out nodes[x][y]);
+                    shape.GetDistance(ref point, out nodes[x][y]);
                 }
             }
             //restore the shape
             shape.ApplyMatrix(ref old);
         }
-        public bool TryGetIntersection(Vector2D vector, out IntersectionInfo result)
+        public bool TryGetIntersection(Vector2D point, out IntersectionInfo result)
         {
             ContainmentType contains;
-            rect.Contains(ref vector,out contains);
+            rect.Contains(ref point,out contains);
             if (contains == ContainmentType.Contains)
             {
-                int x = (int)Math.Floor((vector.X - rect.Min.X) * gridSpacingInv);
-                int y = (int)Math.Floor((vector.Y - rect.Min.Y) * gridSpacingInv);
+                int x = (int)Math.Floor((point.X - rect.Min.X) * gridSpacingInv);
+                int y = (int)Math.Floor((point.Y - rect.Min.Y) * gridSpacingInv);
 
                 Scalar bottomLeft = nodes[x][y];
                 Scalar bottomRight = nodes[x + 1][y];
@@ -99,8 +99,8 @@ namespace Physics2DDotNet
                     topLeft <= 0 ||
                     topRight <= 0)
                 {
-                    Scalar xPercent = (vector.X - (gridSpacing * x + rect.Min.X)) * gridSpacingInv;
-                    Scalar yPercent = (vector.Y - (gridSpacing * y + rect.Min.Y)) * gridSpacingInv;
+                    Scalar xPercent = (point.X - (gridSpacing * x + rect.Min.X)) * gridSpacingInv;
+                    Scalar yPercent = (point.Y - (gridSpacing * y + rect.Min.Y)) * gridSpacingInv;
 
                     Scalar top, bottom, distance;
 
@@ -119,7 +119,7 @@ namespace Physics2DDotNet
                         normal.X = right - left;
                         normal.Y = top - bottom;
                         Vector2D.Normalize(ref normal, out result.Normal);
-                        result.Position = vector;
+                        result.Position = point;
                         result.Distance = distance;
                         return true;
                     }

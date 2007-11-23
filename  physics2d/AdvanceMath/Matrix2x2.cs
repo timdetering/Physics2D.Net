@@ -505,10 +505,10 @@ namespace AdvanceMath
             m10 = yAxis.X;
             m11 = yAxis.Y;
         }
-        public Matrix2x2(Scalar[] vals) : this(vals, 0) { }
-        public Matrix2x2(Scalar[] vals, int index)
+        public Matrix2x2(Scalar[] values) : this(values, 0) { }
+        public Matrix2x2(Scalar[] values, int index)
         {
-            Copy(vals, index, out this);
+            Copy(values, index, out this);
         }
         #endregion
         #region Properties

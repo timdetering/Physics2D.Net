@@ -244,14 +244,9 @@ namespace Physics2DDotNet
             }
         }
         public virtual void UpdateTime(Scalar dt) { }
-        public virtual void Set(Shape other)
-        {
-            if (other == null) { throw new ArgumentNullException("other"); }
-            other.vertexes.CopyTo(this.vertexes, 0);
-        }
-        public abstract bool TryGetIntersection(Vector2D vector, out IntersectionInfo info);
+        public abstract bool TryGetIntersection(Vector2D point, out IntersectionInfo info);
         public abstract bool TryGetCustomIntersection(Body other, out object customIntersectionInfo);
-        public abstract void GetDistance(ref Vector2D vector, out Scalar result);
+        public abstract void GetDistance(ref Vector2D point, out Scalar result);
         public abstract Shape Duplicate();
         public object Clone()
         {
@@ -310,16 +305,16 @@ namespace Physics2DDotNet
                 BoundingRectangleRequested(this, EventArgs.Empty);
             }
         }
-        public override bool TryGetIntersection(Vector2D vector, out IntersectionInfo info)
+        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             ContainmentType type;
-            rect.Contains(ref vector, out type);
+            rect.Contains(ref point, out type);
             if (type == ContainmentType.Contains)
             {
                 Scalar xDist, yDist;
-                info.Position = vector;
-                xDist = Math.Min(rect.Min.X - vector.X, vector.X - rect.Min.X);
-                yDist = Math.Min(rect.Min.Y - vector.Y, vector.Y - rect.Min.Y);
+                info.Position = point;
+                xDist = Math.Min(rect.Min.X - point.X, point.X - rect.Min.X);
+                yDist = Math.Min(rect.Min.Y - point.Y, point.Y - rect.Min.Y);
                 if (xDist < yDist)
                 {
                     info.Distance = xDist;
