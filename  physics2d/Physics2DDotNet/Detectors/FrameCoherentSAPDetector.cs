@@ -72,8 +72,7 @@ namespace Physics2DDotNet.Detectors
                     // First transfer those under consideration to overlaps,
                     // for, they have been considered...
                     int startIndex = this[i].overlaps.Count;
-                    this[i].overlaps.InsertRange(
-                        startIndex, this[i].underConsideration);
+                    this[i].overlaps.AddRange(this[i].underConsideration);
                     this[i].underConsideration.Clear();
 
                     for (int j = startIndex; j < this[i].overlaps.Count; j++)
@@ -157,9 +156,9 @@ namespace Physics2DDotNet.Detectors
 
             public override int GetHashCode()
             {
-                // Arbitrarly choose 10000 as a number of colliders that we won't 
+                // Arbitrarly choose 20000 as a number of colliders that we won't 
                 // approach any time soon.
-                return (body1.ID * 10000 + body2.ID);
+                return (body1.ID * 20000 + body2.ID);
             }
         }
 
@@ -171,9 +170,9 @@ namespace Physics2DDotNet.Detectors
         sealed class Extent
         {
             public bool isMin;
-            public Scalar value;
+            public float value;
             public ExtentInfo info;
-            public Extent(ExtentInfo info, Scalar value, bool isMin)
+            public Extent(ExtentInfo info, float value, bool isMin)
             {
                 this.info = info;
                 this.value = value;
@@ -201,7 +200,7 @@ namespace Physics2DDotNet.Detectors
             /// there is always a min and max extents that need inserting and we
             /// know the max extent is always after the min extent.
             /// </summary>
-            private int InsertIntoSortedList(Extent newExtent)
+            /*private int InsertIntoSortedList(Extent newExtent)
             {
                 // List<> is not the most speedy for insertion, however, since
                 // we don't plan to do this except for when geometry is added
@@ -259,7 +258,7 @@ namespace Physics2DDotNet.Detectors
                 while (iCurr != iMax)
                 {
                     if (this[iCurr].isMin)
-                        this[iCurr].info.underConsideration.AddFirst(ourGeom);
+                        this[iCurr].info.underConsideration.Add(ourGeom);
                     iCurr++;
                 }
 
@@ -274,26 +273,16 @@ namespace Physics2DDotNet.Detectors
                 if (iCurr < 0)
                     return;
 
-                LinkedList<Body> ourUnderConsideration = ourInfo.underConsideration;
+                List<Body> ourUnderConsideration = ourInfo.underConsideration;
                 Extent currExtent = this[iCurr];
 
-                ourUnderConsideration.AddFirst(currExtent.info.body);
+                ourUnderConsideration.Add(currExtent.info.body);
 
                 // RULE 3: Now that we have found a "min" extent, we take
                 // its existing overlap list and copy it into our underConsideration
                 // list. All except for ourselves.
-                LinkedListNode<Body> currGeomNode =
-                    currExtent.info.underConsideration.First;
-
-                while (currGeomNode != null)
-                {
-                    if (currGeomNode.Value != ourGeom)
-                    {
-                        ourUnderConsideration.AddLast(new LinkedListNode<Body>(
-                            currGeomNode.Value));
-                    }
-                    currGeomNode = currGeomNode.Next;
-                }
+                ourUnderConsideration.AddRange(currExtent.info.underConsideration);
+                ourUnderConsideration.Remove(ourGeom); // just in case
 
                 // RULE 4: Move from the found extent back toward our "min" extent.
                 // Whenever and "max" extent is found, we remove its reference
@@ -312,7 +301,7 @@ namespace Physics2DDotNet.Detectors
                     }
                     currExtent = this[++iCurr];
                 }
-            }
+            }*/
 
             /// <summary>
             /// Incrementally sorts ExtentList. It is assumed that there is a high level
@@ -359,14 +348,14 @@ namespace Physics2DDotNet.Detectors
                                 }
 
                                 // Add extent
-                                currExtent.info.underConsideration.AddFirst(
+                                currExtent.info.underConsideration.Add(
                                     evalExtent.info.body);
                             }
                             else
                             {
                                 // "min" extent inserted before the max extent.
                                 // Inserted extent gains reference to non-inserted extent.
-                                evalExtent.info.underConsideration.AddFirst(
+                                evalExtent.info.underConsideration.Add(
                                     currExtent.info.body);
                             }
 
@@ -419,12 +408,12 @@ namespace Physics2DDotNet.Detectors
             public Extent min;
             public Extent max;
             public List<Body> overlaps;
-            public LinkedList<Body> underConsideration;
+            public List<Body> underConsideration;
 
-            public ExtentInfo(Body g, Scalar min, Scalar max)
+            public ExtentInfo(Body g, float min, float max)
             {
                 this.body = g;
-                this.underConsideration = new LinkedList<Body>();
+                this.underConsideration = new List<Body>();
                 this.overlaps = new List<Body>();
                 this.min = new Extent(this, min, true);
                 this.max = new Extent(this, max, false);
@@ -479,7 +468,7 @@ namespace Physics2DDotNet.Detectors
         ExtentInfoList xInfoList;
         ExtentInfoList yInfoList;
         CollisionPairDictionary collisionPairs;
-        //static public Scalar fTol = 1.5f; //.01f;
+        //static public float fTol = 1.5f; //.01f;
         Scalar dt;
 
         public FrameCoherentSAPDetector()
@@ -510,9 +499,10 @@ namespace Physics2DDotNet.Detectors
             {
                 AddGeom(b);
             }
+            ForceNonIncrementalUpdate();
         }
 
-        public override void Detect(Scalar dt)
+        public override void Detect(float dt)
         {
             this.dt = dt;
             this.Run();
@@ -535,11 +525,13 @@ namespace Physics2DDotNet.Detectors
         {
             ExtentInfo xExtentInfo = new ExtentInfo(g, g.Shape.Rectangle.Min.X, g.Shape.Rectangle.Max.X);
             xInfoList.Add(xExtentInfo);
-            xExtentList.IncrementalInsertExtent(xExtentInfo);
+            xExtentList.Add(xExtentInfo.min);
+            xExtentList.Add(xExtentInfo.max);
 
             ExtentInfo yExtentInfo = new ExtentInfo(g, g.Shape.Rectangle.Min.Y, g.Shape.Rectangle.Max.Y);
             yInfoList.Add(yExtentInfo);
-            yExtentList.IncrementalInsertExtent(yExtentInfo);
+            yExtentList.Add(yExtentInfo.min);
+            yExtentList.Add(yExtentInfo.max);
         }
 
 
@@ -670,7 +662,7 @@ namespace Physics2DDotNet.Detectors
                     if (extent.isMin)
                     {
                         // Add whatever is currently in overlaps to this
-                        extent.info.overlaps.InsertRange(0, overlaps);
+                        extent.info.overlaps.AddRange(overlaps);
 
                         // Now add, this geom to overlaps
                         overlaps.Add(extent.info.body);

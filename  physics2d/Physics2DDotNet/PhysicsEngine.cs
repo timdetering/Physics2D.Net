@@ -620,15 +620,18 @@ namespace Physics2DDotNet
         }
         private void AddPendingBodies()
         {
-            bodies.AddRange(pendingBodies);
-            solver.AddBodyRange(pendingBodies);
-            broadPhase.AddBodyRange(pendingBodies);
             for (int index = 0; index < pendingBodies.Count; ++index)
             {
                 Body item = pendingBodies[index];
                 item.ID = nextBodyID++;
                 item.ApplyMatrix();
-                item.OnAdded();
+            }
+            bodies.AddRange(pendingBodies);
+            solver.AddBodyRange(pendingBodies);
+            broadPhase.AddBodyRange(pendingBodies);
+            for (int index = 0; index < pendingBodies.Count; ++index)
+            {
+                pendingBodies[index].OnAdded();
             }
             if (BodiesAdded != null) { BodiesAdded(this, new CollectionEventArgs<Body>(pendingBodies.AsReadOnly())); }
             pendingBodies.Clear();

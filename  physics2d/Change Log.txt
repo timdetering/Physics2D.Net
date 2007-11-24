@@ -53,7 +53,8 @@ Changed: made a few changes suggested by FXcop. Including a few bug fixes.
 Renamed: MultiPartPolygon to MultipartPolygon because of FXcop.
 Changed: did a global Search and replace for float to Scalar. 
 changed: some things to fix serialization
-
+Fixed: the false negative bugs in FrameCoherentSAPDetector. 
+fixed: A bug where a body's ID would not be assigned before it was added to the solver or the detector
 
 AdvanceMath
 1.6.1.0:
