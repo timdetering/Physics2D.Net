@@ -34,18 +34,9 @@ namespace AdvanceMath
     {
         public static void CheckCopy(Scalar[] array, int index, int count)
         {
-            if (array == null)
-            {
-                throw new ArgumentNullException("array", "The array cannot be null");
-            }
-            if (index < 0)
-            {
-                throw new ArgumentOutOfRangeException("index", "the index must be greater or equal to zero");
-            }
-            if (array.Length - index < count)
-            {
-                throw new ArgumentOutOfRangeException("array", String.Format("the array must have the length of {0} from the index", count));
-            }
+            if (array == null) { throw new ArgumentNullException("array", "The array cannot be null"); }
+            if (index < 0) { throw new ArgumentOutOfRangeException("index", "the index must be greater or equal to zero"); }
+            if (array.Length - index < count) { throw new ArgumentOutOfRangeException("array", String.Format("the array must have the length of {0} from the index", count)); }
         }
 #if UNSAFE
         public static void CheckIndex(string name, int index, int count)

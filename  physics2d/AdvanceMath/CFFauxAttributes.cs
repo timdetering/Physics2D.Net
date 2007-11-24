@@ -32,7 +32,7 @@ namespace System
     //Attributes for the CompactFramework that dont exist int the CompactFramework so
     //this can compile under the CompactFramework without rewritting.
     //or having compiler directives surrounding all of these Attributes.
-#if  CompactFramework || WindowsCE || PocketPC || XBOX360 
+#if CompactFramework || WindowsCE || PocketPC
     [ComVisible(true)]
     [AttributeUsage(
         AttributeTargets.Delegate |
@@ -42,16 +42,28 @@ namespace System
         Inherited = false)]
     public sealed class SerializableAttribute : Attribute
     { }
-
+    namespace Runtime.Serialization
+    {
+        [Serializable]
+        [ComVisible(true)]
+        public class SerializationException : SystemException
+        {
+            public SerializationException() { }
+            public SerializationException(string message) : base(message) { }
+            public SerializationException(string message, Exception innerException) : base(message, innerException) { }
+        }
+    }
+#endif
+#if CompactFramework || WindowsCE || PocketPC || XBOX360
     [ComVisible(true)]
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
     public sealed class NonSerializedAttribute : Attribute
-    {}
+    { }
     namespace Xml.Serialization
     {
         [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
         public sealed class XmlIgnoreAttribute : Attribute
-        {}
+        { }
         [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
         public class XmlAttributeAttribute : Attribute
         {
@@ -76,15 +88,6 @@ namespace System
         public interface IDeserializationCallback
         {
             void OnDeserialization(object sender);
-        }
-    
-        [Serializable]
-        [ComVisible(true)]
-        public class SerializationException : SystemException
-        {
-            public SerializationException() { }
-            public SerializationException(string message) : base(message) { }
-            public SerializationException(string message, Exception innerException) : base(message, innerException) { }
         }
     }
 #endif

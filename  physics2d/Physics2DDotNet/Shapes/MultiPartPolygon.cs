@@ -82,7 +82,7 @@ namespace Physics2DDotNet
         /// </summary>
         /// <param name="polygons"></param>
         /// <returns></returns>
-        public static Scalar InertiaOfMultiPartPolygon(Vector2D[][] polygons)
+        public static Scalar InertiaOfMultipartPolygon(Vector2D[][] polygons)
         {
             if (polygons == null) { throw new ArgumentNullException("polygons"); }
             if (polygons.Length == 0) { throw new ArgumentOutOfRangeException("polygons"); }
@@ -211,7 +211,7 @@ namespace Physics2DDotNet
         #region constructors
         [CLSCompliant(false)]
         public MultipartPolygon(Vector2D[][] polygons, Scalar gridSpacing)
-            : this(polygons, gridSpacing, InertiaOfMultiPartPolygon(polygons)) { }
+            : this(polygons, gridSpacing, InertiaOfMultipartPolygon(polygons)) { }
 
         public MultipartPolygon(Vector2D[][] polygons, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
             : base(ConcatVertexes(polygons), momentOfInertiaMultiplier)

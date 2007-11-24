@@ -2,6 +2,11 @@ Release Notes fo Physics2D.Net
 
 Since God Created me and Jesus Saved me All glory goes to God.
 
+NEXT VERSION:
+there were quite a few things renamed becuase FXcop did not like them or I did not like them, the renames where mostly just changing of the case so these should be easy to fix.
+
+
+
 1.4.0.0
 there are a few breaking changes. The StateChanged event was renamed and it logic was changed so that it would only be called when the postion of a object changed from the last time it was called.
 

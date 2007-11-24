@@ -208,12 +208,17 @@ namespace ConsoleDriver
             PhysicsEngine engine = new PhysicsEngine();
             engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             engine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            
+            
             Body b1 = new Body(new PhysicsState(),new Circle(7,7),5,new Coefficients(1,0,0),new Lifespan());
             Body b2 = new Body(new PhysicsState(),new Circle(7,7),5,new Coefficients(1,0,0),new Lifespan());
             engine.AddBody(b1);
             engine.AddBody(b2);
             engine.AddJoint(new HingeJoint(b1, b2, Vector2D.Zero, new Lifespan()));
             engine.Update(0);
+
+
+
             Body.AddProxy(b1, b2, Matrix2x2.Identity);
           //  b1.RemoveFromProxy();
 
