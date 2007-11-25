@@ -41,6 +41,12 @@ namespace Physics2DDotNet
         private Scalar restitution;
         private Scalar staticFriction;
         private Scalar dynamicFriction;
+        public Coefficients(Scalar restitution, Scalar friction)
+        {
+            this.restitution = restitution;
+            this.staticFriction = friction;
+            this.dynamicFriction = friction;
+        }
         public Coefficients(Scalar restitution, Scalar staticFriction, Scalar dynamicFriction)
         {
             this.restitution = restitution;
@@ -77,7 +83,7 @@ namespace Physics2DDotNet
 
         public Coefficients Duplicate()
         {
-            return new Coefficients(restitution, staticFriction, dynamicFriction);
+            return new Coefficients(restitution, staticFriction);//, dynamicFriction);
         }
         public object Clone()
         {

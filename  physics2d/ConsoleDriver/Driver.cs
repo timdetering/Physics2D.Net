@@ -208,18 +208,30 @@ namespace ConsoleDriver
             PhysicsEngine engine = new PhysicsEngine();
             engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             engine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
-            
-            
-            Body b1 = new Body(new PhysicsState(),new Circle(7,7),5,new Coefficients(1,0,0),new Lifespan());
-            Body b2 = new Body(new PhysicsState(),new Circle(7,7),5,new Coefficients(1,0,0),new Lifespan());
-            engine.AddBody(b1);
-            engine.AddBody(b2);
-            engine.AddJoint(new HingeJoint(b1, b2, Vector2D.Zero, new Lifespan()));
+
+            PhysicsTimer timer = new PhysicsTimer(engine.Update, .01f);
+            timer.IsRunning = true;
+
+
+
+            Coefficients coffecients = new Coefficients(/*restitution*/1, /*friction*/.5f);
+
+
+            Shape shape1 = new Circle(8, 7);
+            Shape shape2 = new Polygon(Polygon.CreateRectangle(10, 20),3);
+
+            Scalar mass = 5;
+            Body body1 = new Body(new PhysicsState(), shape1, mass, coffecients, new Lifespan());
+            Body body2 = new Body(new PhysicsState(), shape2, mass, coffecients, new Lifespan());
+
+            engine.AddBody(body1);
+            engine.AddBody(body2);
+            engine.AddJoint(new HingeJoint(body1, body2, Vector2D.Zero, new Lifespan()));
             engine.Update(0);
 
+            body1.Lifetime.IsExpired = true;
 
-
-            Body.AddProxy(b1, b2, Matrix2x2.Identity);
+            Body.AddProxy(body1, body2, Matrix2x2.Identity);
           //  b1.RemoveFromProxy();
 
             BinaryFormatter formatter = new BinaryFormatter();

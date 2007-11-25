@@ -67,7 +67,7 @@ namespace Physics2DDemo
         Body clipper;
         RectangleShape clippersShape;
         Vector2D bombTarget;
-        Coefficients coefficients = new Coefficients(.5f, .4f, .4f);
+        Coefficients coefficients = new Coefficients(.5f, .4f);
 
         SurfaceGl pauseSprite;
 
@@ -316,7 +316,7 @@ namespace Physics2DDemo
             seg.RayInstance = new Ray(Vector2D.Zero, Vector2D.Normalize(Vector2D.XYAxis + Vector2D.XAxis));
             segments.Add(seg);
             distances = new Scalar[segments.Count];
-            Lazer = new Body(new PhysicsState(), new RaySegments(segments.ToArray()), 1, new Coefficients(1, 1, 1), new Lifespan());
+            Lazer = new Body(new PhysicsState(), new RaySegments(segments.ToArray()), 1, new Coefficients(1, 1), new Lifespan());
             AddGlObject(Lazer);
             engine.AddBody(Lazer);
             Lazer.State.Position.Linear = sparkPoint;
@@ -502,7 +502,7 @@ namespace Physics2DDemo
         void CreateClipper()
         {
             clippersShape = new RectangleShape();
-            clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0, 0, 0), new Lifespan());
+            clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0, 0), new Lifespan());
             clipper.IgnoresGravity = true;
             clipper.Collided += new EventHandler<CollisionEventArgs>(clipper_Collided);
             clipper.Updated += new EventHandler<UpdatedEventArgs>(clipper_Updated);
@@ -628,7 +628,7 @@ namespace Physics2DDemo
                     new PhysicsState(new ALVector2D(0, offset)),
                     new Circle(wheelSize, 30),
                     10,
-                    new Coefficients(0,1,1),//  coefficients.Duplicate(),
+                    new Coefficients(0,1),//  coefficients.Duplicate(),
                     new Lifespan());
                 HingeJoint joint = new HingeJoint(a, wheel, offset, new Lifespan());
                 joint.Softness = .1f;
@@ -999,7 +999,7 @@ namespace Physics2DDemo
                     new PhysicsState(new ALVector2D(0, position)),
                     new Particle(),
                     1f,
-                   new Coefficients(1,.5f,.5f),// coefficients.Duplicate(),
+                   new Coefficients(1,.5f),// coefficients.Duplicate(),
                     new Lifespan(.9f));
                 Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((Scalar)rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
@@ -1482,13 +1482,13 @@ namespace Physics2DDemo
             Reset(false);
             AddGravityField();
             Coefficients o = coefficients;
-            coefficients = new Coefficients(1, .5f, .5f);
+            coefficients = new Coefficients(1, .5f);
             AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             Body b1 = AddRectangle(750, 100, Scalar.PositiveInfinity, new ALVector2D(0, 0, 750 / 2));
             b1.IgnoresGravity = true;
             Body b2 = AddRectangle(750, 100, Scalar.PositiveInfinity, new ALVector2D(0, 1024, 750 / 2));
             b2.IgnoresGravity = true;
-            coefficients = new Coefficients(.7f, .05f, .05f);
+            coefficients = new Coefficients(.7f, .05f);
 
 
             for (int x = 60; x < 80; x += 10)
