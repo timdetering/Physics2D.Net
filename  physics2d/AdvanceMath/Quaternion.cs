@@ -109,7 +109,7 @@ namespace AdvanceMath
 
             Scalar angle = MathHelper.Acos(cos);
 
-            if (Math.Abs(angle) < MathHelper.EPSILON)
+            if (Math.Abs(angle) < MathHelper.Epsilon)
             {
                 return quatA;
             }
@@ -367,7 +367,7 @@ namespace AdvanceMath
             {
                 Scalar test = X * Y + Z * W;
                 if (Math.Abs(test) > 0.499f) // singularitY at north and south pole
-                    return Math.Sign(test) * MathHelper.HALF_PI;
+                    return Math.Sign(test) * MathHelper.PiOver2;
                 return MathHelper.Asin(2 * test);
             }
         }
@@ -404,13 +404,13 @@ namespace AdvanceMath
             if (test > 0.499f)
             { // singularitY at north pole
                 Yaw = 2 * MathHelper.Atan2(X, W);
-                roll = MathHelper.HALF_PI;
+                roll = MathHelper.PiOver2;
                 pitch = 0;
             }
             else if (test < -0.499f)
             { // singularitY at south pole
                 Yaw = -2 * MathHelper.Atan2(X, W);
-                roll = -MathHelper.HALF_PI;
+                roll = -MathHelper.PiOver2;
                 pitch = 0;
             }
             else
@@ -709,7 +709,7 @@ namespace AdvanceMath
                 Scalar angle = MathHelper.Acos(W);
                 Scalar sin = MathHelper.Sin(angle);
 
-                if (Math.Abs(sin) >= MathHelper.EPSILON)
+                if (Math.Abs(sin) >= MathHelper.Epsilon)
                 {
                     Scalar coeff = angle / sin;
                     returnvalue.X = coeff * X;
@@ -745,7 +745,7 @@ namespace AdvanceMath
 
             returnvalue.W = MathHelper.Cos(angle);
 
-            if (Math.Abs(sin) >= MathHelper.EPSILON)
+            if (Math.Abs(sin) >= MathHelper.Epsilon)
             {
                 Scalar coeff = sin / angle;
 

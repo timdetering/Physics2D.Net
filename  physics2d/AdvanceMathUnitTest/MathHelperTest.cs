@@ -65,10 +65,10 @@ namespace AdvanceMath.UnitTest
         [Test]
         public void ClampAngle()
         {
-            Assert.AreEqual(0, MathHelper.ClampAngle(MathHelper.TWO_PI), "1");
-            Assert.AreEqual(MathHelper.PI, MathHelper.ClampAngle(MathHelper.PI * 3), UnitHelper.Tolerance, "2");
-            Assert.AreEqual(MathHelper.HALF_PI, MathHelper.ClampAngle(MathHelper.TWO_PI + MathHelper.HALF_PI), UnitHelper.Tolerance, "3");
-            Assert.AreEqual(-MathHelper.HALF_PI, MathHelper.ClampAngle(MathHelper.HALF_THREE_PI), UnitHelper.Tolerance, "4");
+            Assert.AreEqual(0, MathHelper.ClampAngle(MathHelper.TwoPi), "1");
+            Assert.AreEqual(MathHelper.Pi, MathHelper.ClampAngle(MathHelper.Pi * 3), UnitHelper.Tolerance, "2");
+            Assert.AreEqual(MathHelper.PiOver2, MathHelper.ClampAngle(MathHelper.TwoPi + MathHelper.PiOver2), UnitHelper.Tolerance, "3");
+            Assert.AreEqual(-MathHelper.PiOver2, MathHelper.ClampAngle(MathHelper.ThreePiOver2), UnitHelper.Tolerance, "4");
         }
         [Test]
         public void Lerp()

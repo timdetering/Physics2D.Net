@@ -96,7 +96,7 @@ namespace Physics2DDotNet
             if (radius <= 0) { throw new ArgumentOutOfRangeException("radius", "Must be greater then zero."); }
             if (vertexCount < 3) { throw new ArgumentOutOfRangeException("vertexCount", "Must be equal or greater then 3"); }
             Vector2D[] result = new Vector2D[vertexCount];
-            Scalar angleIncrement = MathHelper.TWO_PI / vertexCount;
+            Scalar angleIncrement = MathHelper.TwoPi / vertexCount;
             for (int index = 0; index < vertexCount; ++index)
             {
                 Scalar angle = angleIncrement * index;

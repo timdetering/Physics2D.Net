@@ -38,15 +38,16 @@ namespace AdvanceMath
     {
         #region consts
         public const Scalar E = (Scalar)System.Math.E;
-        public const Scalar PI = (Scalar)System.Math.PI;
-        public const Scalar TWO_PI = (Scalar)(System.Math.PI * 2);
-        public const Scalar HALF_PI = (Scalar)(System.Math.PI *.5);
-        public const Scalar HALF_THREE_PI = (Scalar)(1.5 * System.Math.PI) ;
-        public const Scalar RADIANS_PER_DEGREE = (Scalar)(PI / 180);
-        public const Scalar DEGREES_PER_RADIAN = (Scalar)(180 / PI);
+        public const Scalar Pi = (Scalar)System.Math.PI;
+        public const Scalar TwoPi = (Scalar)(System.Math.PI * 2);
+        public const Scalar PiOver2 = (Scalar)(System.Math.PI / 2);
+        public const Scalar PiOver4 = (Scalar)(System.Math.PI / 4);
+        public const Scalar ThreePiOver2 = (Scalar)((3 * System.Math.PI) / 2);
+        public const Scalar RadiansPerDegree = (Scalar)(System.Math.PI / 180);
+        public const Scalar DegreesPerRadian = (Scalar)(180 / System.Math.PI);
         public const Scalar Tolerance = 0.000000001f;
 
-        public const Scalar EPSILON = 1e-03f;
+        public const Scalar Epsilon = 1e-03f;
 
         internal static Scalar Two = 2;
         #endregion
@@ -162,29 +163,29 @@ namespace AdvanceMath
 
         public static Scalar ClampAngle(Scalar angle)
         {
-            if (-PI <= angle && angle < PI) {     return angle; }
-            Scalar rem = (angle + PI) % (TWO_PI);
-            return rem + ((rem < 0) ? (PI) : (-PI));
+            if (-Pi <= angle && angle < Pi) { return angle; }
+            Scalar rem = (angle + Pi) % (TwoPi);
+            return rem + ((rem < 0) ? (Pi) : (-Pi));
         }
         [CLSCompliant(false)]
         public static void ClampAngle(ref Scalar angle)
         {
-            if (-PI <= angle && angle < PI) { return; }
-            Scalar rem = (angle + PI) % (TWO_PI);
-            angle = rem + ((rem < 0) ? (PI) : (-PI));
+            if (-Pi <= angle && angle < Pi) { return; }
+            Scalar rem = (angle + Pi) % (TwoPi);
+            angle = rem + ((rem < 0) ? (Pi) : (-Pi));
         }
         public static void ClampAngle(ref Scalar angle, out Scalar result)
         {
-            if (-PI <= angle && angle < PI) { result = angle; return; }
-            Scalar rem = (angle + PI) % (TWO_PI);
-            result = rem + ((rem < 0) ? (PI) : (-PI));
+            if (-Pi <= angle && angle < Pi) { result = angle; return; }
+            Scalar rem = (angle + Pi) % (TwoPi);
+            result = rem + ((rem < 0) ? (Pi) : (-Pi));
         }
 
         public static Scalar AngleSubtract(Scalar angle1, Scalar angle2)
         {
             return ClampAngle(angle1 - angle2);
         }
-        public static void AngleSubtract(ref Scalar angle1,ref  Scalar angle2,out Scalar result)
+        public static void AngleSubtract(ref Scalar angle1, ref  Scalar angle2, out Scalar result)
         {
             result = angle1 - angle2;
             ClampAngle(ref result);
@@ -258,7 +259,7 @@ namespace AdvanceMath
         {
             Vector2D vect1, vect2;
             Scalar temp;
-            Vector2D.Subtract(ref b,ref a,out vect1);
+            Vector2D.Subtract(ref b, ref a, out vect1);
             Vector2D.Subtract(ref point, ref b, out vect2);
             Vector2D.ZCross(ref vect1, ref vect2, out temp);
             bool bClockwise = temp >= 0;
@@ -271,8 +272,8 @@ namespace AdvanceMath
             Vector2D.ZCross(ref vect1, ref vect2, out temp);
             return temp < 0 ^ bClockwise;
 
-           /* bool bClockwise = (((b - a) ^ (point - b)) >= 0);
-            return !(((((c - b) ^ (point - c)) >= 0) ^ bClockwise) && ((((a - c) ^ (point - a)) >= 0) ^ bClockwise));*/
+            /* bool bClockwise = (((b - a) ^ (point - b)) >= 0);
+             return !(((((c - b) ^ (point - c)) >= 0) ^ bClockwise) && ((((a - c) ^ (point - a)) >= 0) ^ bClockwise));*/
         }
         /// <summary>
         ///		Converts degrees to radians.
@@ -281,7 +282,7 @@ namespace AdvanceMath
         /// <returns></returns>
         public static Scalar ToRadians(Scalar degrees)
         {
-            return degrees * RADIANS_PER_DEGREE;
+            return degrees * RadiansPerDegree;
         }
         /// <summary>
         ///		Converts radians to degrees.
@@ -290,7 +291,7 @@ namespace AdvanceMath
         /// <returns></returns>
         public static Scalar ToDegrees(Scalar radians)
         {
-            return radians * DEGREES_PER_RADIAN;
+            return radians * DegreesPerRadian;
         }
 
         #region System.Math Methods

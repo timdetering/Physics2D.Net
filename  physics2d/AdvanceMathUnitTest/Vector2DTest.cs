@@ -82,11 +82,11 @@ namespace AdvanceMath.UnitTest
         [Test]
         public void Angle()
         {
-            Scalar angle = MathHelper.PI;
+            Scalar angle = MathHelper.Pi;
             Scalar magnitude = 2;
             Vector2D test = Vector2D.FromLengthAndAngle(magnitude, angle);
             Assert.AreEqual(angle, test.Angle, "angle");
-            angle = MathHelper.HALF_PI;
+            angle = MathHelper.PiOver2;
             test = Vector2D.SetAngle(test, angle);
             Assert.AreEqual(angle, test.Angle, .000001f, "angle2");
             Assert.AreEqual(magnitude, test.Magnitude, "mag");
@@ -107,14 +107,14 @@ namespace AdvanceMath.UnitTest
         [Test]
         public void Transform()
         {
-            Matrix2x2 matrix2x2 = Matrix2x2.FromRotation(MathHelper.PI);
+            Matrix2x2 matrix2x2 = Matrix2x2.FromRotation(MathHelper.Pi);
             Assert.AreEqual(matrix2x2 * Vector2D.XAxis, Vector2D.Transform(matrix2x2, Vector2D.XAxis), "matrix2x2 rotation");
             UnitHelper.RefOperationTesterRightSame<Matrix2x2, Vector2D>(matrix2x2, Vector2D.XAxis, matrix2x2 * Vector2D.XAxis, Vector2D.Transform, "matrix2x2 rotation");
             Matrix3x3 matrix3x3 = Matrix3x3.FromTranslate2D(-op1);
             Assert.AreEqual(Vector2D.Zero, matrix3x3 * op1, "matrix3x3 Translate1");
             Assert.AreEqual((matrix3x3 * op1), Vector2D.Transform(matrix3x3, op1), "matrix3x3 Translate2");
             UnitHelper.RefOperationTesterRightSame<Matrix3x3, Vector2D>(matrix3x3, op1, matrix3x3 * op1, Vector2D.Transform, "matrix3x3 Translate");
-            matrix3x3 = Matrix3x3.FromRotationZ(MathHelper.PI);
+            matrix3x3 = Matrix3x3.FromRotationZ(MathHelper.Pi);
             Assert.AreEqual((matrix3x3 * op1), Vector2D.Transform(matrix3x3, op1), "matrix3x3 rotation");
             UnitHelper.RefOperationTesterRightSame<Matrix3x3, Vector2D>(matrix3x3, op1, matrix3x3 * op1, Vector2D.Transform, "matrix3x3 rotation");
 

@@ -582,10 +582,6 @@ namespace Physics2DDotNet
             if (collisionIgnorer != null) { collisionIgnorer.UpdateTime(dt); }
             if (Updated != null) { Updated(this, new UpdatedEventArgs(dt)); }
         }
-        internal void UpdateProxies()
-        {
-
-        }
 
         /// <summary>
         /// Sets Acceleration and Force Acumilator to Zero.

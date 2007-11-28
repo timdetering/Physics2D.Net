@@ -753,18 +753,18 @@ namespace Physics2DDemo
             Scalar Wd2 = length * .5f;
 
             int curveEdgeCount = 5;
-            Scalar da = MathHelper.PI/curveEdgeCount;
+            Scalar da = MathHelper.Pi/curveEdgeCount;
 
             List<Vector2D> vertexes = new List<Vector2D>();
             vertexes.Add(new Vector2D(Wd2, Hd2));
             vertexes.Add(new Vector2D(-Wd2, Hd2));
-            for (Scalar angle2 = MathHelper.HALF_PI + da; angle2 < MathHelper.HALF_THREE_PI; angle2+= da)
+            for (Scalar angle2 = MathHelper.PiOver2 + da; angle2 < MathHelper.ThreePiOver2; angle2+= da)
             {
                 vertexes.Add(new Vector2D(-Wd2, 0) + Vector2D.FromLengthAndAngle(Hd2, angle2));
             }
             vertexes.Add(new Vector2D(-Wd2, -Hd2));
             vertexes.Add(new Vector2D(Wd2, -Hd2));
-            for (Scalar angle2 = -MathHelper.HALF_PI + da; angle2 < MathHelper.HALF_PI; angle2 += da)
+            for (Scalar angle2 = -MathHelper.PiOver2 + da; angle2 < MathHelper.PiOver2; angle2 += da)
             {
                 vertexes.Add(new Vector2D(Wd2, 0) + Vector2D.FromLengthAndAngle(Hd2, angle2));
             }
@@ -992,7 +992,7 @@ namespace Physics2DDemo
         void AddParticles(Vector2D position,Vector2D velocity, int count)
         {
             Body[] particles = new Body[count];
-            Scalar angle = MathHelper.TWO_PI / count;
+            Scalar angle = MathHelper.TwoPi / count;
             for (int index = 0; index < count; ++index)
             {
                 Body particle = new Body(
@@ -1433,7 +1433,7 @@ namespace Physics2DDemo
             AddLine(new Vector2D(400, 400), new Vector2D(600, 300), 30);
             AddRagDoll(new Vector2D(200, 400));
             AddRagDoll(new Vector2D(300, 300));
-            ApplyMatrix(new ALVector2D(MathHelper.PI, 400, 200), AddRagDoll(new Vector2D(0, 0)));
+            ApplyMatrix(new ALVector2D(MathHelper.Pi, 400, 200), AddRagDoll(new Vector2D(0, 0)));
             AddRagDoll(new Vector2D(500, 100));
             AddRagDoll(new Vector2D(600, 0));
             AddRagDoll(new Vector2D(700, -100));
@@ -1522,7 +1522,7 @@ namespace Physics2DDemo
             for (Scalar distance = 250; distance < 650; length += 10, size *= 2, distance += 60 + length)
             {
 
-                Scalar da = MathHelper.TWO_PI / size;// ((MathHelper.TWO_PI * distance) / size);
+                Scalar da = MathHelper.TwoPi / size;// ((MathHelper.TWO_PI * distance) / size);
                 Scalar l2 = length / 2;
                 // da /= 2;
                 Vector2D[] vertexes = new Vector2D[]
@@ -1537,7 +1537,7 @@ namespace Physics2DDemo
                 vertexes = Polygon.Subdivide(vertexes2, 5);
 
                 Polygon shape = new Polygon(vertexes, 1.5f);
-                for (Scalar angle = 0; angle < MathHelper.TWO_PI; angle += da)
+                for (Scalar angle = 0; angle < MathHelper.TwoPi; angle += da)
                 {
                     Vector2D position = Vector2D.FromLengthAndAngle(distance, angle) + gravityCenter;
                     Body body = AddShape(shape, (size * length) / 10, new ALVector2D(angle, position));

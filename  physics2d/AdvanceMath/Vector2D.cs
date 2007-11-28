@@ -264,13 +264,13 @@ namespace AdvanceMath
         public static Scalar GetAngle(Vector2D source)
         {
             Scalar result = MathHelper.Atan2(source.Y, source.X);
-            if (result < 0) { result += MathHelper.TWO_PI; }
+            if (result < 0) { result += MathHelper.TwoPi; }
             return result;
         }
         public static void GetAngle(ref Vector2D source, out Scalar result)
         {
             result = MathHelper.Atan2(source.Y, source.X);
-            if (result < 0) { result += MathHelper.TWO_PI; }
+            if (result < 0) { result += MathHelper.TwoPi; }
         }
         /// <summary>
         /// Adds 2 Vectors2Ds.

@@ -930,7 +930,7 @@ namespace AdvanceMath
                 }
                 else
                 {
-                    zAngle = MathHelper.HALF_PI;
+                    zAngle = MathHelper.PiOver2;
                     yAngle = (Scalar)Math.Atan(axis.Z / axis.Y);
                 }
             }

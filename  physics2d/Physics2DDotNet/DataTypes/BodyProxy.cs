@@ -75,6 +75,7 @@ namespace Physics2DDotNet
 
         void IDeserializationCallback.OnDeserialization(object sender)
         {
+            if (this.invertedTwin == null) { return; }
             for (LinkedListNode<BodyProxy> node = this.invertedTwin.body2.proxies.First;
                 node != null;
                 node = node.Next)

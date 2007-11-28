@@ -422,6 +422,9 @@ namespace Physics2DDotNet
         /// <param name="body1">The first Body.</param>
         /// <param name="body2">The second Body.</param>
         /// <param name="transformation">How velocities will be transformed from body1 to body2.</param>
+        /// <remarks>
+        /// This will most likely be removed if i ever figure out how to make a joint like this.
+        /// </remarks>
         public void AddProxy(Body body1, Body body2, Matrix2x2 transformation)
         {
             if (body1 == null) { throw new ArgumentNullException("body1"); }
