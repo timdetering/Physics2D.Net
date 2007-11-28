@@ -84,8 +84,6 @@ namespace Physics2DDotNet
             if (item.Engine != null || item.isChecked) { throw new InvalidOperationException("A PhysicsLogic cannot be added to more then one engine or added twice."); }
             item.isChecked = true;
         }
-
-
         #endregion
         #region events
         /// <summary>
@@ -100,7 +98,6 @@ namespace Physics2DDotNet
         /// Generated when PhysicsLogics are truly added to the Engine.
         /// </summary>
         public event EventHandler<CollectionEventArgs<PhysicsLogic>> LogicsAdded;
-
         /// <summary>
         /// Generated when a Bodies are removed to the Engine.
         /// </summary>
@@ -130,6 +127,7 @@ namespace Physics2DDotNet
         private List<PhysicsLogic> pendingLogics;
         private List<Joint> pendingJoints;
         private List<Body> pendingBodies;
+        private List<BodyProxy> pendingProxies;
 
         private List<PhysicsLogic> removedLogics;
         private List<Joint> removedJoints;
@@ -153,6 +151,7 @@ namespace Physics2DDotNet
             this.pendingBodies = new List<Body>();
             this.pendingJoints = new List<Joint>();
             this.pendingLogics = new List<PhysicsLogic>();
+            this.pendingProxies = new List<BodyProxy>();
 
             this.removedBodies = new List<Body>();
             this.removedJoints = new List<Joint>();
@@ -415,7 +414,24 @@ namespace Physics2DDotNet
                 pendingLogics.AddRange(array);
             }
         }
-
+        /// <summary>
+        /// Adds 2 bodies to the same proxy list. 
+        /// If they are both already part of their own proxy list then the lists will merge.
+        /// The transformations will be calcualted automatically. 
+        /// </summary>
+        /// <param name="body1">The first Body.</param>
+        /// <param name="body2">The second Body.</param>
+        /// <param name="transformation">How velocities will be transformed from body1 to body2.</param>
+        public void AddProxy(Body body1, Body body2, Matrix2x2 transformation)
+        {
+            if (body1 == null) { throw new ArgumentNullException("body1"); }
+            if (body2 == null) { throw new ArgumentNullException("body2"); }
+            if (body1 == body2) { throw new ArgumentException("They cannot be the same body"); }
+            lock (syncRoot)
+            {
+                pendingProxies.Add(new BodyProxy(body1, body2, transformation));
+            }
+        }
         /// <summary>
         /// Updates the Engine with a change in time. 
         /// This call will block all access to the engine while it is running.
@@ -475,6 +491,7 @@ namespace Physics2DDotNet
                 this.pendingJoints = new List<Joint>();
                 pendingLogics = this.pendingLogics;
                 this.pendingLogics = new List<PhysicsLogic>();
+                pendingProxies.Clear();
             }
             foreach (Body body in pendingBodies)
             {
@@ -616,6 +633,7 @@ namespace Physics2DDotNet
                 if (pendingBodies.Count > 0) { AddPendingBodies(); }
                 if (pendingJoints.Count > 0) { AddPendingJoints(); }
                 if (pendingLogics.Count > 0) { AddPendingLogics(); }
+                if (pendingProxies.Count > 0) { AddPendingProxies(); }
             }
         }
         private void AddPendingBodies()
@@ -658,7 +676,15 @@ namespace Physics2DDotNet
             if (LogicsAdded != null) { LogicsAdded(this, new CollectionEventArgs<PhysicsLogic>(pendingLogics.AsReadOnly())); }
             pendingLogics.Clear();
         }
-
+        private void AddPendingProxies()
+        {
+            for (int index = 0; index < pendingProxies.Count; ++index)
+            {
+                BodyProxy proxy = pendingProxies[index];
+                Body.CreateProxy(proxy.Body1, proxy.Body2, proxy.transformation);
+            }
+            pendingProxies.Clear();
+        }
         private void CheckState()
         {
             if (this.broadPhase == null) { throw new InvalidOperationException("The BroadPhase property must be set."); }

@@ -39,23 +39,29 @@ namespace Physics2DDotNet
     /// This is a Proxy. That keeps 2 bodies velocities synchronized. 
     /// </summary>
     [Serializable]
-    public sealed class BodyProxy : IDeserializationCallback 
+    public sealed class BodyProxy : IDeserializationCallback
     {
-        internal Body body;
-        internal Matrix2x2 transformation = Matrix2x2.Identity;
+        Body body1;
+        Body body2;
+        internal Matrix2x2 transformation;
         [NonSerialized]
         internal LinkedListNode<BodyProxy> node;
         internal BodyProxy invertedTwin;
-        internal BodyProxy(Body body, Matrix2x2 transformaiton)
+        internal BodyProxy(Body body1, Body body2, Matrix2x2 transformaiton)
         {
-            this.body = body;
+            this.body1 = body1;
+            this.body2 = body2;
             this.transformation = transformaiton;
             this.node = new LinkedListNode<BodyProxy>(this);
         }
         /// <summary>
         /// This is the other body to be Synchronized with.
         /// </summary>
-        public Body Body { get { return body; } }
+        public Body Body1 { get { return body1; } }
+        /// <summary>
+        /// This is the other body to be Synchronized with.
+        /// </summary>
+        public Body Body2 { get { return body2; } }
         /// <summary>
         /// This is how the Velocity will be transformed when syncronized.
         /// </summary>
@@ -69,7 +75,7 @@ namespace Physics2DDotNet
 
         void IDeserializationCallback.OnDeserialization(object sender)
         {
-            for (LinkedListNode<BodyProxy> node = this.invertedTwin.body.proxies.First;
+            for (LinkedListNode<BodyProxy> node = this.invertedTwin.body2.proxies.First;
                 node != null;
                 node = node.Next)
             {

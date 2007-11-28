@@ -152,46 +152,15 @@ namespace ConsoleDriver
 
     static class Driver
     {
-        public static void TwoPassFileErase(string path, int blockSize, Random random)
-        {
-            if (path == null) { throw new ArgumentNullException("path"); }
-            if (blockSize <= 0) { throw new ArgumentOutOfRangeException("blockSize"); }
-            if (random == null) { throw new ArgumentNullException("random"); }
-            using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Write))
-            {
-                Byte[] buffer = new byte[blockSize];
-                long length = stream.Length;
-                for (long index = 0; index < length; index += buffer.Length)
-                {
-                    random.NextBytes(buffer);
-                    stream.Write(buffer, 0, buffer.Length);
-                }
-                stream.Flush();
-                stream.Seek(0, SeekOrigin.Begin);
-                Array.Clear(buffer, 0, buffer.Length);
-                for (long index = 0; index < length; index += buffer.Length)
-                {
-                    stream.Write(buffer, 0, buffer.Length);
-                }
-                stream.Flush();
-            }
-            string newPath;
-            do
-            {
-                newPath = Path.Combine(Path.GetDirectoryName(path), Path.GetRandomFileName());
-            } while (File.Exists(newPath));
-            File.Move(path, newPath);
-            File.Delete(newPath);
-        }
 
 
         static void TestMethod(int c, int d)
         {
-            int a,b;
+            int a, b;
             a = 40;
-            b = (c+ d )*a;
+            b = (c + d) * a;
             a = rand.Next();
-            a = b+ d *a+a;
+            a = b + d * a + a;
         }
 
 
@@ -218,7 +187,7 @@ namespace ConsoleDriver
 
 
             Shape shape1 = new Circle(8, 7);
-            Shape shape2 = new Polygon(Polygon.CreateRectangle(10, 20),3);
+            Shape shape2 = new Polygon(Polygon.CreateRectangle(10, 20), 3);
 
             Scalar mass = 5;
             Body body1 = new Body(new PhysicsState(), shape1, mass, coffecients, new Lifespan());
@@ -226,13 +195,17 @@ namespace ConsoleDriver
 
             engine.AddBody(body1);
             engine.AddBody(body2);
+            Joint joint = new HingeJoint(body1, body2, Vector2D.Zero, new Lifespan());
+            engine.AddJoint(joint);
+            joint.Lifetime.IsExpired = true;
+
             engine.AddJoint(new HingeJoint(body1, body2, Vector2D.Zero, new Lifespan()));
             engine.Update(0);
 
             body1.Lifetime.IsExpired = true;
 
-            Body.AddProxy(body1, body2, Matrix2x2.Identity);
-          //  b1.RemoveFromProxy();
+            engine.AddProxy(body1, body2, Matrix2x2.Identity);
+            //  b1.RemoveFromProxy();
 
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream stream = new MemoryStream();
@@ -245,7 +218,7 @@ namespace ConsoleDriver
 
 
             Console.WriteLine();
-            
+
             /*
 
             Vector2D[] vertexes1 = new Vector2D[]

@@ -66,18 +66,8 @@ namespace Physics2DDotNet
                 (body2.collisionIgnorer.CanCollideInternal(body1)));
         }
 
-        /// <summary>
-        /// Adds 2 bodies to the same proxy list. 
-        /// If they are both already part of their own proxy list then the lists will merge.
-        /// The transformations will be calcualted automatically. 
-        /// </summary>
-        /// <param name="body1">The first Body.</param>
-        /// <param name="body2">The second Body.</param>
-        /// <param name="transformation">How velocities will be transformed from body1 to body2.</param>
-        public static void AddProxy(Body body1, Body body2, Matrix2x2 transformation)
+        internal static void CreateProxy(Body body1, Body body2, Matrix2x2 transformation)
         {
-            if (body1 == null) { throw new ArgumentNullException("body1"); }
-            if (body2 == null) { throw new ArgumentNullException("body2"); }
             AddProxyList(body1, body2, transformation);
             AddProxyList(body2, body1, transformation.Inverted);
             AddProxySingle(body1, body2, transformation);
@@ -89,14 +79,14 @@ namespace Physics2DDotNet
                   node = node.Next)
             {
                 BodyProxy proxyT = node.Value;
-                AddProxySingle(body1, proxyT.body,
+                AddProxySingle(body1, proxyT.Body2,
                     transformation * proxyT.transformation);
             }
         }
         private static void AddProxySingle(Body body1, Body body2, Matrix2x2 transformation)
         {
-            BodyProxy proxy1 = new BodyProxy(body1, transformation.Inverted);
-            BodyProxy proxy2 = new BodyProxy(body2, transformation);
+            BodyProxy proxy1 = new BodyProxy(body2,body1, transformation.Inverted);
+            BodyProxy proxy2 = new BodyProxy(body1,body2, transformation);
             proxy1.invertedTwin = proxy2;
             proxy2.invertedTwin = proxy1;
             body1.proxies.AddLast(proxy2.node);
@@ -156,15 +146,13 @@ namespace Physics2DDotNet
         bool isPending;
         bool isCollidable;
         bool isTransformed;
-
-        internal LinkedList<BodyProxy> proxies = new LinkedList<BodyProxy>();
-
+        internal LinkedList<BodyProxy> proxies;
 
 
         object tag;
         object solverTag;
         object detectorTag;
-        private Matrix2D transformation = Matrix2D.Identity;
+        private Matrix2D transformation;
         #endregion
         #region constructors
         /// <summary>
@@ -204,7 +192,9 @@ namespace Physics2DDotNet
             if (shape == null) { throw new ArgumentNullException("shape"); }
             if (massInfo == null) { throw new ArgumentNullException("massInfo"); }
             if (coefficients == null) { throw new ArgumentNullException("coefficients"); }
-            if (lifetime == null) { throw new ArgumentNullException("lifetime"); }
+            if (lifetime == null) { throw new ArgumentNullException("lifetime"); } 
+            this.transformation = Matrix2D.Identity;
+            this.proxies = new LinkedList<BodyProxy>();
             this.state = new PhysicsState(state);
             this.Shape = shape;
             this.massInfo = massInfo;
@@ -219,6 +209,8 @@ namespace Physics2DDotNet
         {
             this.ignoresGravity = copy.ignoresGravity;
             this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
+
+
 
             this.state = new PhysicsState(copy.state);
             this.shape = copy.shape.Duplicate(); ;
@@ -244,6 +236,10 @@ namespace Physics2DDotNet
             this.isCollidable = copy.isCollidable;
             this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
             this.ignoresGravity = copy.ignoresGravity;
+
+            this.transformation = copy.transformation;
+            this.isTransformed = copy.isTransformed;
+            this.proxies = new LinkedList<BodyProxy>();
         }
         #endregion
         #region properties
@@ -513,7 +509,7 @@ namespace Physics2DDotNet
                 node = node.Next)
             {
                 BodyProxy proxy = node.Value;
-                PhysicsState state = proxy.body.state;
+                PhysicsState state = proxy.Body2.state;
                 state.Velocity.Angular = this.state.Velocity.Angular;
                 Vector2D.Transform(
                     ref proxy.transformation,
@@ -524,7 +520,7 @@ namespace Physics2DDotNet
         /// <summary>
         /// This will remove this body from any proxy list it is a part of.
         /// </summary>
-        public void RemoveFromProxy()
+        private void RemoveFromProxy()
         {
             if (proxies.Count == 0) { return; }
             for (LinkedListNode<BodyProxy> node = proxies.First;
@@ -585,6 +581,10 @@ namespace Physics2DDotNet
             shape.UpdateTime(dt);
             if (collisionIgnorer != null) { collisionIgnorer.UpdateTime(dt); }
             if (Updated != null) { Updated(this, new UpdatedEventArgs(dt)); }
+        }
+        internal void UpdateProxies()
+        {
+
         }
 
         /// <summary>

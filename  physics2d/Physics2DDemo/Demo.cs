@@ -1777,7 +1777,7 @@ namespace Physics2DDemo
                 FillRect(has, clip, mainRect);
                 foreach (BodyProxy proxy in b.Proxies)
                 {
-                    BoundingRectangle rect = proxy.Body.Shape.Rectangle;
+                    BoundingRectangle rect = proxy.Body2.Shape.Rectangle;
                     FillRect(has, clip, rect);
                    
                 }
@@ -1798,10 +1798,10 @@ namespace Physics2DDemo
                             Body prox = b.Duplicate();
                             prox.Updated += new EventHandler<UpdatedEventArgs>(DemoI_Body_Updated);
                             prox.Collided += new EventHandler<CollisionEventArgs>(DemoI_Body_Collided);
-                            prox.State.Position.Linear.X -= xDiff * (Non-x );
-                            prox.State.Position.Linear.Y -= yDiff * (Non-y );
+                            prox.State.Position.Linear.X -= xDiff * (Non - x);
+                            prox.State.Position.Linear.Y -= yDiff * (Non - y);
                             AddBody(prox);
-                            Body.AddProxy(b, prox, Matrix2x2.Identity);
+                            engine.AddProxy(b, prox, Matrix2x2.Identity);
                         }
                     }
                 }
@@ -1817,7 +1817,7 @@ namespace Physics2DDemo
             Body b = (Body)sender;
             foreach( BodyProxy prox in  b.Proxies)
             {
-                if (e.Other == prox.Body)
+                if (e.Other == prox.Body2)
                 {
                     if (b.ID > e.Other.ID)
                     {
