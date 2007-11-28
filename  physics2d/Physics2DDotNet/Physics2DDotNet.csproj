@@ -35,8 +35,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\ImplicitCastCollection.cs" />
-    <Compile Include="Collections\ReadOnlyThreadSafeList.cs" />
+    <Compile Include="Collections\AdvReaderWriterLock.cs" />
+    <Compile Include="Collections\ImplicitCastCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\ReadOnlyThreadSafeCollection.cs" />
     <Compile Include="DataTypes\BodyProxy.cs" />
     <Compile Include="DataTypes\CollectionEventArgs.cs" />
     <Compile Include="DataTypes\MassInfo.cs" />

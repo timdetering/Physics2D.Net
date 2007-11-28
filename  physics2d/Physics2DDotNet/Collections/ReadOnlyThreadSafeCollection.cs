@@ -25,104 +25,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 namespace Physics2DDotNet.Collections
 {
-    public sealed class CFReaderWriterLock
-    {
-        public sealed class WriterLock : IDisposable
-        {
-            CFReaderWriterLock rwLock;
-            public WriterLock(CFReaderWriterLock rwLock)
-            {
-                this.rwLock = rwLock;
-                rwLock.EnterWrite();
-            }
-            public void Dispose()
-            {
-                rwLock.ExitWrite();
-            }
-        }
-        public sealed class ReaderLock : IDisposable
-        {
-            CFReaderWriterLock rwLock;
-            public ReaderLock(CFReaderWriterLock rwLock)
-            {
-                this.rwLock = rwLock;
-                rwLock.EnterRead();
-            }
-            public void Dispose()
-            {
-                rwLock.ExitRead();
-            }
-        }
-
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-        ReaderWriterLock rwLock = new ReaderWriterLock();
-#else
-        object syncRoot = new object();
-#endif
-        public WriterLock Write
-        {
-            get
-            {
-                return new WriterLock(this);
-            }
-        }
-        public ReaderLock Read
-        {
-            get
-            {
-                return new ReaderLock(this);
-            }
-        }
-
-        public void EnterRead()
-        {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-            rwLock.AcquireReaderLock(Timeout.Infinite);
-#else
-            Monitor.Enter(syncRoot);
-#endif
-        }
-        public void EnterWrite()
-        {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
-            rwLock.AcquireWriterLock(Timeout.Infinite);
-#else
-            Monitor.Enter(syncRoot);
-#endif
-        }
-        public void ExitRead()
-        {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
-            rwLock.ReleaseReaderLock();
-#else
-            Monitor.Exit(syncRoot);
-#endif
-        }
-        public void ExitWrite()
-        {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
-            rwLock.ReleaseWriterLock();
-#else
-            Monitor.Exit(syncRoot);
-#endif
-        }
-    }
 
 
-
-
-
-    public sealed class ReadOnlyThreadSafeList<T> : IList<T>
+    public sealed class ReadOnlyThreadSafeCollection<T> : IList<T>
     {
         sealed class ThreadSafeEnumerator : IEnumerator<T>
         {
-            CFReaderWriterLock.ReaderLock readLock;
+            AdvReaderWriterLock.ReaderLock readLock;
             IEnumerator<T> self;
 
-            public ThreadSafeEnumerator(CFReaderWriterLock.ReaderLock readLock, IEnumerator<T> self)
+            public ThreadSafeEnumerator(AdvReaderWriterLock.ReaderLock readLock, IEnumerator<T> self)
             {
                 if (self == null) { throw new ArgumentNullException("self"); }
                 if (readLock == null) { throw new ArgumentNullException("readLock"); }
@@ -153,9 +67,9 @@ namespace Physics2DDotNet.Collections
             }
         }
 
-        CFReaderWriterLock rwLock;
+        AdvReaderWriterLock rwLock;
         List<T> self;
-        public ReadOnlyThreadSafeList(CFReaderWriterLock swLock, List<T> self)
+        public ReadOnlyThreadSafeCollection(AdvReaderWriterLock swLock, List<T> self)
         {
             this.rwLock = swLock;
             this.self = self;

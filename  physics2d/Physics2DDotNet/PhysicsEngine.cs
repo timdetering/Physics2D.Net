@@ -116,7 +116,7 @@ namespace Physics2DDotNet
         [NonSerialized]
         object syncRoot;
         [NonSerialized]
-        CFReaderWriterLock rwLock;
+        AdvReaderWriterLock rwLock;
         [NonSerialized]
         internal bool inUpdate;
 
@@ -142,7 +142,7 @@ namespace Physics2DDotNet
         {
             this.nextBodyID = firstBodyID;
             this.syncRoot = new object();
-            this.rwLock = new CFReaderWriterLock();
+            this.rwLock = new AdvReaderWriterLock();
 
             this.joints = new List<Joint>();
             this.bodies = new List<Body>();
@@ -162,31 +162,31 @@ namespace Physics2DDotNet
         /// <summary>
         /// Gets A threadSafe List of Joints (You wont get the "The collection has changed" Exception with this)
         /// </summary>
-        public ReadOnlyThreadSafeList<Joint> Joints
+        public ReadOnlyThreadSafeCollection<Joint> Joints
         {
             get
             {
-                return new ReadOnlyThreadSafeList<Joint>(rwLock, joints);
+                return new ReadOnlyThreadSafeCollection<Joint>(rwLock, joints);
             }
         }
         /// <summary>
         /// Gets A threadSafe List of Bodies (You wont get the "The collection has changed" Exception with this)
         /// </summary>
-        public ReadOnlyThreadSafeList<Body> Bodies
+        public ReadOnlyThreadSafeCollection<Body> Bodies
         {
             get
             {
-                return new ReadOnlyThreadSafeList<Body>(rwLock, bodies);
+                return new ReadOnlyThreadSafeCollection<Body>(rwLock, bodies);
             }
         }
         /// <summary>
         /// Gets A threadSafe List of PhysicsLogics (You wont get the "The collection has changed" Exception with this)
         /// </summary>
-        public ReadOnlyThreadSafeList<PhysicsLogic> Logics
+        public ReadOnlyThreadSafeCollection<PhysicsLogic> Logics
         {
             get
             {
-                return new ReadOnlyThreadSafeList<PhysicsLogic>(rwLock, logics);
+                return new ReadOnlyThreadSafeCollection<PhysicsLogic>(rwLock, logics);
             }
         }
         /// <summary>
