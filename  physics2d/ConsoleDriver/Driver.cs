@@ -204,8 +204,11 @@ namespace ConsoleDriver
 
             body1.Lifetime.IsExpired = true;
 
+            timer.IsRunning = false;
             engine.AddProxy(body1, body2, Matrix2x2.Identity);
             //  b1.RemoveFromProxy();
+
+
 
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream stream = new MemoryStream();

@@ -264,6 +264,10 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.O:
                     DemoO();
                     break;
+                case SdlDotNet.Input.Key.A:
+                    DemoA();
+                    break;
+
                 case SdlDotNet.Input.Key.F5:
                     Save();
                     break;
@@ -730,7 +734,7 @@ namespace Physics2DDemo
                 objects.AddRange(arr);
             }
         }
-        void AddFloor(ALVector2D position)
+        Body AddFloor(ALVector2D position)
         {
             Body line = new Body(
                 new PhysicsState(position),
@@ -741,6 +745,7 @@ namespace Physics2DDemo
             line.IgnoresGravity = true;
             AddGlObject(line);
             engine.AddBody(line);
+            return line;
         }
         void AddLine(Vector2D point1, Vector2D point2, Scalar thickness)
         {
@@ -1643,8 +1648,6 @@ namespace Physics2DDemo
 
            // this.clippersShape.Rectangle 
         }
-
-
         void DemoO()
         {
             waitHandle.Reset();
@@ -1654,7 +1657,7 @@ namespace Physics2DDemo
             rect.Min.Y -= 75;
             rect.Max.X += 75;
             rect.Max.Y += 75;
-            AddShell(rect,100,Scalar.PositiveInfinity);
+            AddShell(rect, 100, Scalar.PositiveInfinity);
             rect.Min.X += 100;
             rect.Min.Y += 100;
             rect.Max.X -= 100;
@@ -1666,8 +1669,8 @@ namespace Physics2DDemo
             {
                 for (Scalar y = rect.Min.Y; y < rect.Max.Y; y += spacing)
                 {
-                    Scalar radius = rand.Next(2,5);
-                    Body circle =AddCircle(radius, 10, radius * 2, new ALVector2D(0, x, y));
+                    Scalar radius = rand.Next(2, 5);
+                    Body circle = AddCircle(radius, 10, radius * 2, new ALVector2D(0, x, y));
                     circle.State.Velocity.Linear.X = rand.Next(-500, 501);
                     circle.State.Velocity.Linear.Y = rand.Next(-500, 501);
                 }
@@ -1675,6 +1678,48 @@ namespace Physics2DDemo
 
             waitHandle.Set();
         }
+        Body body1IT;
+        Body body2IT;
+        void DemoA()
+        {
+            waitHandle.Reset();
+            Reset(false);
+            AddGravityField();
+            body1IT = AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
+            Sprite blockSprite = GetSprite("fighter.png");
+            Vector2D[][] vertexes = blockSprite.Polygons;
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
+            shape.Tag = blockSprite;
+           //  body1IT = AddShape(shape, 40, new ALVector2D(0, new Vector2D(200, 300)));
+             body2IT = AddShape(shape, 40, new ALVector2D(0, new Vector2D(300, 300)));
+            AdvGroupIgnorer ignore1 = new AdvGroupIgnorer();
+            AdvGroupIgnorer ignore2 = new AdvGroupIgnorer();
+            ignore1.IsInverted = true;
+            ignore2.IsInverted = true;
+            //ignore1.Groups.Add(1);
+            //ignore2.IgnoredGroups.Add(1);
+            ignore2.Groups.Add(1);
+            ignore1.IgnoredGroups.Add(1);
+            body1IT.EventIgnorer = ignore1;
+            body2IT.EventIgnorer = ignore2;
+
+            body1IT.Collided += new EventHandler<CollisionEventArgs>(body2_Collided);
+            //body2IT.Collided += new EventHandler<CollisionEventArgs>(body2_Collided);
+
+            waitHandle.Set();
+        }
+
+        void body2_Collided(object sender, CollisionEventArgs e)
+        {
+           /* if ((sender == body1IT ||
+                sender == body2IT) &&
+                (e.Other == body1IT ||
+                e.Other == body2IT))
+            {*/
+                Console.WriteLine("HAHA");
+            //}
+        }
+
         const int Min = 0;
         const int Non = 1;
         const int Max = 2;

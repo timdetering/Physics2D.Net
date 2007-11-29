@@ -43,9 +43,9 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-        protected override bool CanCollide(Body other)
+        protected override bool CanCollide(Ignorer other)
         {
-            return other.CollisionIgnorer != this;
+            return other!= this;
         }
     }
 }

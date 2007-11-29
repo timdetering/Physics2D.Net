@@ -59,11 +59,11 @@ namespace Physics2DDotNet
                 body1.isCollidable &&
                 body2.isCollidable &&
                 (body1.collisionIgnorer == null ||
-                (body1.collisionIgnorer.CanCollideInternal(body2)))
+                (Ignorer.CanCollide(body1.collisionIgnorer, body2.collisionIgnorer)))
                 &&
                 (body2.collisionIgnorer == null ||
                 !body2.collisionIgnorer.BothNeeded ||
-                (body2.collisionIgnorer.CanCollideInternal(body1)));
+                (Ignorer.CanCollide(body2.collisionIgnorer, body1.collisionIgnorer)));
         }
 
         internal static void CreateProxy(Body body1, Body body2, Matrix2x2 transformation)
@@ -695,7 +695,7 @@ namespace Physics2DDotNet
         {
             if (Collided != null &&
                 (eventIgnorer == null ||
-                eventIgnorer.CanCollideInternal(other)))
+                Ignorer.CanCollide(eventIgnorer,other.eventIgnorer)))
             {
                 Collided(this, new CollisionEventArgs(other, contacts));
             }
@@ -704,7 +704,7 @@ namespace Physics2DDotNet
         {
             if (Collided != null &&
                 (eventIgnorer == null ||
-                eventIgnorer.CanCollideInternal(other)))
+                Ignorer.CanCollide(eventIgnorer,other.eventIgnorer)))
             {
                 Collided(this, new CollisionEventArgs(other, customIntersectionInfo));
             }
