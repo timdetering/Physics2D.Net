@@ -56,7 +56,7 @@ namespace Physics2DDemo
     class Demo
     {
         #region fields
-        static readonly string dataDir = @"..\..\..\data";
+        static readonly string dataDir = @"..|..|..|data".Replace('|',Path.DirectorySeparatorChar);
         static Random rand = new Random();
         ManualResetEvent waitHandle;
         PhysicsEngine engine;
