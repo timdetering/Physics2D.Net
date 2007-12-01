@@ -267,7 +267,9 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.A:
                     DemoA();
                     break;
-
+                case SdlDotNet.Input.Key.S:
+                    DemoS();
+                    break;
                 case SdlDotNet.Input.Key.F5:
                     Save();
                     break;
@@ -1708,7 +1710,38 @@ namespace Physics2DDemo
 
             waitHandle.Set();
         }
+        void DemoS()
+        {
+         /*   waitHandle.Reset();
+            Reset(false);
+            AddGravityField();
+            engine.AddLogic(new GlobalFluidLogic(.45f, .02f, Vector2D.Zero, new Lifespan()));
 
+            BoundingRectangle rect = this.clippersShape.Rectangle;
+            rect.Min.X -= 75;
+            rect.Min.Y -= 75;
+            rect.Max.X += 75;
+            rect.Max.Y += 75;
+            AddShell(rect, 100, Scalar.PositiveInfinity).ForEach(delegate(Body b) { b.IgnoresGravity = true; });
+            
+            Sprite blockSprite = GetSprite("fighter.png");
+            Vector2D[][] vertexes = blockSprite.Polygons;
+            MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
+            shape.Tag = blockSprite;
+
+            AddShape(shape, 40, new ALVector2D(0, new Vector2D(200, 300)));
+            AddShape(shape, 40, new ALVector2D(0, new Vector2D(500, 300)));
+            AddRectangle(50, 50, 50, new ALVector2D(0, 600, 600));
+            AddRectangle(50, 50, 500, new ALVector2D(0, 600, 450));
+            AddCircle(10, 9, 5, new ALVector2D(0, 600, 600));
+            AddCircle(10, 9, 50, new ALVector2D(0, 500, 600));
+            AddCircle(10, 9, 500, new ALVector2D(0, 400, 600));
+            AddCircle(10, 9, 5000, new ALVector2D(0, 300, 600));
+
+
+
+            waitHandle.Set();*/
+        }
         void body2_Collided(object sender, CollisionEventArgs e)
         {
            /* if ((sender == body1IT ||

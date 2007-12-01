@@ -104,36 +104,6 @@ namespace Physics2DDemo
             }
 
         }
-      /*  public Sprite(Surface surface2)
-        {
-            this.surface =  surface2 ;
-            texture = new SurfaceGl(surface, true);
-            texture.WrapS = WrapOption.GL_CLAMP;
-            texture.WrapT = WrapOption.GL_CLAMP;
-            //texture.MagFilter = MagnificationOption.GL_LINEAR;
-            //texture.MinFilter = MinifyingOption.GL_LINEAR_MIPMAP_LINEAR;
-            int blank = surface.TransparentColor.ToArgb();
-            bool[,] bitmap = new bool[surface.Width, surface.Height];
-            Color[,] pixels = surface.GetColors(new System.Drawing.Rectangle(0, 0, surface.Width, surface.Height));
-
-            for (int x = 0; x < bitmap.GetLength(0); ++x)
-            {
-                for (int y = 0; y < bitmap.GetLength(1); ++y)
-                {
-                    bitmap[x, y] = pixels[x, y].ToArgb() != blank;
-                }
-            }  
-            vertexes = Polygon.CreateFromBitmap(bitmap);
-            Console.WriteLine("Before {0}", vertexes.Length);
-            vertexes = Polygon.Reduce(vertexes, 1);
-            vertexes = Polygon.Reduce(vertexes, 2);
-            vertexes = Polygon.Reduce(vertexes, 3);
-            Console.WriteLine("After {0}", vertexes.Length);
-            vertexes = Polygon.Subdivide(vertexes, 10);
-            Console.WriteLine("Subdivide {0}", vertexes.Length);
-            offset = Polygon.GetCentroid(vertexes);
-            vertexes = Polygon.MakeCentroidOrigin(vertexes);
-        }*/
         public Vector2D Offset
         {
             get { return offset; }

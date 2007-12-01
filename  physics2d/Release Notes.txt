@@ -3,8 +3,25 @@ Release Notes fo Physics2D.Net
 Since God Created me and Jesus Saved me All glory goes to God.
 
 NEXT VERSION:
-there were quite a few things renamed becuase FXcop did not like them or I did not like them, the renames where mostly just changing of the case so these should be easy to fix.
+There were quite a few things renamed because FXcop did not like them or I did not like them, the renames where mostly just changing of the case so these should be easy to fix.
 
+A few things in AdvanceMath were renamed to make them closer to XNA’s math lib. 
+
+There are some minor speed improvements done.
+
+There are quite a few bug fixes.
+
+There are 3 new Broad Phase Detectors: Brute force, Selective Sweep and Frame Coherent Sweep and Prune. The brute force is there for people to use as a baseline for comparisons. Selective Sweep is a very good broudphase that I would recommend. Frame Coherent Sweep and Prune is good for very static environments. 
+
+Compatibility with Xbox360: the library will now compile under the compact framework for the Xbox360.
+
+Fixes for support of serialization. All Physics2D.Net class now should serialize properly. Serializing the PhysicsEngine during a call to Update is not supported.
+
+Support for filtering collision events using ignorers via the Body.EventIgnorer property. 
+
+MultipartPolygon.CreateFromBitmap returns multiple polygons that are inside a bitmap. 
+
+Added something I am calling proxying. It’s a way to have objects either wrap around the screen with collision being done properly or doing a 2d version of portal. 
 
 
 1.4.0.0

@@ -32,7 +32,6 @@ using Scalar = System.Single;
 using System;
 using System.Collections.Generic;
 
-
 namespace Physics2DDotNet
 {
     /// <summary>
@@ -150,11 +149,13 @@ namespace Physics2DDotNet
         internal void OnAddedInternal()
         {
             this.isPending = false;
+            AddBodyRange(engine.bodies);
             OnAdded();
             if (Added != null) { Added(this, EventArgs.Empty); }
         }
         internal void OnRemovedInternal()
         {
+            Clear();
             bool wasPending = this.isPending;
             PhysicsEngine engine = this.engine;
             this.isPending = false;
@@ -169,6 +170,9 @@ namespace Physics2DDotNet
         {
             this.lifetime.Update(dt);
         }
-    }
 
+        protected internal virtual void AddBodyRange(List<Body> collection) { }
+        protected internal virtual void RemoveExpiredBodies() { }
+        protected internal virtual void Clear() { }
+    }
 }

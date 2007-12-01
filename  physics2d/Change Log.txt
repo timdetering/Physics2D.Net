@@ -56,6 +56,7 @@ Changed: did a global Search and replace for float to Scalar.
 changed: some things to fix serialization
 Fixed: the false negative bugs in FrameCoherentSAPDetector. 
 fixed: A bug where a body's ID would not be assigned before it was added to the solver or the detector
+Added: AddBodyRange, RemoveExpired, and Clear to PhysicsLogic
 
 AdvanceMath
 1.6.1.0:

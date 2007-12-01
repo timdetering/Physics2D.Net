@@ -581,6 +581,10 @@ namespace Physics2DDotNet
             if (bodies.RemoveAll(IsBodyExpired) == 0) { return; }
             solver.RemoveExpiredBodies();
             broadPhase.RemoveExpiredBodies();
+            for (int index = 0; index < logics.Count; ++index)
+            {
+                logics[0].RemoveExpiredBodies();
+            }
             if (BodiesRemoved != null)
             {
                 BodiesRemoved(this, new CollectionEventArgs<Body>(removedBodies.AsReadOnly()));
@@ -650,6 +654,10 @@ namespace Physics2DDotNet
             bodies.AddRange(pendingBodies);
             solver.AddBodyRange(pendingBodies);
             broadPhase.AddBodyRange(pendingBodies);
+            for (int index = 0; index < logics.Count; ++index)
+            {
+                logics[index].AddBodyRange(pendingBodies);
+            }
             for (int index = 0; index < pendingBodies.Count; ++index)
             {
                 pendingBodies[index].OnAdded();
