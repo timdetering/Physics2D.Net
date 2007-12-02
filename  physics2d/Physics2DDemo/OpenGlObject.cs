@@ -65,8 +65,8 @@ namespace Physics2DDemo
         {
             this.surface = surface2;
             texture = new SurfaceGl(surface, true);
-            texture.WrapS = WrapOption.GL_CLAMP;
-            texture.WrapT = WrapOption.GL_CLAMP;
+            texture.WrapS = WrapOption.Clamp;
+            texture.WrapT = WrapOption.Clamp;
             //texture.MagFilter = MagnificationOption.GL_LINEAR;
             //texture.MinFilter = MinifyingOption.GL_LINEAR_MIPMAP_LINEAR;
             int blank = surface.TransparentColor.ToArgb();
