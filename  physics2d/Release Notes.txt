@@ -2,7 +2,7 @@ Release Notes fo Physics2D.Net
 
 Since God Created me and Jesus Saved me All glory goes to God.
 
-NEXT VERSION:
+1.5.0.0
 There were quite a few things renamed because FXcop did not like them or I did not like them, the renames where mostly just changing of the case so these should be easy to fix.
 
 A few things in AdvanceMath were renamed to make them closer to XNA’s math lib. 
