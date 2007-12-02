@@ -1,5 +1,5 @@
 AdvanceMath
-NEXTVERSION:
+1.7.0.0:
 added: "#if !CompactFramework ... #endif"  statements for all non Compact framework compatible code.
 removed: some unneeded code that was not supported by compact framework.
 changed: now compiles on compact framework.
@@ -15,7 +15,7 @@ Changed: BoundingPolygon.GetDistance to potentially be faster
 Changed: renamed MathHelper constants to be closer to XNA
 
 Physics2D.Net
-NEXTVERSION:
+1.5.0.0:
 added: "#if !CompactFramework ... #endif"  statements for all non Compact framework compatible code.
 changed: PhysicsTimer to be compatible with the Compact framework
 removed: most of the classes in Collections.
