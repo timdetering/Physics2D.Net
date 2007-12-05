@@ -1,4 +1,12 @@
 AdvanceMath
+NextVersion:
+
+Physics2D.Net
+NextVersion:
+Fixed: bug with PhysicsTimer that would let it run faster then it should. 
+
+
+AdvanceMath
 1.7.0.0:
 added: "#if !CompactFramework ... #endif"  statements for all non Compact framework compatible code.
 removed: some unneeded code that was not supported by compact framework.

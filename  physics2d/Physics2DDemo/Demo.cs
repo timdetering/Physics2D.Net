@@ -990,7 +990,7 @@ namespace Physics2DDemo
         }
         void AddGravityField()
         {
-            engine.AddLogic(new GravityField(new Vector2D(0, 500), new Lifespan()));
+            engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
         }
         void AddParticles(Vector2D position, int count)
         {
@@ -1384,7 +1384,7 @@ namespace Physics2DDemo
         {
             waitHandle.Reset();
             Reset();
-            engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 200, new Lifespan()));
+            engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 800, new Lifespan()));
             AddTowers();
             Scalar y = 0;
             for (Scalar x = 200; x < 500; x += 100, y -= 100)

@@ -162,31 +162,34 @@ namespace Physics2DDotNet
         }
         void EngineProcess()
         {
-            Scalar extraDt, dt;
-            extraDt = 0;
+            Scalar extraDt  = 0;
             while (!isDisposed)
             {
                 if (!isRunning)
                 {
                     state = TimerState.Paused;
-                    waitHandle.WaitOne(Timeout.Infinite, false);
+                    waitHandle.WaitOne();
                     lastRun = DateTime.Now;
                     extraDt = 0;
                 }
                 else
                 {
-                    dt = (Scalar)(DateTime.Now.Subtract(lastRun).TotalMilliseconds / 1000);
-                    extraDt += dt;
-                    if (extraDt < targetInterval)
+                    DateTime now = DateTime.Now;
+                    Scalar dt = ((Scalar)now.Subtract(lastRun).TotalMilliseconds / 1000);
+                    Scalar currentDt = extraDt + dt;
+                    if (currentDt < targetInterval)
                     {
                         state = TimerState.Fast;
-                        int sleep = (int)((targetInterval - (extraDt + dt)) * 1000);
-                        if (sleep < 0) { sleep = 0; }
+                        int sleep = (int)Math.Ceiling((targetInterval - (currentDt)) * 1000);
+                        if (sleep < 0)
+                        {
+                            sleep = 0;
+                        }
                         waitHandle.WaitOne(sleep, false);
                     }
                     else
                     {
-                        extraDt -= targetInterval;
+                        extraDt = currentDt - targetInterval;
                         if (extraDt > targetInterval)
                         {
                             extraDt = targetInterval;
@@ -196,7 +199,7 @@ namespace Physics2DDotNet
                         {
                             state = TimerState.Normal;
                         }
-                        lastRun = DateTime.Now;
+                        lastRun = now;
                         callback(targetInterval);
                     }
                 }
