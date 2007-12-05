@@ -41,6 +41,7 @@ namespace Physics2DDotNet
     /// </summary>
     public enum TimerState
     {
+        NotStarted,
         /// <summary>
         /// The PhysicsTimer is Paused.
         /// </summary>
@@ -67,21 +68,27 @@ namespace Physics2DDotNet
     /// </summary>
     /// <param name="dt">The change in time.</param>
     public delegate void PhysicsCallback(Scalar dt);
+
     /// <summary>
     /// A class to update the PhysicsEngine at regular intervals.
     /// </summary>
-    public class PhysicsTimer : IDisposable 
+    public sealed class PhysicsTimer : IDisposable
     {
-        TimerState state;
-        bool isDisposed;
+        #region static
         static int threadCount;
+        #endregion
+        #region fields
+        bool isBackground;
+        bool isDisposed;
+        bool isRunning;
+
+        TimerState state;
         Scalar targetInterval;
         PhysicsCallback callback;
         AutoResetEvent waitHandle;
-        Thread engineThread;
-        bool isRunning;
-        DateTime lastRun;
-
+        Thread engineThread; 
+        #endregion
+        #region constructors
         /// <summary>
         /// Creates a new PhysicsTimer Instance.
         /// </summary>
@@ -91,9 +98,35 @@ namespace Physics2DDotNet
         {
             if (callback == null) { throw new ArgumentNullException("callback"); }
             if (targetInterval <= 0) { throw new ArgumentOutOfRangeException("targetInterval"); }
+            this.isBackground = true;
+            this.isDisposed = false;
+            this.isRunning = false;
+            this.state = TimerState.NotStarted;
             this.targetInterval = targetInterval;
             this.callback = callback;
             this.waitHandle = new AutoResetEvent(true);
+            this.engineThread = null;
+        } 
+        #endregion
+        #region properties
+        /// <summary>
+        /// Gets or sets a value indicating whether or not the thread that runs the time is a background thread.
+        /// </summary>
+        public bool IsBackground
+        {
+            get { return isBackground; }
+            set
+            {
+                if (isDisposed) { throw new ObjectDisposedException(typeof(PhysicsTimer).Name); }
+                if (isBackground ^ value)
+                {
+                    isBackground = value;
+                    if (engineThread != null)
+                    {
+                        engineThread.IsBackground = value;
+                    }
+                }
+            }
         }
         /// <summary>
         /// Gets and Sets if the PhysicsTimer is currently calling the Callback.
@@ -106,7 +139,7 @@ namespace Physics2DDotNet
             }
             set
             {
-                if (isDisposed) { throw new ObjectDisposedException(this.ToString()); }
+                if (isDisposed) { throw new ObjectDisposedException(typeof(PhysicsTimer).Name); }
                 if (this.isRunning ^ value)
                 {
                     this.isRunning = value;
@@ -115,8 +148,8 @@ namespace Physics2DDotNet
                         if (this.engineThread == null)
                         {
                             this.engineThread = new Thread(EngineProcess);
-                            this.engineThread.IsBackground = true;
-                            this.engineThread.Name = string.Format("PhysicsEngine Thread: {0}", threadCount++);
+                            this.engineThread.IsBackground = isBackground;
+                            this.engineThread.Name = string.Format("PhysicsEngine Thread: {0}", Interlocked.Increment(ref threadCount));
                             this.engineThread.Start();
                         }
                         else
@@ -159,40 +192,47 @@ namespace Physics2DDotNet
                 if (value == null) { throw new ArgumentNullException("value"); }
                 callback = value;
             }
+        } 
+        #endregion
+        #region methods
+        /// <summary>
+        /// Stops the Timer 
+        /// </summary>
+        public void Dispose()
+        {
+            if (!isDisposed)
+            {
+                isDisposed = true;
+                isRunning = false;
+                waitHandle.Set();
+                waitHandle.Close();
+                state = TimerState.Disposed;
+            }
         }
         void EngineProcess()
         {
-            Scalar extraDt  = 0;
+            Scalar desiredDt = targetInterval * 1000;
+            DateTime lastRun = DateTime.Now;
+            Scalar extraDt = 0;
             while (!isDisposed)
             {
-                if (!isRunning)
-                {
-                    state = TimerState.Paused;
-                    waitHandle.WaitOne();
-                    lastRun = DateTime.Now;
-                    extraDt = 0;
-                }
-                else
+                if (isRunning)
                 {
                     DateTime now = DateTime.Now;
-                    Scalar dt = ((Scalar)now.Subtract(lastRun).TotalMilliseconds / 1000);
+                    Scalar dt = (Scalar)(now.Subtract(lastRun).TotalMilliseconds);
                     Scalar currentDt = extraDt + dt;
-                    if (currentDt < targetInterval)
+                    if (currentDt < desiredDt)
                     {
                         state = TimerState.Fast;
-                        int sleep = (int)Math.Ceiling((targetInterval - (currentDt)) * 1000);
-                        if (sleep < 0)
-                        {
-                            sleep = 0;
-                        }
+                        int sleep = (int)Math.Ceiling(desiredDt - currentDt);
                         waitHandle.WaitOne(sleep, false);
                     }
                     else
                     {
-                        extraDt = currentDt - targetInterval;
-                        if (extraDt > targetInterval)
+                        extraDt = currentDt - desiredDt;
+                        if (extraDt > desiredDt)
                         {
-                            extraDt = targetInterval;
+                            extraDt = desiredDt;
                             state = TimerState.Slow;
                         }
                         else
@@ -203,26 +243,16 @@ namespace Physics2DDotNet
                         callback(targetInterval);
                     }
                 }
-            }
-            state = TimerState.Disposed;
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!isDisposed)
-            {
-                if (disposing)
+                else
                 {
-                    isDisposed = true;
-                    waitHandle.Set();
-                    isRunning = false;
-                    state = TimerState.Disposed;
-                    waitHandle.Close();
+                    state = TimerState.Paused;
+                    waitHandle.WaitOne();
+                    lastRun = DateTime.Now;
+                    extraDt = 0;
                 }
             }
-        }
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+            state = TimerState.Disposed;
+        } 
+        #endregion
     }
 }
