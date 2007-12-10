@@ -64,6 +64,10 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
+        public override bool CanGetDragInfo
+        {
+            get { return false; }
+        }
 
         public void SetRectangle(BoundingRectangle rectangle)
         {
@@ -118,6 +122,37 @@ namespace Physics2DDotNet
         public override Shape Duplicate()
         {
             return new RectangleShape();
+        }
+
+        public override DragInfo GetDragInfo(Vector2D tangent)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override bool CanGetCentroid
+        {
+            get { return false; }
+        }
+        public override bool CanGetArea
+        {
+            get { return false; }
+        }
+        public override bool CanGetInertia
+        {
+            get { return false; }
+        }
+
+        public override Vector2D GetCentroid()
+        {
+            throw new NotSupportedException();
+        }
+        public override float GetArea()
+        {
+            throw new NotSupportedException();
+        }
+        public override float GetInertia()
+        {
+            throw new NotSupportedException();
         }
     }
 }

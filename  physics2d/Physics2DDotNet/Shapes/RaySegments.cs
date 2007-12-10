@@ -130,7 +130,22 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-
+        public override bool CanGetDragInfo
+        {
+            get { return false; }
+        }
+        public override bool CanGetCentroid
+        {
+            get { return false; }
+        }
+        public override bool CanGetArea
+        {
+            get { return false; }
+        }
+        public override bool CanGetInertia
+        {
+            get { return false; }
+        }
 
         bool TryGetCustomIntersection(Circle circle, out RaySegmentIntersectionInfo info)
         {
@@ -217,6 +232,7 @@ namespace Physics2DDotNet
             Scalar[] result = new Scalar[segments.Length];
             Scalar temp;
             Vector2D[][] polygons = polygon.Polygons;
+            Matrix2D matrix = polygon.MatrixInv;
             for (int index = 0; index < segments.Length; ++index)
             {
                 result[index] = -1;
@@ -230,6 +246,8 @@ namespace Physics2DDotNet
                     rect.Intersects(ref segment.RayInstance, out temp);
                     if (temp >= 0 && temp <= segment.Length)
                     {
+                        Vector2D.Transform(ref matrix.NormalMatrix, ref segment.RayInstance.Direction, out segment.RayInstance.Direction);
+                        Vector2D.Transform(ref matrix.VertexMatrix, ref segment.RayInstance.Origin, out segment.RayInstance.Origin);
                         poly.Intersects(ref segment.RayInstance, out temp);
                         if (temp >= 0 && temp <= segment.Length)
                         {
@@ -369,5 +387,27 @@ namespace Physics2DDotNet
         {
             return new RaySegments(this);
         }
+
+        public override DragInfo GetDragInfo(Vector2D tangent)
+        {
+            throw new NotSupportedException();
+        }
+
+
+
+
+        public override Vector2D GetCentroid()
+        {
+            throw new NotSupportedException();
+        }
+        public override float GetArea()
+        {
+            throw new NotSupportedException();
+        }
+        public override float GetInertia()
+        {
+            throw new NotSupportedException();
+        }
+       
     }
 }

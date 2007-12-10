@@ -47,7 +47,7 @@ namespace Physics2DDotNet
         private static Vector2D Zero = Vector2D.Zero;
         #region fields
         private Scalar radius;
-        private Vector2D position; 
+        private Vector2D position;
         #endregion
         #region constructors
 
@@ -85,7 +85,7 @@ namespace Physics2DDotNet
         {
             this.position = copy.position;
             this.radius = copy.radius;
-        } 
+        }
         #endregion
         #region properties
         /// <summary>
@@ -118,6 +118,22 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
+        public override bool CanGetDragInfo
+        {
+            get { return true; }
+        }
+        public override bool CanGetCentroid
+        {
+            get { return true; }
+        }
+        public override bool CanGetArea
+        {
+            get { return true; }
+        }
+        public override bool CanGetInertia
+        {
+            get { return true; }
+        }
         #endregion
         #region methods
         protected override void CalcBoundingRectangle()
@@ -134,7 +150,7 @@ namespace Physics2DDotNet
                 rect.Min.Y = position.Y - radius;
             }
         }
-        public override void GetDistance(ref Vector2D point,out Scalar result)
+        public override void GetDistance(ref Vector2D point, out Scalar result)
         {
             Vector2D temp;
             Vector2D.Subtract(ref point, ref position, out temp);
@@ -162,7 +178,23 @@ namespace Physics2DDotNet
         public override Shape Duplicate()
         {
             return new Circle(this);
-        } 
+        }
+        public override DragInfo GetDragInfo(Vector2D tangent)
+        {
+            return new DragInfo(Vector2D.Zero, radius * 2);
+        }
+        public override Vector2D GetCentroid()
+        {
+            return Vector2D.Zero;
+        }
+        public override float GetArea()
+        {
+            return radius * radius * MathHelper.Pi;
+        }
+        public override float GetInertia()
+        {
+            return .5f * (radius * radius);
+        }
         #endregion
     }
 }

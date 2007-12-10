@@ -47,7 +47,7 @@ namespace AdvanceMath.Geometry2D.UnitTest
         BoundingRectangle rect2;
 
         BoundingPolygon polygon1;
-        BoundingPolygon polygon2;
+       // BoundingPolygon polygon2;
 
         [SetUp]
         public void Init()

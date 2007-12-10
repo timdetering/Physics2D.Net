@@ -43,6 +43,27 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class MultipartPolygon : Shape
     {
+        sealed class StubComparer : System.Collections.Generic.IComparer<SAPNode>
+        {
+            public int Compare(SAPNode left, SAPNode right)
+            {
+                if (left.value < right.value) { return -1; }
+                if (left.value > right.value) { return 1; }
+                return ((left == right) ? (0) : ((left.begin) ? (-1) : (1)));
+            }
+        }
+        sealed class SAPNode
+        {
+            public bool begin;
+            public Scalar value;
+            public SAPNode(Scalar value, bool begin)
+            {
+                this.value = value;
+                this.begin = begin;
+            }
+        }
+        static StubComparer comparer = new StubComparer();
+
 
         public static Vector2D[][] CreateFromBitmap(bool[,] bitmap)
         {
@@ -135,7 +156,7 @@ namespace Physics2DDotNet
             if (polygons == null) { throw new ArgumentNullException("polygons"); }
             if (polygons.Length == 0) { throw new ArgumentOutOfRangeException("polygons"); }
 
-            
+
             Scalar temp, area, areaTotal;
             Vector2D v1, v2;
             Vector2D[] vertices;
@@ -206,7 +227,7 @@ namespace Physics2DDotNet
         private Vector2D[][] polygons;
 
 
-        private DistanceGrid grid; 
+        private DistanceGrid grid;
 
         #region constructors
         [CLSCompliant(false)]
@@ -220,7 +241,7 @@ namespace Physics2DDotNet
             this.polygons = polygons;
             this.grid = new DistanceGrid(this, gridSpacing);
         }
-        
+
         private MultipartPolygon(MultipartPolygon copy)
             : base(copy)
         {
@@ -251,7 +272,22 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-
+        public override bool CanGetDragInfo
+        {
+            get { return true; }
+        }
+        public override bool CanGetCentroid
+        {
+            get { return true; }
+        }
+        public override bool CanGetArea
+        {
+            get { return true; }
+        }
+        public override bool CanGetInertia
+        {
+            get { return true; }
+        }
         protected override void CalcBoundingRectangle()
         {
             BoundingRectangle.FromVectors(base.vertexes, out rect);
@@ -287,6 +323,75 @@ namespace Physics2DDotNet
         {
             throw new NotSupportedException();
         }
+
+
+        public override DragInfo GetDragInfo(Vector2D tangent)
+        {
+            // direction = body.Shape.MatrixInv.NormalMatrix * direction;
+            Scalar min, max;
+            Scalar avg;
+            if (polygons.Length == 1)
+            {
+                GetProjectedBounds(
+                    vertexes, 0,
+                    vertexes.Length,
+                    tangent, out min, out max);
+                Vector2D.Dot(ref tangent, ref  Parent.State.Position.Linear, out avg);
+                avg = (max + min) / 2 - avg;
+                return new DragInfo(tangent * avg, max - min);
+            }
+            SAPNode[] sapNodes = new SAPNode[polygons.Length * 2];
+            int offset = 0;
+            for (int index = 0; index < polygons.Length; ++index)
+            {
+                GetProjectedBounds(vertexes, offset, polygons[index].Length, tangent, out min, out max);
+                sapNodes[index * 2] = new SAPNode(min, true);
+                sapNodes[(index * 2) + 1] = new SAPNode(max, false);
+                offset += polygons[index].Length;
+            }
+            Array.Sort<SAPNode>(sapNodes, comparer);
+            int depth = 0;
+            Scalar result = 0;
+            Scalar start = 0;
+            for (int index = 0; index < sapNodes.Length; ++index)
+            {
+                SAPNode node = sapNodes[index];
+                if (node.begin)
+                {
+                    if (depth == 0)
+                    {
+                        start = node.value;
+                    }
+                    depth++;
+                }
+                else
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        result += node.value - start;
+                    }
+                }
+            }
+            Vector2D.Dot(ref tangent, ref  Parent.State.Position.Linear, out avg);
+            avg = (sapNodes[0].value + sapNodes[sapNodes.Length - 1].value) / 2 - avg;
+            return new DragInfo(tangent * avg, result);
+        }
+
+        public override Vector2D GetCentroid()
+        {
+            return GetCentroid(polygons);
+        }
+        public override float GetArea()
+        {
+            return GetArea(polygons);
+        }
+        public override float GetInertia()
+        {
+            return InertiaOfMultipartPolygon(polygons);
+        }
+
+
         public override Shape Duplicate()
         {
             return new MultipartPolygon(this);

@@ -47,11 +47,20 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class PhysicsEngine
     {
+        public class LogicComparer : IComparer<PhysicsLogic>
+        {
+            public int Compare(PhysicsLogic x, PhysicsLogic y)
+            {
+                return  x.Order.CompareTo(y.Order);
+            }
+        }
+
         #region static/const fields
         /// <summary>
         /// This is the ID the first body added to the engine will get.
         /// </summary>
         const int firstBodyID = 1;
+        static LogicComparer logicComparer = new LogicComparer();
         #endregion
         #region static methods
         private static void PreCheckItem(Joint item)
@@ -120,6 +129,7 @@ namespace Physics2DDotNet
         AdvReaderWriterLock rwLock;
         [NonSerialized]
         internal bool inUpdate;
+        internal bool logicsNeedSorting;
 
         private List<PhysicsLogic> logics;
         internal List<Body> bodies;
@@ -453,7 +463,11 @@ namespace Physics2DDotNet
             {
                 RemoveExpired();
                 AddPending();
-
+                if (logicsNeedSorting)
+                {
+                    logicsNeedSorting = false;
+                    logics.Sort(logicComparer);
+                }
                 UpdateTime(step);
                 solver.Solve(step);
                 OnStateChanged();
@@ -684,10 +698,12 @@ namespace Physics2DDotNet
             logics.AddRange(pendingLogics);
             for (int index = 0; index < pendingLogics.Count; ++index)
             {
-                pendingLogics[index].OnAddedInternal();
+                PhysicsLogic logic = pendingLogics[index];
+                logic.OnAddedInternal();
             }
             if (LogicsAdded != null) { LogicsAdded(this, new CollectionEventArgs<PhysicsLogic>(pendingLogics.AsReadOnly())); }
             pendingLogics.Clear();
+            this.logicsNeedSorting = true;
         }
         private void AddPendingProxies()
         {

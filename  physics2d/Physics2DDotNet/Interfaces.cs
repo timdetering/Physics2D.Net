@@ -42,7 +42,7 @@ namespace Physics2DDotNet
         T Duplicate();
     }
 
-    public interface IPhysicsEntity 
+    public interface IPhysicsEntity
     {
         event EventHandler Pending;
         event EventHandler Added;
@@ -52,6 +52,7 @@ namespace Physics2DDotNet
         bool IsPending { get;}
         bool IsAdded { get;}
         Lifespan Lifetime { get; set;}
+        object Tag { get; set;}
     }
 
     public interface IJoint : IPhysicsEntity

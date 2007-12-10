@@ -286,6 +286,9 @@ namespace Physics2DDemo
                 case SdlDotNet.Input.Key.S:
                     DemoS();
                     break;
+                case SdlDotNet.Input.Key.D:
+                    DemoD();
+                    break;
                 case SdlDotNet.Input.Key.LeftArrow:
                     torque += torqueMag;
                     //force += new Vector2D(-forceMag, 0);
@@ -1663,13 +1666,16 @@ namespace Physics2DDemo
 
             EndDemoChange();
         }
-        Body body1IT;
-        Body body2IT;
+       
         void DemoA()
         {
+
             BeginDemoChange();
             Reset(false);
             AddGravityField();
+            Body body1IT;
+            Body body2IT;
+            
             body1IT = AddFloor(new ALVector2D(0, new Vector2D(700, 750)));
             Sprite blockSprite = GetSprite("fighter.png");
             Vector2D[][] vertexes = blockSprite.Polygons;
@@ -1718,9 +1724,9 @@ namespace Physics2DDemo
             joint1.Softness = .95f;
             engine.AddJointRange(new Joint[] { joint1, joint2 });
 
-             lever = AddRectangle(20, 100, 9, new ALVector2D(0, 385, 300));
-             joint1 = new FixedAngleJoint(lever, new Lifespan());
-             joint2 = new FixedHingeJoint(lever, new Vector2D(460, 300), new Lifespan());
+            lever = AddRectangle(20, 100, 9, new ALVector2D(0, 385, 300));
+            joint1 = new FixedAngleJoint(lever, new Lifespan());
+            joint2 = new FixedHingeJoint(lever, new Vector2D(460, 300), new Lifespan());
             joint1.Softness = .95f;
             engine.AddJointRange(new Joint[] { joint1, joint2 });
 
@@ -1729,10 +1735,42 @@ namespace Physics2DDemo
             ball.Transformation *= Matrix3x3.FromScale(new Vector2D(1, .8f));
 
             EndDemoChange();
-         /*   BeginDemoChange();
+            /*   BeginDemoChange();
+               Reset(false);
+               AddGravityField();
+               engine.AddLogic(new GlobalFluidLogic(.45f, .02f, Vector2D.Zero, new Lifespan()));
+
+               BoundingRectangle rect = this.clippersShape.Rectangle;
+               rect.Min.X -= 75;
+               rect.Min.Y -= 75;
+               rect.Max.X += 75;
+               rect.Max.Y += 75;
+               AddShell(rect, 100, Scalar.PositiveInfinity).ForEach(delegate(Body b) { b.IgnoresGravity = true; });
+            
+               Sprite blockSprite = GetSprite("fighter.png");
+               Vector2D[][] vertexes = blockSprite.Polygons;
+               MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
+               shape.Tag = blockSprite;
+
+               AddShape(shape, 40, new ALVector2D(0, new Vector2D(200, 300)));
+               AddShape(shape, 40, new ALVector2D(0, new Vector2D(500, 300)));
+               AddRectangle(50, 50, 50, new ALVector2D(0, 600, 600));
+               AddRectangle(50, 50, 500, new ALVector2D(0, 600, 450));
+               AddCircle(10, 9, 5, new ALVector2D(0, 600, 600));
+               AddCircle(10, 9, 50, new ALVector2D(0, 500, 600));
+               AddCircle(10, 9, 500, new ALVector2D(0, 400, 600));
+               AddCircle(10, 9, 5000, new ALVector2D(0, 300, 600));
+
+
+
+               EndDemoChange();*/
+        }
+        void DemoD()
+        {
+            BeginDemoChange();
             Reset(false);
+            engine.AddLogic(new GlobalFluidLogic(.95f, .02f, new Vector2D(700,7), new Lifespan()));
             AddGravityField();
-            engine.AddLogic(new GlobalFluidLogic(.45f, .02f, Vector2D.Zero, new Lifespan()));
 
             BoundingRectangle rect = this.clippersShape.Rectangle;
             rect.Min.X -= 75;
@@ -1740,7 +1778,7 @@ namespace Physics2DDemo
             rect.Max.X += 75;
             rect.Max.Y += 75;
             AddShell(rect, 100, Scalar.PositiveInfinity).ForEach(delegate(Body b) { b.IgnoresGravity = true; });
-            
+
             Sprite blockSprite = GetSprite("fighter.png");
             Vector2D[][] vertexes = blockSprite.Polygons;
             MultipartPolygon shape = new MultipartPolygon(vertexes, 4);
@@ -1755,10 +1793,11 @@ namespace Physics2DDemo
             AddCircle(10, 9, 500, new ALVector2D(0, 400, 600));
             AddCircle(10, 9, 5000, new ALVector2D(0, 300, 600));
 
-
-
-            EndDemoChange();*/
+            EndDemoChange();
         }
+
+
+      
         void body2_Collided(object sender, CollisionEventArgs e)
         {
            /* if ((sender == body1IT ||
@@ -1769,7 +1808,6 @@ namespace Physics2DDemo
                 Console.WriteLine("HAHA");
             //}
         }
-
         const int Min = 0;
         const int Non = 1;
         const int Max = 2;

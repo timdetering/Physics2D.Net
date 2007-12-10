@@ -11,6 +11,12 @@ Added: FixedAngleJoint
 Changed: Redid the Lifespan class to get rid of Master and to make it possible to have multiple items have the same lifespan.
 Added: TimeStep and used it to replace all internal dt parameters. 
 Fixed: UseDouble to work.
+Fixed: RaySegments.TryGetCustomIntersection against a MultipartPolygon
+Added: GlobalFluidLogic and changes to make it work. 
+Added: a bunch of methods and properties to Shape.
+Added: PhysicsLogic.Order to allow for Logics to run in a certain order declaratively. 
+Added: LinearDamping and AngularDamping Properties to Body. 
+
 
 AdvanceMath
 1.7.0.0:

@@ -42,6 +42,7 @@
     <Compile Include="Collections\ReadOnlyThreadSafeCollection.cs" />
     <Compile Include="DataTypes\BodyProxy.cs" />
     <Compile Include="DataTypes\CollectionEventArgs.cs" />
+    <Compile Include="DataTypes\DragInfo.cs" />
     <Compile Include="DataTypes\MassInfo.cs" />
     <Compile Include="DataTypes\RemovedEventArgs.cs" />
     <Compile Include="DataTypes\TimeStep.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="DistanceGrid.cs" />
     <Compile Include="Math2D\Matrix2D.cs" />
     <Compile Include="PhysicsHelper.cs" />
+    <Compile Include="PhysicsLogic\GlobalFluidLogic.cs" />
     <Compile Include="PhysicsLogic\GravityField.cs" />
     <Compile Include="PhysicsLogic\GravityPointField.cs" />
     <Compile Include="PhysicsLogic\GravityPointMass.cs" />

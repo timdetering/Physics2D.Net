@@ -48,7 +48,7 @@ namespace Physics2DDotNet
         /// </summary>
         public Particle()
             : this(1)
-        {  }
+        { }
         /// <summary>
         /// Creates a new Particle Instance.
         /// </summary>
@@ -78,6 +78,22 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
+        public override bool CanGetDragInfo
+        {
+            get { return false; }
+        }
+        public override bool CanGetCentroid
+        {
+            get { return true; }
+        }
+        public override bool CanGetArea
+        {
+            get { return true; }
+        }
+        public override bool CanGetInertia
+        {
+            get { return false; }
+        }
 
         protected override void CalcBoundingRectangle()
         {
@@ -92,13 +108,30 @@ namespace Physics2DDotNet
         {
             throw new NotSupportedException();
         }
-        public override void GetDistance(ref Vector2D point,out Scalar result)
+        public override void GetDistance(ref Vector2D point, out Scalar result)
         {
             Vector2D.Distance(ref point, ref vertexes[0], out result);
         }
         public override Shape Duplicate()
         {
             return new Particle(this);
+        }
+
+        public override DragInfo GetDragInfo(Vector2D tangent)
+        {
+            throw new NotSupportedException();
+        }
+        public override Vector2D GetCentroid()
+        {
+            return Vector2D.Zero;
+        }
+        public override float GetArea()
+        {
+            return 0;
+        }
+        public override float GetInertia()
+        {
+            throw new NotSupportedException();
         }
     }
 }

@@ -146,6 +146,12 @@ namespace Physics2DDotNet
         bool isPending;
         bool isCollidable;
         bool isTransformed;
+
+        Scalar linearDamping;
+        Scalar angularDamping;
+
+
+
         internal LinkedList<BodyProxy> proxies;
 
 
@@ -201,8 +207,10 @@ namespace Physics2DDotNet
             this.coefficients = coefficients;
             this.lifetime = lifetime;
             this.isCollidable = true;
+            this.linearDamping = 1;
+            this.angularDamping = 1;
             Matrix2D matrix = shape.Matrix;
-            ALVector2D.Transform(ref matrix, ref lastPosition, out lastPosition);
+            ALVector2D.Transform(ref matrix, ref lastPosition, out this.lastPosition);
         }
 
         private Body(Body copy)
@@ -243,6 +251,34 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+
+        /// <summary>
+        /// Gets and Sets The value represents how much Linear velocity is kept each time step. 
+        /// This Dampens the Body's Linear velocity a little per time step. Valid values are zero exclusive to one inclusive.  
+        /// </summary>
+        public Scalar LinearDamping
+        {
+            get { return linearDamping; }
+            set
+            {
+                if (value <= 0 || value > 1) { throw new ArgumentOutOfRangeException("value"); }
+                linearDamping = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets and Sets The value represents how much Angular velocity is kept each time step. 
+        /// This Dampens the Body's Angular velocity a little per time step. Valid values are zero exclusive to one inclusive.  
+        /// </summary>
+        public Scalar AngularDamping
+        {
+            get { return angularDamping; }
+            set
+            {
+                if (value <= 0 || value > 1) { throw new ArgumentOutOfRangeException("value"); }
+                angularDamping = value;
+            }
+        }
 
         /// <summary>
         /// These are bodies that are mirrors of this body. 
@@ -567,14 +603,19 @@ namespace Physics2DDotNet
                 state.Acceleration.Linear.Y += state.ForceAccumulator.Linear.Y * massInv;
                 state.Acceleration.Angular += state.ForceAccumulator.Angular * massInfo.MomentOfInertiaInv;
             }
-            state.Velocity.Linear.X += state.Acceleration.Linear.X * step.Dt;
-            state.Velocity.Linear.Y += state.Acceleration.Linear.Y * step.Dt;
-            state.Velocity.Angular += state.Acceleration.Angular * step.Dt;
+            UpdateVelocity(ref state.Velocity, ref state.Acceleration, step.Dt);
             if (hasProxies)
             {
                 ApplyProxy();
             }
         }
+        void UpdateVelocity(ref ALVector2D velocity, ref ALVector2D acceleration, Scalar dt)
+        {
+            velocity.Linear.X = velocity.Linear.X * linearDamping + acceleration.Linear.X * dt;
+            velocity.Linear.Y = velocity.Linear.Y * linearDamping + acceleration.Linear.Y * dt;
+            velocity.Angular = velocity.Angular * angularDamping + acceleration.Angular * dt;
+        }
+
         internal void UpdateTime(TimeStep step)
         {
             lifetime.Update(step);
@@ -632,10 +673,20 @@ namespace Physics2DDotNet
             state.Velocity.Linear.X += impulse.X * massInv;
             state.Velocity.Linear.Y += impulse.Y * massInv;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="impulse"></param>
+        /// <param name="position">(In Body Coordinates)</param>
         public void ApplyImpulse(Vector2D impulse, Vector2D position)
         {
             ApplyImpulse(ref impulse, ref position);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="impulse"></param>
+        /// <param name="position">(In Body Coordinates)</param>
         [CLSCompliant(false)]
         public void ApplyImpulse(ref Vector2D impulse, ref Vector2D position)
         {

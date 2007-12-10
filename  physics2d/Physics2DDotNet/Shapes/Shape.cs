@@ -104,6 +104,25 @@ namespace Physics2DDotNet
             }
             return result;
         }
+        protected static void GetProjectedBounds(Vector2D[] vertexes, int offset, int length, Vector2D tangent, out Scalar min, out Scalar max)
+        {
+            Scalar value;
+            Vector2D.Dot(ref vertexes[offset], ref tangent, out value);
+            min = value;
+            max = value;
+            for (int index = 1; index < length; ++index)
+            {
+                Vector2D.Dot(ref vertexes[index + offset], ref tangent, out value);
+                if (value > max)
+                {
+                    max = value;
+                }
+                else if (value < min)
+                {
+                    min = value;
+                }
+            }
+        }
         #endregion
         #region fields
         object tag;
@@ -150,6 +169,10 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+        public abstract bool CanGetCentroid { get;}
+        public abstract bool CanGetArea { get;}
+        public abstract bool CanGetInertia { get;}
+
         /// <summary>
         /// Gets and Sets if this shape's Vertexes will not be used in collision detection.
         /// </summary>
@@ -159,6 +182,7 @@ namespace Physics2DDotNet
             set { ignoreVertexes = value; }
         }
         public abstract bool CanGetIntersection { get;}
+        public abstract bool CanGetDragInfo { get;}
         public abstract bool CanGetDistance { get;}
         public abstract bool CanGetCustomIntersection { get;}
         /// <summary>
@@ -245,10 +269,34 @@ namespace Physics2DDotNet
             }
         }
         public virtual void UpdateTime(TimeStep step) { }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point">(In World Coordinates)</param>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public abstract bool TryGetIntersection(Vector2D point, out IntersectionInfo info);
         public abstract bool TryGetCustomIntersection(Body other, out object customIntersectionInfo);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point">(In World Coordinates)</param>
+        /// <param name="result"></param>
         public abstract void GetDistance(ref Vector2D point, out Scalar result);
-        public abstract Shape Duplicate();
+        public abstract DragInfo GetDragInfo(Vector2D tangent);
+
+
+
+        /// <summary>
+        /// Gets the Centroid of the Shape without the Matrix Applied. (In Body Coordinates)
+        /// </summary>
+        /// <returns>the Centroid of the Shape without the Matrix Applied.</returns>
+        public abstract Vector2D GetCentroid();
+        public abstract Scalar GetArea();
+        public abstract Scalar GetInertia();
+
+            
+
         public object Clone()
         {
             return Duplicate();
@@ -264,6 +312,7 @@ namespace Physics2DDotNet
             this.parent = null;
         }
 
+        public abstract Shape Duplicate();
         #endregion
     }
 }

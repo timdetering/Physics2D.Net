@@ -193,7 +193,7 @@ namespace Physics2DDotNet
         public static Scalar GetArea(Vector2D[] vertices)
         {
             Scalar result;
-            BoundingPolygon.GetArea(vertices,out result);
+            BoundingPolygon.GetArea(vertices, out result);
             return result;
         }
         /// <summary>
@@ -223,7 +223,7 @@ namespace Physics2DDotNet
         }
         #endregion
         #region fields
-        private DistanceGrid grid; 
+        private DistanceGrid grid;
         #endregion
         #region constructors
         /// <summary>
@@ -280,13 +280,29 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
+        public override bool CanGetDragInfo
+        {
+            get { return true; }
+        }
+        public override bool CanGetCentroid
+        {
+            get { return true; }
+        }
+        public override bool CanGetArea
+        {
+            get { return true; }
+        }
+        public override bool CanGetInertia
+        {
+            get { return true; }
+        }
         #endregion
         #region methods
         protected override void CalcBoundingRectangle()
         {
             BoundingRectangle.FromVectors(vertexes, out rect);
         }
-        public override void GetDistance(ref Vector2D point,out Scalar result)
+        public override void GetDistance(ref Vector2D point, out Scalar result)
         {
             BoundingPolygon.GetDistance(vertexes, ref point, out result);
         }
@@ -309,7 +325,31 @@ namespace Physics2DDotNet
         public override Shape Duplicate()
         {
             return new Polygon(this);
-        } 
+        }
+
+
+
+        public override DragInfo GetDragInfo(Vector2D tangent)
+        {
+            Scalar min, max;
+            GetProjectedBounds(this.vertexes, 0, this.vertexes.Length, tangent, out min, out max);
+            Scalar avg;
+            Vector2D.Dot(ref tangent,ref  Parent.State.Position.Linear,out avg);
+            avg = (max + min) / 2 - avg;
+            return new DragInfo(tangent * avg, max - min);
+        }
+        public override Vector2D GetCentroid()
+        {
+            return GetCentroid(originalVertexes);
+        }
+        public override float GetArea()
+        {
+            return GetArea(originalVertexes);
+        }
+        public override float GetInertia()
+        {
+            return Shape.InertiaOfPolygon(originalVertexes);
+        }
         #endregion
     }
 }

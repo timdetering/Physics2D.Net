@@ -57,7 +57,7 @@ namespace Physics2DDotNet
         /// Raised when the object is Removed from a Physics Engine. 
         /// </summary>
         public event EventHandler<RemovedEventArgs> Removed;
-
+        int order;
         Lifespan lifetime;
         PhysicsEngine engine;
         object tag;
@@ -127,7 +127,26 @@ namespace Physics2DDotNet
                 return engine.bodies;
             }
         }
-
+        /// <summary>
+        /// Get and Sets The order number of when it will be ran.
+        /// All Logics with a higher order will run after this one and all logics
+        /// with a lower order number will be ran before this one.
+        /// </summary>
+        public int Order
+        {
+            get { return order; }
+            set
+            {
+                if (order != value)
+                {
+                    order = value;
+                    if (engine != null)
+                    {
+                        engine.logicsNeedSorting = true;
+                    }
+                }
+            }
+        }
 
         protected internal abstract void RunLogic(TimeStep step);
 
