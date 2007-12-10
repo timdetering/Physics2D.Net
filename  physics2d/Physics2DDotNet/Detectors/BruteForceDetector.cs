@@ -39,7 +39,7 @@ namespace Physics2DDotNet.Detectors
     [Serializable]
     public sealed class BruteForceDetector : BroadPhaseCollisionDetector
     {
-        public override void Detect(Scalar dt)
+        public override void Detect(TimeStep step)
         {
             Body body1, body2;
             for (int index1 = 0; index1 < this.Bodies.Count; index1++)
@@ -52,7 +52,7 @@ namespace Physics2DDotNet.Detectors
                             Body.CanCollide(body1, body2) &&
                             body1.Shape.Rectangle.Intersects(body2.Shape.Rectangle))
                     {
-                        OnCollision(dt, body1, body2);
+                        OnCollision(step, body1, body2);
                     }
                 }
             }

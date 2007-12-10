@@ -170,9 +170,9 @@ namespace Physics2DDotNet.Detectors
         sealed class Extent
         {
             public bool isMin;
-            public float value;
+            public Scalar value;
             public ExtentInfo info;
-            public Extent(ExtentInfo info, float value, bool isMin)
+            public Extent(ExtentInfo info, Scalar value, bool isMin)
             {
                 this.info = info;
                 this.value = value;
@@ -410,7 +410,7 @@ namespace Physics2DDotNet.Detectors
             public List<Body> overlaps;
             public List<Body> underConsideration;
 
-            public ExtentInfo(Body g, float min, float max)
+            public ExtentInfo(Body g, Scalar min, Scalar max)
             {
                 this.body = g;
                 this.underConsideration = new List<Body>();
@@ -468,8 +468,8 @@ namespace Physics2DDotNet.Detectors
         ExtentInfoList xInfoList;
         ExtentInfoList yInfoList;
         CollisionPairDictionary collisionPairs;
-        //static public float fTol = 1.5f; //.01f;
-        Scalar dt;
+        //static public Scalar fTol = 1.5f; //.01f;
+        TimeStep step;
 
         public FrameCoherentSAPDetector()
         {
@@ -502,9 +502,9 @@ namespace Physics2DDotNet.Detectors
             ForceNonIncrementalUpdate();
         }
 
-        public override void Detect(float dt)
+        public override void Detect(TimeStep step)
         {
-            this.dt = dt;
+            this.step = step;
             this.Run();
         }
         protected internal override void Clear()
@@ -582,7 +582,7 @@ namespace Physics2DDotNet.Detectors
                      physicsSimulator.arbiterList.Add(arbiter);
                  else
                      physicsSimulator.arbiterPool.Release(arbiter);*/
-                OnCollision(dt, cp.body1, cp.body2);
+                OnCollision(step, cp.body1, cp.body2);
             }
         }
 

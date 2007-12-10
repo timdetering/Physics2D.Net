@@ -4,7 +4,13 @@ NextVersion:
 Physics2D.Net
 NextVersion:
 Fixed: bug with PhysicsTimer that would let it run faster then it should. 
-
+Changed: Made Pivot and Hinge Joint Breakable by adding the DistanceTolerance Property.
+Changed: Made it so the PhysicsEngine.Update commands Removes Expired Bodies First instead of last.
+Changed: Renamed PivotJoint to FixedHingeJoint.
+Added: FixedAngleJoint
+Changed: Redid the Lifespan class to get rid of Master and to make it possible to have multiple items have the same lifespan.
+Added: TimeStep and used it to replace all internal dt parameters. 
+Fixed: UseDouble to work.
 
 AdvanceMath
 1.7.0.0:

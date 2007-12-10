@@ -23,68 +23,49 @@
 
 
 
+
 #if UseDouble
 using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.ObjectModel;
-
+using System.Collections.Generic;
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
-
+using System.Runtime.Serialization;
 namespace Physics2DDotNet
 {
-    public interface IDuplicateable<T> : ICloneable
-        where T : IDuplicateable<T>
-    {
-        T Duplicate();
-    }
-
-    public interface IPhysicsEntity 
-    {
-        event EventHandler Pending;
-        event EventHandler Added;
-        event EventHandler<RemovedEventArgs> Removed;
-        event EventHandler LifetimeChanged;
-        PhysicsEngine Engine { get;}
-        bool IsPending { get;}
-        bool IsAdded { get;}
-        Lifespan Lifetime { get; set;}
-    }
-
-    public interface IJoint : IPhysicsEntity
-    {
-        ReadOnlyCollection<Body> Bodies { get;}
-    }
-
     /// <summary>
-    /// Describes a Contact in a collision.
+    /// Class that holds information about a change in time;
     /// </summary>
-    public interface IContactInfo
+    [Serializable]
+    public sealed class TimeStep
     {
+        Scalar dt;
+        Scalar dtInv;
+        private int updateCount;
         /// <summary>
-        /// Gets The world coordinates of the contact.
+        /// Creates a new Timestep instance.
         /// </summary>
-        Vector2D Position { get;}
+        /// <param name="dt">The current change in time. (seconds)</param>
+        /// <param name="updateCount">The number for the current update.</param>
+        public TimeStep(Scalar dt, int updateCount)
+        {
+            this.dt = dt;
+            this.dtInv = (dt > 0) ? (1 / dt) : (0);
+            this.updateCount = updateCount;
+        }
         /// <summary>
-        /// Gets a Direction Vector Pointing away from the Edge.
+        /// The current change in time. (seconds)
         /// </summary>
-        Vector2D Normal { get;}
+        public Scalar Dt { get { return dt; } }
         /// <summary>
-        /// Gets The distance the contact is inside the other object.
+        /// The inverse of the change in time. (0 if dt is 0)
         /// </summary>
-        Scalar Distance { get;}
+        public Scalar DtInv { get { return dtInv; } }
         /// <summary>
-        /// Gets The First Body that is part of the Contact.
-        /// (The Normal belongs to this Body.)
+        /// The number for the current update.
         /// </summary>
-        Body Body1 { get;}
-        /// <summary>
-        /// Gets The Second Body that is part of the Contact.
-        /// (The Position of the Vertex belongs to this Body.)
-        /// </summary>
-        Body Body2 { get;}
+        public int UpdateCount { get { return updateCount; } }
     }
 }

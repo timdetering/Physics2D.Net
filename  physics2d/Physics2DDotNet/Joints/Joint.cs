@@ -67,7 +67,8 @@ namespace Physics2DDotNet
 
         protected Joint(Lifespan lifetime)
         {
-            Lifetime = lifetime;
+            if (lifetime == null) { throw new ArgumentNullException("lifetime"); }
+            this.lifetime = lifetime;
         }
 
         /// <summary>
@@ -124,7 +125,10 @@ namespace Physics2DDotNet
         public abstract ReadOnlyCollection<Body> Bodies { get;}
 
 
-        protected internal virtual void UpdateTime(Scalar dt) { }
+        protected internal virtual void UpdateTime(TimeStep step)
+        {
+            lifetime.Update(step);
+        }
         protected internal void BeforeAddCheckInternal(PhysicsEngine engine)
         {
             foreach (Body item in Bodies)

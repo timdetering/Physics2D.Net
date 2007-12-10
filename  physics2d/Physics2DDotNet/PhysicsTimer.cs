@@ -99,13 +99,10 @@ namespace Physics2DDotNet
             if (callback == null) { throw new ArgumentNullException("callback"); }
             if (targetInterval <= 0) { throw new ArgumentOutOfRangeException("targetInterval"); }
             this.isBackground = true;
-            this.isDisposed = false;
-            this.isRunning = false;
             this.state = TimerState.NotStarted;
             this.targetInterval = targetInterval;
             this.callback = callback;
             this.waitHandle = new AutoResetEvent(true);
-            this.engineThread = null;
         } 
         #endregion
         #region properties

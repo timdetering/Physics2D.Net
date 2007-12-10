@@ -63,6 +63,6 @@ namespace Physics2DDotNet
             return isInverted ^ CanCollide(other);
         }
         protected abstract bool CanCollide(Ignorer other);
-        public virtual void UpdateTime(Scalar dt) { }
+        public virtual void UpdateTime(TimeStep step) { }
     }
 }

@@ -112,6 +112,7 @@ namespace Physics2DDotNet
         public event EventHandler<CollectionEventArgs<PhysicsLogic>> LogicsRemoved;
         #endregion
         #region fields
+        private int updateCount;
         private int nextBodyID;
         [NonSerialized]
         object syncRoot;
@@ -446,16 +447,16 @@ namespace Physics2DDotNet
             if (dt < 0) { throw new ArgumentOutOfRangeException("dt"); }
             CheckState();
             rwLock.EnterWrite();
+            TimeStep step = new TimeStep(dt, updateCount++);
             inUpdate = true;
             try
             {
+                RemoveExpired();
                 AddPending();
 
-                UpdateTime(dt);
-                solver.Solve(dt);
+                UpdateTime(step);
+                solver.Solve(step);
                 OnStateChanged();
-
-                RemoveExpired();
             }
             finally
             {
@@ -474,6 +475,8 @@ namespace Physics2DDotNet
             {
                 ClearPending();
                 ClearAdded();
+                updateCount = 0;
+                nextBodyID = firstBodyID;
             }
             finally
             {
@@ -514,7 +517,6 @@ namespace Physics2DDotNet
         }
         private void ClearAdded()
         {
-            nextBodyID = firstBodyID;
             solver.Clear();
             broadPhase.Clear();
             foreach (Body body in bodies)
@@ -546,19 +548,19 @@ namespace Physics2DDotNet
             logics.Clear();
         }
 
-        private void UpdateTime(Scalar dt)
+        private void UpdateTime(TimeStep step)
         {
             for (int index = 0; index < bodies.Count; ++index)
             {
-                bodies[index].UpdateTime(dt);
+                bodies[index].UpdateTime(step);
             }
             for (int index = 0; index < joints.Count; ++index)
             {
-                joints[index].UpdateTime(dt);
+                joints[index].UpdateTime(step);
             }
             for (int index = 0; index < logics.Count; ++index)
             {
-                logics[index].UpdateTime(dt);
+                logics[index].UpdateTime(step);
             }
         }
         private void OnStateChanged()
@@ -712,14 +714,14 @@ namespace Physics2DDotNet
             CheckItem(logic);
             logic.BeforeAddCheck(this);
         }
-        internal void RunLogic(Scalar dt)
+        internal void RunLogic(TimeStep step)
         {
             for (int index = 0; index < logics.Count; ++index)
             {
-                logics[index].RunLogic(dt);
+                logics[index].RunLogic(step);
             }
         }
-        internal void HandleCollision(Scalar dt, Body first, Body second)
+        internal void HandleCollision(TimeStep step, Body first, Body second)
         {
             if (first.Mass.MassInv == 0 && second.Mass.MassInv == 0) { return; }
 
@@ -751,7 +753,7 @@ namespace Physics2DDotNet
             else
             {
                 ReadOnlyCollection<IContactInfo> contacts;
-                if (solver.TryGetIntersection(dt, first, second, out contacts))
+                if (solver.TryGetIntersection(step, first, second, out contacts))
                 {
                     first.OnCollision(second, contacts);
                     second.OnCollision(first, contacts);

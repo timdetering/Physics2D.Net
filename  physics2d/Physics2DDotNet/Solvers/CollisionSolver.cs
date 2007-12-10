@@ -57,8 +57,8 @@ namespace Physics2DDotNet.Solvers
             get { return engine; }
         }
 
-        protected internal abstract bool TryGetIntersection(Scalar dt, Body first, Body second,out ReadOnlyCollection<IContactInfo> contacts);
-        protected internal abstract void Solve(Scalar dt);
+        protected internal abstract bool TryGetIntersection(TimeStep step, Body first, Body second, out ReadOnlyCollection<IContactInfo> contacts);
+        protected internal abstract void Solve(TimeStep step);
 
         internal void OnAddedInternal(PhysicsEngine engine)
         {
@@ -84,9 +84,9 @@ namespace Physics2DDotNet.Solvers
 
         protected internal virtual void RemoveExpiredBodies() { }
         protected internal virtual void RemoveExpiredJoints() { }
-        protected void Detect(Scalar dt)
+        protected void Detect(TimeStep step)
         {
-            engine.BroadPhase.Detect(dt);
+            engine.BroadPhase.Detect(step);
         }
 
         protected internal abstract void CheckJoint(Joint joint);

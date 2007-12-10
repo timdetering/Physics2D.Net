@@ -36,8 +36,8 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class UpdatedEventArgs : EventArgs
     {
-        Scalar dt;
-        public UpdatedEventArgs(Scalar dt) { this.dt = dt; }
-        public Scalar DT { get { return dt; } }
+        TimeStep step;
+        public UpdatedEventArgs(TimeStep step) { this.step = step; }
+        public TimeStep Step { get { return step; } }
     }
 }

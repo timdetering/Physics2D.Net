@@ -44,6 +44,7 @@
     <Compile Include="DataTypes\CollectionEventArgs.cs" />
     <Compile Include="DataTypes\MassInfo.cs" />
     <Compile Include="DataTypes\RemovedEventArgs.cs" />
+    <Compile Include="DataTypes\TimeStep.cs" />
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Detectors\BruteForceDetector.cs" />
     <Compile Include="Detectors\SelectiveSweepDetector.cs" />
@@ -54,7 +55,8 @@
     <Compile Include="Ignorers\Ignorer.cs" />
     <Compile Include="Ignorers\ObjectIgnorer.cs" />
     <Compile Include="Joints\AngleJoint.cs" />
-    <Compile Include="Joints\PivotJoint.cs" />
+    <Compile Include="Joints\FixedAngleJoint.cs" />
+    <Compile Include="Joints\FixedHingeJoint.cs" />
     <Compile Include="Joints\HingeJoint.cs" />
     <Compile Include="Math2D\ALVector2D.cs" />
     <Compile Include="DataTypes\Coefficients.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Shapes\Particle.cs" />
     <Compile Include="Shapes\Polygon.cs" />
     <Compile Include="Shapes\RaySegments.cs" />
+    <Compile Include="Shapes\RectangleShape.cs" />
     <Compile Include="Solvers\CollisionSolver.cs" />
     <Compile Include="Solvers\ISequentialImpulsesJoint.cs" />
     <Compile Include="Solvers\SequentialImpulses.cs" />

@@ -33,7 +33,7 @@ namespace Physics2DDotNet.Solvers
 {
     public interface ISequentialImpulsesJoint : IJoint
     {
-        void PreStep(Scalar dtInv);
+        void PreStep(TimeStep step);
         void ApplyImpulse();
     }
 }

@@ -62,7 +62,7 @@ namespace Physics2DDotNet
             get { return gravity; }
             set { gravity = value; }
         }
-        protected internal override void RunLogic(Scalar dt)
+        protected internal override void RunLogic(TimeStep step)
         {
             foreach (Body e in this.Bodies)
             {

@@ -629,7 +629,7 @@ namespace Physics2DDotNet.Solvers
             set { iterations = value; }
         }
 
-        protected internal override bool TryGetIntersection(Scalar dt, Body first, Body second, out ReadOnlyCollection<IContactInfo> contacts)
+        protected internal override bool TryGetIntersection(TimeStep step, Body first, Body second, out ReadOnlyCollection<IContactInfo> contacts)
         {
             long id = PairID.GetId(first.ID, second.ID);
             Arbiter arbiter;
@@ -672,21 +672,20 @@ namespace Physics2DDotNet.Solvers
             }
         }
 
-        protected internal override void Solve(Scalar dt)
+        protected internal override void Solve(TimeStep step)
         {
-            Scalar dtInv = (dt > 0.0f) ? (1.0f / dt) : (0.0f);
             foreach (Arbiter arb in arbiters.Values)
             {
                 arb.Updated = false;
             }
-            Detect(dt);
+            Detect(step);
             RemoveEmpty();
-            this.Engine.RunLogic(dt);
+            this.Engine.RunLogic(step);
             for (int index = 0; index < tags.Count; ++index)
             {
                 SequentialImpulsesTag tag = tags[index];
                 tag.biasVelocity = ALVector2D.Zero;
-                tag.body.UpdateVelocity(dt);
+                tag.body.UpdateVelocity(step);
                 tag.body.ClearForces();
             }
 
@@ -694,11 +693,11 @@ namespace Physics2DDotNet.Solvers
             arbiters.Values.CopyTo(arbs, 0);
             for (int index = 0; index < arbs.Length; ++index)
             {
-                arbs[index].PreApply(dtInv);
+                arbs[index].PreApply(step.DtInv);
             }
             for (int index = 0; index < siJoints.Count; ++index)
             {
-                siJoints[index].PreStep(dtInv);
+                siJoints[index].PreStep(step);
             }
             for (int i = 0; i < iterations; ++i)
             {
@@ -716,11 +715,11 @@ namespace Physics2DDotNet.Solvers
                 SequentialImpulsesTag tag = tags[index];
                 if (splitImpulse)
                 {
-                    tag.body.UpdatePosition(dt, ref tag.biasVelocity);
+                    tag.body.UpdatePosition(step, ref tag.biasVelocity);
                 }
                 else
                 {
-                    tag.body.UpdatePosition(dt);
+                    tag.body.UpdatePosition(step);
                 }
             }
         }

@@ -38,61 +38,45 @@ namespace Physics2DDotNet
     public sealed class Lifespan : IDuplicateable<Lifespan>
     {
         #region fields
-        Scalar age = 0;
+        int lastUpdate;
+        Scalar age;
         Scalar maxAge;
-        Lifespan master;
+        bool isExpired;
         #endregion
         #region constructors
         /// <summary>
         /// Creates a new Lifespan Instance that is Immortal.
         /// </summary>
         public Lifespan()
-            : this(0, -1, null)
+            : this(0, Scalar.PositiveInfinity)
         { }
         /// <summary>
         /// Creates a new Lifespan Instance that is mortal.
         /// </summary>
         /// <param name="maxAge">How long the item will stay in the engine. (in seconds)</param>
         public Lifespan(Scalar maxAge)
-            : this(0, maxAge, null)
+            : this(0, maxAge)
         { }
         /// <summary>
-        /// Creates a new Lifespan Instance that dies when it's master dies.
+        /// Creates a new Lifespan Instance that is mortal and has already aged.
         /// </summary>
-        /// <param name="master">The Master of this new Instance</param>
-        public Lifespan(Lifespan master)
-            : this(0, -1, master)
-        { }
-        /// <summary>
-        /// Creates a new Lifespan Instance that dies when it's master dies or of old age.
-        /// </summary>
+        /// <param name="age">How old the item is. (in seconds)</param>
         /// <param name="maxAge">How long the item will stay in the engine. (in seconds)</param>
-        /// <param name="master">The Master of this new Instance</param>
-        public Lifespan(Scalar maxAge, Lifespan master)
-            : this(0, maxAge, master)
-        { }
-        /// <summary>
-        /// Creates a new Lifespan Instance that dies when it's master dies or of old age that is already aged.
-        /// </summary>
-        /// <param name="age">the current age of the new Lifespan.</param>
-        /// <param name="maxAge">How long the item will stay in the engine. (in seconds)</param>
-        /// <param name="master">The Master of this new Instance</param>
-        public Lifespan(Scalar age, Scalar maxAge, Lifespan master)
+        public Lifespan(Scalar age, Scalar maxAge)
         {
+            this.lastUpdate = -1;
             this.age = age;
             this.maxAge = maxAge;
-            this.master = master;
+        }
+        private Lifespan(Lifespan self)
+        {
+            this.lastUpdate = self.lastUpdate;
+            this.age = self.age;
+            this.maxAge = self.maxAge;
+            this.isExpired = self.isExpired;
         }
         #endregion
         #region properties
-        /// <summary>
-        /// Gets and Sets The Master of this Instance. This instance IsExpired the master is.
-        /// </summary>
-        public Lifespan Master
-        {
-            get { return master; }
-            set { master = value; }
-        }
         /// <summary>
         /// Gets and Sets if it IsExpired and should be removed from the engine.
         /// </summary>
@@ -100,44 +84,18 @@ namespace Physics2DDotNet
         {
             get
             {
-                return OverAged || IsMasterExpired;
+                return isExpired || age >= maxAge;
             }
             set
             {
-                if (value ^ IsExpired)
+                if (value)
                 {
-                    if (value)
-                    {
-                        age = -1;
-                    }
-                    else
-                    {
-                        if (OverAged)
-                        {
-                            age = 0;
-                        }
-                        if (IsMasterExpired)
-                        {
-                            IsMasterExpired = false;
-                        }
-                    }
+                    isExpired = true;
                 }
-            }
-        }
-        /// <summary>
-        /// Gets and Sets if the Master IsExpired and should be removed from the engine.
-        /// </summary>
-        public bool IsMasterExpired
-        {
-            get
-            {
-                return (master != null && master.IsExpired);
-            }
-            set
-            {
-                if (master != null)
+                else
                 {
-                    master.IsExpired = value;
+                    isExpired = false;
+                    age = 0;
                 }
             }
         }
@@ -148,7 +106,7 @@ namespace Physics2DDotNet
         {
             get
             {
-                return maxAge < 0;
+                return Scalar.IsPositiveInfinity(maxAge);
             }
         }
         /// <summary>
@@ -158,7 +116,7 @@ namespace Physics2DDotNet
         {
             get
             {
-                return maxAge >= 0 && age > maxAge || age < 0;
+                return age >= maxAge;
             }
         }
         /// <summary>
@@ -176,7 +134,7 @@ namespace Physics2DDotNet
         {
             get
             {
-                return (maxAge > 0) ? (maxAge - age) : (Scalar.PositiveInfinity);
+                return maxAge - age;
             }
         }
         /// <summary>
@@ -198,14 +156,19 @@ namespace Physics2DDotNet
         /// <summary>
         /// Increases the Age of object by a change in time.
         /// </summary>
-        /// <param name="dt">the amount of time passed since the last call.</param>
-        public void Update(Scalar dt)
+        /// <param name="update">the update's number (It wont age more then once on a update)</param>
+        /// <param name="step">The TimeStep describing the change in time.</param>
+        public void Update(TimeStep step)
         {
-            age += dt;
+            if (step.UpdateCount != lastUpdate)
+            {
+                age += step.Dt;
+                lastUpdate = step.UpdateCount;
+            }
         }
         public Lifespan Duplicate()
         {
-            return new Lifespan(this.age, this.maxAge, this.master);
+            return new Lifespan(this);
         }
         public object Clone()
         {

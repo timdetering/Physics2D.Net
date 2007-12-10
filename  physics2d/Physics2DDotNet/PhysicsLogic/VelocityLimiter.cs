@@ -46,7 +46,7 @@ namespace Physics2DDotNet
             this.maxLinearVelocity = maxLinearVelocity;
             this.maxAngularVelocity = maxAngularVelocity;
         }
-        protected internal override void RunLogic(Scalar dt)
+        protected internal override void RunLogic(TimeStep step)
         {
             foreach (Body e in Bodies)
             {

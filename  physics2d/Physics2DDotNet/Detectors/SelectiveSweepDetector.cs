@@ -212,12 +212,12 @@ namespace Physics2DDotNet.Detectors
             return xCount < yCount;
         }
 
-        public override void Detect(Scalar dt)
+        public override void Detect(TimeStep step)
         {
             Update();
-            DetectInternal(dt, ShouldDoX());
+            DetectInternal(step, ShouldDoX());
         }
-        private void DetectInternal(Scalar dt, bool doX)
+        private void DetectInternal(TimeStep step, bool doX)
         {
             List<Stub> stubs = (doX) ? (xStubs) : (yStubs);
             LinkedList<Wrapper> currentBodies = new LinkedList<Wrapper>();
@@ -242,7 +242,7 @@ namespace Physics2DDotNet.Detectors
                             wrapper2.min <= wrapper1.max &&
                             Body.CanCollide(body1, body2))
                         {
-                            OnCollision(dt, body1, body2);
+                            OnCollision(step, body1, body2);
                         }
                     }
                     if (wrapper1.shouldAddNode)

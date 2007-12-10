@@ -46,7 +46,7 @@ namespace Physics2DDotNet
     /// A joint that makes a single Body Pivot around an Anchor.
     /// </summary>
     [Serializable]
-    public sealed class PivotJoint : Joint, Solvers.ISequentialImpulsesJoint
+    public sealed class FixedHingeJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
         Solvers.SequentialImpulsesSolver solver;
         Body body;
@@ -60,9 +60,10 @@ namespace Physics2DDotNet
         Vector2D accumulatedImpulse;
         Scalar biasFactor;
         Scalar softness;
+        Scalar distanceTolerance;
 
 
-        public PivotJoint(Body body, Vector2D anchor, Lifespan lifetime)
+        public FixedHingeJoint(Body body, Vector2D anchor, Lifespan lifetime)
             : base(lifetime)
         {
             if (body == null) { throw new ArgumentNullException("body"); }
@@ -70,9 +71,10 @@ namespace Physics2DDotNet
             this.anchor = anchor;
             body.ApplyMatrix();
             Matrix3x3 matrix1 = body.Shape.MatrixInv.VertexMatrix;
-            Vector2D.Transform(ref matrix1, ref anchor, out localAnchor1);
-            softness = 0.001f;
-            biasFactor = 0.2f;
+            Vector2D.Transform(ref matrix1, ref anchor, out this.localAnchor1);
+            this.softness = 0.001f;
+            this.biasFactor = 0.2f;
+            this.distanceTolerance = Scalar.PositiveInfinity;
         }
         public Vector2D Anchor
         {
@@ -90,6 +92,18 @@ namespace Physics2DDotNet
             get { return softness; }
             set { softness = value; }
         }
+        /// <summary>
+        /// The distance the joint can stretch before breaking. 
+        /// </summary>
+        public Scalar DistanceTolerance
+        {
+            get { return distanceTolerance; }
+            set
+            {
+                if (value <= 0) { throw new ArgumentOutOfRangeException("value"); }
+                distanceTolerance = value;
+            }
+        }
         public override ReadOnlyCollection<Body> Bodies
         {
             get { return new ReadOnlyCollection<Body>(new Body[1] { body }); }
@@ -98,7 +112,7 @@ namespace Physics2DDotNet
         {
             this.solver = (Solvers.SequentialImpulsesSolver)Engine.Solver;
         }
-        void Solvers.ISequentialImpulsesJoint.PreStep(Scalar dtInv)
+        void Solvers.ISequentialImpulsesJoint.PreStep(TimeStep step)
         {
 
             Scalar mass1Inv = body.Mass.MassInv;
@@ -132,12 +146,17 @@ namespace Physics2DDotNet
             Vector2D dp;
             Vector2D.Add(ref body.State.Position.Linear, ref r1, out dp);
             Vector2D.Subtract(ref anchor, ref dp, out dp);
-
+           
+            if (!Scalar.IsPositiveInfinity(distanceTolerance) &&
+                dp.MagnitudeSq > distanceTolerance * distanceTolerance)
+            {
+                this.Lifetime.IsExpired = true;
+            }
 
             if (solver.PositionCorrection)
             {
                 //bias = -0.1f * dtInv * dp;
-                Scalar flt = -biasFactor * dtInv;
+                Scalar flt = -biasFactor * step.DtInv;
                 Vector2D.Multiply(ref dp, ref flt, out bias);
             }
             else
@@ -154,7 +173,7 @@ namespace Physics2DDotNet
             {
                 accumulatedImpulse = Vector2D.Zero;
             }
-                body.ApplyProxy();
+            body.ApplyProxy();
 
         }
         void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
@@ -165,12 +184,13 @@ namespace Physics2DDotNet
             Vector2D dv;
             PhysicsHelper.GetRelativeVelocity(ref body.State.Velocity, ref r1, out dv);
 
-            Vector2D impulse, vect1;
-            Vector2D.Multiply(ref softness, ref accumulatedImpulse, out vect1);
-            Vector2D.Subtract(ref bias, ref dv, out impulse);
-            Vector2D.Subtract(ref impulse, ref vect1, out impulse);
+
+            Vector2D impulse;
+            impulse.X = bias.X - dv.X - softness * accumulatedImpulse.X;
+            impulse.Y = bias.Y - dv.Y - softness * accumulatedImpulse.Y;
             Vector2D.Transform(ref  M, ref impulse, out impulse);
             //impulse = M * (bias - dv - softness * P);
+
 
             PhysicsHelper.SubtractImpulse(
                 ref body.State.Velocity, ref impulse,
@@ -178,7 +198,7 @@ namespace Physics2DDotNet
 
 
             Vector2D.Add(ref accumulatedImpulse, ref impulse, out accumulatedImpulse);
-                body.ApplyProxy();
+            body.ApplyProxy();
 
         }
     }

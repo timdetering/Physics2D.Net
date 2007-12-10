@@ -42,10 +42,9 @@ namespace Physics2DDotNet
     /// A Joint between 2 Bodies that will keep the Angles between the 2 bodies at a certain amount.
     /// </summary>
     [Serializable]
-    public sealed class AngleJoint : Joint, Solvers.ISequentialImpulsesJoint
+    public sealed class FixedAngleJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
-        Body body1;
-        Body body2;
+        Body body;
         Scalar angle;
 
         Scalar bias;
@@ -53,18 +52,16 @@ namespace Physics2DDotNet
         Scalar softness;
         Scalar M;
 
-        public AngleJoint(Body body1, Body body2, Lifespan lifetime)
+        public FixedAngleJoint(Body body, Lifespan lifetime)
             : base(lifetime)
         {
-            if (body1 == null) { throw new ArgumentNullException("body1"); }
-            if (body2 == null) { throw new ArgumentNullException("body2"); }
-            if (body1 == body2) { throw new ArgumentException("You cannot add a joint to a body to itself"); }
-            this.body1 = body1;
-            this.body2 = body2;
-            this.angle = MathHelper.ClampAngle(body1.State.Position.Angular - body2.State.Position.Angular);
+            if (body == null) { throw new ArgumentNullException("body"); }
+            this.body = body;
+            this.angle = body.State.Position.Angular;
             this.softness = 0.001f;
             this.biasFactor = 0.2f;
         }
+
         public Scalar Angle
         {
             get { return angle; }
@@ -82,19 +79,18 @@ namespace Physics2DDotNet
         }
         public override ReadOnlyCollection<Body> Bodies
         {
-            get { return new ReadOnlyCollection<Body>(new Body[2] { body1, body2 }); }
+            get { return new ReadOnlyCollection<Body>(new Body[1] { body }); }
         }
         void Solvers.ISequentialImpulsesJoint.PreStep(TimeStep step)
         {
-            Scalar difference = MathHelper.ClampAngle(body1.State.Position.Angular - body2.State.Position.Angular) - angle;
+            Scalar difference = body.State.Position.Angular - angle;
             bias = -biasFactor * step.DtInv * difference;
-            M = (1 - softness) / (body1.Mass.MomentOfInertiaInv + body2.Mass.MomentOfInertiaInv);
+            M = (1 - softness) / (body.Mass.MomentOfInertiaInv);
         }
         void Solvers.ISequentialImpulsesJoint.ApplyImpulse()
         {
-            Scalar angularImpulse = M * (bias + (body2.State.Velocity.Angular - body1.State.Velocity.Angular));
-            body1.State.Velocity.Angular += body1.Mass.MomentOfInertiaInv * angularImpulse;
-            body2.State.Velocity.Angular -= body2.Mass.MomentOfInertiaInv * angularImpulse;
+            Scalar angularImpulse = M * (bias - body.State.Velocity.Angular);
+            body.State.Velocity.Angular += body.Mass.MomentOfInertiaInv * angularImpulse;
         }
     }
 }

@@ -63,7 +63,7 @@ namespace Physics2DDotNet
             this.body = body;
             this.metersPerDistanceUnit = metersPerDistanceUnit;
         }
-        protected internal override void RunLogic(Scalar dt)
+        protected internal override void RunLogic(TimeStep step)
         {
             foreach (Body e in Bodies)
             {

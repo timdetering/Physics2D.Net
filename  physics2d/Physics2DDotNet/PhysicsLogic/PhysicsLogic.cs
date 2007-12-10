@@ -65,7 +65,8 @@ namespace Physics2DDotNet
         internal bool isChecked;
         protected PhysicsLogic(Lifespan lifetime)
         {
-            this.Lifetime = lifetime;
+            if (lifetime == null) { throw new ArgumentNullException("lifetime"); }
+            this.lifetime = lifetime;
         }
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace Physics2DDotNet
         }
 
 
-        protected internal abstract void RunLogic(Scalar dt);
+        protected internal abstract void RunLogic(TimeStep step);
 
         /// <summary>
         /// Before the item is allowed to be added to pending this method is called to 
@@ -166,9 +167,9 @@ namespace Physics2DDotNet
 
         protected virtual void OnAdded() { }
         protected virtual void OnRemoved(PhysicsEngine engine, bool wasPending) { }
-        protected internal virtual void UpdateTime(Scalar dt)
+        protected internal virtual void UpdateTime(TimeStep step)
         {
-            this.lifetime.Update(dt);
+            this.lifetime.Update(step);
         }
 
         protected internal virtual void AddBodyRange(List<Body> collection) { }

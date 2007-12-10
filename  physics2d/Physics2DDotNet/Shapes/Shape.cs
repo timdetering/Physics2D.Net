@@ -131,6 +131,7 @@ namespace Physics2DDotNet
         }
         protected Shape(Shape copy)
         {
+            if (copy == null) { throw new ArgumentNullException("copy"); }
             this.ignoreVertexes = copy.ignoreVertexes;
             this.matrix2D = copy.matrix2D;
             this.matrix2DInv = copy.matrix2DInv;
@@ -243,7 +244,7 @@ namespace Physics2DDotNet
                 Vector2D.Transform(ref matrix, ref originalVertexes[index], out vertexes[index]);
             }
         }
-        public virtual void UpdateTime(Scalar dt) { }
+        public virtual void UpdateTime(TimeStep step) { }
         public abstract bool TryGetIntersection(Vector2D point, out IntersectionInfo info);
         public abstract bool TryGetCustomIntersection(Body other, out object customIntersectionInfo);
         public abstract void GetDistance(ref Vector2D point, out Scalar result);
@@ -264,89 +265,5 @@ namespace Physics2DDotNet
         }
 
         #endregion
-    }
-
-    /// <summary>
-    /// A shape whose BoundingRectangle is manualy Set and will not change, unless manualy changed.
-    /// It is meant for clipping and Area triggers.
-    /// </summary>
-    [Serializable]
-    public sealed class RectangleShape : Shape
-    {
-        public event EventHandler BoundingRectangleRequested;
-        public RectangleShape()
-            : base(Empty, Scalar.PositiveInfinity)
-        { }
-        public override bool CanGetIntersection
-        {
-            get { return true; }
-        }
-        public override bool CanGetDistance
-        {
-            get { return true; }
-        }
-        public override bool BroadPhaseDetectionOnly
-        {
-            get { return true; }
-        }
-        public override bool CanGetCustomIntersection
-        {
-            get { return false; }
-        }
-
-        public void SetRectangle(BoundingRectangle rectangle)
-        {
-            this.rect = rectangle;
-        }
-        public override void ApplyMatrix(ref Matrix2D matrix) { }
-        protected override void CalcBoundingRectangle()
-        {
-            if (BoundingRectangleRequested != null)
-            {
-                BoundingRectangleRequested(this, EventArgs.Empty);
-            }
-        }
-        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
-        {
-            ContainmentType type;
-            rect.Contains(ref point, out type);
-            if (type == ContainmentType.Contains)
-            {
-                Scalar xDist, yDist;
-                info.Position = point;
-                xDist = Math.Min(rect.Min.X - point.X, point.X - rect.Min.X);
-                yDist = Math.Min(rect.Min.Y - point.Y, point.Y - rect.Min.Y);
-                if (xDist < yDist)
-                {
-                    info.Distance = xDist;
-                    info.Normal.Y = 0;
-                    info.Normal.X = (xDist < 0) ? (1) : (-1);
-                }
-                else 
-                {
-                    info.Distance = yDist;
-                    info.Normal.X = 0;
-                    info.Normal.Y = (yDist < 0) ? (1) : (-1);
-                }
-                return true;
-            }
-            else
-            {
-                info = IntersectionInfo.Zero;
-                return false;
-            }
-        }
-        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
-        {
-            throw new NotSupportedException();
-        }
-        public override void GetDistance(ref Vector2D point, out Scalar result)
-        {
-            rect.GetDistance(ref point, out result);
-        }
-        public override Shape Duplicate()
-        {
-            return new RectangleShape();
-        }
     }
 }

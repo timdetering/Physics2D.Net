@@ -58,26 +58,26 @@ namespace ConsoleDriver
 
     public class TestSubClass
     {
-        public float member;
+        public Scalar member;
     }
     public class TestClass
     {
-        public float local;
+        public Scalar local;
         public TestSubClass B;
 
-        public float Test(float arg, TestSubClass C)
+        public Scalar Test(Scalar arg, TestSubClass C)
         {
-            float stack = 1;
+            Scalar stack = 1;
             return stack * arg * local * B.member * C.member;
         }
 
-        public float Test2(float arg, TestSubClass C)
+        public Scalar Test2(Scalar arg, TestSubClass C)
         {
-            float stack = 1;
-            float temp1 = arg;
-            float temp2 = local;
-            float temp3 = B.member;
-            float temp4 = C.member;
+            Scalar stack = 1;
+            Scalar temp1 = arg;
+            Scalar temp2 = local;
+            Scalar temp3 = B.member;
+            Scalar temp4 = C.member;
             return stack * temp1 * temp2 * temp3 * temp4;
         }
     }

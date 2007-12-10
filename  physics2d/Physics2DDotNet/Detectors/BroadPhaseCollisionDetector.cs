@@ -55,7 +55,7 @@ namespace Physics2DDotNet.Detectors
             }
         }
 
-        public abstract void Detect(Scalar dt);
+        public abstract void Detect(TimeStep step);
         internal void OnAddedInternal(PhysicsEngine engine)
         {
             if (this.engine != null)
@@ -79,9 +79,9 @@ namespace Physics2DDotNet.Detectors
         protected internal virtual void RemoveExpiredBodies() { }
 
         protected internal virtual void Clear() { }
-        protected void OnCollision(Scalar dt, Body first, Body second)
+        protected void OnCollision(TimeStep step, Body first, Body second)
         {
-            this.engine.HandleCollision(dt, first, second);
+            this.engine.HandleCollision(step, first, second);
         }
     }
 

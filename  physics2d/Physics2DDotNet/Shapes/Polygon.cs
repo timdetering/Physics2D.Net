@@ -72,14 +72,14 @@ namespace Physics2DDotNet
         {
             if (height <= 0) { throw new ArgumentOutOfRangeException("height", "must be greater then 0"); }
             if (width <= 0) { throw new ArgumentOutOfRangeException("width", "must be greater then 0"); }
-            Scalar Ld2 = height * .5f;
-            Scalar Wd2 = width * .5f;
+            Scalar ld2 = height * .5f;
+            Scalar wd2 = width * .5f;
             return new Vector2D[4]
             {
-                new Vector2D(Wd2, Ld2),
-                new Vector2D(-Wd2, Ld2),
-                new Vector2D(-Wd2, -Ld2),
-                new Vector2D(Wd2, -Ld2)
+                new Vector2D(wd2, ld2),
+                new Vector2D(-wd2, ld2),
+                new Vector2D(-wd2, -ld2),
+                new Vector2D(wd2, -ld2)
             };
         }
         /// <summary>
@@ -104,34 +104,34 @@ namespace Physics2DDotNet
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 2) { throw new ArgumentOutOfRangeException("vertexes"); }
             if (maxLength <= 0) { throw new ArgumentOutOfRangeException("maxLength", "must be greater then zero"); }
-
             LinkedList<Vector2D> list = new LinkedList<Vector2D>(vertexes);
-            LinkedListNode<Vector2D> node = list.First;
-            while (node != null)
+            LinkedListNode<Vector2D> prevNode, node;
+            if (loop)
             {
-                Vector2D line;
-                if (node.Next == null)
-                {
-                    if (!loop) { break; }
-                    line = list.First.Value - node.Value;
-                }
-                else
-                {
-                    line = node.Next.Value - node.Value;
-                }
-                Scalar mag;
-                Vector2D.GetMagnitude(ref line, out mag);
+                prevNode = list.Last;
+                node = list.First;
+            }
+            else
+            {
+                prevNode = list.First;
+                node = prevNode.Next;
+            }
+            for (; node != null;
+                prevNode = node,
+                node = node.Next)
+            {
+                Vector2D edge = node.Value - prevNode.Value;
+                Scalar mag = edge.Magnitude;
                 if (mag > maxLength)
                 {
-                    int count = (int)MathHelper.Ceiling(mag / maxLength);
+                    int count = (int)Math.Ceiling(mag / maxLength);
                     mag = 1f / count;
-                    Vector2D.Multiply(ref line, ref mag, out line);
+                    Vector2D.Multiply(ref edge, ref mag, out edge);
                     for (int pos = 1; pos < count; ++pos)
                     {
-                        node = list.AddAfter(node, line + node.Value);
+                        prevNode = list.AddAfter(prevNode, edge + prevNode.Value);
                     }
                 }
-                node = node.Next;
             }
             Vector2D[] result = new Vector2D[list.Count];
             list.CopyTo(result, 0);
@@ -159,13 +159,13 @@ namespace Physics2DDotNet
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 2) { throw new ArgumentOutOfRangeException("vertexes"); }
-            if (areaTolerance < 0) { throw new ArgumentOutOfRangeException("areaTolerance","must be equal to or greater then zero."); }
+            if (areaTolerance < 0) { throw new ArgumentOutOfRangeException("areaTolerance", "must be equal to or greater then zero."); }
             List<Vector2D> result = new List<Vector2D>(vertexes.Length);
             Vector2D v1, v2, v3;
             Scalar old1, old2, new1;
             v1 = vertexes[vertexes.Length - 2];
             v2 = vertexes[vertexes.Length - 1];
-            areaTolerance = areaTolerance * 2;
+            areaTolerance *= 2;
             for (int index = 0; index < vertexes.Length; ++index, v2 = v3)
             {
                 if (index == vertexes.Length - 1)

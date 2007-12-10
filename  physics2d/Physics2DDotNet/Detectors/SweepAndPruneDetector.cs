@@ -248,8 +248,8 @@ namespace Physics2DDotNet.Detectors
             xStubs.Sort(comparer);
             yStubs.Sort(comparer);
         }
-        
-        public override void Detect(Scalar dt)
+
+        public override void Detect(TimeStep step)
         {
             Update();
             int count1 = 0;
@@ -362,7 +362,7 @@ namespace Physics2DDotNet.Detectors
                             }
                             if (collided)//node.Value.colliders.Contains(body1.ID))
                             {
-                                this.OnCollision(dt, body1, body2);
+                                this.OnCollision(step, body1, body2);
                                 //this.OnCollision(dt, body1, node.Value.body);
                             }
                             node = node.Next;
