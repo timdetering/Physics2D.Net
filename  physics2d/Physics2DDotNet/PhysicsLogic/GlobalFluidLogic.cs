@@ -99,6 +99,8 @@ namespace Physics2DDotNet
         Scalar dragCoefficient;
         Scalar density;
         Vector2D fluidVelocity;
+
+
         List<Wrapper> items;
 
         public GlobalFluidLogic(
@@ -114,6 +116,23 @@ namespace Physics2DDotNet
             this.items = new List<Wrapper>();
             this.Order = 1;
         }
+
+        public Scalar DragCoefficient
+        {
+            get { return dragCoefficient; }
+            set { dragCoefficient = value; }
+        }
+        public Scalar Density
+        {
+            get { return density; }
+            set { density = value; }
+        }
+        public Vector2D FluidVelocity
+        {
+            get { return fluidVelocity; }
+            set { fluidVelocity = value; }
+        }
+
         protected internal override void RunLogic(TimeStep step)
         {
             for (int index = 0; index < items.Count; ++index)
@@ -123,17 +142,17 @@ namespace Physics2DDotNet
                 Body body = wrapper.body;
 
                 Vector2D centroid = wrapper.body.Shape.Matrix.NormalMatrix * wrapper.centroid;
-                Vector2D buoyancyForce = body.State.Acceleration.Linear * wrapper.area * -density;
+                Vector2D buoyancyForce = body.State.Acceleration.Linear * wrapper.area * -Density;
                 wrapper.body.ApplyForce(buoyancyForce, centroid);
 
-                Vector2D relativeVelocity = body.State.Velocity.Linear - fluidVelocity;
+                Vector2D relativeVelocity = body.State.Velocity.Linear - FluidVelocity;
                 Vector2D velocityDirection = relativeVelocity.Normalized;
                 if (velocityDirection == Vector2D.Zero) { continue; }
                 Vector2D dragDirection = velocityDirection.LeftHandNormal;
                 DragInfo dragInfo = body.Shape.GetDragInfo(dragDirection);
                 if (dragInfo.Area < .01f) { continue; }
                 Scalar speedSq = relativeVelocity.MagnitudeSq;
-                Scalar dragForceMag = -.5f * density * speedSq * dragInfo.Area * dragCoefficient;
+                Scalar dragForceMag = -.5f * Density * speedSq * dragInfo.Area * DragCoefficient;
                 Scalar maxDrag = -MathHelper.Sqrt(speedSq) * body.Mass.Mass * step.DtInv;
                 if (dragForceMag < maxDrag)
                 {
@@ -145,7 +164,7 @@ namespace Physics2DDotNet
 
                 wrapper.body.ApplyTorque(
                    -body.Mass.MomentOfInertia *
-                   (body.Coefficients.DynamicFriction + density + dragCoefficient) *
+                   (body.Coefficients.DynamicFriction + Density + DragCoefficient) *
                    body.State.Velocity.Angular);
             }
         }

@@ -342,11 +342,11 @@ namespace Physics2DDotNet
         {
             return GetCentroid(originalVertexes);
         }
-        public override float GetArea()
+        public override Scalar GetArea()
         {
             return GetArea(originalVertexes);
         }
-        public override float GetInertia()
+        public override Scalar GetInertia()
         {
             return Shape.InertiaOfPolygon(originalVertexes);
         }

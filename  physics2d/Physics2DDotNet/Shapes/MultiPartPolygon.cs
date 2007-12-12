@@ -382,11 +382,11 @@ namespace Physics2DDotNet
         {
             return GetCentroid(polygons);
         }
-        public override float GetArea()
+        public override Scalar GetArea()
         {
             return GetArea(polygons);
         }
-        public override float GetInertia()
+        public override Scalar GetInertia()
         {
             return InertiaOfMultipartPolygon(polygons);
         }

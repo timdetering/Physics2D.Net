@@ -125,11 +125,11 @@ namespace Physics2DDotNet
         {
             return Vector2D.Zero;
         }
-        public override float GetArea()
+        public override Scalar GetArea()
         {
             return 0;
         }
-        public override float GetInertia()
+        public override Scalar GetInertia()
         {
             throw new NotSupportedException();
         }

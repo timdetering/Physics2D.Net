@@ -146,11 +146,11 @@ namespace Physics2DDotNet
         {
             throw new NotSupportedException();
         }
-        public override float GetArea()
+        public override Scalar GetArea()
         {
             throw new NotSupportedException();
         }
-        public override float GetInertia()
+        public override Scalar GetInertia()
         {
             throw new NotSupportedException();
         }

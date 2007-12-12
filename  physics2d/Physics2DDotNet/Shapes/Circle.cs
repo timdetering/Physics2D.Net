@@ -187,11 +187,11 @@ namespace Physics2DDotNet
         {
             return Vector2D.Zero;
         }
-        public override float GetArea()
+        public override Scalar GetArea()
         {
             return radius * radius * MathHelper.Pi;
         }
-        public override float GetInertia()
+        public override Scalar GetInertia()
         {
             return .5f * (radius * radius);
         }
