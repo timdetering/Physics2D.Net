@@ -88,7 +88,7 @@ namespace Physics2DDotNet
         }
         static bool IsRemoved(Wrapper wrapper)
         {
-            if (wrapper.body.IsAdded)
+            if (!wrapper.body.IsAdded)
             {
                 wrapper.Dispose();
                 return true;
