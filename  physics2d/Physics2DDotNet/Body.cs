@@ -591,23 +591,25 @@ namespace Physics2DDotNet
         }
         public void UpdateVelocity(TimeStep step)
         {
-            Scalar massInv = massInfo.MassInv;
-            bool hasProxies = proxies.Count != 0;
-            if (massInv != 0)
+            if (massInfo.MassInv != 0)
             {
-                if (hasProxies)
-                {
-                    massInv *= 1 / (proxies.Count + 1);
-                }
-                state.Acceleration.Linear.X += state.ForceAccumulator.Linear.X * massInv;
-                state.Acceleration.Linear.Y += state.ForceAccumulator.Linear.Y * massInv;
-                state.Acceleration.Angular += state.ForceAccumulator.Angular * massInfo.MomentOfInertiaInv;
+                UpdateAcceleration(ref state.Acceleration, ref state.ForceAccumulator);
+             //   state.Acceleration.Linear.X += state.ForceAccumulator.Linear.X * massInv ;
+             //   state.Acceleration.Linear.Y += state.ForceAccumulator.Linear.Y * massInv ;
+             //   state.Acceleration.Angular += state.ForceAccumulator.Angular * massInfo.MomentOfInertiaInv ;
             }
             UpdateVelocity(ref state.Velocity, ref state.Acceleration, step.Dt);
-            if (hasProxies)
+            if (proxies.Count != 0)
             {
                 ApplyProxy();
             }
+        }
+        void UpdateAcceleration(ref ALVector2D acceleration, ref ALVector2D forceAccumulator)
+        {
+            Scalar proxDamping = 1.0f / (proxies.Count + 1);
+            acceleration.Linear.X = acceleration.Linear.X * proxDamping + forceAccumulator.Linear.X * massInfo.MassInv;
+            acceleration.Linear.Y = acceleration.Linear.Y * proxDamping + forceAccumulator.Linear.Y * massInfo.MassInv;
+            acceleration.Angular += forceAccumulator.Angular * massInfo.MomentOfInertiaInv;
         }
         void UpdateVelocity(ref ALVector2D velocity, ref ALVector2D acceleration, Scalar dt)
         {

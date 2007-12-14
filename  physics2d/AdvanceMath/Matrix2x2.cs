@@ -53,7 +53,7 @@ namespace AdvanceMath
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2x2>))]
 #endif
-    public struct Matrix2x2 : IMatrix<Matrix2x2, Vector2D>
+    public struct Matrix2x2 : IMatrix<Matrix2x2, Vector2D, Vector2D>
     {
         #region const fields
         /// <summary>

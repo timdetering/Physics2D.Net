@@ -1299,10 +1299,11 @@ namespace Physics2DDemo
             for (int i = 128 * 3; i > -128; i -= 128)
             {
               Body b =  AddShape(shape, 40, new ALVector2D(0, new Vector2D(600, 272 + i)));
-
             }
+            Body b1 = AddShape(shape, 40, new ALVector2D(0, new Vector2D(400,400)));
+            Body b2 = AddShape(shape, 40, new ALVector2D(0, new Vector2D(400, 200)));
 
-
+            engine.AddProxy(b1, b2, Matrix2x2.FromRotation(MathHelper.PiOver2 ));
 
 
             Body ball = AddShape(new Circle(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));

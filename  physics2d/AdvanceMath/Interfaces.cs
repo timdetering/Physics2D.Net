@@ -142,34 +142,35 @@ namespace AdvanceMath
         Scalar Determinant { get;}
     }
 
-    public interface IMatrix<M, V> : IMatrix, IAdvanceValueType, IEquatable<M>
-        where M : struct, IMatrix<M, V>
-        where V : struct, IVector<V>
+    public interface IMatrix<M, VC, VR> : IMatrix, IAdvanceValueType, IEquatable<M>
+        where M : struct, IMatrix<M, VC, VR>
+        where VC : struct, IVector<VC>
+        where VR : struct, IVector<VR>
     {
         /// <summary>
         /// Gets the <typeparamref name="V"/> at the specified Column.
         /// </summary>
         /// <param name="column">The zero-based index of the Column of the <typeparamref name="V"/> to get.</param>
         /// <returns>The <typeparamref name="V"/> at the specified Column.</returns>
-        V GetColumn(int columnIndex);
+        VC GetColumn(int columnIndex);
         /// <summary>
         /// Sets the <typeparamref name="V"/>  at the specified Column.
         /// </summary>
         /// <param name="column">The zero-based index of the Column of the <typeparamref name="V"/> to set.</param>
         /// <param name="value">The <typeparamref name="V"/> to set at the specified Column.</param>
-        void SetColumn(int columnIndex, V value);
+        void SetColumn(int columnIndex, VC value);
         /// <summary>
         /// Gets the <typeparamref name="V"/> at the specified Row.
         /// </summary>
         /// <param name="row">The zero-based index of the Row of the <typeparamref name="V"/> to get.</param>
         /// <returns>The <typeparamref name="V"/> at the specified Row.</returns>
-        V GetRow(int rowIndex);
+        VR GetRow(int rowIndex);
         /// <summary>
         /// Sets the <typeparamref name="V"/> at the specified Row.
         /// </summary>
         /// <param name="row">The zero-based index of the Row of the <typeparamref name="V"/> to set.</param>
         /// <param name="value">The <typeparamref name="V"/> to set at the specified Row.</param>
-        void SetRow(int rowIndex, V value);
+        void SetRow(int rowIndex, VR value);
         /// <summary>
         /// Gets the Inverse of the IMatrix
         /// </summary>

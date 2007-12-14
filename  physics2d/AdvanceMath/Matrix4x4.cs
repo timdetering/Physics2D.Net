@@ -41,7 +41,7 @@ namespace AdvanceMath
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix4x4>))]
 #endif
-    public struct Matrix4x4 : IMatrix<Matrix4x4, Vector4D>
+    public struct Matrix4x4 : IMatrix<Matrix4x4, Vector4D, Vector4D>
     {
         #region const fields
         /// <summary>

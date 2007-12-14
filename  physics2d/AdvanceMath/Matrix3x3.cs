@@ -57,7 +57,7 @@ namespace AdvanceMath
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix3x3>))]
 #endif
-    public struct Matrix3x3 : IMatrix<Matrix3x3, Vector3D>
+    public struct Matrix3x3 : IMatrix<Matrix3x3, Vector3D, Vector3D>
     {
         #region const fields
         /// <summary>
