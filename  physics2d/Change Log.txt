@@ -16,6 +16,9 @@ Added: GlobalFluidLogic and changes to make it work.
 Added: a bunch of methods and properties to Shape.
 Added: PhysicsLogic.Order to allow for Logics to run in a certain order declaratively. 
 Added: LinearDamping and AngularDamping Properties to Body. 
+Added: MassInfo.Infinite
+Fixed: The bug where objects can get trapped inside each other and are next to impossible to separate. 
+Added: Shape.Normals as a part to the above bug fix. 
 
 
 AdvanceMath

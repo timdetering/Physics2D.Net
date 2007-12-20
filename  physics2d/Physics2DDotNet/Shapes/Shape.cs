@@ -132,6 +132,9 @@ namespace Physics2DDotNet
         protected Scalar inertiaMultiplier;
         protected Vector2D[] originalVertexes;
         protected Vector2D[] vertexes;
+        private Vector2D[] normals;
+
+
         private Body parent;
         bool ignoreVertexes;
 
@@ -147,6 +150,7 @@ namespace Physics2DDotNet
             this.originalVertexes = vertexes;
             this.vertexes = (Vector2D[])vertexes.Clone();
             this.inertiaMultiplier = momentOfInertiaMultiplier;
+            CalculateNormals();
         }
         protected Shape(Shape copy)
         {
@@ -165,10 +169,18 @@ namespace Physics2DDotNet
                 this.tag = copy.tag;
             }
             this.originalVertexes = copy.originalVertexes;
+            this.normals = copy.normals;
             this.vertexes = (Vector2D[])copy.vertexes.Clone();
         }
         #endregion
         #region properties
+        /// <summary>
+        /// These are the normals for the original vertexes.
+        /// </summary>
+        public Vector2D[] Normals
+        {
+            get { return normals; }
+        }
         public abstract bool CanGetCentroid { get;}
         public abstract bool CanGetArea { get;}
         public abstract bool CanGetInertia { get;}
@@ -252,6 +264,28 @@ namespace Physics2DDotNet
         }
         #endregion
         #region methods
+        private void CalculateNormals()
+        {
+            if (vertexes.Length < 3)
+            {
+                return;
+            }
+            Vector2D[] edges = new Vector2D[vertexes.Length];
+            Vector2D last = vertexes[vertexes.Length - 1];
+            Vector2D current;
+            for (int index = 0; index < vertexes.Length; ++index, last = current)
+            {
+                current = vertexes[index];
+                edges[index] = (current - last).LeftHandNormal.Normalized;
+            }
+            this.normals = new Vector2D[vertexes.Length];
+            last = edges[vertexes.Length - 1];
+            for (int index = 0; index < vertexes.Length; ++index, last = current)
+            {
+                current = edges[index];
+                normals[index] = (current + last).Normalized;
+            }
+        }
         protected abstract void CalcBoundingRectangle();
         public virtual void ApplyMatrix(ref Matrix2D matrix)
         {

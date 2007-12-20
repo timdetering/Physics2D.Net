@@ -252,19 +252,28 @@ namespace Physics2DDotNet.Solvers
             void Collide(ref LinkedListNode<Contact> node, Body b1, Body b2,bool inverse, ref BoundingRectangle targetArea)
             {
                 Vector2D[] vertexes = b2.Shape.Vertices;
+                Vector2D[] normals = b2.Shape.Normals;
+                Matrix2x2 normalMatrix = b2.Shape.Matrix.NormalMatrix;
                 IntersectionInfo info;
                 ContainmentType contains;
                 Contact contact;
+                Vector2D normal = Vector2D.Zero ;
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
                     Vector2D vertex = vertexes[index];
+                    if (normals != null)
+                    {
+                        Vector2D.Transform(ref normalMatrix,ref normals[index], out normal);
+                    }
                     targetArea.Contains(ref vertex, out contains);
                     int Id = (inverse) ? (index) : ((-vertexes.Length + index));
 
                     while (node != null && node.Value.id < Id) { node = node.Next; }
 
                     if (contains != ContainmentType.Contains ||
-                        !b1.Shape.TryGetIntersection(vertex, out info))
+                        !b1.Shape.TryGetIntersection(vertex, out info)||
+                       (normals != null &&
+                        info.Normal * normal > 0))
                     {
                         if (node != null && node.Value.id == Id)
                         {

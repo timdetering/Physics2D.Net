@@ -44,10 +44,21 @@ namespace Physics2DDotNet
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>))]
 #endif
     [AdvBrowsableOrder("Mass,MomentofInertia"), Serializable]
-    public sealed class MassInfo : IDeserializationCallback
+    public sealed class MassInfo : IDeserializationCallback, IDuplicateable<MassInfo>
     {
+        #region static
+        private static MassInfo infinite = new MassInfo(Scalar.PositiveInfinity, Scalar.PositiveInfinity);
+        /// <summary>
+        /// A body with this mass will not be affected by forces or impulse.
+        /// </summary>
+        /// <remarks>
+        /// This is the mass of Chuck Norris.
+        /// </remarks>
+        public static MassInfo Infinite
+        {
+            get { return new MassInfo(infinite); }
+        }
 
-        #region static methods
         public static MassInfo FromCylindricalShell(Scalar mass, Scalar radius)
         {
             return new MassInfo(mass, mass * radius * radius);
@@ -114,6 +125,14 @@ namespace Physics2DDotNet
             this.MomentOfInertia = momentOfInertia;
             this.Mass = mass;
         }
+        private MassInfo(MassInfo copy)
+        {
+            this.mass = copy.mass;
+            this.momentOfInertia = copy.momentOfInertia;
+            this.massInv = copy.massInv;
+            this.momentOfInertiaInv = copy.momentOfInertiaInv;
+            this.accelerationDueToGravity = copy.accelerationDueToGravity;
+        }
         #endregion
         #region properties
         [AdvBrowsable]
@@ -165,7 +184,15 @@ namespace Physics2DDotNet
             }
         }
         #endregion
-        #region IDeserializationCallback Members
+        #region Methods
+        public MassInfo Duplicate()
+        {
+            return new MassInfo(this);
+        }
+        public object Clone()
+        {
+            return Duplicate();
+        }
         void IDeserializationCallback.OnDeserialization(object sender)
         {
             this.massInv = 1 / this.mass;
