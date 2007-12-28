@@ -69,7 +69,7 @@ namespace Physics2DDotNet.Joints
             if (body == null) { throw new ArgumentNullException("body"); }
             this.body = body;
             this.anchor = anchor;
-            body.ApplyMatrix();
+            body.ApplyPosition();
             Vector2D.Transform(ref body.Matrices.ToBody, ref anchor, out this.localAnchor1);
             this.softness = 0.001f;
             this.biasFactor = 0.2f;

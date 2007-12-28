@@ -38,6 +38,9 @@ Changed: put all Ignorers into a Ignorers namespace
 Changed: put all Shapes into a Shapes namespace
 Added: RaySegmentsCollisionLogic to manage a RaySegmentsShape
 Added: ExplosionLogic
+Changed: Removed ApplyMatrix from Body
+Changed: Renamed ApplyMatrix to ApplyPosition
+Added: SpatialHashDetector
 
 AdvanceMath
 1.7.0.0:

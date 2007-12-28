@@ -212,7 +212,7 @@ namespace Physics2DDotNet
             this.isCollidable = true;
             this.linearDamping = 1;
             this.angularDamping = 1;
-            this.ApplyMatrix();
+            this.ApplyPosition();
         }
 
         private Body(Body copy)
@@ -553,9 +553,8 @@ namespace Physics2DDotNet
             state.Position.Linear.X += state.Velocity.Linear.X * step.Dt;
             state.Position.Linear.Y += state.Velocity.Linear.Y * step.Dt;
             state.Position.Angular += state.Velocity.Angular * step.Dt;
-            ApplyMatrix();
+            ApplyPosition();
         }
-
         public void UpdatePosition(TimeStep step, ALVector2D extraVelocity)
         {
             UpdatePosition(step, ref extraVelocity);
@@ -566,7 +565,7 @@ namespace Physics2DDotNet
             state.Position.Linear.X += (state.Velocity.Linear.X + extraVelocity.Linear.X) * step.Dt;
             state.Position.Linear.Y += (state.Velocity.Linear.Y + extraVelocity.Linear.Y) * step.Dt;
             state.Position.Angular += (state.Velocity.Angular + extraVelocity.Angular) * step.Dt;
-            ApplyMatrix();
+            ApplyPosition();
         }
         public void UpdateVelocity(TimeStep step)
         {
@@ -601,107 +600,17 @@ namespace Physics2DDotNet
             if (Updated != null) { Updated(this, new UpdatedEventArgs(step)); }
         }
 
-        /// <summary>
-        /// Sets Acceleration and Force Acumilator to Zero.
-        /// </summary>
-        public void ClearForces()
-        {
-            this.state.Acceleration = ALVector2D.Zero;
-            this.state.ForceAccumulator = ALVector2D.Zero;
-        }
-
-        public void ApplyForce(Vector2D force)
-        {
-            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
-        }
-        [CLSCompliant(false)]
-        public void ApplyForce(ref Vector2D force)
-        {
-            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
-        }
-        public void ApplyForce(Vector2D force, Vector2D position)
-        {
-            Scalar torque;
-            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
-            Vector2D.ZCross(ref position, ref force, out torque);
-            state.ForceAccumulator.Angular += torque;
-        }
-        [CLSCompliant(false)]
-        public void ApplyForce(ref Vector2D force, ref Vector2D position)
-        {
-            Scalar torque;
-            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
-            Vector2D.ZCross(ref position, ref force, out torque);
-            state.ForceAccumulator.Angular += torque;
-        }
-        public void ApplyTorque(Scalar torque)
-        {
-            state.ForceAccumulator.Angular += torque;
-        }
-
-        public void ApplyImpulse(Vector2D impulse)
-        {
-            ApplyImpulse(ref impulse);
-        }
-        [CLSCompliant(false)]
-        public void ApplyImpulse(ref Vector2D impulse)
-        {
-            Scalar massInv = massInfo.MassInv;
-            state.Velocity.Linear.X += impulse.X * massInv;
-            state.Velocity.Linear.Y += impulse.Y * massInv;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="impulse"></param>
-        /// <param name="position">(In Body Coordinates)</param>
-        public void ApplyImpulse(Vector2D impulse, Vector2D position)
-        {
-            ApplyImpulse(ref impulse, ref position);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="impulse"></param>
-        /// <param name="position">(In Body Coordinates)</param>
-        [CLSCompliant(false)]
-        public void ApplyImpulse(ref Vector2D impulse, ref Vector2D position)
-        {
-            Scalar massInv = massInfo.MassInv;
-            Scalar IInv = massInfo.MomentOfInertia;
-            PhysicsHelper.AddImpulse(ref state.Velocity, ref impulse, ref position, ref massInv, ref IInv);
-        }
 
         /// <summary>
-        /// Applys a Matrix Created from the State.Position AlVector2D to the Shape.
+        /// Updates all the values caluclated from the State.Position.
+        /// Re-calculates the Matrices property the re-calculates the Rectangle property
+        /// from that.
         /// </summary>
-        public void ApplyMatrix()
+        public void ApplyPosition()
         {
             MathHelper.ClampAngle(ref state.Position.Angular);
             Matrix2x3 matrix;
             ALVector2D.ToMatrix2x3(ref state.Position, out matrix);
-            ApplyMatrixInternal(ref matrix);
-        }
-        /// <summary>
-        /// Applys a Matrix to the Shape and to the State.Position AlVector2D.
-        /// </summary>
-        /// <param name="matrix">The matrix being applied to the Body</param>
-        public void ApplyMatrix(Matrix2x3 matrix)
-        {
-            ApplyMatrix(ref matrix);
-        }
-        /// <summary>
-        /// Applys a Matrix to the Shape and to the State.Position AlVector2D.
-        /// </summary>
-        /// <param name="matrix">The matrix being applied to the Body</param>
-        [CLSCompliant(false)]
-        public void ApplyMatrix(ref Matrix2x3 matrix)
-        {
-            ALVector2D.Transform(ref matrix, ref state.Position, out state.Position);
-            ApplyMatrix();
-        }
-        private void ApplyMatrixInternal(ref Matrix2x3 matrix)
-        {
             Matrix2x3.Multiply(ref matrix, ref transformation, out matrix);
             matrices.Set(ref matrix);
             shape.CalcBoundingRectangle(matrices, out rectangle);
@@ -710,6 +619,109 @@ namespace Physics2DDotNet
                 OnPositionChanged();
             }
         }
+
+        /// <summary>
+        /// Sets Acceleration and ForceAccumulator to Zero.
+        /// </summary>
+        public void ClearForces()
+        {
+            this.state.Acceleration = ALVector2D.Zero;
+            this.state.ForceAccumulator = ALVector2D.Zero;
+        }
+
+        /// <summary>
+        /// Applys a Force
+        /// </summary>
+        /// <param name="force">The direction and magnitude of the force</param>
+        public void ApplyForce(Vector2D force)
+        {
+            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
+        }
+        /// <summary>
+        /// Applys a Force
+        /// </summary>
+        /// <param name="force">The direction and magnitude of the force</param>
+        [CLSCompliant(false)]
+        public void ApplyForce(ref Vector2D force)
+        {
+            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
+        }
+        /// <summary>
+        /// Applys a Force
+        /// </summary>
+        /// <param name="force">The direction and magnitude of the force</param>
+        /// <param name="position">The Location where the force will be applied (Offset: Body Rotation: World) </param>
+        public void ApplyForce(Vector2D force, Vector2D position)
+        {
+            Scalar torque;
+            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
+            Vector2D.ZCross(ref position, ref force, out torque);
+            state.ForceAccumulator.Angular += torque;
+        }
+        /// <summary>
+        /// Applys a Force
+        /// </summary>
+        /// <param name="force">The direction and magnitude of the force</param>
+        /// <param name="position">The Location where the force will be applied (Offset: Body Rotation: World) </param>
+        [CLSCompliant(false)]
+        public void ApplyForce(ref Vector2D force, ref Vector2D position)
+        {
+            Scalar torque;
+            Vector2D.Add(ref state.ForceAccumulator.Linear, ref force, out state.ForceAccumulator.Linear);
+            Vector2D.ZCross(ref position, ref force, out torque);
+            state.ForceAccumulator.Angular += torque;
+        }
+        /// <summary>
+        /// Applys Torque
+        /// </summary>
+        /// <param name="torque">The direction and magnitude of the torque</param>
+        public void ApplyTorque(Scalar torque)
+        {
+            state.ForceAccumulator.Angular += torque;
+        }
+
+        /// <summary>
+        /// Applys Impulse
+        /// </summary>
+        /// <param name="impulse">The direction and magnitude of the impulse</param>
+        public void ApplyImpulse(Vector2D impulse)
+        {
+            ApplyImpulse(ref impulse);
+        }
+        /// <summary>
+        /// Applys Impulse
+        /// </summary>
+        /// <param name="impulse">The direction and magnitude of the impulse.</param>
+        [CLSCompliant(false)]
+        public void ApplyImpulse(ref Vector2D impulse)
+        {
+            Scalar massInv = massInfo.MassInv;
+            state.Velocity.Linear.X += impulse.X * massInv;
+            state.Velocity.Linear.Y += impulse.Y * massInv;
+        }
+        /// <summary>
+        /// Applys Impulse
+        /// </summary>
+        /// <param name="impulse">The direction and magnitude of the impulse.</param>
+        /// <param name="position">The Location where the impulse will be applied (Offset: Body Rotation: World)</param>
+        public void ApplyImpulse(Vector2D impulse, Vector2D position)
+        {
+            ApplyImpulse(ref impulse, ref position);
+        }
+        /// <summary>
+        /// Applys Impulse
+        /// </summary>
+        /// <param name="impulse">The direction and magnitude of the impulse.</param>
+        /// <param name="position">The Location where the impulse will be applied (Offset: Body Rotation: World)</param>
+        [CLSCompliant(false)]
+        public void ApplyImpulse(ref Vector2D impulse, ref Vector2D position)
+        {
+            Scalar massInv = massInfo.MassInv;
+            Scalar IInv = massInfo.MomentOfInertia;
+            PhysicsHelper.AddImpulse(ref state.Velocity, ref impulse, ref position, ref massInv, ref IInv);
+        }
+
+
 
         public Body Duplicate()
         {

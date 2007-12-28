@@ -356,7 +356,7 @@ namespace Physics2DDemo
             lazer.State.Position.Linear = sparkPoint;
             lazer.State.Velocity.Angular = .91f;
             lazer.IgnoresGravity = true;
-            lazer.ApplyMatrix();
+            lazer.ApplyPosition();
             engine.AddBody(lazer);
             lazerLogic = new RaySegmentsCollisionLogic(lazer);
             engine.AddLogic(lazerLogic);
@@ -516,7 +516,8 @@ namespace Physics2DDemo
             //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
             engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
-            
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
+
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
             solver.Iterations = 12;
@@ -699,7 +700,7 @@ namespace Physics2DDemo
             avatarBodies[0].State.Position.Linear = position;
             avatarBodies[0].State.Position.Angular = 0;
             avatarBodies[0].State.Velocity = ALVector2D.Zero;
-            avatarBodies[0].ApplyMatrix();
+            avatarBodies[0].ApplyPosition();
             for (int index = 1; index < avatarBodies.Count; ++index)
             {
                 avatarBodies[index].IsCollidable = true;
@@ -707,7 +708,7 @@ namespace Physics2DDemo
                 avatarBodies[index].State.Position.Linear = position + avatarOffsets[index - 1];
                 avatarBodies[index].State.Position.Angular = 0;
                 avatarBodies[index].State.Velocity = ALVector2D.Zero;
-                avatarBodies[index].ApplyMatrix();
+                avatarBodies[index].ApplyPosition();
             }
             for (int index = 0; index < avatarJoints.Count; ++index)
             {
@@ -1046,17 +1047,18 @@ namespace Physics2DDemo
             engine.AddBodyRange(particles);
         }
 
-        void ApplyMatrix(ALVector2D vector, IList<Body> collection)
+        void Transform(ALVector2D vector, IList<Body> collection)
         {
             Matrix2x3 matrix;
             ALVector2D.ToMatrix2x3(ref vector, out matrix);
-            ApplyMatrix(matrix, collection);
+            Transform(matrix, collection);
         }
-        void ApplyMatrix(Matrix2x3  matrix, IList<Body> collection)
+        void Transform(Matrix2x3  matrix, IList<Body> collection)
         {
             foreach (Body b in collection)
             {
-                b.ApplyMatrix(ref matrix);
+                ALVector2D.Transform(ref matrix,ref b.State.Position, out b.State.Position);
+                b.ApplyPosition();
             }
         }
 
@@ -1450,8 +1452,8 @@ namespace Physics2DDemo
             engine.AddJoint(joint1);
             end2.State.Position.Linear.X -= 10;
             end1.State.Position.Linear.X += 10;
-            end2.ApplyMatrix();
-            end1.ApplyMatrix();
+            end2.ApplyPosition();
+            end1.ApplyPosition();
 
             AddTower2();
 
@@ -1472,7 +1474,7 @@ namespace Physics2DDemo
             AddLine(new Vector2D(400, 400), new Vector2D(600, 300), 30);
             AddRagDoll(new Vector2D(200, 400));
             AddRagDoll(new Vector2D(300, 300));
-            ApplyMatrix(new ALVector2D(MathHelper.Pi, 400, 200), AddRagDoll(new Vector2D(0, 0)));
+            Transform(new ALVector2D(MathHelper.Pi, 400, 200), AddRagDoll(new Vector2D(0, 0)));
             AddRagDoll(new Vector2D(500, 100));
             AddRagDoll(new Vector2D(600, 0));
             AddRagDoll(new Vector2D(700, -100));

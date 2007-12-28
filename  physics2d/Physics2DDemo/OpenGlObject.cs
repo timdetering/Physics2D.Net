@@ -179,7 +179,7 @@ namespace Physics2DDemo
             {
                 entity.Collided += entity_Collided2;
             }
-            entity.ApplyMatrix();
+            entity.ApplyPosition();
         }
         public OpenGlObject(Body entity, RaySegmentsCollisionLogic logic):this(entity)
         {

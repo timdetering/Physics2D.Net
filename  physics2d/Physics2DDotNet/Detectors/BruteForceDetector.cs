@@ -41,13 +41,12 @@ namespace Physics2DDotNet.Detectors
     {
         public override void Detect(TimeStep step)
         {
-            Body body1, body2;
             for (int index1 = 0; index1 < this.Bodies.Count; index1++)
             {
-                body1 = this.Bodies[index1];
+                Body body1 = this.Bodies[index1];
                 for (int index2 = index1 + 1; index2 < this.Bodies.Count; index2++)
                 {
-                    body2 = this.Bodies[index2];
+                    Body body2 = this.Bodies[index2];
                     if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
                             Body.CanCollide(body1, body2) &&
                             body1.Rectangle.Intersects(body2.Rectangle))
@@ -58,4 +57,5 @@ namespace Physics2DDotNet.Detectors
             }
         }
     }
+
 }

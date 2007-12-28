@@ -696,7 +696,7 @@ namespace Physics2DDotNet
             {
                 Body item = pendingBodies[index];
                 item.ID = nextBodyID++;
-                item.ApplyMatrix();
+                item.ApplyPosition();
             }
             bodies.AddRange(pendingBodies);
             solver.AddBodyRange(pendingBodies);

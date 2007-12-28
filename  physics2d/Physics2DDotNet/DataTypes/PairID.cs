@@ -56,6 +56,14 @@ namespace Physics2DDotNet
             }
             return result.ID;
         }
+        public static long GetHash(int value1, int value2)
+        {
+            PairID result;
+            result.ID = 0;
+            result.lowID = value1;
+            result.highID = value2;
+            return result.ID;
+        }
         public static void GetIds(long id,out int id1,out  int id2)
         {
             PairID result;

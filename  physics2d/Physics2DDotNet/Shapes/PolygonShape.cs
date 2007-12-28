@@ -373,7 +373,7 @@ namespace Physics2DDotNet.Shapes
             return ShapeHelper.GetFluidInfo(Vertexes, callback, line);
         }
 
-        DragInfo IExplosionAffectable.GetExplosionInfo(Matrix2x3 matrix, float radius, GetTangentCallback callback)
+        DragInfo IExplosionAffectable.GetExplosionInfo(Matrix2x3 matrix, Scalar radius, GetTangentCallback callback)
         {
             Vector2D[] vertexes2 = new Vector2D[Vertexes.Length];
             for (int index = 0; index < vertexes2.Length; ++index)

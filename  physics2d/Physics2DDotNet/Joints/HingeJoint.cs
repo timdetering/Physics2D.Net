@@ -77,8 +77,8 @@ namespace Physics2DDotNet.Joints
             if (body1 == body2) { throw new ArgumentException("You cannot add a joint to a body to itself"); }
             this.body1 = body1;
             this.body2 = body2;
-            body1.ApplyMatrix();
-            body2.ApplyMatrix();
+            body1.ApplyPosition();
+            body2.ApplyPosition();
 
             Vector2D.Transform(ref body1.Matrices.ToBody, ref anchor, out  this.localAnchor1);
             Vector2D.Transform(ref body2.Matrices.ToBody, ref anchor, out  this.localAnchor2);
