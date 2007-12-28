@@ -1298,7 +1298,7 @@ namespace Physics2DDemo
         MemoryStream savedEngine = new MemoryStream();
 
 
-        void Demo1()
+       /* void Demo1()
         {
             BeginDemoChange();
             Reset();
@@ -1320,8 +1320,8 @@ namespace Physics2DDemo
 
 
             EndDemoChange();
-        }
-        void Demo123()
+        }*/
+        void Demo1()
         {
             BeginDemoChange();
             Reset();
