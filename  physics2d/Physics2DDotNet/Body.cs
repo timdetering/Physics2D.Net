@@ -493,9 +493,7 @@ namespace Physics2DDotNet
             }
         }
         /// <summary>
-        /// Gets and Sets the Matrix3x2 that transforms the Shape belonging to the Body.
-        /// TODO: make it so this wont break Circle.CalcBoundingRectangle() ;
-        /// TODO: make sure this is right in terms of the normal matrix. because I just did stuff till it seamed to work.
+        /// Gets and Sets the Matrix2x3 that transforms the Shape belonging to the Body.
         /// </summary>
         public Matrix2x3 Transformation
         {

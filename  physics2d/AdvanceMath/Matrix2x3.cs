@@ -225,7 +225,7 @@ namespace AdvanceMath
         }
 
         /// <summary>
-        /// Used to multiply a Matrix3x2 object by a scalar value..
+        /// Used to multiply a Matrix2x3 object by a scalar value..
         /// </summary>
         /// <param name="left"></param>
         /// <param name="scalar"></param>
@@ -259,7 +259,7 @@ namespace AdvanceMath
         }
 
         /// <summary>
-        /// Used to multiply (concatenate) a Matrix3x2 and a Matrix2x2.
+        /// Used to multiply (concatenate) a Matrix2x3 and a Matrix2x2.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -298,7 +298,7 @@ namespace AdvanceMath
         }
 
         /// <summary>
-        /// Used to multiply (concatenate) a Matrix3x2 and a Matrix2x2.
+        /// Used to multiply (concatenate) a Matrix2x3 and a Matrix2x2.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -505,7 +505,7 @@ namespace AdvanceMath
         }
 
         /// <summary>
-        /// Negates a Matrix3x2.
+        /// Negates a Matrix2x3.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -592,13 +592,13 @@ namespace AdvanceMath
                 source.m01 * (source.m10);
         }
 
-        /*  public static Matrix3x2 Transpose(Matrix3x2 source)
+        /*  public static Matrix2x3 Transpose(Matrix2x3 source)
          {
-             Matrix3x2 result;
+             Matrix2x3 result;
              Transpose(ref source, out result);
              return result;
          }
-        public static void Transpose(ref Matrix3x2 source, out Matrix3x2 result)
+        public static void Transpose(ref Matrix2x3 source, out Matrix2x3 result)
          {
              Scalar m01 = source.m01;
              Scalar m02 = source.m02;
@@ -692,9 +692,9 @@ namespace AdvanceMath
             Copy(array, 0, out result);
             return result;
         }
-       /* public static Matrix3x2 FromTransposedArray(Scalar[] array)
+       /* public static Matrix2x3 FromTransposedArray(Scalar[] array)
         {
-            Matrix3x2 result;
+            Matrix2x3 result;
             CopyTranspose(array, 0, out result);
             return result;
         }*/
@@ -883,7 +883,7 @@ namespace AdvanceMath
         #endregion
         #region Properties
         [AdvBrowsable]
-        [System.ComponentModel.Description("The First row of the Matrix3x2")]
+        [System.ComponentModel.Description("The First row of the Matrix2x3")]
         public Vector3D Rx
         {
             get
@@ -902,7 +902,7 @@ namespace AdvanceMath
             }
         }
         [AdvBrowsable]
-        [System.ComponentModel.Description("The Second row of the Matrix3x2")]
+        [System.ComponentModel.Description("The Second row of the Matrix2x3")]
         public Vector3D Ry
         {
             get
@@ -978,7 +978,7 @@ namespace AdvanceMath
             get
             {
                 throw new NotSupportedException();
-              /*  Matrix3x2 result;
+              /*  Matrix2x3 result;
                 Transpose(ref this, out result);
                 return result;*/
             }
@@ -1248,7 +1248,7 @@ namespace AdvanceMath
             return result;
         }
         /// <summary>
-        /// Multiply (concatenate) a Matrix3x2 and a Matrix2x2
+        /// Multiply (concatenate) a Matrix2x3 and a Matrix2x2
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -1269,7 +1269,7 @@ namespace AdvanceMath
             return result;
         }
         /// <summary>
-        /// Multiply (concatenate) a Matrix3x2 and a Matrix2x2
+        /// Multiply (concatenate) a Matrix2x3 and a Matrix2x2
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>

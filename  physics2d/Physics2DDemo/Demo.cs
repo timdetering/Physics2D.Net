@@ -1337,7 +1337,7 @@ namespace Physics2DDemo
             for (int i = 128 * 3; i > -128; i -= 128)
             {
                 Body b = AddShape(shape, 40, new ALVector2D(1, new Vector2D(600, 272 + i)));
-                //b.Transformation *= Matrix3x2.FromScale(new Vector2D(1, .5f));
+                //b.Transformation *= Matrix2x3.FromScale(new Vector2D(1, .5f));
             }
             Body b1 = AddShape(shape, 40, new ALVector2D(1, new Vector2D(400,400)));
             Body b2 = AddShape(shape, 40, new ALVector2D(1, new Vector2D(400, 200)));

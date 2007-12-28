@@ -82,14 +82,14 @@ namespace Physics2DDotNet.Detectors
 
                 BoundingRectangle rect = body.Rectangle;
                 average += Math.Max(rect.Max.X - rect.Min.X, rect.Max.Y - rect.Min.Y);
-                int left = (int)(rect.Min.X * cellSizeInv);
-                int right = (int)(rect.Max.X * cellSizeInv);
-                int top = (int)(rect.Min.Y * cellSizeInv);
-                int bottom = (int)(rect.Max.Y * cellSizeInv);
+                int minX = (int)(rect.Min.X * cellSizeInv);
+                int maxX = (int)(rect.Max.X * cellSizeInv) + 1;
+                int minY = (int)(rect.Min.Y * cellSizeInv);
+                int maxY = (int)(rect.Max.Y * cellSizeInv) + 1;
 
-                for (int x = left; x <= right; x++)
+                for (int x = minX; x < maxX; x++)
                 {
-                    for (int y = top; y <= bottom; y++)
+                    for (int y = minY; y < maxY; y++)
                     {
                         long key = PairID.GetHash(x, y);
                         List<Body> list;
