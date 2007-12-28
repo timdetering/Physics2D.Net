@@ -34,20 +34,19 @@ using System;
 
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
 
-namespace Physics2DDotNet
+
+namespace Physics2DDotNet.Shapes
 {
     /// <summary>
     /// A Circle
     /// </summary>
     [Serializable]
-    public sealed class Circle : Shape
+    public sealed class CircleShape : Shape, IRaySegmentsCollidable, ILineFluidAffectable, IExplosionAffectable
     {
-        private static Vector2D Zero = Vector2D.Zero;
         #region fields
         private Scalar radius;
-        private Vector2D position;
+        // private Vector2D position;
         #endregion
         #region constructors
 
@@ -59,7 +58,7 @@ namespace Physics2DDotNet
         /// The number or vertex that will be generated along the perimeter of the circle. 
         /// This is for collision detection.
         /// </param>
-        public Circle(Scalar radius, int vertexCount)
+        public CircleShape(Scalar radius, int vertexCount)
             : this(radius, vertexCount, InertiaOfSolidCylinder(radius))
         { }
         /// <summary>
@@ -74,33 +73,29 @@ namespace Physics2DDotNet
         /// How hard it is to turn the shape. Depending on the construtor in the 
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
-        public Circle(Scalar radius, int vertexCount, Scalar momentOfInertiaMultiplier)
+        public CircleShape(Scalar radius, int vertexCount, Scalar momentOfInertiaMultiplier)
             : base(CreateCircle(radius, vertexCount), momentOfInertiaMultiplier)
         {
             if (radius <= 0) { throw new ArgumentOutOfRangeException("radius", "must be larger then zero"); }
             this.radius = radius;
-        }
-        private Circle(Circle copy)
-            : base(copy)
-        {
-            this.position = copy.position;
-            this.radius = copy.radius;
+            this.Normals = ShapeHelper.CalculateNormals(this.Vertexes);
         }
         #endregion
         #region properties
+        public Vector2D Centroid
+        {
+            get { return Vector2D.Zero; }
+        }
+        public Scalar Area
+        {
+            get { return radius * radius * MathHelper.Pi; }
+        }
         /// <summary>
         /// the distance from the position where the circle ends.
         /// </summary>
         public Scalar Radius
         {
             get { return radius; }
-        }
-        /// <summary>
-        /// the cenrter of the circle.
-        /// </summary>
-        public Vector2D Position
-        {
-            get { return position; }
         }
         public override bool CanGetIntersection
         {
@@ -118,82 +113,90 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-        public override bool CanGetDragInfo
-        {
-            get { return true; }
-        }
-        public override bool CanGetCentroid
-        {
-            get { return true; }
-        }
-        public override bool CanGetArea
-        {
-            get { return true; }
-        }
-        public override bool CanGetInertia
-        {
-            get { return true; }
-        }
         #endregion
         #region methods
-        protected override void CalcBoundingRectangle()
+        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
         {
-            if (Parent.IsTransformed)
-            {
-                BoundingRectangle.FromVectors(vertexes, out rect);
-            }
-            else
-            {
-                rect.Max.X = position.X + radius;
-                rect.Max.Y = position.Y + radius;
-                rect.Min.X = position.X - radius;
-                rect.Min.Y = position.Y - radius;
-            }
+            BoundingRectangle.FromCircle(ref matrices.ToWorld, ref radius, out rectangle);
         }
         public override void GetDistance(ref Vector2D point, out Scalar result)
         {
-            Vector2D temp;
-            Vector2D.Subtract(ref point, ref position, out temp);
-            Vector2D.GetMagnitude(ref temp, out result);
+            Vector2D.GetMagnitude(ref point, out result);
             result -= radius;
         }
         public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             info.Position = point;
-            Vector2D.Transform(ref this.matrix2DInv.VertexMatrix, ref point, out  point);
             Vector2D.Normalize(ref point, out info.Distance, out info.Normal);
-            Vector2D.Transform(ref this.matrix2D.NormalMatrix, ref info.Normal, out  info.Normal);
             info.Distance -= radius;
             return info.Distance <= 0;
         }
-        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }
-        public override void ApplyMatrix(ref Matrix2D matrix)
+        bool IRaySegmentsCollidable.TryGetRayCollision(Body thisBody, Body raysBody, RaySegmentsShape raySegments, out RaySegmentIntersectionInfo info)
         {
-            Vector2D.Transform(ref matrix.VertexMatrix, ref Zero, out position);
-            base.ApplyMatrix(ref matrix);
+            bool intersects = false;
+            RaySegment[] segments = raySegments.Segments;
+            Scalar[] result = new Scalar[segments.Length];
+            BoundingCircle bounding = new BoundingCircle(Vector2D.Zero, this.radius);
+            Matrix2x3 vertexM = thisBody.Matrices.ToBody * raysBody.Matrices.ToWorld;
+
+            for (int index = 0; index < segments.Length; ++index)
+            {
+                RaySegment segment = segments[index];
+                Ray ray2;
+
+                Vector2D.Transform(ref vertexM, ref segment.RayInstance.Origin, out ray2.Origin);
+                Vector2D.TransformNormal(ref vertexM, ref segment.RayInstance.Direction, out ray2.Direction);
+
+                Scalar temp;
+                bounding.Intersects(ref ray2, out temp);
+                if (temp >= 0 && temp <= segment.Length)
+                {
+                    intersects = true;
+                    result[index] = temp;
+                    continue;
+                }
+                else
+                {
+                    result[index] = -1;
+                }
+            }
+            if (intersects)
+            {
+                info = new RaySegmentIntersectionInfo(result);
+            }
+            else
+            {
+                info = null;
+            }
+            return intersects;
         }
-        public override Shape Duplicate()
-        {
-            return new Circle(this);
-        }
-        public override DragInfo GetDragInfo(Vector2D tangent)
+        DragInfo IGlobalFluidAffectable.GetFluidInfo(Vector2D tangent)
         {
             return new DragInfo(Vector2D.Zero, radius * 2);
         }
-        public override Vector2D GetCentroid()
+        FluidInfo ILineFluidAffectable.GetFluidInfo(GetTangentCallback callback, Line line)
         {
-            return Vector2D.Zero;
+            return ShapeHelper.GetFluidInfo(Vertexes,callback, line);
         }
-        public override Scalar GetArea()
+        DragInfo IExplosionAffectable.GetExplosionInfo(Matrix2x3 matrix, float radius, GetTangentCallback callback)
         {
-            return radius * radius * MathHelper.Pi;
-        }
-        public override Scalar GetInertia()
-        {
-            return .5f * (radius * radius);
+            Vector2D[] vertexes2 = new Vector2D[Vertexes.Length];
+            for (int index = 0; index < vertexes2.Length; ++index)
+            {
+                vertexes2[index] = matrix * Vertexes[index];
+            }
+            Vector2D[] inter = ShapeHelper.GetIntersection(vertexes2, radius);
+            if (inter.Length < 3) { return null; }
+            Vector2D centroid = PolygonShape.GetCentroid(inter);
+            Vector2D tangent = callback(centroid);
+            Scalar min, max;
+            ShapeHelper.GetProjectedBounds(inter, tangent, out min, out max);
+            Scalar avg = (max + min) / 2;
+            return new DragInfo(tangent * avg, max - min);
         }
         #endregion
     }

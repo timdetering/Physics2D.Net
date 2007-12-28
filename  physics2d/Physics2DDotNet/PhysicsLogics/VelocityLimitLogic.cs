@@ -31,14 +31,14 @@ using System;
 
 using AdvanceMath;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.PhysicsLogics
 {
     [Serializable]
-    public sealed class VelocityLimiter : PhysicsLogic
+    public sealed class VelocityLimitLogic : PhysicsLogic
     {
         Scalar maxLinearVelocity;
         Scalar maxAngularVelocity;
-        public VelocityLimiter(Scalar maxLinearVelocity, Scalar maxAngularVelocity, Lifespan lifetime)
+        public VelocityLimitLogic(Scalar maxLinearVelocity, Scalar maxAngularVelocity, Lifespan lifetime)
             : base(lifetime)
         {
             if (maxLinearVelocity < 0) { throw new ArgumentOutOfRangeException("maxLinearVelocity"); }

@@ -50,7 +50,7 @@ namespace Physics2DDotNet.Detectors
                     body2 = this.Bodies[index2];
                     if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
                             Body.CanCollide(body1, body2) &&
-                            body1.Shape.Rectangle.Intersects(body2.Shape.Rectangle))
+                            body1.Rectangle.Intersects(body2.Rectangle))
                     {
                         OnCollision(step, body1, body2);
                     }

@@ -43,6 +43,11 @@ namespace AdvanceMath.Geometry2D
     {
         public const int Size = Vector2D.Size * 2;
 
+        public static void Transform(ref Matrix2x3 matrix,ref BoundingRectangle rect, out BoundingRectangle result)
+        {
+            FromVectors(ref matrix, rect.Corners(), out result);
+        }
+
         /// <summary>
         /// Creates a new BoundingRectangle Instance from 2 Vector2Ds.
         /// </summary>
@@ -137,6 +142,70 @@ namespace AdvanceMath.Geometry2D
                 }
             }
         }
+        public static void FromVectors(ref Matrix3x3 matrix, Vector2D[] vectors, out BoundingRectangle result)
+        {
+            if (vectors == null) { throw new ArgumentNullException("vectors"); }
+            if (vectors.Length == 0) { throw new ArgumentOutOfRangeException("vectors"); }
+
+            Vector2D current;
+            Vector2D.Transform(ref matrix, ref vectors[0], out current);
+            result.Max = current;
+            result.Min = current;
+            for (int index = 1; index < vectors.Length; ++index)
+            {
+                Vector2D.Transform(ref matrix, ref vectors[index], out current);
+                if (current.X > result.Max.X)
+                {
+                    result.Max.X = current.X;
+                }
+                else if (current.X < result.Min.X)
+                {
+                    result.Min.X = current.X;
+                }
+                if (current.Y > result.Max.Y)
+                {
+                    result.Max.Y = current.Y;
+                }
+                else if (current.Y < result.Min.Y)
+                {
+                    result.Min.Y = current.Y;
+                }
+            }
+        }
+        public static void FromVectors(ref Matrix2x3 matrix, Vector2D[] vectors, out BoundingRectangle result)
+        {
+            if (vectors == null) { throw new ArgumentNullException("vectors"); }
+            if (vectors.Length == 0) { throw new ArgumentOutOfRangeException("vectors"); }
+
+            Vector2D current;
+            Vector2D.TransformNormal(ref matrix, ref vectors[0], out current);
+            result.Max = current;
+            result.Min = current;
+            for (int index = 1; index < vectors.Length; ++index)
+            {
+                Vector2D.TransformNormal(ref matrix, ref vectors[index], out current);
+                if (current.X > result.Max.X)
+                {
+                    result.Max.X = current.X;
+                }
+                else if (current.X < result.Min.X)
+                {
+                    result.Min.X = current.X;
+                }
+                if (current.Y > result.Max.Y)
+                {
+                    result.Max.Y = current.Y;
+                }
+                else if (current.Y < result.Min.Y)
+                {
+                    result.Min.Y = current.Y;
+                }
+            }
+            result.Max.X += matrix.m02;
+            result.Max.Y += matrix.m12;
+            result.Min.X += matrix.m02;
+            result.Min.Y += matrix.m12;
+        }
         /// <summary>
         /// Makes a BoundingRectangle that can contain the 2 BoundingRectangles passed.
         /// </summary>
@@ -188,6 +257,29 @@ namespace AdvanceMath.Geometry2D
             result.Min.Y = circle.Position.Y - circle.Radius;
         }
 
+        public static BoundingRectangle FromCircle( Matrix2x3 toWorld, Scalar radius)
+        {
+            BoundingRectangle result;
+            FromCircle(ref toWorld, ref radius, out result);
+            return result;
+        }
+        public static void FromCircle(ref Matrix2x3 toWorld, ref Scalar radius, out BoundingRectangle result)
+        {
+            Vector2D position = Vector2D.Zero;
+            Vector2D.Transform(ref toWorld, ref position, out position);
+
+            Scalar xRadius = toWorld.m01 * toWorld.m01 + toWorld.m00 * toWorld.m00;
+            xRadius = ((xRadius == 1) ? (radius) : (radius * MathHelper.Sqrt(xRadius)));
+            Scalar yRadius = toWorld.m10 * toWorld.m10 + toWorld.m11 * toWorld.m11;
+            yRadius = ((yRadius == 1) ? (radius) : (radius * MathHelper.Sqrt(yRadius)));
+
+            result.Max.X = position.X + xRadius;
+            result.Max.Y = position.Y + yRadius;
+            result.Min.X = position.X - xRadius;
+            result.Min.Y = position.Y - yRadius;
+        }
+        
+        
         [AdvBrowsable]
         public Vector2D Max;
         [AdvBrowsable]

@@ -30,7 +30,9 @@ using System.Runtime.InteropServices;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
-using Physics2DDotNet.Math2D;
+using Physics2DDotNet.Shapes;
+using Physics2DDotNet.PhysicsLogics;
+
 using SdlDotNet.Core;
 using SdlDotNet.Graphics;
 using SdlDotNet.Input;
@@ -80,16 +82,16 @@ namespace Physics2DDemo
                     bitmap[x, y] = !(pixels[x, y].A == 0 || pixels[x, y].ToArgb() == blank);
                 }
             }
-            vertexes = MultipartPolygon.CreateFromBitmap(bitmap);
+            vertexes = MultiPolygonShape.CreateFromBitmap(bitmap);
             Console.WriteLine("Before {0}", GetCount);
-            vertexes = MultipartPolygon.Reduce(vertexes, 1);
-            vertexes = MultipartPolygon.Reduce(vertexes, 2);
-            vertexes = MultipartPolygon.Reduce(vertexes, 3);
+            vertexes = MultiPolygonShape.Reduce(vertexes, 1);
+            vertexes = MultiPolygonShape.Reduce(vertexes, 2);
+            vertexes = MultiPolygonShape.Reduce(vertexes, 3);
             Console.WriteLine("After {0}", GetCount);
-            vertexes = MultipartPolygon.Subdivide(vertexes, 10);
+            vertexes = MultiPolygonShape.Subdivide(vertexes, 10);
             Console.WriteLine("Subdivide {0}", GetCount);
-            offset = MultipartPolygon.GetCentroid(vertexes);
-            vertexes = MultipartPolygon.MakeCentroidOrigin(vertexes);
+            offset = MultiPolygonShape.GetCentroid(vertexes);
+            vertexes = MultiPolygonShape.MakeCentroidOrigin(vertexes);
         }
         private int GetCount
         {
@@ -139,7 +141,7 @@ namespace Physics2DDemo
 
         public static bool DrawCollisionPoints = false;
         public static bool DrawLinesAndNormalsForSprites = false;
-        public static bool DrawBoundingBoxes = false;
+        public static bool DrawBoundingBoxes = false ;
 
         public bool collided = true;
         public bool shouldDraw = true;
@@ -154,41 +156,36 @@ namespace Physics2DDemo
             get { return removed; }
         }
 
-        Scalar[] distances;
         List<Vector2D> points;
+
+        RaySegmentsCollisionLogic logic;
+
         public OpenGlObject(Body entity)
         {
             this.points = new List<Vector2D>();
             this.entity = entity;
             this.entity.PositionChanged += entity_NewState;
             this.entity.Removed += entity_Removed;
-            Matrix3x3 mat = entity.Shape.Matrix.VertexMatrix;
-            Matrix3x3.Copy2DToOpenGlMatrix(ref mat, matrix);
-            if (entity.Shape is RaySegments)
+            Matrix2x3 mat = entity.Matrices.ToWorld;
+            Matrix2x3.Copy2DToOpenGlMatrix(ref mat, matrix);
+            if (entity.Shape is RaySegmentsShape)
             {
-                RaySegments se = (RaySegments)entity.Shape;
+                /*RaySegmentsShape se = (RaySegmentsShape)entity.Shape;
                 entity.Collided += new EventHandler<CollisionEventArgs>(entity_Collided);
                 distances = new Scalar[se.Segments.Length];
-                entity.Updated += new EventHandler<UpdatedEventArgs>(entity_Updated);
+                entity.Updated += new EventHandler<UpdatedEventArgs>(entity_Updated);*/
             }
-            else if (DrawCollisionPoints && !(entity.Shape is Particle))
+            else if (DrawCollisionPoints && !(entity.Shape is ParticleShape))
             {
                 entity.Collided += entity_Collided2;
             }
             entity.ApplyMatrix();
         }
-        bool collided2 = false;
-        void entity_Updated(object sender, UpdatedEventArgs e)
+        public OpenGlObject(Body entity, RaySegmentsCollisionLogic logic):this(entity)
         {
-            if (!collided2)
-            {
-                for (int index = 0; index < distances.Length; index++)
-                {
-                    distances[index] = -1;
-                }
-            }
-            collided2 = false;
+            this.logic = logic;
         }
+
         void entity_Collided2(object sender, CollisionEventArgs e)
         {
             lock (points)
@@ -200,18 +197,7 @@ namespace Physics2DDemo
             }
         }
 
-        void entity_Collided(object sender, CollisionEventArgs e)
-        {
-            RaySegmentIntersectionInfo info = (RaySegmentIntersectionInfo)e.CustomCollisionInfo;
-            for (int index = 0; index < distances.Length; index++)
-            {
-                if (!collided2 || distances[index] == -1 || (info.Distances[index] < distances[index] && info.Distances[index] != -1))
-                {
-                    distances[index] = info.Distances[index];
-                }
-            }
-            collided2 = true;
-        }
+
         void entity_Removed(object sender, RemovedEventArgs e)
         {
             this.entity.PositionChanged -= entity_NewState;
@@ -220,8 +206,8 @@ namespace Physics2DDemo
         }
         void entity_NewState(object sender, EventArgs e)
         {
-            Matrix3x3 mat = entity.Shape.Matrix.VertexMatrix;
-            Matrix3x3.Copy2DToOpenGlMatrix(ref mat, matrix);
+            Matrix2x3 mat = entity.Matrices.ToWorld;
+            Matrix2x3.Copy2DToOpenGlMatrix(ref mat, matrix);
         }
         public void Invalidate()
         {
@@ -272,22 +258,22 @@ namespace Physics2DDemo
                     }
                 }
             }
-            else if (entity.Shape is Physics2DDotNet.Particle)
+            else if (entity.Shape is ParticleShape)
             {
 
                 Gl.glBegin(Gl.GL_POINTS);
                 Gl.glColor3f(1, 0, 0);
                 //Gl.glColor3d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
-                foreach (Vector2D vector in entity.Shape.OriginalVertices)
+                foreach (Vector2D vector in entity.Shape.Vertexes)
                 {
                     Gl.glVertex2f((Scalar)vector.X, (Scalar)vector.Y);
                 }
                 Gl.glEnd();
             }
-            else if (entity.Shape is Physics2DDotNet.RaySegments)
+            else if (entity.Shape is RaySegmentsShape)
             {
                 Gl.glLineWidth(1);
-                RaySegments collection = (RaySegments)entity.Shape;
+                RaySegmentsShape collection = (RaySegmentsShape)entity.Shape;
                 Gl.glBegin(Gl.GL_LINES);
                 for (int index = 0; index < collection.Segments.Length; ++index)
                 {
@@ -295,13 +281,13 @@ namespace Physics2DDemo
                     RaySegment ray = collection.Segments[index];
                     Gl.glVertex2f(ray.RayInstance.Origin.X, ray.RayInstance.Origin.Y);
                     Scalar length;
-                    if (distances[index] == -1)
+                    if (logic.Collisions[index].Distance == -1)
                     {
                         length = ray.Length;
                     }
                     else
                     {
-                        length = distances[index];
+                        length = logic.Collisions[index].Distance;
                     }
                     Vector2D temp = ray.RayInstance.Origin + ray.RayInstance.Direction * length;
                     Gl.glColor3f(1, 1, 1);
@@ -314,7 +300,7 @@ namespace Physics2DDemo
                 Gl.glBegin(Gl.GL_POLYGON);
                 bool first = true;
                 bool second = true;
-                foreach (Vector2D vector in entity.Shape.OriginalVertices)
+                foreach (Vector2D vector in entity.Shape.Vertexes)
                 {
                     if (first)
                     {
@@ -338,7 +324,7 @@ namespace Physics2DDemo
             {
                 return;
             }
-            if (distances == null)
+            if (logic == null)
             {
                 if (list == -1)
                 {
@@ -353,13 +339,14 @@ namespace Physics2DDemo
             }
             else
             {
-                Gl.glLoadIdentity();
+               // Gl.glLoadIdentity();
+                Gl.glLoadMatrixf(matrix);
                 DrawInternal();
             }
             if (DrawBoundingBoxes)
             {
                 Gl.glLineWidth(1);
-                BoundingRectangle rect = entity.Shape.Rectangle;
+                BoundingRectangle rect = entity.Rectangle;
                 Gl.glLoadIdentity();
                 Gl.glColor3f(1,1,1);
                 Gl.glBegin(Gl.GL_LINES);

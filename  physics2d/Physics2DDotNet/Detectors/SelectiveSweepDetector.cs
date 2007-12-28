@@ -84,7 +84,7 @@ namespace Physics2DDotNet.Detectors
             }
             public void Update()
             {
-                BoundingRectangle rect = body.Shape.Rectangle;
+                BoundingRectangle rect = body.Rectangle;
                 //if it is a single point in space
                 //then dont even add it to the link list.
                 shouldAddNode = rect.Min.X != rect.Max.X || rect.Min.Y != rect.Max.Y;

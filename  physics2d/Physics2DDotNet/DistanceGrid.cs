@@ -32,7 +32,8 @@ using System;
 
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
+using Physics2DDotNet.Shapes;
+
 
 namespace Physics2DDotNet
 {
@@ -51,12 +52,10 @@ namespace Physics2DDotNet
             if (shape == null) { throw new ArgumentNullException("shape"); }
             if (!shape.CanGetDistance) { throw new ArgumentException("The Shape must support Get Distance", "shape"); }
             if (spacing <= 0) { throw new ArgumentOutOfRangeException("spacing"); }
-            //prepare the shape.
-            Matrix2D old = shape.Matrix;
-            Matrix2D ident = Matrix2D.Identity;
-            shape.ApplyMatrix(ref ident);
+            Matrices matrc = new Matrices();
+            shape.CalcBoundingRectangle(matrc, out this.rect);
 
-            this.rect = shape.Rectangle;
+           // this.rect = shape.Rectangle;
             this.gridSpacing = spacing;
             this.gridSpacingInv = 1 / spacing;
             int xSize = (int)Math.Ceiling((rect.Max.X - rect.Min.X) * gridSpacingInv) + 2;
@@ -78,7 +77,7 @@ namespace Physics2DDotNet
                 }
             }
             //restore the shape
-            shape.ApplyMatrix(ref old);
+           // shape.ApplyMatrix(ref old);
         }
         public bool TryGetIntersection(Vector2D point, out IntersectionInfo result)
         {

@@ -35,6 +35,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ALVector2D.cs" />
     <Compile Include="Collections\AdvReaderWriterLock.cs" />
     <Compile Include="Collections\ImplicitCastCollection.cs">
       <SubType>Code</SubType>
@@ -44,6 +45,7 @@
     <Compile Include="DataTypes\CollectionEventArgs.cs" />
     <Compile Include="DataTypes\DragInfo.cs" />
     <Compile Include="DataTypes\MassInfo.cs" />
+    <Compile Include="DataTypes\Matrices.cs" />
     <Compile Include="DataTypes\RemovedEventArgs.cs" />
     <Compile Include="DataTypes\TimeStep.cs" />
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
@@ -59,18 +61,11 @@
     <Compile Include="Joints\FixedAngleJoint.cs" />
     <Compile Include="Joints\FixedHingeJoint.cs" />
     <Compile Include="Joints\HingeJoint.cs" />
-    <Compile Include="Math2D\ALVector2D.cs" />
     <Compile Include="DataTypes\Coefficients.cs" />
     <Compile Include="DataTypes\CollisionEventArgs.cs" />
     <Compile Include="Detectors\SweepAndPruneDetector.cs" />
     <Compile Include="DistanceGrid.cs" />
-    <Compile Include="Math2D\Matrix2D.cs" />
     <Compile Include="PhysicsHelper.cs" />
-    <Compile Include="PhysicsLogic\GlobalFluidLogic.cs" />
-    <Compile Include="PhysicsLogic\GravityField.cs" />
-    <Compile Include="PhysicsLogic\GravityPointField.cs" />
-    <Compile Include="PhysicsLogic\GravityPointMass.cs" />
-    <Compile Include="PhysicsLogic\PhysicsLogic.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="DataTypes\IntersectionInfo.cs" />
     <Compile Include="Joints\Joint.cs" />
@@ -79,17 +74,24 @@
     <Compile Include="PhysicsEngine.cs" />
     <Compile Include="Body.cs" />
     <Compile Include="DataTypes\PhysicsState.cs" />
-    <Compile Include="PhysicsLogic\VelocityLimiter.cs" />
+    <Compile Include="PhysicsLogics\ExplosionLogic.cs" />
+    <Compile Include="PhysicsLogics\GlobalFluidLogic.cs" />
+    <Compile Include="PhysicsLogics\GravityField.cs" />
+    <Compile Include="PhysicsLogics\GravityPointField.cs" />
+    <Compile Include="PhysicsLogics\GravityPointMass.cs" />
+    <Compile Include="PhysicsLogics\LineFluidLogic.cs" />
+    <Compile Include="PhysicsLogics\PhysicsLogic.cs" />
+    <Compile Include="PhysicsLogics\RaySegmentsCollisionLogic.cs" />
+    <Compile Include="PhysicsLogics\VelocityLimitLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shapes\BitmapHelper.cs" />
-    <Compile Include="Shapes\Circle.cs" />
-    <Compile Include="Shapes\MultiPartPolygon.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Shapes\Particle.cs" />
-    <Compile Include="Shapes\Polygon.cs" />
-    <Compile Include="Shapes\RaySegments.cs" />
+    <Compile Include="Shapes\CircleShape.cs" />
+    <Compile Include="Shapes\MultiPolygonShape.cs" />
+    <Compile Include="Shapes\ParticleShape.cs" />
+    <Compile Include="Shapes\PolygonShape.cs" />
+    <Compile Include="Shapes\RaySegmentsShape.cs" />
     <Compile Include="Shapes\RectangleShape.cs" />
+    <Compile Include="Shapes\ShapeHelper.cs" />
     <Compile Include="Solvers\CollisionSolver.cs" />
     <Compile Include="Solvers\ISequentialImpulsesJoint.cs" />
     <Compile Include="Solvers\SequentialImpulses.cs" />

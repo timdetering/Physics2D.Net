@@ -278,7 +278,6 @@ namespace AdvanceMath.Geometry2D
         {
             Vector2D rayOriginRelativeToCircle2D;
             Vector2D.Subtract(ref ray.Origin, ref Position, out rayOriginRelativeToCircle2D);
-           // Vector2D.Subtract(ref Position, ref ray.Origin, out rayOriginRelativeToCircle2D);
             Scalar radiusSq = this.Radius * this.Radius;
             Scalar MagSq = rayOriginRelativeToCircle2D.MagnitudeSq;
 

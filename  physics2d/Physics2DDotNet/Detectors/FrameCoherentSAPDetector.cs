@@ -67,7 +67,7 @@ namespace Physics2DDotNet.Detectors
                         continue;
 
                     Body g1 = this[i].body;
-                    BoundingRectangle aabb1 = g1.Shape.Rectangle;
+                    BoundingRectangle aabb1 = g1.Rectangle;
 
                     // First transfer those under consideration to overlaps,
                     // for, they have been considered...
@@ -449,9 +449,9 @@ namespace Physics2DDotNet.Detectors
                         if (AABB.Intersect(aabb1, aabb2) == false)
                             return false;
             */
-            /* if (AABB.Intersect(g1.Shape.Rectangle, g2.Shape.Rectangle) == false)
+            /* if (AABB.Intersect(g1.Rectangle, g2.Rectangle) == false)
                  return false;*/
-            if (!g1.Shape.Rectangle.Intersects(g2.Shape.Rectangle))
+            if (!g1.Rectangle.Intersects(g2.Rectangle))
             {
                 return false;
             }
@@ -523,12 +523,12 @@ namespace Physics2DDotNet.Detectors
         /// <param name="g">The geometry to be added</param>
         void AddGeom(Body g)
         {
-            ExtentInfo xExtentInfo = new ExtentInfo(g, g.Shape.Rectangle.Min.X, g.Shape.Rectangle.Max.X);
+            ExtentInfo xExtentInfo = new ExtentInfo(g, g.Rectangle.Min.X, g.Rectangle.Max.X);
             xInfoList.Add(xExtentInfo);
             xExtentList.Add(xExtentInfo.min);
             xExtentList.Add(xExtentInfo.max);
 
-            ExtentInfo yExtentInfo = new ExtentInfo(g, g.Shape.Rectangle.Min.Y, g.Shape.Rectangle.Max.Y);
+            ExtentInfo yExtentInfo = new ExtentInfo(g, g.Rectangle.Min.Y, g.Rectangle.Max.Y);
             yInfoList.Add(yExtentInfo);
             yExtentList.Add(yExtentInfo.min);
             yExtentList.Add(yExtentInfo.max);
@@ -546,7 +546,7 @@ namespace Physics2DDotNet.Detectors
                 ExtentInfo xInfo = xInfoList[i];
                 ExtentInfo yInfo = yInfoList[i];
                 System.Diagnostics.Debug.Assert(xInfo.body == yInfo.body);
-                BoundingRectangle aabb = xInfo.body.Shape.Rectangle;
+                BoundingRectangle aabb = xInfo.body.Rectangle;
 
                 xInfo.min.value = aabb.Min.X;
                 xInfo.max.value = aabb.Max.X;

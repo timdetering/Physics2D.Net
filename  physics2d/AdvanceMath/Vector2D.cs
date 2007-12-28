@@ -332,6 +332,52 @@ namespace AdvanceMath
             result.X = (X * matrix.m00 + source.Y * matrix.m01 + matrix.m02) * inverseZ;
             result.Y = (X * matrix.m10 + source.Y * matrix.m11 + matrix.m12) * inverseZ;
         }
+        public static Vector2D TransformNormal(Matrix3x3 matrix, Vector2D source)
+        {
+            Vector2D result;
+            result.X = (source.X * matrix.m00 + source.Y * matrix.m01);
+            result.Y = (source.X * matrix.m10 + source.Y * matrix.m11);
+            return result;
+        }
+        public static void TransformNormal(ref Matrix3x3 matrix, ref Vector2D source, out Vector2D result)
+        {
+            Scalar X = source.X;
+            result.X = (X * matrix.m00 + source.Y * matrix.m01);
+            result.Y = (X * matrix.m10 + source.Y * matrix.m11);
+        }
+        /// <summary>
+        /// Uses a matrix multiplication to Transform the vector.
+        /// </summary>
+        /// <param name="matrix">The Transformation matrix</param>
+        /// <param name="source">The Vector to be transformed</param>
+        /// <returns>The transformed vector.</returns>
+        /// <remarks><seealso href="http://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations"/></remarks>
+        public static Vector2D Transform(Matrix2x3 matrix, Vector2D source)
+        {
+            Vector2D result;
+            result.X = (source.X * matrix.m00 + source.Y * matrix.m01 + matrix.m02);
+            result.Y = (source.X * matrix.m10 + source.Y * matrix.m11 + matrix.m12);
+            return result;
+        }
+        public static void Transform(ref Matrix2x3 matrix, ref Vector2D source, out Vector2D result)
+        {
+            Scalar X = source.X;
+            result.X = (X * matrix.m00 + source.Y * matrix.m01 + matrix.m02);
+            result.Y = (X * matrix.m10 + source.Y * matrix.m11 + matrix.m12);
+        }
+        public static Vector2D TransformNormal(Matrix2x3 matrix, Vector2D source)
+        {
+            Vector2D result;
+            result.X = (source.X * matrix.m00 + source.Y * matrix.m01);
+            result.Y = (source.X * matrix.m10 + source.Y * matrix.m11);
+            return result;
+        }
+        public static void TransformNormal(ref Matrix2x3 matrix, ref Vector2D source, out Vector2D result)
+        {
+            Scalar X = source.X;
+            result.X = (X * matrix.m00 + source.Y * matrix.m01);
+            result.Y = (X * matrix.m10 + source.Y * matrix.m11);
+        }
         /// <summary>
         /// Uses a matrix multiplication to Transform the vector.
         /// </summary>
@@ -982,6 +1028,13 @@ namespace AdvanceMath
         public static Scalar operator *(Vector2D left, Vector2D right)
         {
             return left.Y * right.Y + left.X * right.X;
+        }
+        public static Vector2D operator *(Matrix2x3 matrix, Vector2D source)
+        {
+            Vector2D result;
+            result.X = (source.X * matrix.m00 + source.Y * matrix.m01 + matrix.m02);
+            result.Y = (source.X * matrix.m10 + source.Y * matrix.m11 + matrix.m12);
+            return result;
         }
         public static Vector2D operator *(Matrix3x3 matrix, Vector2D source)
         {

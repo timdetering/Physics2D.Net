@@ -36,7 +36,9 @@ using System.Collections.Generic;
 
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
+using Physics2DDotNet.Shapes;
+using Physics2DDotNet.Joints;
+
 
 
 namespace Physics2DDotNet.Solvers
@@ -102,8 +104,8 @@ namespace Physics2DDotNet.Solvers
         sealed class Arbiter 
         {
             static Contact[]  Empty = new Contact[0];
-            Circle circle1;
-            Circle circle2;
+            CircleShape circle1;
+            CircleShape circle2;
            
             static Scalar ZeroClamp(Scalar value)
             {
@@ -137,8 +139,8 @@ namespace Physics2DDotNet.Solvers
                 }
                 this.tag1 = (SequentialImpulsesTag)this.body1.SolverTag;
                 this.tag2 = (SequentialImpulsesTag)this.body2.SolverTag;
-                this.circle1 = this.body1.Shape as Circle;
-                this.circle2 = this.body2.Shape as Circle;
+                this.circle1 = this.body1.Shape as CircleShape;
+                this.circle2 = this.body2.Shape as CircleShape;
                 this.friction = MathHelper.Sqrt(
                         this.body1.Coefficients.DynamicFriction *
                         this.body2.Coefficients.DynamicFriction);
@@ -155,7 +157,8 @@ namespace Physics2DDotNet.Solvers
             public void Update()
             {
                 updated = true;
-                if (circle1 != null && circle2 != null &&
+
+                if (circle1 != null && circle2 != null&&
                     !body1.IsTransformed && !body2.IsTransformed)
                 {
                     CollideCircles();
@@ -179,7 +182,42 @@ namespace Physics2DDotNet.Solvers
                 }
                 contacts.CopyTo(contactsArray, 0);
             }
+
+
             void CollideCircles()
+            {
+                Vector2D center1 = Vector2D.Zero;
+                Vector2D center2 = Vector2D.Zero;
+                Vector2D.Transform(ref  body1.Matrices.ToWorld, ref center1, out center1);
+                Vector2D.Transform(ref  body2.Matrices.ToWorld, ref center2, out center2);
+                Vector2D normal;
+                Vector2D.Subtract(ref  center2, ref center1, out normal);
+                Scalar distance;
+                Vector2D.Normalize(ref normal, out distance, out normal);
+                Scalar depth = distance - (circle1.Radius + circle2.Radius);
+                if (depth > 0)
+                {
+                    contacts.Clear();
+                }
+                else
+                {
+                    Contact contact;
+                    if (contacts.First == null)
+                    {
+                        contact = new Contact(this);
+                        contacts.AddLast(contact);
+                    }
+                    else
+                    {
+                        contact = contacts.First.Value;
+                    }
+                    contact.distance = depth;
+                    contact.normal = normal;
+                    contact.position.X = center2.X - normal.X * circle2.Radius;
+                    contact.position.Y = center2.Y - normal.Y * circle2.Radius;
+                }
+            }
+            void CollideCirclesOLD()
             {
                 Contact contact;
                 if (contacts.First == null)
@@ -195,8 +233,13 @@ namespace Physics2DDotNet.Solvers
 
                 Vector2D normal,p1,p2;
                 Scalar distance,r2;
-                p1 = circle1.Position;
-                p2 = circle2.Position;
+
+                p1 = Vector2D.Zero;
+                p2 = Vector2D.Zero;
+                Vector2D.Transform(ref body1.Matrices.ToWorld, ref  p1, out p1);
+                Vector2D.Transform(ref body2.Matrices.ToWorld, ref  p2, out p2);
+                //p1 = circle1.Position;
+                //p2 = circle2.Position;
                 r2 = circle2.Radius;
                 //diff = circle2.Position - circle1.Position;
                 Vector2D.Subtract(ref  p2, ref p1, out normal);
@@ -229,51 +272,68 @@ namespace Physics2DDotNet.Solvers
                 contact.distance = info.Distance;
                 Vector2D.Negate(ref info.Normal, out contact.normal);
                 contact.position = info.Position;*/
-
- 
             }
             void Collide()
             {
-                BoundingRectangle bb1 = body1.Shape.Rectangle;
-                BoundingRectangle bb2 = body2.Shape.Rectangle;
+                BoundingRectangle bb1 = body1.Rectangle;
+                BoundingRectangle bb2 = body2.Rectangle;
                 BoundingRectangle targetArea;
                 BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
 
                 LinkedListNode<Contact> node = contacts.First;
-                if (!body2.Shape.IgnoreVertexes && body1.Shape.CanGetIntersection)
+                if (!body2.Shape.IgnoreVertexes &&
+                    body1.Shape.CanGetIntersection)
                 {
                     Collide(ref node, this.body1, this.body2, false, ref targetArea);
                 }
-                if (!body1.Shape.IgnoreVertexes && body2.Shape.CanGetIntersection)
+                if (!body1.Shape.IgnoreVertexes &&
+                    body2.Shape.CanGetIntersection)
                 {
                     Collide(ref node, this.body2, this.body1, true, ref targetArea);
                 }
             }
-            void Collide(ref LinkedListNode<Contact> node, Body b1, Body b2,bool inverse, ref BoundingRectangle targetArea)
+            void Collide(ref LinkedListNode<Contact> node, Body b1, Body b2, bool inverse, ref BoundingRectangle targetArea)
             {
-                Vector2D[] vertexes = b2.Shape.Vertices;
+                Vector2D[] vertexes = b2.Shape.Vertexes;
                 Vector2D[] normals = b2.Shape.Normals;
-                Matrix2x2 normalMatrix = b2.Shape.Matrix.NormalMatrix;
-                IntersectionInfo info;
+
+
+                Matrix2x3 b2ToWorld = b2.Matrices.ToWorld;
+                Matrix2x3 b1ToBody = b1.Matrices.ToBody;
+                Matrix2x2 b1ToWorldNormal = b1.Matrices.ToWorldNormal;
+
+                Matrix2x2 normalM;
+                Matrix2x2.Multiply(ref b1.Matrices.ToBodyNormal, ref b2.Matrices.ToWorldNormal, out normalM);
+
+                IntersectionInfo info = IntersectionInfo.Zero;
                 ContainmentType contains;
                 Contact contact;
-                Vector2D normal = Vector2D.Zero ;
+
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
-                    Vector2D vertex = vertexes[index];
-                    if (normals != null)
+                    Vector2D worldVertex;
+                    Vector2D.Transform(ref b2ToWorld, ref vertexes[index], out worldVertex);
+                    targetArea.Contains(ref worldVertex, out contains);
+                    bool isBad = (contains != ContainmentType.Contains);
+                    if (!isBad)
                     {
-                        Vector2D.Transform(ref normalMatrix,ref normals[index], out normal);
+                        Vector2D bodyVertex;
+                        Vector2D.Transform(ref b1ToBody, ref worldVertex, out bodyVertex);
+                        isBad = !b1.Shape.TryGetIntersection(bodyVertex, out info);
+                        if (!isBad && normals != null)
+                        {
+                            Vector2D normal;
+                            Vector2D.Transform(ref normalM, ref  normals[index], out normal);
+                            Scalar temp;
+                            Vector2D.Dot(ref info.Normal, ref normal, out temp);
+                            isBad = temp > 0;
+                        }
                     }
-                    targetArea.Contains(ref vertex, out contains);
-                    int Id = (inverse) ? (index) : ((-vertexes.Length + index));
 
+                    int Id = (inverse) ? (index) : ((-vertexes.Length + index));
                     while (node != null && node.Value.id < Id) { node = node.Next; }
 
-                    if (contains != ContainmentType.Contains ||
-                        !b1.Shape.TryGetIntersection(vertex, out info)||
-                       (normals != null &&
-                        info.Normal * normal > 0))
+                    if (isBad)
                     {
                         if (node != null && node.Value.id == Id)
                         {
@@ -307,13 +367,14 @@ namespace Physics2DDotNet.Solvers
                             contact.id = Id;
                             contacts.AddBefore(node, contact);
                         }
-                        contact.normal = info.Normal;
+                        Vector2D.Transform(ref b1ToWorldNormal, ref info.Normal, out contact.normal);
                         contact.distance = info.Distance;
-                        contact.position = vertex;
+                        contact.position = worldVertex;
                         if (inverse)
                         {
                             Vector2D.Negate(ref contact.normal, out contact.normal);
                         }
+                        Vector2D.Normalize(ref contact.normal, out contact.normal);
                     }
                 }
             }

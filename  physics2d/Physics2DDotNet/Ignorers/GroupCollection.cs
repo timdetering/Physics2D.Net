@@ -31,7 +31,7 @@ using Scalar = System.Single;
 using System;
 using System.Collections.Generic;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Ignorers
 {
     /// <summary>
     /// A collection that stores ints that represent groups

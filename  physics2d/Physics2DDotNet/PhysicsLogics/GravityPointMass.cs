@@ -31,7 +31,7 @@ using System;
 
 using AdvanceMath;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.PhysicsLogics
 {
     /// <summary>
     /// A PhysicsLogic to causes a Body to have a realistic pull of Gravity with a exponential drop-off. 

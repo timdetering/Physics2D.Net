@@ -640,6 +640,130 @@ namespace AdvanceMath
             result.m33 = right.m33;
         }
 
+        public static Matrix4x4 Multiply(Matrix4x4 left, Matrix2x3 right)
+        {
+            Matrix4x4 result;
+
+            result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
+            result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
+            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02;
+            result.m03 = left.m03;
+
+            result.m10 = left.m10 * right.m00 + left.m11 * right.m10;
+            result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
+            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12;
+            result.m13 = left.m13;
+
+            result.m20 = left.m20 * right.m00 + left.m21 * right.m10;
+            result.m21 = left.m20 * right.m01 + left.m21 * right.m11;
+            result.m22 = left.m20 * right.m02 + left.m21 * right.m12 + left.m22;
+            result.m23 = left.m23;
+
+            result.m30 = left.m30 * right.m00 + left.m31 * right.m10;
+            result.m31 = left.m30 * right.m01 + left.m31 * right.m11;
+            result.m32 = left.m30 * right.m02 + left.m31 * right.m12 + left.m32;
+            result.m33 = left.m33;
+
+            return result;
+        }
+        public static void Multiply(ref Matrix4x4 left, ref Matrix2x3 right, out Matrix4x4 result)
+        {
+            Scalar m00 = left.m00 * right.m00 + left.m01 * right.m10;
+            Scalar m01 = left.m00 * right.m01 + left.m01 * right.m11;
+            Scalar m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02;
+
+            Scalar m10 = left.m10 * right.m00 + left.m11 * right.m10;
+            Scalar m11 = left.m10 * right.m01 + left.m11 * right.m11;
+            Scalar m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12;
+
+            Scalar m20 = left.m20 * right.m00 + left.m21 * right.m10;
+            Scalar m21 = left.m20 * right.m01 + left.m21 * right.m11;
+            Scalar m22 = left.m20 * right.m02 + left.m21 * right.m12 + left.m22;
+
+            Scalar m30 = left.m30 * right.m00 + left.m31 * right.m10;
+            Scalar m31 = left.m30 * right.m01 + left.m31 * right.m11;
+            Scalar m32 = left.m30 * right.m02 + left.m31 * right.m12 + left.m32;
+
+
+            result.m00 = m00;
+            result.m01 = m01;
+            result.m02 = m02;
+            result.m03 = left.m03;
+
+            result.m10 = m10;
+            result.m11 = m11;
+            result.m12 = m12;
+            result.m13 = left.m13;
+
+            result.m20 = m20;
+            result.m21 = m21;
+            result.m22 = m22;
+            result.m23 = left.m23;
+
+            result.m30 = m30;
+            result.m31 = m31;
+            result.m32 = m32;
+            result.m33 = left.m33;
+        }
+
+        public static Matrix4x4 Multiply(Matrix2x3 left, Matrix4x4 right)
+        {
+            Matrix4x4 result;
+
+            result.m00 = left.m00 * right.m00 + left.m01 * right.m10 + left.m02 * right.m20;
+            result.m01 = left.m00 * right.m01 + left.m01 * right.m11 + left.m02 * right.m21;
+            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 * right.m22;
+            result.m03 = left.m00 * right.m03 + left.m01 * right.m13 + left.m02 * right.m23;
+
+            result.m10 = left.m10 * right.m00 + left.m11 * right.m10 + left.m12 * right.m20;
+            result.m11 = left.m10 * right.m01 + left.m11 * right.m11 + left.m12 * right.m21;
+            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12 * right.m22;
+            result.m13 = left.m10 * right.m03 + left.m11 * right.m13 + left.m12 * right.m23;
+
+            result.m20 =  right.m20;
+            result.m21 =  right.m21;
+            result.m22 =  right.m22;
+            result.m23 =  right.m23;
+
+            result.m30 = right.m30;
+            result.m31 = right.m31;
+            result.m32 = right.m32;
+            result.m33 = right.m33;
+
+            return result;
+        }
+        public static void Multiply(ref Matrix2x3 left, ref Matrix4x4 right, out Matrix4x4 result)
+        {
+            Scalar m00 = left.m00 * right.m00 + left.m01 * right.m10 + left.m02 * right.m20;
+            Scalar m01 = left.m00 * right.m01 + left.m01 * right.m11 + left.m02 * right.m21;
+            Scalar m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 * right.m22;
+            Scalar m03 = left.m00 * right.m03 + left.m01 * right.m13 + left.m02 * right.m23;
+
+            Scalar m10 = left.m10 * right.m00 + left.m11 * right.m10 + left.m12 * right.m20;
+            Scalar m11 = left.m10 * right.m01 + left.m11 * right.m11 + left.m12 * right.m21;
+            Scalar m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12 * right.m22;
+            Scalar m13 = left.m10 * right.m03 + left.m11 * right.m13 + left.m12 * right.m23;
+
+            result.m00 = m00;
+            result.m01 = m01;
+            result.m02 = m02;
+            result.m03 = m03;
+
+            result.m10 = m10;
+            result.m11 = m11;
+            result.m12 = m12;
+            result.m13 = m13;
+
+            result.m20 = right.m20;
+            result.m21 = right.m21;
+            result.m22 = right.m22;
+            result.m23 = right.m23;
+
+            result.m30 = right.m30;
+            result.m31 = right.m31;
+            result.m32 = right.m32;
+            result.m33 = right.m33;
+        }
 
         public static Matrix4x4 Multiply(Matrix4x4 left, Matrix2x2 right)
         {
@@ -874,6 +998,63 @@ namespace AdvanceMath
             result.m33 = left.m33 + 1;
         }
 
+        public static Matrix4x4 Add(Matrix2x3 left, Matrix4x4 right)
+        {
+            Matrix4x4 result;
+            Add(ref left, ref right, out result);
+            return result;
+        }
+        public static void Add(ref Matrix2x3 left, ref Matrix4x4 right, out Matrix4x4 result)
+        {
+            result.m00 = left.m00 + right.m00;
+            result.m01 = left.m01 + right.m01;
+            result.m02 = left.m02 + right.m02;
+            result.m03 = right.m03;
+
+            result.m10 = left.m10 + right.m10;
+            result.m11 = left.m11 + right.m11;
+            result.m12 = left.m12 + right.m12;
+            result.m13 = right.m13;
+
+            result.m20 = right.m20;
+            result.m21 = right.m21;
+            result.m22 = 1 + right.m22;
+            result.m23 = right.m23;
+
+            result.m30 = right.m30;
+            result.m31 = right.m31;
+            result.m32 = right.m32;
+            result.m33 = 1 + right.m33;
+        }
+        public static Matrix4x4 Add(Matrix4x4 left, Matrix2x3 right)
+        {
+            Matrix4x4 result;
+            Add(ref left, ref right, out result);
+            return result;
+        }
+        public static void Add(ref Matrix4x4 left, ref Matrix2x3 right, out Matrix4x4 result)
+        {
+            result.m00 = left.m00 + right.m00;
+            result.m01 = left.m01 + right.m01;
+            result.m02 = left.m02 + right.m02;
+            result.m03 = left.m03;
+
+            result.m10 = left.m10 + right.m10;
+            result.m11 = left.m11 + right.m11;
+            result.m12 = left.m12 + right.m12;
+            result.m13 = left.m13;
+
+            result.m20 = left.m20;
+            result.m21 = left.m21;
+            result.m22 = left.m22 + 1;
+            result.m23 = left.m23;
+
+            result.m30 = left.m30;
+            result.m31 = left.m31;
+            result.m32 = left.m32;
+            result.m33 = left.m33 + 1;
+        }
+
         public static Matrix4x4 Add(Matrix2x2 left, Matrix4x4 right)
         {
             Matrix4x4 result;
@@ -1030,6 +1211,63 @@ namespace AdvanceMath
             result.m20 = left.m20 - right.m20;
             result.m21 = left.m21 - right.m21;
             result.m22 = left.m22 - right.m22;
+            result.m23 = left.m23;
+
+            result.m30 = left.m30;
+            result.m31 = left.m31;
+            result.m32 = left.m32;
+            result.m33 = left.m33 - 1;
+        }
+
+        public static Matrix4x4 Subtract(Matrix2x3 left, Matrix4x4 right)
+        {
+            Matrix4x4 result;
+            Subtract(ref left, ref right, out result);
+            return result;
+        }
+        public static void Subtract(ref Matrix2x3 left, ref Matrix4x4 right, out Matrix4x4 result)
+        {
+            result.m00 = left.m00 - right.m00;
+            result.m01 = left.m01 - right.m01;
+            result.m02 = left.m02 - right.m02;
+            result.m03 = -right.m03;
+
+            result.m10 = left.m10 - right.m10;
+            result.m11 = left.m11 - right.m11;
+            result.m12 = left.m12 - right.m12;
+            result.m13 = -right.m13;
+
+            result.m20 = -right.m20;
+            result.m21 = -right.m21;
+            result.m22 = 1 - right.m22;
+            result.m23 = -right.m23;
+
+            result.m30 = -right.m30;
+            result.m31 = -right.m31;
+            result.m32 = -right.m32;
+            result.m33 = 1 - right.m33;
+        }
+        public static Matrix4x4 Subtract(Matrix4x4 left, Matrix2x3 right)
+        {
+            Matrix4x4 result;
+            Subtract(ref left, ref right, out result);
+            return result;
+        }
+        public static void Subtract(ref Matrix4x4 left, ref Matrix2x3 right, out Matrix4x4 result)
+        {
+            result.m00 = left.m00 - right.m00;
+            result.m01 = left.m01 - right.m01;
+            result.m02 = left.m02 - right.m02;
+            result.m03 = left.m03;
+
+            result.m10 = left.m10 - right.m10;
+            result.m11 = left.m11 - right.m11;
+            result.m12 = left.m12 - right.m12;
+            result.m13 = left.m13;
+
+            result.m20 = left.m20;
+            result.m21 = left.m21;
+            result.m22 = left.m22 - 1;
             result.m23 = left.m23;
 
             result.m30 = left.m30;
@@ -2064,6 +2302,60 @@ namespace AdvanceMath
             return result;
         }
 
+        public static Matrix4x4 operator *(Matrix4x4 left, Matrix2x3 right)
+        {
+            Matrix4x4 result;
+
+            result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
+            result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
+            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02;
+            result.m03 = left.m03;
+
+            result.m10 = left.m10 * right.m00 + left.m11 * right.m10;
+            result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
+            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12;
+            result.m13 = left.m13;
+
+            result.m20 = left.m20 * right.m00 + left.m21 * right.m10;
+            result.m21 = left.m20 * right.m01 + left.m21 * right.m11;
+            result.m22 = left.m20 * right.m02 + left.m21 * right.m12 + left.m22;
+            result.m23 = left.m23;
+
+            result.m30 = left.m30 * right.m00 + left.m31 * right.m10;
+            result.m31 = left.m30 * right.m01 + left.m31 * right.m11;
+            result.m32 = left.m30 * right.m02 + left.m31 * right.m12 + left.m32;
+            result.m33 = left.m33;
+
+            return result;
+        }
+
+        public static Matrix4x4 operator *(Matrix2x3 left, Matrix4x4 right)
+        {
+            Matrix4x4 result;
+
+            result.m00 = left.m00 * right.m00 + left.m01 * right.m10 + left.m02 * right.m20;
+            result.m01 = left.m00 * right.m01 + left.m01 * right.m11 + left.m02 * right.m21;
+            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 * right.m22;
+            result.m03 = left.m00 * right.m03 + left.m01 * right.m13 + left.m02 * right.m23;
+
+            result.m10 = left.m10 * right.m00 + left.m11 * right.m10 + left.m12 * right.m20;
+            result.m11 = left.m10 * right.m01 + left.m11 * right.m11 + left.m12 * right.m21;
+            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12 * right.m22;
+            result.m13 = left.m10 * right.m03 + left.m11 * right.m13 + left.m12 * right.m23;
+
+            result.m20 = right.m20;
+            result.m21 = right.m21;
+            result.m22 = right.m22;
+            result.m23 = right.m23;
+
+            result.m30 = right.m30;
+            result.m31 = right.m31;
+            result.m32 = right.m32;
+            result.m33 = right.m33;
+
+            return result;
+        }
+
         public static Matrix4x4 operator *(Matrix4x4 left, Matrix2x2 right)
         {
             Matrix4x4 result;
@@ -2156,6 +2448,18 @@ namespace AdvanceMath
             Add(ref left, ref right, out result);
             return result;
         }
+        public static Matrix4x4 operator +(Matrix2x3 left, Matrix4x4 right)
+        {
+            Matrix4x4 result;
+            Add(ref left, ref right, out result);
+            return result;
+        }
+        public static Matrix4x4 operator +(Matrix4x4 left, Matrix2x3 right)
+        {
+            Matrix4x4 result;
+            Add(ref left, ref right, out result);
+            return result;
+        }
         public static Matrix4x4 operator +(Matrix2x2 left, Matrix4x4 right)
         {
             Matrix4x4 result;
@@ -2202,6 +2506,18 @@ namespace AdvanceMath
             return result;
         }
         public static Matrix4x4 operator -(Matrix4x4 left, Matrix3x3 right)
+        {
+            Matrix4x4 result;
+            Subtract(ref left, ref right, out result);
+            return result;
+        }
+        public static Matrix4x4 operator -(Matrix2x3 left, Matrix4x4 right)
+        {
+            Matrix4x4 result;
+            Subtract(ref left, ref right, out result);
+            return result;
+        }
+        public static Matrix4x4 operator -(Matrix4x4 left, Matrix2x3 right)
         {
             Matrix4x4 result;
             Subtract(ref left, ref right, out result);

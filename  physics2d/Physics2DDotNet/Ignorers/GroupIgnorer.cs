@@ -30,7 +30,7 @@ using Scalar = System.Single;
 #endif
 using System;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Ignorers
 {
 
 

@@ -31,8 +31,9 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.PhysicsLogics
 {
     /// <summary>
     /// A physics logic is a way for the engine to effect object within the Update call.
@@ -41,6 +42,10 @@ namespace Physics2DDotNet
     [Serializable]
     public abstract class PhysicsLogic : IPhysicsEntity
     {
+        #region static
+        private static ReadOnlyCollection<Body> none = new ReadOnlyCollection<Body>(new Body[0]);
+        #endregion
+        #region events
         /// <summary>
         /// Raised when the Lifetime property has been Changed.
         /// </summary>
@@ -56,25 +61,41 @@ namespace Physics2DDotNet
         /// <summary>
         /// Raised when the object is Removed from a Physics Engine. 
         /// </summary>
-        public event EventHandler<RemovedEventArgs> Removed;
-        int order;
-        Lifespan lifetime;
-        PhysicsEngine engine;
-        object tag;
-        bool isPending;
-        internal bool isChecked;
+        public event EventHandler<RemovedEventArgs> Removed; 
+        #endregion
+        #region fields
+        private int order;
+        private Lifespan lifetime;
+        private PhysicsEngine engine;
+        private object tag;
+        private bool isAdded;
+        internal bool isChecked; 
+        #endregion
+        #region constructors
         protected PhysicsLogic(Lifespan lifetime)
         {
             if (lifetime == null) { throw new ArgumentNullException("lifetime"); }
             this.lifetime = lifetime;
         }
-
+        #endregion
+        #region properties
+        public virtual ReadOnlyCollection<Body> LogicBodies
+        {
+            get { return none; }
+        }
         /// <summary>
         /// Gets if it has been added the the Engine's PendingQueue, but not yet added to the engine.
         /// </summary>
         public bool IsPending
         {
-            get { return isPending; }
+            get { return engine != null && !isAdded; }
+        }
+        /// <summary>
+        /// Gets if the object has been added to the engine.
+        /// </summary>
+        public bool IsAdded
+        {
+            get { return isAdded; }
         }
         /// <summary>
         /// Gets The PhysicsEngine the object is currently in. Null if it is in none.
@@ -110,16 +131,7 @@ namespace Physics2DDotNet
                 }
             }
         }
-        /// <summary>
-        /// Gets if the object has been added to the engine.
-        /// </summary>
-        public bool IsAdded
-        {
-            get
-            {
-                return engine != null && !isPending;
-            }
-        }
+
         protected List<Body> Bodies
         {
             get
@@ -146,7 +158,9 @@ namespace Physics2DDotNet
                     }
                 }
             }
-        }
+        } 
+        #endregion
+        #region methods
 
         protected internal abstract void RunLogic(TimeStep step);
 
@@ -159,7 +173,6 @@ namespace Physics2DDotNet
         internal void OnPendingInternal(PhysicsEngine engine)
         {
             this.isChecked = true;
-            this.isPending = true;
             this.engine = engine;
             OnPending();
             if (Pending != null) { Pending(this, EventArgs.Empty); }
@@ -168,7 +181,7 @@ namespace Physics2DDotNet
 
         internal void OnAddedInternal()
         {
-            this.isPending = false;
+            this.isAdded = true;
             AddBodyRange(engine.bodies);
             OnAdded();
             if (Added != null) { Added(this, EventArgs.Empty); }
@@ -176,9 +189,9 @@ namespace Physics2DDotNet
         internal void OnRemovedInternal()
         {
             Clear();
-            bool wasPending = this.isPending;
+            bool wasPending = this.IsPending;
             PhysicsEngine engine = this.engine;
-            this.isPending = false;
+            this.isAdded = false;
             this.engine = null;
             OnRemoved(engine, wasPending);
             if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }
@@ -193,6 +206,7 @@ namespace Physics2DDotNet
 
         protected internal virtual void AddBodyRange(List<Body> collection) { }
         protected internal virtual void RemoveExpiredBodies() { }
-        protected internal virtual void Clear() { }
+        protected internal virtual void Clear() { } 
+        #endregion
     }
 }

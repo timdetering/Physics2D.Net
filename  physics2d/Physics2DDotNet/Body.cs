@@ -33,7 +33,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
+using AdvanceMath.Geometry2D;
+using Physics2DDotNet.Shapes;
+using Physics2DDotNet.Ignorers;
+
 
 namespace Physics2DDotNet
 {
@@ -92,6 +95,7 @@ namespace Physics2DDotNet
             body1.proxies.AddLast(proxy2.node);
             body2.proxies.AddLast(proxy1.node);
         }
+
         #endregion
         #region events
         /// <summary>
@@ -129,36 +133,34 @@ namespace Physics2DDotNet
         public event EventHandler<CollisionEventArgs> Collided;
         #endregion
         #region fields
-        ALVector2D lastPosition;
-        PhysicsEngine engine;
-        Shape shape;
-        PhysicsState state;
-        MassInfo massInfo;
-        Coefficients coefficients;
-        Lifespan lifetime;
-        Ignorer eventIgnorer;
-        Ignorer collisionIgnorer;
-        int id = -1;
+        internal LinkedList<BodyProxy> proxies;
+        private PhysicsEngine engine;
+        private Shape shape;
+        private PhysicsState state;
+        private Matrices matrices;
+        private MassInfo massInfo;
+        private Coefficients coefficients;
+        private Matrix2x3 transformation;
+        private BoundingRectangle rectangle;
+        private Lifespan lifetime;
+        private Ignorer eventIgnorer;
+        private Ignorer collisionIgnorer;
+        private ALVector2D lastPosition;
+        private int id = -1;
         internal int jointCount;
         internal bool isChecked;
-        bool ignoresGravity;
-        bool ignoresCollisionResponce;
-        bool isPending;
-        bool isCollidable;
-        bool isTransformed;
+        private bool ignoresGravity;
+        private bool ignoresCollisionResponce;
+        private bool isAdded;
+       // private bool isPending;
+        private bool isCollidable;
+        private bool isTransformed;
 
-        Scalar linearDamping;
-        Scalar angularDamping;
-
-
-
-        internal LinkedList<BodyProxy> proxies;
-
-
-        object tag;
-        object solverTag;
-        object detectorTag;
-        private Matrix2D transformation;
+        private Scalar linearDamping;
+        private Scalar angularDamping;
+        private object tag;
+        private object solverTag;
+        private object detectorTag;
         #endregion
         #region constructors
         /// <summary>
@@ -198,8 +200,9 @@ namespace Physics2DDotNet
             if (shape == null) { throw new ArgumentNullException("shape"); }
             if (massInfo == null) { throw new ArgumentNullException("massInfo"); }
             if (coefficients == null) { throw new ArgumentNullException("coefficients"); }
-            if (lifetime == null) { throw new ArgumentNullException("lifetime"); } 
-            this.transformation = Matrix2D.Identity;
+            if (lifetime == null) { throw new ArgumentNullException("lifetime"); }
+            this.matrices = new Matrices();
+            this.transformation = Matrix2x3.Identity;
             this.proxies = new LinkedList<BodyProxy>();
             this.state = new PhysicsState(state);
             this.Shape = shape;
@@ -209,48 +212,49 @@ namespace Physics2DDotNet
             this.isCollidable = true;
             this.linearDamping = 1;
             this.angularDamping = 1;
-            Matrix2D matrix = shape.Matrix;
-            ALVector2D.Transform(ref matrix, ref lastPosition, out this.lastPosition);
+            this.ApplyMatrix();
         }
 
         private Body(Body copy)
         {
-            this.ignoresGravity = copy.ignoresGravity;
+            this.proxies = new LinkedList<BodyProxy>();
             this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
-
-
-
-            this.state = new PhysicsState(copy.state);
-            this.shape = copy.shape.Duplicate(); ;
+            this.shape = copy.shape;
             this.massInfo = copy.massInfo;
             this.coefficients = copy.coefficients;
+            this.collisionIgnorer = copy.collisionIgnorer;
+            this.matrices = copy.matrices.Duplicate();
+            this.state = copy.state.Duplicate();
             this.lifetime = copy.lifetime.Duplicate();
-            if (copy.collisionIgnorer is ICloneable)
-            {
-                this.collisionIgnorer = (Ignorer)((ICloneable)copy.collisionIgnorer).Clone();
-            }
-            else
-            {
-                this.collisionIgnorer = copy.collisionIgnorer;
-            }
-            if (copy.tag is ICloneable)
-            {
-                this.tag = ((ICloneable)copy.tag).Clone();
-            }
-            else
-            {
-                this.tag = copy.tag;
-            }
-            this.isCollidable = copy.isCollidable;
-            this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
-            this.ignoresGravity = copy.ignoresGravity;
 
             this.transformation = copy.transformation;
+            this.linearDamping = copy.linearDamping;
+            this.angularDamping = copy.angularDamping;
+
+            this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
+            this.ignoresGravity = copy.ignoresGravity;
+            this.isCollidable = copy.isCollidable;
+            this.ignoresGravity = copy.ignoresGravity;
             this.isTransformed = copy.isTransformed;
-            this.proxies = new LinkedList<BodyProxy>();
+
+            this.tag = (copy.tag is ICloneable) ? (((ICloneable)copy.tag).Clone()) : (copy.tag);
         }
         #endregion
         #region properties
+        /// <summary>
+        /// This is the Baunding rectangle It is calculated on the call to apply matrix.
+        /// </summary>
+        public BoundingRectangle Rectangle
+        {
+            get { return rectangle; }
+        }
+        /// <summary>
+        /// The Matrices that are tranfroming this bodies Shape.
+        /// </summary>
+        public Matrices Matrices
+        {
+            get { return matrices; }
+        }
 
         /// <summary>
         /// Gets and Sets The value represents how much Linear velocity is kept each time step. 
@@ -296,15 +300,11 @@ namespace Physics2DDotNet
                 }
             }
         }
+        /// <summary>
+        /// The number of proxies that this body has.
+        /// </summary>
         public int ProxiesCount { get { return proxies.Count; } }
 
-        /// <summary>
-        /// Gets if it has been added the the Engine's PendingQueue, but not yet added to the engine.
-        /// </summary>
-        public bool IsPending
-        {
-            get { return isPending; }
-        }
         /// <summary>
         /// Unique ID of a PhysicsEntity in the PhysicsEngine
         /// Assigned on being Added.
@@ -339,14 +339,7 @@ namespace Physics2DDotNet
                 if (value == null) { throw new ArgumentNullException("value"); }
                 if (value != this.shape)
                 {
-                    if (this.shape != null) { this.shape.OnRemoved(); }
-                    this.shape = null;
-                    if (value.Parent != null)
-                    {
-                        value = value.Duplicate();
-                    }
                     this.shape = value;
-                    value.OnAdded(this);
                     if (ShapeChanged != null) { ShapeChanged(this, EventArgs.Empty); }
                 }
             }
@@ -460,13 +453,20 @@ namespace Physics2DDotNet
             set { ignoresCollisionResponce = value; }
         }
         /// <summary>
+        /// Gets if it has been added the the Engine's PendingQueue, but not yet added to the engine.
+        /// </summary>
+        public bool IsPending
+        {
+            get { return engine != null && !isAdded; }
+        }
+        /// <summary>
         /// Gets if the object has been added to the engine.
         /// </summary>
         public bool IsAdded
         {
             get
             {
-                return engine != null && !isPending;
+                return isAdded;
             }
         }
         /// <summary>
@@ -493,41 +493,20 @@ namespace Physics2DDotNet
             }
         }
         /// <summary>
-        /// Gets and Sets the Matrix3x3 that transforms the Shape belonging to the Body.
-        /// TODO: make it so this wont break Circle.CalcBoundingRectangle() and Line.CalcBoundingRectangle()
+        /// Gets and Sets the Matrix3x2 that transforms the Shape belonging to the Body.
+        /// TODO: make it so this wont break Circle.CalcBoundingRectangle() ;
         /// TODO: make sure this is right in terms of the normal matrix. because I just did stuff till it seamed to work.
         /// </summary>
-        public Matrix3x3 Transformation
+        public Matrix2x3 Transformation
         {
-            get { return transformation.VertexMatrix; }
+            get { return transformation; }
             set
             {
-                if (value == Matrix3x3.Identity)
-                {
-                    isTransformed = false;
-                    transformation = Matrix2D.Identity;
-                }
-                else
-                {
-                    isTransformed = true;
-                    transformation.VertexMatrix = value;
-                    Matrix3x3 temp = value;
-                    Matrix3x3.Invert(ref temp, out temp);
-                    Matrix3x3.Transpose(ref temp, out temp);
-                    Matrix3x3.Invert(ref temp, out temp);
-                    Matrix2x2.Copy(ref temp, out transformation.NormalMatrix);
-                    Scalar x = transformation.NormalMatrix.m00 + transformation.NormalMatrix.m01;
-                    Scalar y = transformation.NormalMatrix.m10 + transformation.NormalMatrix.m11;
-                    Scalar multiply = 1 / MathHelper.Sqrt(x * x + y * y);
-                    Matrix2x2.Multiply(ref transformation.NormalMatrix, ref multiply, out transformation.NormalMatrix);
-                }
+                transformation = value;
+                isTransformed = value != Matrix2x3.Identity;
             }
         }
-
-        public bool IsTransformed
-        {
-            get { return isTransformed; }
-        }
+        public bool IsTransformed{ get { return isTransformed; } }
 
         #endregion
         #region methods
@@ -594,9 +573,6 @@ namespace Physics2DDotNet
             if (massInfo.MassInv != 0)
             {
                 UpdateAcceleration(ref state.Acceleration, ref state.ForceAccumulator);
-             //   state.Acceleration.Linear.X += state.ForceAccumulator.Linear.X * massInv ;
-             //   state.Acceleration.Linear.Y += state.ForceAccumulator.Linear.Y * massInv ;
-             //   state.Acceleration.Angular += state.ForceAccumulator.Angular * massInfo.MomentOfInertiaInv ;
             }
             UpdateVelocity(ref state.Velocity, ref state.Acceleration, step.Dt);
             if (proxies.Count != 0)
@@ -621,7 +597,6 @@ namespace Physics2DDotNet
         internal void UpdateTime(TimeStep step)
         {
             lifetime.Update(step);
-            shape.UpdateTime(step);
             if (collisionIgnorer != null) { collisionIgnorer.UpdateTime(step); }
             if (Updated != null) { Updated(this, new UpdatedEventArgs(step)); }
         }
@@ -702,16 +677,16 @@ namespace Physics2DDotNet
         /// </summary>
         public void ApplyMatrix()
         {
-            Matrix2D matrix;
             MathHelper.ClampAngle(ref state.Position.Angular);
-            Matrix2D.FromALVector2D(ref state.Position, out matrix);
+            Matrix2x3 matrix;
+            ALVector2D.ToMatrix2x3(ref state.Position, out matrix);
             ApplyMatrixInternal(ref matrix);
         }
         /// <summary>
         /// Applys a Matrix to the Shape and to the State.Position AlVector2D.
         /// </summary>
         /// <param name="matrix">The matrix being applied to the Body</param>
-        public void ApplyMatrix(Matrix2D matrix)
+        public void ApplyMatrix(Matrix2x3 matrix)
         {
             ApplyMatrix(ref matrix);
         }
@@ -720,15 +695,16 @@ namespace Physics2DDotNet
         /// </summary>
         /// <param name="matrix">The matrix being applied to the Body</param>
         [CLSCompliant(false)]
-        public void ApplyMatrix(ref Matrix2D matrix)
+        public void ApplyMatrix(ref Matrix2x3 matrix)
         {
             ALVector2D.Transform(ref matrix, ref state.Position, out state.Position);
             ApplyMatrix();
         }
-        private void ApplyMatrixInternal(ref Matrix2D matrix)
+        private void ApplyMatrixInternal(ref Matrix2x3 matrix)
         {
-            Matrix2D.Multiply(ref matrix, ref transformation, out matrix);
-            shape.ApplyMatrix(ref matrix);
+            Matrix2x3.Multiply(ref matrix, ref transformation, out matrix);
+            matrices.Set(ref matrix);
+            shape.CalcBoundingRectangle(matrices, out rectangle);
             if (engine == null || !engine.inUpdate)
             {
                 OnPositionChanged();
@@ -775,22 +751,21 @@ namespace Physics2DDotNet
         internal void OnPending(PhysicsEngine engine)
         {
             this.isChecked = false;
-            this.isPending = true;
             this.engine = engine;
             if (Pending != null) { Pending(this, EventArgs.Empty); }
         }
         internal void OnAdded()
         {
-            this.isPending = false;
+            this.isAdded = true;
             if (Added != null) { Added(this, EventArgs.Empty); }
         }
         internal void OnRemoved()
         {
-            bool wasPending = this.isPending;
+            bool wasPending = this.IsPending;
             PhysicsEngine engine = this.engine;
             this.engine = null;
             this.id = -1;
-            this.isPending = false;
+            this.isAdded = false;
             this.RemoveFromProxy();
             if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }
         }

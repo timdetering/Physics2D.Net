@@ -2,6 +2,33 @@ Release Notes fo Physics2D.Net
 
 Since God Created me and Jesus Saved me All glory goes to God.
 
+NEXT:
+
+Quite a few changes to this release. And quite a few of them breaking.
+
+It is guaranteed any code that worked with this engine in the past will no longer. But don’t worry most of it can be easily fixed.
+
+These are the ones that are more likely to get you:
+
+All the shapes have been renamed. 
+A lot of classes have moved around to different namespaces.
+The Lifespan class has been completely rewritten.
+
+These are ones that might get you if you use any special features in the engine:
+
+All Matrix3x3 in the engine have been changed to the new Matrix2x3. (You can no longer do perspective transformations)
+
+Changed all Shapes to be stateless. This means all methods and properties will return data as if the shape has an identity matrix applied to it. It also means that multiple Bodies can share the exact same Shape instance.  Vertexes is now what original vertexes was. This means the Rectangle and Matrix properties have been moved to the Body. The body now has a Matrices class that hold the matrixs and instead of the confusing names of inverted and such I use the naming of ToBody(Normal)  and ToWorld(Normal).
+
+Another big change is now the Body.Transform property should work in every condition. Earlier raysegments would not work against a transformed circle or even a polygon. 
+
+I’ve added a few logics to make certain things easier. 
+The GlobalFluidLogic applies buoyancy and drag to everything in the engine. 
+The LineFluidLogic Applys drag and buoyancy to items on one side of a line. (The water line)
+The ExplosionLogic simulates a simple explosion.  
+
+Also Added Dampening to the Body.
+
 1.5.0.0
 There were quite a few things renamed because FXcop did not like them or I did not like them, the renames where mostly just changing of the case so these should be easy to fix.
 

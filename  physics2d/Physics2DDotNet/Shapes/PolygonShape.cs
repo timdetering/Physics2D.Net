@@ -34,12 +34,16 @@ using System.Collections.Generic;
 
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
 
-namespace Physics2DDotNet
+
+namespace Physics2DDotNet.Shapes
 {
+    /// <summary>
+    /// Use this to Represent a Polygon in the engine
+    /// </summary>
     [Serializable]
-    public sealed class Polygon : Shape
+    public sealed class PolygonShape : 
+        Shape, IRaySegmentsCollidable, ILineFluidAffectable , IExplosionAffectable 
     {
         #region static methods
         /// <summary>
@@ -234,7 +238,7 @@ namespace Physics2DDotNet
         /// How large a grid cell is. Usualy you will want at least 2 cells between major vertexes.
         /// The smaller this is the better precision you get, but higher cost in memory. 
         /// The larger the less precision and if it's to high collision detection may fail completely.
-        public Polygon(Vector2D[] vertexes, Scalar gridSpacing)
+        public PolygonShape(Vector2D[] vertexes, Scalar gridSpacing)
             : this(vertexes, gridSpacing, InertiaOfPolygon(vertexes)) { }
         /// <summary>
         /// Creates a new Polygon Instance.
@@ -249,21 +253,25 @@ namespace Physics2DDotNet
         /// How hard it is to turn the shape. Depending on the construtor in the 
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
-        public Polygon(Vector2D[] vertexes, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
+        public PolygonShape(Vector2D[] vertexes, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
             : base(vertexes, momentOfInertiaMultiplier)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (vertexes.Length < 3) { throw new ArgumentException("too few", "vertexes"); }
             if (gridSpacing <= 0) { throw new ArgumentOutOfRangeException("gridSpacing"); }
+            this.Normals = ShapeHelper.CalculateNormals(this.Vertexes);
             this.grid = new DistanceGrid(this, gridSpacing);
-        }
-        private Polygon(Polygon copy)
-            : base(copy)
-        {
-            this.grid = copy.grid;
         }
         #endregion
         #region properties
+        public Vector2D Centroid
+        {
+            get { return GetCentroid(Vertexes); }
+        }
+        public Scalar Area
+        {
+            get { return GetArea(Vertexes); }
+        }
         public override bool CanGetIntersection
         {
             get { return true; }
@@ -280,76 +288,114 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-        public override bool CanGetDragInfo
-        {
-            get { return true; }
-        }
-        public override bool CanGetCentroid
-        {
-            get { return true; }
-        }
-        public override bool CanGetArea
-        {
-            get { return true; }
-        }
-        public override bool CanGetInertia
-        {
-            get { return true; }
-        }
         #endregion
         #region methods
-        protected override void CalcBoundingRectangle()
+        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
         {
-            BoundingRectangle.FromVectors(vertexes, out rect);
+            BoundingRectangle.FromVectors(ref matrices.ToWorld, Vertexes, out rectangle);
         }
         public override void GetDistance(ref Vector2D point, out Scalar result)
         {
-            BoundingPolygon.GetDistance(vertexes, ref point, out result);
+            BoundingPolygon.GetDistance(Vertexes, ref point, out result);
         }
         public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
-            Vector2D local;
-            Vector2D.Transform(ref matrix2DInv.VertexMatrix, ref point, out local);
-            if (grid.TryGetIntersection(local, out info))
-            {
-                Vector2D.Transform(ref matrix2D.NormalMatrix, ref info.Normal, out info.Normal);
-                info.Position = point;
-                return true;
-            }
-            return false;
+            return grid.TryGetIntersection(point, out info);
         }
-        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }
-        public override Shape Duplicate()
-        {
-            return new Polygon(this);
-        }
 
-
-
-        public override DragInfo GetDragInfo(Vector2D tangent)
+        DragInfo IGlobalFluidAffectable.GetFluidInfo(Vector2D tangent)
         {
             Scalar min, max;
-            GetProjectedBounds(this.vertexes, 0, this.vertexes.Length, tangent, out min, out max);
-            Scalar avg;
-            Vector2D.Dot(ref tangent,ref  Parent.State.Position.Linear,out avg);
-            avg = (max + min) / 2 - avg;
+            ShapeHelper.GetProjectedBounds(this.Vertexes, tangent, out min, out max);
+            Scalar avg = (max + min) / 2;
             return new DragInfo(tangent * avg, max - min);
         }
-        public override Vector2D GetCentroid()
+
+        bool IRaySegmentsCollidable.TryGetRayCollision(Body thisBody, Body raysBody, RaySegmentsShape raySegments, out RaySegmentIntersectionInfo info)
         {
-            return GetCentroid(originalVertexes);
+            bool intersects = false;
+            Scalar temp;
+            RaySegment[] segments = raySegments.Segments;
+            Scalar[] result = new Scalar[segments.Length];
+            Matrix2x3 matrix = raysBody.Matrices.ToBody * thisBody.Matrices.ToWorld;
+            Vector2D[] polygon = new Vector2D[Vertexes.Length];
+            for (int index = 0; index < polygon.Length; ++index)
+            {
+                Vector2D.Transform(ref matrix, ref Vertexes[index], out polygon[index]);
+            }
+            BoundingRectangle rect;
+            BoundingRectangle.FromVectors(polygon, out rect);
+            BoundingPolygon poly = new BoundingPolygon(polygon);
+
+            for (int index = 0; index < segments.Length; ++index)
+            {
+                RaySegment segment = segments[index];
+
+                rect.Intersects(ref segment.RayInstance, out temp);
+                if (temp >= 0 && temp <= segment.Length)
+                {
+                    
+                    poly.Intersects(ref segment.RayInstance, out temp);
+                    if (temp < 0 || temp > segment.Length)
+                    {
+                        result[index] = -1;
+                    }
+                    else
+                    {
+                        result[index] = temp;
+                        intersects = true;
+                    }
+                }
+                else
+                {
+                    result[index] = -1;
+                }
+            }
+            if (intersects)
+            {
+                info = new RaySegmentIntersectionInfo(result);
+            }
+            else
+            {
+                info = null;
+            }
+            return intersects;
         }
-        public override Scalar GetArea()
+
+
+
+        FluidInfo ILineFluidAffectable.GetFluidInfo(GetTangentCallback callback, Line line)
         {
-            return GetArea(originalVertexes);
+            return ShapeHelper.GetFluidInfo(Vertexes, callback, line);
         }
-        public override Scalar GetInertia()
+
+        DragInfo IExplosionAffectable.GetExplosionInfo(Matrix2x3 matrix, float radius, GetTangentCallback callback)
         {
-            return Shape.InertiaOfPolygon(originalVertexes);
+            Vector2D[] vertexes2 = new Vector2D[Vertexes.Length];
+            for (int index = 0; index < vertexes2.Length; ++index)
+            {
+                vertexes2[index] = matrix * Vertexes[index];
+            }
+            Vector2D[] inter = ShapeHelper.GetIntersection(vertexes2, radius);
+            if (inter.Length < 3) { return null; }
+            Vector2D centroid = PolygonShape.GetCentroid(inter);
+            Vector2D tangent = callback(centroid);
+            Scalar min,max;
+            ShapeHelper.GetProjectedBounds(inter, tangent, out min, out max);
+            Scalar avg = (max + min) / 2;
+            return new DragInfo(tangent * avg, max - min);
         }
         #endregion
+
+
+
+
+
+
+
     }
 }

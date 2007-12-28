@@ -33,20 +33,28 @@ using Scalar = System.Single;
 using System;
 
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
 
-namespace Physics2DDotNet
+using AdvanceMath.Geometry2D;
+
+namespace Physics2DDotNet.Shapes
 {
     /// <summary>
     /// Represents a Single point.
     /// </summary>
     [Serializable]
-    public sealed class Particle : Shape
+    public sealed class ParticleShape : Shape
     {
+        #region static
+        /// <summary>
+        /// All particles are the same! so use this one!
+        /// </summary>
+        public static readonly ParticleShape Default = new ParticleShape();
+        #endregion
+        #region constructors
         /// <summary>
         /// Creates a new Particle Instance.
         /// </summary>
-        public Particle()
+        public ParticleShape()
             : this(1)
         { }
         /// <summary>
@@ -56,12 +64,12 @@ namespace Physics2DDotNet
         /// How hard it is to turn the shape. Depending on the construtor in the 
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
-        public Particle(Scalar momentOfInertiaMultiplier)
+        public ParticleShape(Scalar momentOfInertiaMultiplier)
             : base(new Vector2D[] { Vector2D.Zero }, momentOfInertiaMultiplier)
         { }
-        private Particle(Particle copy)
-            : base(copy) { }
-        public Vector2D Location { get { return vertexes[0]; } }
+        #endregion
+        #region Properties
+
         public override bool CanGetIntersection
         {
             get { return false; }
@@ -78,60 +86,25 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-        public override bool CanGetDragInfo
+        #endregion
+        #region Methods
+        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
         {
-            get { return false; }
-        }
-        public override bool CanGetCentroid
-        {
-            get { return true; }
-        }
-        public override bool CanGetArea
-        {
-            get { return true; }
-        }
-        public override bool CanGetInertia
-        {
-            get { return false; }
-        }
-
-        protected override void CalcBoundingRectangle()
-        {
-            rect.Max = vertexes[0];
-            rect.Min = vertexes[0];
+            Vector2D.Transform(ref matrices.ToWorld, ref Zero, out rectangle.Max);
+            rectangle.Min = rectangle.Max;
         }
         public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             throw new NotSupportedException();
         }
-        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }
         public override void GetDistance(ref Vector2D point, out Scalar result)
         {
-            Vector2D.Distance(ref point, ref vertexes[0], out result);
+            Vector2D.Distance(ref point, ref Zero, out result);
         }
-        public override Shape Duplicate()
-        {
-            return new Particle(this);
-        }
-
-        public override DragInfo GetDragInfo(Vector2D tangent)
-        {
-            throw new NotSupportedException();
-        }
-        public override Vector2D GetCentroid()
-        {
-            return Vector2D.Zero;
-        }
-        public override Scalar GetArea()
-        {
-            return 0;
-        }
-        public override Scalar GetInertia()
-        {
-            throw new NotSupportedException();
-        }
+        #endregion
     }
 }

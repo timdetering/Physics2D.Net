@@ -32,19 +32,23 @@ using Scalar = System.Single;
 using System;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
+
 using System.Xml.Serialization;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Shapes
 {
+
+
     /// <summary>
     /// A abstract class used to define the Shape of a Body.
     /// </summary>
     [Serializable]
-    public abstract class Shape : IDuplicateable<Shape>
+    public abstract class Shape : IShape
     {
         #region static fields
-        protected readonly static Vector2D[] Empty = new Vector2D[0];
+        protected static Vector2D Zero = Vector2D.Zero;
+        private static Vector2D[] empty = new Vector2D[0];
+        protected static Vector2D[] Empty { get { return empty; } }
         #endregion
         #region static methods
         public static Scalar InertiaOfCylindricalShell(Scalar radius)
@@ -104,86 +108,40 @@ namespace Physics2DDotNet
             }
             return result;
         }
-        protected static void GetProjectedBounds(Vector2D[] vertexes, int offset, int length, Vector2D tangent, out Scalar min, out Scalar max)
-        {
-            Scalar value;
-            Vector2D.Dot(ref vertexes[offset], ref tangent, out value);
-            min = value;
-            max = value;
-            for (int index = 1; index < length; ++index)
-            {
-                Vector2D.Dot(ref vertexes[index + offset], ref tangent, out value);
-                if (value > max)
-                {
-                    max = value;
-                }
-                else if (value < min)
-                {
-                    min = value;
-                }
-            }
-        }
+
         #endregion
         #region fields
-        object tag;
-        protected Matrix2D matrix2D;
-        protected Matrix2D matrix2DInv;
-        protected BoundingRectangle rect;
-        protected Scalar inertiaMultiplier;
-        protected Vector2D[] originalVertexes;
-        protected Vector2D[] vertexes;
+        private Scalar inertiaMultiplier;
+        private Vector2D[] vertexes;
         private Vector2D[] normals;
-
-
-        private Body parent;
-        bool ignoreVertexes;
-
-
+        private bool ignoreVertexes;
+        private object tag;
         #endregion
         #region constructors
         protected Shape(Vector2D[] vertexes, Scalar momentOfInertiaMultiplier)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (momentOfInertiaMultiplier <= 0) { throw new ArgumentOutOfRangeException("momentOfInertiaMultiplier"); }
-            this.matrix2D = Matrix2D.Identity;
-            this.matrix2DInv = Matrix2D.Identity;
-            this.originalVertexes = vertexes;
-            this.vertexes = (Vector2D[])vertexes.Clone();
+            this.vertexes = vertexes;
             this.inertiaMultiplier = momentOfInertiaMultiplier;
-            CalculateNormals();
-        }
-        protected Shape(Shape copy)
-        {
-            if (copy == null) { throw new ArgumentNullException("copy"); }
-            this.ignoreVertexes = copy.ignoreVertexes;
-            this.matrix2D = copy.matrix2D;
-            this.matrix2DInv = copy.matrix2DInv;
-            this.inertiaMultiplier = copy.inertiaMultiplier;
-            this.rect = copy.rect;
-            if (copy.tag is ICloneable)
-            {
-                this.tag = ((ICloneable)copy.tag).Clone();
-            }
-            else
-            {
-                this.tag = copy.tag;
-            }
-            this.originalVertexes = copy.originalVertexes;
-            this.normals = copy.normals;
-            this.vertexes = (Vector2D[])copy.vertexes.Clone();
         }
         #endregion
         #region properties
+        /// <summary>
+        /// Gets the original (body/local) Vertices with the origin being the center of the Body.
+        /// </summary>
+        public Vector2D[] Vertexes
+        {
+            get { return vertexes; }
+        }
         /// <summary>
         /// These are the normals for the original vertexes.
         /// </summary>
         public Vector2D[] Normals
         {
             get { return normals; }
+            protected set { normals = value; }
         }
-        public abstract bool CanGetCentroid { get;}
-        public abstract bool CanGetArea { get;}
-        public abstract bool CanGetInertia { get;}
 
         /// <summary>
         /// Gets and Sets if this shape's Vertexes will not be used in collision detection.
@@ -194,7 +152,6 @@ namespace Physics2DDotNet
             set { ignoreVertexes = value; }
         }
         public abstract bool CanGetIntersection { get;}
-        public abstract bool CanGetDragInfo { get;}
         public abstract bool CanGetDistance { get;}
         public abstract bool CanGetCustomIntersection { get;}
         /// <summary>
@@ -205,148 +162,37 @@ namespace Physics2DDotNet
         /// </summary>
         public abstract bool BroadPhaseDetectionOnly { get;}
         /// <summary>
-        /// Gets the Body this Shape is part of.
-        /// </summary>
-        public Body Parent
-        {
-            get { return parent; }
-        }
-        /// <summary>
         /// Gets the Moment of Inertia Multiplier. Which is the ratio of inertia to mass of a Body.
         /// </summary>
         public Scalar MomentofInertiaMultiplier
         {
             get { return inertiaMultiplier; }
         }
-        /// <summary>
-        /// Gets the Bounding Rectangle of the Shape. (This is only calculated when ApplyMatrix() is called.)
-        /// </summary>
-        public BoundingRectangle Rectangle
-        {
-            get { return rect; }
-        }
-        /// <summary>
-        /// Gets and Sets a User Defined Object.
-        /// </summary>
         [XmlIgnore]
         public object Tag
         {
             get { return tag; }
             set { tag = value; }
         }
-        /// <summary>
-        /// Gets The current Matrix being Applied to the Shape.
-        /// </summary>
-        public Matrix2D Matrix
-        {
-            get { return matrix2D; }
-        }
-        /// <summary>
-        /// Gets The Inverse of the current Matrix being Applied to the Shape.
-        /// </summary>
-        public Matrix2D MatrixInv
-        {
-            get { return matrix2DInv; }
-        }
-        /// <summary>
-        /// Gets the original (body/local) Vertices with the origin being the center of the Body.
-        /// </summary>
-        public Vector2D[] OriginalVertices
-        {
-            get { return originalVertexes; }
-        }
-        /// <summary>
-        /// Gets the transformed (world) Vertices with the origin being the center of the world.
-        /// </summary>
-        public Vector2D[] Vertices
-        {
-            get { return vertexes; }
-        }
+
         #endregion
         #region methods
-        private void CalculateNormals()
-        {
-            if (vertexes.Length < 3)
-            {
-                return;
-            }
-            Vector2D[] edges = new Vector2D[vertexes.Length];
-            Vector2D last = vertexes[vertexes.Length - 1];
-            Vector2D current;
-            for (int index = 0; index < vertexes.Length; ++index, last = current)
-            {
-                current = vertexes[index];
-                edges[index] = (current - last).LeftHandNormal.Normalized;
-            }
-            this.normals = new Vector2D[vertexes.Length];
-            last = edges[vertexes.Length - 1];
-            for (int index = 0; index < vertexes.Length; ++index, last = current)
-            {
-                current = edges[index];
-                normals[index] = (current + last).Normalized;
-            }
-        }
-        protected abstract void CalcBoundingRectangle();
-        public virtual void ApplyMatrix(ref Matrix2D matrix)
-        {
-            this.matrix2D = matrix;
-            Matrix2D.Invert(ref matrix, out matrix2DInv);
-            ApplyMatrixToVertexes();
-            CalcBoundingRectangle();
-        }
-        protected void ApplyMatrixToVertexes()
-        {
-            Matrix3x3 matrix = matrix2D.VertexMatrix;
-            for (int index = 0; index < originalVertexes.Length; ++index)
-            {
-                Vector2D.Transform(ref matrix, ref originalVertexes[index], out vertexes[index]);
-            }
-        }
-        public virtual void UpdateTime(TimeStep step) { }
+
+        public abstract void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle);
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="point">(In World Coordinates)</param>
+        /// <param name="point">(In Body Coordinates)</param>
         /// <param name="info"></param>
         /// <returns></returns>
         public abstract bool TryGetIntersection(Vector2D point, out IntersectionInfo info);
-        public abstract bool TryGetCustomIntersection(Body other, out object customIntersectionInfo);
+        public abstract bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo);
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="point">(In World Coordinates)</param>
+        /// <param name="point">(In Body Coordinates)</param>
         /// <param name="result"></param>
         public abstract void GetDistance(ref Vector2D point, out Scalar result);
-        public abstract DragInfo GetDragInfo(Vector2D tangent);
-
-
-
-        /// <summary>
-        /// Gets the Centroid of the Shape without the Matrix Applied. (In Body Coordinates)
-        /// </summary>
-        /// <returns>the Centroid of the Shape without the Matrix Applied.</returns>
-        public abstract Vector2D GetCentroid();
-        public abstract Scalar GetArea();
-        public abstract Scalar GetInertia();
-
-            
-
-        public object Clone()
-        {
-            return Duplicate();
-        }
-
-        internal void OnAdded(Body parent)
-        {
-            if (this.parent != null) { throw new InvalidOperationException("must be orphan"); }
-            this.parent = parent;
-        }
-        internal void OnRemoved()
-        {
-            this.parent = null;
-        }
-
-        public abstract Shape Duplicate();
         #endregion
     }
 }

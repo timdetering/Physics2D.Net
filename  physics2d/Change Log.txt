@@ -1,5 +1,7 @@
 AdvanceMath
 NextVersion:
+Added: the struct Matrix3x2 and changes to other classes to make it work.
+Fixed: Line's GetDistance method
 
 Physics2D.Net
 NextVersion:
@@ -19,7 +21,23 @@ Added: LinearDamping and AngularDamping Properties to Body.
 Added: MassInfo.Infinite
 Fixed: The bug where objects can get trapped inside each other and are next to impossible to separate. 
 Added: Shape.Normals as a part to the above bug fix. 
-
+BREAKING Change: Made all shapes stateless. a shape no longe knows or cares what body it is attached too.
+Breaking Change: Renamed all shapes to end in “Shape” this for naming conflicts with other libraries.
+Added: the Matrices class and property to the body. This used to me the matrix properties on the Shape.
+Added: Rectangle property to the Body (this use to be on the shape). 
+Changed: Shapes that object that can collide with a RaySegmentsShape to implement a new IRaySegmentsCollidable interface.
+Added: the IRaySegmentsCollidable interface.
+Changed: Replaced all usage of Matrix3x3 with Matrix3x2.
+Changed: Got rid of the Matrix2D struct
+Added: Matrices class.
+Added: LineFluidLogic and associated classes
+Fixed: The RaySegments to work properly with Body.Transform
+Changed: put all PhysicsLogics into a PhysicsLogics namespace
+Changed: put all Joints into a Joints namespace
+Changed: put all Ignorers into a Ignorers namespace
+Changed: put all Shapes into a Shapes namespace
+Added: RaySegmentsCollisionLogic to manage a RaySegmentsShape
+Added: ExplosionLogic
 
 AdvanceMath
 1.7.0.0:

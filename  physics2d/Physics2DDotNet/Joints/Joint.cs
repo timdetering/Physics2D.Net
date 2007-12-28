@@ -32,7 +32,7 @@ using System;
 using System.Collections.ObjectModel;
 
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Joints
 {
 
 
@@ -62,7 +62,7 @@ namespace Physics2DDotNet
         object tag;
         PhysicsEngine engine;
         Lifespan lifetime;
-        bool isPending;
+        bool isAdded;
         internal bool isChecked;
 
         protected Joint(Lifespan lifetime)
@@ -76,7 +76,7 @@ namespace Physics2DDotNet
         /// </summary>
         public bool IsPending
         {
-            get { return isPending; }
+            get { return engine != null && !isAdded; }
         }
         /// <summary>
         /// Gets and Sets a User defined object.
@@ -116,7 +116,7 @@ namespace Physics2DDotNet
         {
             get
             {
-                return engine != null && !isPending;
+                return isAdded;
             }
         }
         /// <summary>
@@ -143,14 +143,13 @@ namespace Physics2DDotNet
         internal void OnPendingInternal(PhysicsEngine engine)
         {
             this.isChecked = false;
-            this.isPending = true;
             this.engine = engine;
             OnPending();
             if (Pending != null) { Pending(this, EventArgs.Empty); }
         }
         internal void OnAddedInternal(PhysicsEngine engine)
         {
-            this.isPending = false;
+            this.isAdded = true;
             this.engine = engine;
             foreach (Body b in Bodies)
             {
@@ -162,6 +161,7 @@ namespace Physics2DDotNet
         }
         internal void OnRemovedInternal()
         {
+            bool isPending = IsPending;
             foreach (Body b in Bodies)
             {
                 if (!isPending)
@@ -170,10 +170,9 @@ namespace Physics2DDotNet
                 }
                 b.Removed -= OnBodyRemoved;
             }
-
             PhysicsEngine engine = this.engine;
-            bool wasPending = this.isPending;
-            this.isPending = false;
+            bool wasPending = isPending;
+            this.isAdded = false;
             this.engine = null;
             OnRemoved(engine, wasPending);
             if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }

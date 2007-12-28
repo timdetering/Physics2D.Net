@@ -33,7 +33,7 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-using Physics2DDotNet.Math2D;
+
 using AdvanceMath;
 using System.Runtime.InteropServices;
 
@@ -47,6 +47,8 @@ using System.Diagnostics;
 using AdvanceMath.Design;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
+using Physics2DDotNet.Shapes;
+using Physics2DDotNet.Joints;
 
 #if UseDouble
 using Scalar = System.Double;
@@ -211,8 +213,8 @@ namespace ConsoleDriver
             Coefficients coffecients = new Coefficients(/*restitution*/1, /*friction*/.5f);
 
 
-            Shape shape1 = new Circle(8, 7);
-            Shape shape2 = new Polygon(Polygon.CreateRectangle(10, 20), 3);
+            Shape shape1 = new CircleShape(8, 7);
+            Shape shape2 = new PolygonShape(PolygonShape.CreateRectangle(10, 20), 3);
 
             Scalar mass = 5;
             Body body1 = new Body(new PhysicsState(), shape1, mass, coffecients, new Lifespan());

@@ -40,7 +40,7 @@ using AdvanceMath;
 
 
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Joints
 {
     /// <summary>
     /// A joint that makes a single Body Pivot around an Anchor.
@@ -70,8 +70,7 @@ namespace Physics2DDotNet
             this.body = body;
             this.anchor = anchor;
             body.ApplyMatrix();
-            Matrix3x3 matrix1 = body.Shape.MatrixInv.VertexMatrix;
-            Vector2D.Transform(ref matrix1, ref anchor, out this.localAnchor1);
+            Vector2D.Transform(ref body.Matrices.ToBody, ref anchor, out this.localAnchor1);
             this.softness = 0.001f;
             this.biasFactor = 0.2f;
             this.distanceTolerance = Scalar.PositiveInfinity;
@@ -119,10 +118,9 @@ namespace Physics2DDotNet
             Scalar inertia1Inv = body.Mass.MomentOfInertiaInv;
 
             // Pre-compute anchors, mass matrix, and bias.
-            Matrix2x2 matrix1 = body.Shape.Matrix.NormalMatrix;
 
-            Vector2D.Transform(ref matrix1, ref localAnchor1, out r1);
-
+            Vector2D.TransformNormal(ref body.Matrices.ToWorld, ref localAnchor1, out r1);
+            
             // deltaV = deltaV0 + K * impulse
             // invM = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
             //      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]

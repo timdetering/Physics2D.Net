@@ -31,7 +31,7 @@ using Scalar = System.Single;
 using System;
 
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Ignorers
 {
     /// <summary>
     /// Base class for Collision Ignorers to impliment.

@@ -31,6 +31,7 @@ using Scalar = System.Single;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Physics2DDotNet.Joints;
 
 
 namespace Physics2DDotNet.Solvers

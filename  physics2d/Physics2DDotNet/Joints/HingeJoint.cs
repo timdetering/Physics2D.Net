@@ -40,7 +40,7 @@ using AdvanceMath;
 
 
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Joints
 {
     /// <summary>
     /// A Joint Between 2 Bodies that will pivot around an Anchor.
@@ -80,10 +80,8 @@ namespace Physics2DDotNet
             body1.ApplyMatrix();
             body2.ApplyMatrix();
 
-            Matrix3x3 matrix1 = body1.Shape.MatrixInv.VertexMatrix;
-            Matrix3x3 matrix2 = body2.Shape.MatrixInv.VertexMatrix;
-            Vector2D.Transform(ref matrix1, ref anchor, out  this.localAnchor1);
-            Vector2D.Transform(ref matrix2, ref anchor, out  this.localAnchor2);
+            Vector2D.Transform(ref body1.Matrices.ToBody, ref anchor, out  this.localAnchor1);
+            Vector2D.Transform(ref body2.Matrices.ToBody, ref anchor, out  this.localAnchor2);
 
             this.softness = 0.001f;
             this.biasFactor = 0.2f;
@@ -130,12 +128,9 @@ namespace Physics2DDotNet
             Scalar inertia2Inv = body2.Mass.MomentOfInertiaInv;
 
             // Pre-compute anchors, mass matrix, and bias.
-            Matrix2x2 matrix1 = body1.Shape.Matrix.NormalMatrix;
-            Matrix2x2 matrix2 = body2.Shape.Matrix.NormalMatrix;
 
-
-            Vector2D.Transform(ref matrix1, ref localAnchor1, out r1);
-            Vector2D.Transform(ref matrix2, ref localAnchor2, out r2);
+            Vector2D.TransformNormal(ref body1.Matrices.ToWorld, ref localAnchor1, out r1);
+            Vector2D.TransformNormal(ref body2.Matrices.ToWorld, ref localAnchor2, out r2);
 
             // deltaV = deltaV0 + K * impulse
             // invM = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]

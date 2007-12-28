@@ -159,6 +159,14 @@ namespace AdvanceMath
             dest.m10 = source.m10;
             dest.m11 = source.m11;
         }
+        public static void Copy(ref Matrix2x3 source, out Matrix2x2 dest)
+        {
+            dest.m00 = source.m00;
+            dest.m01 = source.m01;
+
+            dest.m10 = source.m10;
+            dest.m11 = source.m11;
+        }
 
         public static Matrix2x2 Lerp(Matrix2x2 left, Matrix2x2 right, Scalar amount)
         {
@@ -394,6 +402,7 @@ namespace AdvanceMath
         }
 
 
+
         public static Matrix2x2 FromArray(Scalar[] array)
         {
             Matrix2x2 result;
@@ -468,6 +477,36 @@ namespace AdvanceMath
             return
                 left.m00 == right.m00 && left.m01 == right.m01 &&
                 left.m10 == right.m10 && left.m11 == right.m11;
+        }
+
+
+        public static Matrix2x2 CreateNormal(Matrix2x3 source)
+        {
+            Matrix2x2 result;
+            CreateNormal(ref source, out result);
+            return result;
+        }
+        public static void CreateNormal(ref Matrix2x3 source, out Matrix2x2 result)
+        {
+            Scalar detInv = 1 / (source.m00 * source.m11 - source.m01 * source.m10);
+            result.m10 = detInv * -source.m01;
+            result.m11 = detInv * source.m00;
+            result.m00 = detInv * source.m11;
+            result.m01 = detInv * -source.m10;
+        }
+        public static Matrix2x2 CreateNormal(Matrix3x3 source)
+        {
+            Matrix2x2 result;
+            CreateNormal(ref source, out result);
+            return result;
+        }
+        public static void CreateNormal(ref Matrix3x3 source, out Matrix2x2 result)
+        {
+            Scalar detInv = 1 / (source.m00 * source.m11 - source.m01 * source.m10);
+            result.m10 = detInv * -source.m01;
+            result.m11 = detInv * source.m00;
+            result.m00 = detInv * source.m11;
+            result.m01 = detInv * -source.m10;
         }
 
         #endregion
@@ -696,14 +735,6 @@ namespace AdvanceMath
         public Scalar[] ToTransposedArray()
         {
             return new Scalar[Count] { m00, m10, m01, m11 };
-        }
-
-        public Matrix3x3 ToMatrix3x3()
-        {
-            Matrix3x3 result = Matrix3x3.Identity;
-            result.m00 = this.m00; result.m01 = this.m01;
-            result.m10 = this.m10; result.m11 = this.m11;
-            return result;
         }
 
 

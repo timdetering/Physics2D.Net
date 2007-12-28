@@ -34,27 +34,62 @@ using AdvanceMath;
 
 namespace Physics2DDotNet
 {
-    public sealed class DragInfo
+    public sealed class FluidInfo
     {
-        Vector2D center;
+        Vector2D centroid;
         Scalar area;
-        
-        public DragInfo(Vector2D center, Scalar area)
+        Vector2D dragCenter;
+        Scalar dragArea;
+
+        public FluidInfo(Vector2D dragCenter, 
+                         Scalar dragArea, 
+                         Vector2D centroid, 
+                         Scalar area)
         {
-            this.center = center;
+            this.centroid = centroid;
             this.area = area;
+            this.dragCenter = dragCenter;
+            this.dragArea = dragArea;
         }
-        /// <summary>
-        /// (In Body Coordinates)
-        /// </summary>
-        public Vector2D Center
+
+        public Vector2D Centroid
         {
-            get { return center; }
+            get { return centroid; }
         }
         public Scalar Area
         {
             get { return area; }
         }
+        public Vector2D DragCenter
+        {
+            get { return dragCenter; }
+        }
+        public Scalar DragArea
+        {
+            get { return dragArea; }
+        }
+    }
 
+    public sealed class DragInfo
+    {
+        Vector2D dragCenter;
+        Scalar dragArea;
+        
+        public DragInfo(Vector2D dragCenter, Scalar dragArea)
+        {
+            this.dragCenter = dragCenter;
+            this.dragArea = dragArea;
+        }
+        /// <summary>
+        /// (In Body Coordinates)
+        /// </summary>
+        public Vector2D DragCenter
+        {
+            get { return dragCenter; }
+        }
+        public Scalar DragArea
+        {
+            get { return dragArea; }
+        }
     }
 }

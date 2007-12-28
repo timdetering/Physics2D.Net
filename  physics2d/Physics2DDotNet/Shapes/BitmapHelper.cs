@@ -34,9 +34,9 @@ using System.Collections.Generic;
 
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
 
-namespace Physics2DDotNet
+
+namespace Physics2DDotNet.Shapes
 {
     public interface IBitmap
     {

@@ -32,10 +32,8 @@ using Scalar = System.Single;
 using System;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
 using System.Xml.Serialization;
-
-namespace Physics2DDotNet
+namespace Physics2DDotNet.Shapes
 {
     /// <summary>
     /// A shape whose BoundingRectangle is manualy Set and will not change, unless manualy changed.
@@ -44,10 +42,23 @@ namespace Physics2DDotNet
     [Serializable]
     public sealed class RectangleShape : Shape
     {
+        #region events
         public event EventHandler BoundingRectangleRequested;
+        #endregion
+        #region fields
+        BoundingRectangle rectangle;
+        #endregion
+        #region constructors
         public RectangleShape()
             : base(Empty, Scalar.PositiveInfinity)
         { }
+        #endregion
+        #region properties
+        public BoundingRectangle Rectangle
+        {
+            get { return rectangle; }
+            set { rectangle = value; }
+        }
         public override bool CanGetIntersection
         {
             get { return true; }
@@ -64,33 +75,26 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-        public override bool CanGetDragInfo
-        {
-            get { return false; }
-        }
-
-        public void SetRectangle(BoundingRectangle rectangle)
-        {
-            this.rect = rectangle;
-        }
-        public override void ApplyMatrix(ref Matrix2D matrix) { }
-        protected override void CalcBoundingRectangle()
+        #endregion
+        #region methods
+        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
         {
             if (BoundingRectangleRequested != null)
             {
                 BoundingRectangleRequested(this, EventArgs.Empty);
             }
+            rectangle = this.Rectangle;
         }
         public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             ContainmentType type;
-            rect.Contains(ref point, out type);
+            Rectangle.Contains(ref point, out type);
             if (type == ContainmentType.Contains)
             {
                 Scalar xDist, yDist;
                 info.Position = point;
-                xDist = Math.Min(rect.Min.X - point.X, point.X - rect.Min.X);
-                yDist = Math.Min(rect.Min.Y - point.Y, point.Y - rect.Min.Y);
+                xDist = Math.Min(Rectangle.Min.X - point.X, point.X - Rectangle.Min.X);
+                yDist = Math.Min(Rectangle.Min.Y - point.Y, point.Y - Rectangle.Min.Y);
                 if (xDist < yDist)
                 {
                     info.Distance = xDist;
@@ -111,48 +115,15 @@ namespace Physics2DDotNet
                 return false;
             }
         }
-        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }
         public override void GetDistance(ref Vector2D point, out Scalar result)
         {
-            rect.GetDistance(ref point, out result);
-        }
-        public override Shape Duplicate()
-        {
-            return new RectangleShape();
+            Rectangle.GetDistance(ref point, out result);
         }
 
-        public override DragInfo GetDragInfo(Vector2D tangent)
-        {
-            throw new NotSupportedException();
-        }
-
-        public override bool CanGetCentroid
-        {
-            get { return false; }
-        }
-        public override bool CanGetArea
-        {
-            get { return false; }
-        }
-        public override bool CanGetInertia
-        {
-            get { return false; }
-        }
-
-        public override Vector2D GetCentroid()
-        {
-            throw new NotSupportedException();
-        }
-        public override Scalar GetArea()
-        {
-            throw new NotSupportedException();
-        }
-        public override Scalar GetInertia()
-        {
-            throw new NotSupportedException();
-        }
+        #endregion
     }
 }

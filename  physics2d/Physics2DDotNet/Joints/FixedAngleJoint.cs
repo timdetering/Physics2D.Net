@@ -33,10 +33,10 @@ using System;
 using System.Collections.ObjectModel;
 
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
 
 
-namespace Physics2DDotNet
+
+namespace Physics2DDotNet.Joints
 {
     /// <summary>
     /// A Joint between 2 Bodies that will keep the Angles between the 2 bodies at a certain amount.

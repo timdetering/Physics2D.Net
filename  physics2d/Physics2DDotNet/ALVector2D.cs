@@ -33,7 +33,7 @@ using System;
 using System.Runtime.InteropServices;
 using AdvanceMath;
 using AdvanceMath.Design;
-namespace Physics2DDotNet.Math2D
+namespace Physics2DDotNet
 {
     /// <summary>
     /// Class Used to store a Linear Value along with an Angular Value. Like Position and Orientation. 
@@ -219,8 +219,17 @@ namespace Physics2DDotNet.Math2D
             result.Linear.X = source.Linear.X * scalar;
             result.Linear.Y = source.Linear.Y * scalar;
         }
+        public static void ToMatrix2x3(ref ALVector2D source, out Matrix2x3 result)
+        {
+            result.m00 = MathHelper.Cos(source.Angular);
+            result.m10 = MathHelper.Sin(source.Angular);
+            result.m01 = -result.m10;
+            result.m11 = result.m00;
+            result.m02 = source.Linear.X;
+            result.m12 = source.Linear.Y;
+        }
 
-        public static ALVector2D Transform(Matrix2D matrix, ALVector2D source)
+       /* public static ALVector2D Transform(Matrix2D matrix, ALVector2D source)
         {
             ALVector2D result;
             Transform(ref matrix,ref source,out result);
@@ -230,12 +239,23 @@ namespace Physics2DDotNet.Math2D
         {
             Scalar dAngle;
             Vector2D angular = Vector2D.XAxis;
-            Vector2D.Transform(ref matrix.VertexMatrix, ref source.Linear, out result.Linear);
-            Vector2D.Transform(ref matrix.NormalMatrix, ref angular, out angular);
+            Vector2D.Transform(ref matrix.Vertex, ref source.Linear, out result.Linear);
+            Vector2D.Transform(ref matrix.Normal, ref angular, out angular);
+            Vector2D.GetAngle(ref angular, out dAngle);
+            result.Angular = source.Angular + dAngle;
+        }*/
+        public static void Transform(ref Matrix2x3 matrix, ref ALVector2D source, out ALVector2D result)
+        {
+            Scalar dAngle;
+            Vector2D angular = Vector2D.XAxis;
+            Vector2D.Transform(ref matrix, ref source.Linear, out result.Linear);
+            Matrix2x2 normal;
+            Matrix2x2.CreateNormal(ref matrix, out normal);
+
+            Vector2D.Transform(ref normal, ref angular, out angular);
             Vector2D.GetAngle(ref angular, out dAngle);
             result.Angular = source.Angular + dAngle;
         }
-
         
         
         public static bool operator ==(ALVector2D left, ALVector2D right)

@@ -68,7 +68,7 @@ namespace AdvanceMath.Geometry2D
         public void GetDistance(ref Vector2D point, out Scalar result)
         {
             Vector2D.Dot(ref point, ref Normal, out result);
-            result += D;
+            result -= D;
         }
 
         public Scalar Intersects(Ray ray)

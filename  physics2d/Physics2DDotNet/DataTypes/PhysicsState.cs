@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 
 using AdvanceMath;
 using AdvanceMath.Design;
-using Physics2DDotNet.Math2D;
+
 
 namespace Physics2DDotNet
 {
@@ -47,7 +47,7 @@ namespace Physics2DDotNet
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360  
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<PhysicsState>))]
 #endif
-    public sealed class PhysicsState
+    public sealed class PhysicsState : IDuplicateable<PhysicsState>
     {
         public const int Size = ALVector2D.Size * 4;
         /// <summary>
@@ -114,13 +114,15 @@ namespace Physics2DDotNet
             this.Acceleration = state.Acceleration;
             this.ForceAccumulator = state.ForceAccumulator;
         }
-        public void Set(PhysicsState state)
+
+        public PhysicsState Duplicate()
         {
-            if (state == null) { throw new ArgumentNullException("state"); }
-            this.Position = state.Position;
-            this.Velocity = state.Velocity;
-            this.Acceleration = state.Acceleration;
-            this.ForceAccumulator = state.ForceAccumulator;
+            return new PhysicsState(this);
         }
+        public object Clone()
+        {
+            return Duplicate();
+        }
+
     }
 }

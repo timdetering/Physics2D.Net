@@ -33,7 +33,7 @@ using System;
 using System.Runtime.InteropServices;
 
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
+
 
 namespace Physics2DDotNet
 {

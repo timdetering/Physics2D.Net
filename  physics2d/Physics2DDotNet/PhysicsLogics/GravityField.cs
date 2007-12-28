@@ -31,7 +31,7 @@ using System;
 
 using AdvanceMath;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.PhysicsLogics
 {
 
     /// <summary>

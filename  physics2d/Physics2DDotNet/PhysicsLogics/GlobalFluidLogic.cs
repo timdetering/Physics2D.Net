@@ -31,10 +31,14 @@ using System;
 using System.Collections.Generic;
 
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
+using Physics2DDotNet.Shapes;
 
-namespace Physics2DDotNet
+namespace Physics2DDotNet.PhysicsLogics
 {
-
+    /// <summary>
+    /// Applys drag and buoyancy to all items in the engine.
+    /// </summary>
     public sealed class GlobalFluidLogic : PhysicsLogic
     {
         sealed class Wrapper : IDisposable
@@ -42,7 +46,7 @@ namespace Physics2DDotNet
             public Vector2D centroid;
             public Scalar area;
             public Body body;
-            public bool valid;
+            public IGlobalFluidAffectable affectable;
             public Wrapper(Body body)
             {
                 this.body = body;
@@ -64,18 +68,12 @@ namespace Physics2DDotNet
             void CalculatePart()
             {
                 Shape shape = body.Shape;
-                if (!shape.CanGetDragInfo ||
-                    !shape.CanGetArea ||
-                    !shape.CanGetCentroid)
+                affectable = shape as IGlobalFluidAffectable;
+                if (affectable != null)
                 {
-                    valid = false;
-                    area = 0;
-                    centroid = Vector2D.Zero;
-                    return;
+                    area = affectable.Area;
+                    centroid = affectable.Centroid;
                 }
-                valid = true;
-                area = shape.GetArea();
-                centroid = shape.GetCentroid();
             }
             void OnShapeChanged(object sender, EventArgs e)
             {
@@ -138,21 +136,25 @@ namespace Physics2DDotNet
             for (int index = 0; index < items.Count; ++index)
             {
                 Wrapper wrapper = items[index];
-                if (!wrapper.valid) { continue; }
                 Body body = wrapper.body;
+                if (wrapper.affectable == null ||
+                   Scalar.IsPositiveInfinity(body.Mass.Mass))
+                {
+                    continue;
+                }
 
-                Vector2D centroid = wrapper.body.Shape.Matrix.NormalMatrix * wrapper.centroid;
+                Vector2D centroid = wrapper.body.Matrices.ToWorldNormal * wrapper.centroid;
                 Vector2D buoyancyForce = body.State.Acceleration.Linear * wrapper.area * -Density;
                 wrapper.body.ApplyForce(buoyancyForce, centroid);
 
                 Vector2D relativeVelocity = body.State.Velocity.Linear - FluidVelocity;
                 Vector2D velocityDirection = relativeVelocity.Normalized;
                 if (velocityDirection == Vector2D.Zero) { continue; }
-                Vector2D dragDirection = velocityDirection.LeftHandNormal;
-                DragInfo dragInfo = body.Shape.GetDragInfo(dragDirection);
-                if (dragInfo.Area < .01f) { continue; }
+                Vector2D dragDirection = body.Matrices.ToBodyNormal * velocityDirection.LeftHandNormal;
+                DragInfo dragInfo = wrapper.affectable.GetFluidInfo(dragDirection);
+                if (dragInfo.DragArea < .01f) { continue; }
                 Scalar speedSq = relativeVelocity.MagnitudeSq;
-                Scalar dragForceMag = -.5f * Density * speedSq * dragInfo.Area * DragCoefficient;
+                Scalar dragForceMag = -.5f * Density * speedSq * dragInfo.DragArea * DragCoefficient;
                 Scalar maxDrag = -MathHelper.Sqrt(speedSq) * body.Mass.Mass * step.DtInv;
                 if (dragForceMag < maxDrag)
                 {
@@ -160,7 +162,7 @@ namespace Physics2DDotNet
                 }
 
                 Vector2D dragForce = dragForceMag * velocityDirection;
-                wrapper.body.ApplyForce(dragForce, dragInfo.Center);
+                wrapper.body.ApplyForce(dragForce, body.Matrices.ToWorldNormal * dragInfo.DragCenter);
 
                 wrapper.body.ApplyTorque(
                    -body.Mass.MomentOfInertia *

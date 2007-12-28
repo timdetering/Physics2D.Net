@@ -50,20 +50,20 @@ using System.Xml.Serialization;
 namespace AdvanceMath
 {
     /// <summary>
-    /// A 3x3 matrix which can represent rotations around axes.
+    /// A 2x3 matrix which can represent rotations around axes.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Size = Matrix3x3.Size)]
-    [AdvBrowsableOrder("Rx,Ry,Rz"), Serializable]
+    [StructLayout(LayoutKind.Sequential, Size = Matrix2x3.Size)]
+    [AdvBrowsableOrder("Rx,Ry"), Serializable]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix3x3>))]
+    [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2x3>))]
 #endif
-    public struct Matrix3x3 : IMatrix<Matrix3x3, Vector3D, Vector3D>
+    public struct Matrix2x3 : IMatrix<Matrix2x3,Vector2D, Vector3D>
     {
         #region const fields
         /// <summary>
         /// The number of rows.
         /// </summary>
-        public const int RowCount = 3;
+        public const int RowCount = 2;
         /// <summary>
         /// The number of columns.
         /// </summary>
@@ -81,22 +81,20 @@ namespace AdvanceMath
         private readonly static string FormatString = MatrixHelper.CreateMatrixFormatString(RowCount, ColumnCount);
         private readonly static string FormatableString = MatrixHelper.CreateMatrixFormatableString(RowCount, ColumnCount);
 
-        public static readonly Matrix3x3 Identity = new Matrix3x3(
+        public static readonly Matrix2x3 Identity = new Matrix2x3(
         1, 0, 0,
-        0, 1, 0,
-        0, 0, 1);
-        public static readonly Matrix3x3 Zero = new Matrix3x3(
-        0, 0, 0,
+        0, 1, 0);
+        public static readonly Matrix2x3 Zero = new Matrix2x3(
         0, 0, 0,
         0, 0, 0);
         #endregion
         #region static methods
 
-        public static void Copy(ref Matrix3x3 matrix, Scalar[] destArray)
+        public static void Copy(ref Matrix2x3 matrix, Scalar[] destArray)
         {
             Copy(ref matrix, destArray, 0);
         }
-        public static void Copy(ref Matrix3x3 matrix, Scalar[] destArray, int index)
+        public static void Copy(ref Matrix2x3 matrix, Scalar[] destArray, int index)
         {
             ThrowHelper.CheckCopy(destArray, index, Count);
 
@@ -108,15 +106,12 @@ namespace AdvanceMath
             destArray[++index] = matrix.m11;
             destArray[++index] = matrix.m12;
 
-            destArray[++index] = matrix.m20;
-            destArray[++index] = matrix.m21;
-            destArray[++index] = matrix.m22;
         }
-        public static void Copy(Scalar[] sourceArray, out Matrix3x3 result)
+        public static void Copy(Scalar[] sourceArray, out Matrix2x3 result)
         {
             Copy(sourceArray, 0, out result);
         }
-        public static void Copy(Scalar[] sourceArray, int index, out Matrix3x3 result)
+        public static void Copy(Scalar[] sourceArray, int index, out Matrix2x3 result)
         {
             ThrowHelper.CheckCopy(sourceArray, index, Count);
 
@@ -128,53 +123,10 @@ namespace AdvanceMath
             result.m11 = sourceArray[++index];
             result.m12 = sourceArray[++index];
 
-            result.m20 = sourceArray[++index];
-            result.m21 = sourceArray[++index];
-            result.m22 = sourceArray[++index];
         }
 
-        public static void CopyTranspose(ref Matrix3x3 matrix, Scalar[] destArray)
-        {
-            CopyTranspose(ref matrix, destArray, 0);
-        }
-        public static void CopyTranspose(ref Matrix3x3 matrix, Scalar[] destArray, int index)
-        {
-            ThrowHelper.CheckCopy(destArray, index, Count);
 
-            destArray[index] = matrix.m00;
-            destArray[++index] = matrix.m10;
-            destArray[++index] = matrix.m20;
-
-            destArray[++index] = matrix.m01;
-            destArray[++index] = matrix.m11;
-            destArray[++index] = matrix.m21;
-
-            destArray[++index] = matrix.m02;
-            destArray[++index] = matrix.m12;
-            destArray[++index] = matrix.m22;
-        }
-        public static void CopyTranspose(Scalar[] sourceArray, out Matrix3x3 result)
-        {
-            CopyTranspose(sourceArray, 0, out result);
-        }
-        public static void CopyTranspose(Scalar[] sourceArray, int index, out Matrix3x3 result)
-        {
-            ThrowHelper.CheckCopy(sourceArray, index, Count);
-
-            result.m00 = sourceArray[index];
-            result.m10 = sourceArray[++index];
-            result.m20 = sourceArray[++index];
-
-            result.m01 = sourceArray[++index];
-            result.m11 = sourceArray[++index];
-            result.m21 = sourceArray[++index];
-
-            result.m02 = sourceArray[++index];
-            result.m12 = sourceArray[++index];
-            result.m22 = sourceArray[++index];
-        }
-
-        public static void Copy(ref Matrix4x4 source, out Matrix3x3 dest)
+        public static void Copy(ref Matrix4x4 source, out Matrix2x3 dest)
         {
             dest.m00 = source.m00;
             dest.m01 = source.m01;
@@ -184,11 +136,8 @@ namespace AdvanceMath
             dest.m11 = source.m11;
             dest.m12 = source.m12;
 
-            dest.m20 = source.m20;
-            dest.m21 = source.m21;
-            dest.m22 = source.m22;
         }
-        public static void Copy(ref Matrix2x2 source, ref Matrix3x3 dest)
+        public static void Copy(ref Matrix2x2 source, ref Matrix2x3 dest)
         {
             dest.m00 = source.m00;
             dest.m01 = source.m01;
@@ -197,32 +146,32 @@ namespace AdvanceMath
             dest.m11 = source.m11;
         }
 
-        public static void Copy2DToOpenGlMatrix(ref Matrix3x3 source, Scalar[] destArray)
+
+
+        public static void Copy2DToOpenGlMatrix(ref Matrix2x3 source, Scalar[] destArray)
         {
             destArray[0] = source.m00;
             destArray[1] = source.m10;
 
-            destArray[3] = source.m20;
 
             destArray[4] = source.m01;
             destArray[5] = source.m11;
 
-            destArray[7] = source.m21;
 
             destArray[12] = source.m02;
             destArray[13] = source.m12;
 
-            destArray[15] = source.m22;
+            destArray[10] = 1;
+            destArray[15] = 1;
         }
 
-
-        public static Matrix3x3 Lerp(Matrix3x3 left, Matrix3x3 right, Scalar amount)
+        public static Matrix2x3 Lerp(Matrix2x3 left, Matrix2x3 right, Scalar amount)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Lerp(ref left, ref right, ref amount, out result);
             return result;
         }
-        public static void Lerp(ref Matrix3x3 left, ref  Matrix3x3 right, ref  Scalar amount, out Matrix3x3 result)
+        public static void Lerp(ref Matrix2x3 left, ref  Matrix2x3 right, ref  Scalar amount, out Matrix2x3 result)
         {
             result.m00 = (right.m00 - left.m00) * amount + left.m00;
             result.m01 = (right.m01 - left.m01) * amount + left.m01;
@@ -232,9 +181,6 @@ namespace AdvanceMath
             result.m11 = (right.m11 - left.m11) * amount + left.m11;
             result.m12 = (right.m12 - left.m12) * amount + left.m12;
 
-            result.m20 = (right.m20 - left.m20) * amount + left.m20;
-            result.m21 = (right.m21 - left.m21) * amount + left.m21;
-            result.m22 = (right.m22 - left.m22) * amount + left.m22;
         }
 
 
@@ -244,38 +190,30 @@ namespace AdvanceMath
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 Multiply(Matrix3x3 left, Matrix3x3 right)
+        public static Matrix2x3 Multiply(Matrix2x3 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
-            result.m00 = left.m00 * right.m00 + left.m01 * right.m10 + left.m02 * right.m20;
-            result.m01 = left.m00 * right.m01 + left.m01 * right.m11 + left.m02 * right.m21;
-            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 * right.m22;
+            result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
+            result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
+            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 ;
 
-            result.m10 = left.m10 * right.m00 + left.m11 * right.m10 + left.m12 * right.m20;
-            result.m11 = left.m10 * right.m01 + left.m11 * right.m11 + left.m12 * right.m21;
-            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12 * right.m22;
+            result.m10 = left.m10 * right.m00 + left.m11 * right.m10;
+            result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
+            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12;
 
-            result.m20 = left.m20 * right.m00 + left.m21 * right.m10 + left.m22 * right.m20;
-            result.m21 = left.m20 * right.m01 + left.m21 * right.m11 + left.m22 * right.m21;
-            result.m22 = left.m20 * right.m02 + left.m21 * right.m12 + left.m22 * right.m22;
 
             return result;
         }
-        public static void Multiply(ref Matrix3x3 left, ref Matrix3x3 right, out Matrix3x3 result)
+        public static void Multiply(ref Matrix2x3 left, ref Matrix2x3 right, out Matrix2x3 result)
         {
-            Scalar m00 = left.m00 * right.m00 + left.m01 * right.m10 + left.m02 * right.m20;
-            Scalar m01 = left.m00 * right.m01 + left.m01 * right.m11 + left.m02 * right.m21;
-            Scalar m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 * right.m22;
+            Scalar m00 = left.m00 * right.m00 + left.m01 * right.m10;
+            Scalar m01 = left.m00 * right.m01 + left.m01 * right.m11;
+            Scalar m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02;
 
-            Scalar m10 = left.m10 * right.m00 + left.m11 * right.m10 + left.m12 * right.m20;
-            Scalar m11 = left.m10 * right.m01 + left.m11 * right.m11 + left.m12 * right.m21;
-            Scalar m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12 * right.m22;
-
-            Scalar m20 = left.m20 * right.m00 + left.m21 * right.m10 + left.m22 * right.m20;
-            Scalar m21 = left.m20 * right.m01 + left.m21 * right.m11 + left.m22 * right.m21;
-            Scalar m22 = left.m20 * right.m02 + left.m21 * right.m12 + left.m22 * right.m22;
-
+            Scalar m10 = left.m10 * right.m00 + left.m11 * right.m10;
+            Scalar m11 = left.m10 * right.m01 + left.m11 * right.m11;
+            Scalar m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12;
 
             result.m00 = m00;
             result.m01 = m01;
@@ -284,21 +222,17 @@ namespace AdvanceMath
             result.m10 = m10;
             result.m11 = m11;
             result.m12 = m12;
-
-            result.m20 = m20;
-            result.m21 = m21;
-            result.m22 = m22;
         }
 
         /// <summary>
-        /// Used to multiply a Matrix3x3 object by a scalar value..
+        /// Used to multiply a Matrix3x2 object by a scalar value..
         /// </summary>
         /// <param name="left"></param>
         /// <param name="scalar"></param>
         /// <returns></returns>
-        public static Matrix3x3 Multiply(Matrix3x3 left, Scalar scalar)
+        public static Matrix2x3 Multiply(Matrix2x3 left, Scalar scalar)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 * scalar;
             result.m01 = left.m01 * scalar;
@@ -308,13 +242,10 @@ namespace AdvanceMath
             result.m11 = left.m11 * scalar;
             result.m12 = left.m12 * scalar;
 
-            result.m20 = left.m20 * scalar;
-            result.m21 = left.m21 * scalar;
-            result.m22 = left.m22 * scalar;
 
             return result;
         }
-        public static void Multiply(ref Matrix3x3 left, ref Scalar scalar, out Matrix3x3 result)
+        public static void Multiply(ref Matrix2x3 left, ref Scalar scalar, out Matrix2x3 result)
         {
 
             result.m00 = left.m00 * scalar;
@@ -325,20 +256,17 @@ namespace AdvanceMath
             result.m11 = left.m11 * scalar;
             result.m12 = left.m12 * scalar;
 
-            result.m20 = left.m20 * scalar;
-            result.m21 = left.m21 * scalar;
-            result.m22 = left.m22 * scalar;
         }
 
         /// <summary>
-        /// Used to multiply (concatenate) a Matrix3x3 and a Matrix2x2.
+        /// Used to multiply (concatenate) a Matrix3x2 and a Matrix2x2.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 Multiply(Matrix3x3 left, Matrix2x2 right)
+        public static Matrix2x3 Multiply(Matrix2x3 left, Matrix2x2 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
             result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
@@ -348,13 +276,9 @@ namespace AdvanceMath
             result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
             result.m12 = left.m12;
 
-            result.m20 = left.m20 * right.m00 + left.m21 * right.m10;
-            result.m21 = left.m20 * right.m01 + left.m21 * right.m11;
-            result.m22 = left.m22;
-
             return result;
         }
-        public static void Multiply(ref Matrix3x3 left, ref Matrix2x2 right, out Matrix3x3 result)
+        public static void Multiply(ref Matrix2x3 left, ref Matrix2x2 right, out Matrix2x3 result)
         {
             Scalar m00 = left.m00 * right.m00 + left.m01 * right.m10;
             Scalar m01 = left.m00 * right.m01 + left.m01 * right.m11;
@@ -362,8 +286,6 @@ namespace AdvanceMath
             Scalar m10 = left.m10 * right.m00 + left.m11 * right.m10;
             Scalar m11 = left.m10 * right.m01 + left.m11 * right.m11;
 
-            Scalar m20 = left.m20 * right.m00 + left.m21 * right.m10;
-            Scalar m21 = left.m20 * right.m01 + left.m21 * right.m11;
 
             result.m00 = m00;
             result.m01 = m01;
@@ -373,20 +295,17 @@ namespace AdvanceMath
             result.m11 = m11;
             result.m12 = left.m12;
 
-            result.m20 = m20;
-            result.m21 = m21;
-            result.m22 = left.m22;
         }
 
         /// <summary>
-        /// Used to multiply (concatenate) a Matrix3x3 and a Matrix2x2.
+        /// Used to multiply (concatenate) a Matrix3x2 and a Matrix2x2.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 Multiply(Matrix2x2 left, Matrix3x3 right)
+        public static Matrix2x3 Multiply(Matrix2x2 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
             result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
@@ -396,15 +315,10 @@ namespace AdvanceMath
             result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
             result.m12 = left.m10 * right.m02 + left.m11 * right.m12;
 
-            result.m20 = right.m20;
-            result.m21 = right.m21;
-            result.m22 = right.m22;
-
-
 
             return result;
         }
-        public static void Multiply(ref Matrix2x2 left, ref Matrix3x3 right, out Matrix3x3 result)
+        public static void Multiply(ref Matrix2x2 left, ref Matrix2x3 right, out Matrix2x3 result)
         {
             Scalar m00 = left.m00 * right.m00 + left.m01 * right.m10;
             Scalar m01 = left.m00 * right.m01 + left.m01 * right.m11;
@@ -422,9 +336,6 @@ namespace AdvanceMath
             result.m11 = m11;
             result.m12 = m12;
 
-            result.m20 = right.m20;
-            result.m21 = right.m21;
-            result.m22 = right.m22;
 
 
         }
@@ -436,9 +347,9 @@ namespace AdvanceMath
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 Add(Matrix3x3 left, Matrix3x3 right)
+        public static Matrix2x3 Add(Matrix2x3 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 + right.m00;
             result.m01 = left.m01 + right.m01;
@@ -448,13 +359,10 @@ namespace AdvanceMath
             result.m11 = left.m11 + right.m11;
             result.m12 = left.m12 + right.m12;
 
-            result.m20 = left.m20 + right.m20;
-            result.m21 = left.m21 + right.m21;
-            result.m22 = left.m22 + right.m22;
 
             return result;
         }
-        public static void Add(ref Matrix3x3 left, ref Matrix3x3 right, out Matrix3x3 result)
+        public static void Add(ref Matrix2x3 left, ref Matrix2x3 right, out Matrix2x3 result)
         {
             result.m00 = left.m00 + right.m00;
             result.m01 = left.m01 + right.m01;
@@ -464,18 +372,16 @@ namespace AdvanceMath
             result.m11 = left.m11 + right.m11;
             result.m12 = left.m12 + right.m12;
 
-            result.m20 = left.m20 + right.m20;
-            result.m21 = left.m21 + right.m21;
-            result.m22 = left.m22 + right.m22;
+
         }
 
-        public static Matrix3x3 Add(Matrix2x2 left, Matrix3x3 right)
+        public static Matrix2x3 Add(Matrix2x2 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Add(ref left, ref right, out result);
             return result;
         }
-        public static void Add(ref Matrix2x2 left, ref Matrix3x3 right, out Matrix3x3 result)
+        public static void Add(ref Matrix2x2 left, ref Matrix2x3 right, out Matrix2x3 result)
         {
             result.m00 = left.m00 + right.m00;
             result.m01 = left.m01 + right.m01;
@@ -485,17 +391,14 @@ namespace AdvanceMath
             result.m11 = left.m11 + right.m11;
             result.m12 = right.m12;
 
-            result.m20 = right.m20;
-            result.m21 = right.m21;
-            result.m22 = 1 + right.m22;
         }
-        public static Matrix3x3 Add(Matrix3x3 left, Matrix2x2 right)
+        public static Matrix2x3 Add(Matrix2x3 left, Matrix2x2 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Add(ref left, ref right, out result);
             return result;
         }
-        public static void Add(ref Matrix3x3 left, ref Matrix2x2 right, out Matrix3x3 result)
+        public static void Add(ref Matrix2x3 left, ref Matrix2x2 right, out Matrix2x3 result)
         {
             result.m00 = left.m00 + right.m00;
             result.m01 = left.m01 + right.m01;
@@ -505,12 +408,32 @@ namespace AdvanceMath
             result.m11 = left.m11 + right.m11;
             result.m12 = left.m12;
 
-            result.m20 = left.m20;
-            result.m21 = left.m21;
-            result.m22 = left.m22 + 1;
         }
 
+        public static Matrix2x3 Transpose(Matrix2x3 source)
+        {
+            Matrix2x3 result;
+            Transpose(ref source, out result);
+            return result;
+        }
+        public static void Transpose(ref Matrix2x3 source, out Matrix2x3 result)
+        {
+            Scalar m01 = source.m01;
+            Scalar m02 = source.m02;
+            Scalar m12 = source.m12;
 
+            result.m00 = source.m00;
+            result.m01 = source.m10;
+            result.m02 = 0;
+
+            result.m10 = m01;
+            result.m11 = source.m11;
+            result.m12 = 0;
+
+
+
+
+        }
 
         /// <summary>
         /// Used to subtract two matrices.
@@ -518,9 +441,9 @@ namespace AdvanceMath
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 Subtract(Matrix3x3 left, Matrix3x3 right)
+        public static Matrix2x3 Subtract(Matrix2x3 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 - right.m00;
             result.m01 = left.m01 - right.m01;
@@ -530,13 +453,10 @@ namespace AdvanceMath
             result.m11 = left.m11 - right.m11;
             result.m12 = left.m12 - right.m12;
 
-            result.m20 = left.m20 - right.m20;
-            result.m21 = left.m21 - right.m21;
-            result.m22 = left.m22 - right.m22;
 
             return result;
         }
-        public static void Subtract(ref Matrix3x3 left, ref Matrix3x3 right, out Matrix3x3 result)
+        public static void Subtract(ref Matrix2x3 left, ref Matrix2x3 right, out Matrix2x3 result)
         {
             result.m00 = left.m00 - right.m00;
             result.m01 = left.m01 - right.m01;
@@ -546,19 +466,16 @@ namespace AdvanceMath
             result.m11 = left.m11 - right.m11;
             result.m12 = left.m12 - right.m12;
 
-            result.m20 = left.m20 - right.m20;
-            result.m21 = left.m21 - right.m21;
-            result.m22 = left.m22 - right.m22;
 
         }
 
-        public static Matrix3x3 Subtract(Matrix2x2 left, Matrix3x3 right)
+        public static Matrix2x3 Subtract(Matrix2x2 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Subtract(ref left, ref right, out result);
             return result;
         }
-        public static void Subtract(ref Matrix2x2 left, ref Matrix3x3 right, out Matrix3x3 result)
+        public static void Subtract(ref Matrix2x2 left, ref Matrix2x3 right, out Matrix2x3 result)
         {
             result.m00 = left.m00 - right.m00;
             result.m01 = left.m01 - right.m01;
@@ -568,17 +485,14 @@ namespace AdvanceMath
             result.m11 = left.m11 - right.m11;
             result.m12 = -right.m12;
 
-            result.m20 = -right.m20;
-            result.m21 = -right.m21;
-            result.m22 = 1 - right.m22;
         }
-        public static Matrix3x3 Subtract(Matrix3x3 left, Matrix2x2 right)
+        public static Matrix2x3 Subtract(Matrix2x3 left, Matrix2x2 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Subtract(ref left, ref right, out result);
             return result;
         }
-        public static void Subtract(ref Matrix3x3 left, ref Matrix2x2 right, out Matrix3x3 result)
+        public static void Subtract(ref Matrix2x3 left, ref Matrix2x2 right, out Matrix2x3 result)
         {
             result.m00 = left.m00 - right.m00;
             result.m01 = left.m01 - right.m01;
@@ -588,20 +502,17 @@ namespace AdvanceMath
             result.m11 = left.m11 - right.m11;
             result.m12 = left.m12;
 
-            result.m20 = left.m20;
-            result.m21 = left.m21;
-            result.m22 = left.m22 - 1;
         }
 
         /// <summary>
-        /// Negates a Matrix3x3.
+        /// Negates a Matrix3x2.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 Negate(Matrix3x3 source)
+        public static Matrix2x3 Negate(Matrix2x3 source)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = -source.m00;
             result.m01 = -source.m01;
@@ -611,19 +522,16 @@ namespace AdvanceMath
             result.m11 = -source.m11;
             result.m12 = -source.m12;
 
-            result.m20 = -source.m20;
-            result.m21 = -source.m21;
-            result.m22 = -source.m22;
 
 
             return result;
         }
         [CLSCompliant(false)]
-        public static void Negate(ref Matrix3x3 source)
+        public static void Negate(ref Matrix2x3 source)
         {
             Negate(ref source, out source);
         }
-        public static void Negate(ref Matrix3x3 source, out Matrix3x3 result)
+        public static void Negate(ref Matrix2x3 source, out Matrix2x3 result)
         {
             result.m00 = -source.m00;
             result.m01 = -source.m01;
@@ -633,18 +541,15 @@ namespace AdvanceMath
             result.m11 = -source.m11;
             result.m12 = -source.m12;
 
-            result.m20 = -source.m20;
-            result.m21 = -source.m21;
-            result.m22 = -source.m22;
         }
 
-        public static Matrix3x3 Invert(Matrix3x3 source)
+        public static Matrix2x3 Invert(Matrix2x3 source)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Invert(ref source, out result);
             return result;
         }
-        public static void Invert(ref Matrix3x3 source, out Matrix3x3 result)
+        public static void Invert(ref Matrix2x3 source, out Matrix2x3 result)
         {
             Scalar m01 = source.m01;
             Scalar m02 = source.m02;
@@ -655,164 +560,122 @@ namespace AdvanceMath
 
 
 
-            Scalar m11m22m12m21 = (m11 * source.m22 - m12 * source.m21);
-            Scalar m10m22m12m20 = (source.m10 * source.m22 - m12 * source.m20);
-            Scalar m10m21m11m20 = (source.m10 * source.m21 - m11 * source.m20);
+            // Scalar m11m22m12m21 = (m11);
+            // Scalar m10m22m12m20 = (source.m10 );
+            // Scalar m10m21m11m20 = 0;
 
 
 
-            Scalar detInv = 1 / (source.m00 * (m11m22m12m21) - m01 * (m10m22m12m20) + m02 * (m10m21m11m20));
+            Scalar detInv = 1 / (source.m00 * m11 - m01 * source.m10);
 
 
-            result.m01 = detInv * (-(m01 * source.m22 - m02 * source.m21));
+            result.m01 = detInv * (-m01);
             result.m02 = detInv * (m01 * m12 - m02 * m11);
 
-            result.m11 = detInv * (source.m00 * source.m22 - m02 * source.m20);
+            result.m11 = detInv * (source.m00);
             result.m12 = detInv * (-(source.m00 * m12 - m02 * source.m10));
 
-            result.m21 = detInv * (-(source.m00 * source.m21 - m01 * source.m20));
-            result.m22 = detInv * (source.m00 * m11 - m01 * source.m10);
-
-
-            result.m00 = detInv * (m11m22m12m21);
-            result.m10 = detInv * (-(m10m22m12m20));
-            result.m20 = detInv * (m10m21m11m20);
-
+            result.m00 = detInv * (m11);
+            result.m10 = detInv * (-source.m10);
         }
 
-        public static Scalar GetDeterminant(Matrix3x3 source)
+        public static Scalar GetDeterminant(Matrix2x3 source)
         {
             Scalar result;
             GetDeterminant(ref source, out result);
             return result;
         }
-        public static void GetDeterminant(ref Matrix3x3 source, out Scalar result)
+        public static void GetDeterminant(ref Matrix2x3 source, out Scalar result)
         {
-            // note: this is an expanded version of the Ogre determinant() method, to give better performance in C#. Generated using a script
             result =
-            source.m00 * (source.m11 * source.m22 - source.m12 * source.m21) -
-            source.m01 * (source.m10 * source.m22 - source.m12 * source.m20) +
-            source.m02 * (source.m10 * source.m21 - source.m11 * source.m20);
+                source.m00 * (source.m11) -
+                source.m01 * (source.m10);
         }
 
-        public static Matrix3x3 Transpose(Matrix3x3 source)
+        /*  public static Matrix3x2 Transpose(Matrix3x2 source)
+         {
+             Matrix3x2 result;
+             Transpose(ref source, out result);
+             return result;
+         }
+        public static void Transpose(ref Matrix3x2 source, out Matrix3x2 result)
+         {
+             Scalar m01 = source.m01;
+             Scalar m02 = source.m02;
+             Scalar m12 = source.m12;
+
+             result.m00 = source.m00;
+             result.m01 = source.m10;
+             result.m02 = source.m20;
+
+             result.m10 = m01;
+             result.m11 = source.m11;
+             result.m12 = source.m21;
+
+             result.m20 = m02;
+             result.m21 = m12;
+             result.m22 = source.m22;
+
+
+
+         }*/
+
+        public static Matrix2x3 GetAdjoint(Matrix2x3 source)
         {
-            Matrix3x3 result;
-            Transpose(ref source, out result);
-            return result;
-        }
-        public static void Transpose(ref Matrix3x3 source, out Matrix3x3 result)
-        {
-            Scalar m01 = source.m01;
-            Scalar m02 = source.m02;
-            Scalar m12 = source.m12;
-
-            result.m00 = source.m00;
-            result.m01 = source.m10;
-            result.m02 = source.m20;
-
-            result.m10 = m01;
-            result.m11 = source.m11;
-            result.m12 = source.m21;
-
-            result.m20 = m02;
-            result.m21 = m12;
-            result.m22 = source.m22;
-
-
-
-        }
-
-        public static Matrix3x3 GetAdjoint(Matrix3x3 source)
-        {
-            Matrix3x3 result;
+            Matrix2x3 result;
             GetAdjoint(ref source, out result);
             return result;
         }
-        public static void GetAdjoint(ref Matrix3x3 source, out Matrix3x3 result)
+        public static void GetAdjoint(ref Matrix2x3 source, out Matrix2x3 result)
         {
             Scalar m01 = source.m01;
             Scalar m02 = source.m02;
             Scalar m11 = source.m11;
             Scalar m12 = source.m12;
 
-            Scalar m11m22m12m21 = (m11 * source.m22 - m12 * source.m21);
-            Scalar m10m22m12m20 = (source.m10 * source.m22 - m12 * source.m20);
-            Scalar m10m21m11m20 = (source.m10 * source.m21 - m11 * source.m20);
 
-
-            result.m01 = (-(m01 * source.m22 - m02 * source.m21));
+            result.m01 = (-(m01 * 1 - m02 * 0));
             result.m02 = (m01 * m12 - m02 * m11);
 
-            result.m11 = (source.m00 * source.m22 - m02 * source.m20);
+            result.m11 = (source.m00);
             result.m12 = (-(source.m00 * m12 - m02 * source.m10));
 
-            result.m21 = (-(source.m00 * source.m21 - m01 * source.m20));
-            result.m22 = (source.m00 * m11 - m01 * source.m10);
-
-
-            result.m00 = (m11m22m12m21);
-            result.m10 = (-(m10m22m12m20));
-            result.m20 = (m10m21m11m20);
-
+            result.m00 = (m11);
+            result.m10 = (-(source.m10));
         }
 
-        public static Matrix3x3 GetCofactor(Matrix3x3 source)
+        public static Matrix2x3 GetCofactor(Matrix2x3 source)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             GetCofactor(ref source, out result);
             return result;
         }
-        public static void GetCofactor(ref Matrix3x3 source, out Matrix3x3 result)
+        public static void GetCofactor(ref Matrix2x3 source, out Matrix2x3 result)
         {
             Scalar m01 = source.m01;
             Scalar m02 = source.m02;
             Scalar m11 = source.m11;
             Scalar m12 = source.m12;
 
-            Scalar m11m22m12m21 = (m11 * source.m22 - m12 * source.m21);
-            Scalar m10m22m12m20 = (source.m10 * source.m22 - m12 * source.m20);
-            Scalar m10m21m11m20 = (source.m10 * source.m21 - m11 * source.m20);
+            result.m01 = m01;
+            result.m02 = -(m01 * m12 - m02 * m11);
 
+            result.m11 = -source.m00;
+            result.m12 = source.m00 * m12 - m02 * source.m10;
 
-            result.m01 = ((m01 * source.m22 - m02 * source.m21));
-            result.m02 = (-(m01 * m12 - m02 * m11));
-
-            result.m11 = (-(source.m00 * source.m22 - m02 * source.m20));
-            result.m12 = ((source.m00 * m12 - m02 * source.m10));
-
-            result.m21 = ((source.m00 * source.m21 - m01 * source.m20));
-            result.m22 = (-(source.m00 * m11 - m01 * source.m10));
-
-
-            result.m00 = (-(m11m22m12m21));
-            result.m10 = ((m10m22m12m20));
-            result.m20 = (-(m10m21m11m20));
+            result.m00 = -m11;
+            result.m10 = source.m10;
 
         }
 
 
-
-        public static Matrix3x3 FromArray(Scalar[] array)
+        public static Matrix2x3 FromTransformation(Scalar rotation, Vector2D translation)
         {
-            Matrix3x3 result;
-            Copy(array, 0, out result);
-            return result;
-        }
-        public static Matrix3x3 FromTransposedArray(Scalar[] array)
-        {
-            Matrix3x3 result;
-            CopyTranspose(array, 0, out result);
-            return result;
-        }
-
-        public static Matrix3x3 FromTransformation(Scalar rotation, Vector2D translation)
-        {
-            Matrix3x3 result;
+            Matrix2x3 result;
             FromTransformation(ref rotation, ref translation, out result);
             return result;
         }
-        public static void FromTransformation(ref Scalar rotation, ref Vector2D translation, out Matrix3x3 result)
+        public static void FromTransformation(ref Scalar rotation, ref Vector2D translation, out Matrix2x3 result)
         {
             result.m00 = MathHelper.Cos(rotation);
             result.m10 = MathHelper.Sin(rotation);
@@ -820,87 +683,25 @@ namespace AdvanceMath
             result.m11 = result.m00;
             result.m02 = translation.X;
             result.m12 = translation.Y;
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
         }
 
-        public static Matrix3x3 FromRotationX(Scalar radianAngle)
+
+        public static Matrix2x3 FromArray(Scalar[] array)
         {
-            Matrix3x3 result;
-
-            result.m21 = MathHelper.Sin(radianAngle);
-
-
-            result.m00 = 1;
-            result.m01 = 0;
-            result.m02 = 0;
-
-            result.m10 = 0;
-            result.m11 = MathHelper.Cos(radianAngle);
-            result.m12 = -result.m21;
-
-            result.m20 = 0;
-            result.m22 = result.m11;
-
+            Matrix2x3 result;
+            Copy(array, 0, out result);
             return result;
         }
-        public static void FromRotationX(ref Scalar radianAngle, out Matrix3x3 result)
+       /* public static Matrix3x2 FromTransposedArray(Scalar[] array)
         {
-            result.m21 = MathHelper.Sin(radianAngle);
-
-
-            result.m00 = 1;
-            result.m01 = 0;
-            result.m02 = 0;
-
-            result.m10 = 0;
-            result.m11 = MathHelper.Cos(radianAngle);
-            result.m12 = -result.m21;
-
-            result.m20 = 0;
-            result.m22 = result.m11;
-        }
-        public static Matrix3x3 FromRotationY(Scalar radianAngle)
-        {
-            Matrix3x3 result;
-
-            result.m20 = MathHelper.Sin(radianAngle);
-
-
-            result.m00 = MathHelper.Cos(radianAngle);
-            result.m01 = 0;
-            result.m02 = -result.m20;
-
-            result.m10 = 0;
-            result.m11 = 1;
-            result.m12 = 0;
-
-            result.m21 = 0;
-            result.m22 = result.m00;
-
+            Matrix3x2 result;
+            CopyTranspose(array, 0, out result);
             return result;
-        }
-        public static void FromRotationY(ref Scalar radianAngle, out Matrix3x3 result)
+        }*/
+
+        public static Matrix2x3 FromRotationZ(Scalar radianAngle)
         {
-            result.m20 = MathHelper.Sin(radianAngle);
-
-
-            result.m00 = MathHelper.Cos(radianAngle);
-            result.m01 = 0;
-            result.m02 = -result.m20;
-
-            result.m10 = 0;
-            result.m11 = 1;
-            result.m12 = 0;
-
-            result.m21 = 0;
-            result.m22 = result.m00;
-
-        }
-        public static Matrix3x3 FromRotationZ(Scalar radianAngle)
-        {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m10 = MathHelper.Sin(radianAngle);
 
@@ -912,17 +713,12 @@ namespace AdvanceMath
             result.m11 = result.m00;
             result.m12 = 0;
 
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
-
             return result;
         }
-        public static void FromRotationZ(ref Scalar radianAngle, out Matrix3x3 result)
+        public static void FromRotationZ(ref Scalar radianAngle, out Matrix2x3 result)
         {
 
             result.m10 = MathHelper.Sin(radianAngle);
-
 
             result.m00 = MathHelper.Cos(radianAngle);
             result.m01 = -result.m10;
@@ -931,57 +727,14 @@ namespace AdvanceMath
             result.m11 = result.m00;
             result.m12 = 0;
 
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
 
-        }
-        public static Matrix3x3 FromRotationAxisUsingAtan(Scalar radianAngle, Vector3D axis)
-        {
-            Scalar zAngle;
-            Scalar yAngle;
-            if (axis.X == 0)
-            {
-                if (axis.Y == 0)
-                {
-                    return FromRotationZ(radianAngle);
-                }
-                else
-                {
-                    zAngle = MathHelper.PiOver2;
-                    yAngle = (Scalar)Math.Atan(axis.Z / axis.Y);
-                }
-            }
-            else
-            {
-                zAngle = (Scalar)Math.Atan(axis.Y / axis.X);
-                yAngle = (Scalar)Math.Atan(axis.Z / Math.Sqrt(axis.X * axis.X + axis.Y * axis.Y));
-            }
-            return FromRotationZ(-zAngle) *
-            FromRotationY(-yAngle) *
-            FromRotationX(radianAngle) *
-            FromRotationY(yAngle) *
-            FromRotationZ(zAngle);
-        }
-
-        public static Matrix3x3 FromRotationAxis(Scalar radianAngle, Vector3D axis)
-        {
-            Matrix3x3 first = FromLookAt(Vector3D.Zero, axis, new Vector3D(axis.Z, axis.X, axis.Y));
-            return first.Inverted * FromRotationZ(radianAngle) * first;
-        }
-        internal static Matrix3x3 FromLookAt(Vector3D origin, Vector3D positiveZAxis, Vector3D onPositiveY)
-        {
-            Matrix3x3 rv = Identity;
-            rv.Rz = Vector3D.Normalize(positiveZAxis - origin);
-            rv.Rx = Vector3D.Normalize((onPositiveY - origin) ^ rv.Rz);
-            rv.Ry = Vector3D.Normalize(rv.Rz ^ rv.Rx);
-            return rv;
         }
 
 
-        public static Matrix3x3 FromScale(Vector3D scale)
+
+        public static Matrix2x3 FromScale(Vector2D scale)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = scale.X;
             result.m01 = 0;
@@ -991,13 +744,9 @@ namespace AdvanceMath
             result.m11 = scale.Y;
             result.m12 = 0;
 
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = scale.Z;
-
             return result;
         }
-        public static void FromScale(ref Vector3D scale, out Matrix3x3 result)
+        public static void FromScale(ref Vector2D scale, out Matrix2x3 result)
         {
             result.m00 = scale.X;
             result.m01 = 0;
@@ -1007,43 +756,11 @@ namespace AdvanceMath
             result.m11 = scale.Y;
             result.m12 = 0;
 
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = scale.Z;
         }
-        public static Matrix3x3 FromScale(Vector2D scale)
+
+        public static Matrix2x3 FromTranslate2D(Vector2D value)
         {
-            Matrix3x3 result;
-            result.m00 = scale.X;
-            result.m01 = 0;
-            result.m02 = 0;
-
-            result.m10 = 0;
-            result.m11 = scale.Y;
-            result.m12 = 0;
-
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
-            return result;
-        }
-        public static void FromScale(ref Vector2D scale, out Matrix3x3 result)
-        {
-            result.m00 = scale.X;
-            result.m01 = 0;
-            result.m02 = 0;
-
-            result.m10 = 0;
-            result.m11 = scale.Y;
-            result.m12 = 0;
-
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
-        }
-        public static Matrix3x3 FromTranslate2D(Vector2D value)
-        {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = 1;
             result.m01 = 0;
@@ -1053,13 +770,10 @@ namespace AdvanceMath
             result.m11 = 1;
             result.m12 = value.Y;
 
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
 
             return result;
         }
-        public static void FromTranslate2D(ref Vector2D value, out Matrix3x3 result)
+        public static void FromTranslate2D(ref Vector2D value, out Matrix2x3 result)
         {
             result.m00 = 1;
             result.m01 = 0;
@@ -1068,47 +782,11 @@ namespace AdvanceMath
             result.m10 = 0;
             result.m11 = 1;
             result.m12 = value.Y;
-
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
-        }
-        public static Matrix3x3 FromShear3D(Vector2D value)
-        {
-            Matrix3x3 result;
-
-            result.m00 = 1;
-            result.m01 = 0;
-            result.m02 = value.X;
-
-            result.m10 = 0;
-            result.m11 = 1;
-            result.m12 = value.Y;
-
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
-
-            return result;
-        }
-        public static void FromShear3D(ref Vector2D value, out Matrix3x3 result)
-        {
-            result.m00 = 1;
-            result.m01 = 0;
-            result.m02 = value.X;
-
-            result.m10 = 0;
-            result.m11 = 1;
-            result.m12 = value.Y;
-
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
         }
 
         public static Scalar GetDeterminant(Scalar m00, Scalar m01, Scalar m02,
-        Scalar m10, Scalar m11, Scalar m12,
-        Scalar m20, Scalar m21, Scalar m22)
+            Scalar m10, Scalar m11, Scalar m12,
+            Scalar m20, Scalar m21, Scalar m22)
         {
             Scalar cofactor00 = m11 * m22 - m12 * m21;
             Scalar cofactor10 = m12 * m20 - m10 * m22;
@@ -1131,47 +809,35 @@ namespace AdvanceMath
             return result;
         }
 
-        /// <summary>
-        /// Constructs this Matrix from 3 euler angles, in degrees.
-        /// </summary>
-        /// <param name="yaw"></param>
-        /// <param name="pitch"></param>
-        /// <param name="roll"></param>
-        public static Matrix3x3 FromEulerAnglesXYZ(Scalar yaw, Scalar pitch, Scalar roll)
-        {
-            return FromRotationX(yaw) * (FromRotationY(pitch) * FromRotationZ(roll));
-        }
 
         [ParseMethod]
-        public static Matrix3x3 Parse(string s)
+        public static Matrix2x3 Parse(string s)
         {
-            Matrix3x3 rv = Zero;
-            ParseHelper.ParseMatrix<Matrix3x3>(s, ref rv);
+            Matrix2x3 rv = Zero;
+            ParseHelper.ParseMatrix<Matrix2x3>(s, ref rv);
             return rv;
         }
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
-        public static bool TryParse(string s, out Matrix3x3 result)
+        public static bool TryParse(string s, out Matrix2x3 result)
         {
             result = Zero;
-            return ParseHelper.TryParseMatrix<Matrix3x3>(s, ref result);
+            return ParseHelper.TryParseMatrix<Matrix2x3>(s, ref result);
         }
 #endif
 
 
-        public static bool Equals(Matrix3x3 left, Matrix3x3 right)
+        public static bool Equals(Matrix2x3 left, Matrix2x3 right)
         {
             return
                 left.m00 == right.m00 && left.m01 == right.m01 && left.m02 == right.m02 &&
-                left.m10 == right.m10 && left.m11 == right.m11 && left.m12 == right.m12 &&
-                left.m20 == right.m20 && left.m21 == right.m21 && left.m22 == right.m22;
+                left.m10 == right.m10 && left.m11 == right.m11 && left.m12 == right.m12;
         }
         [CLSCompliant(false)]
-        public static bool Equals(ref Matrix3x3 left, ref Matrix3x3 right)
+        public static bool Equals(ref Matrix2x3 left, ref Matrix2x3 right)
         {
             return
                 left.m00 == right.m00 && left.m01 == right.m01 && left.m02 == right.m02 &&
-                left.m10 == right.m10 && left.m11 == right.m11 && left.m12 == right.m12 &&
-                left.m20 == right.m20 && left.m21 == right.m21 && left.m22 == right.m22;
+                left.m10 == right.m10 && left.m11 == right.m11 && left.m12 == right.m12;
         }
 
         #endregion
@@ -1179,13 +845,10 @@ namespace AdvanceMath
 
         // | m00 m01 m02 |
         // | m10 m11 m12 |
-        // | m20 m21 m22 |
         [XmlIgnore]
         public Scalar m00, m01, m02;
         [XmlIgnore]
         public Scalar m10, m11, m12;
-        [XmlIgnore]
-        public Scalar m20, m21, m22;
 
         #endregion
         #region Constructors
@@ -1193,13 +856,11 @@ namespace AdvanceMath
         /// <summary>
         /// Creates a new Matrix3 with all the specified parameters.
         /// </summary>
-        public Matrix3x3(Scalar m00, Scalar m01, Scalar m02,
-        Scalar m10, Scalar m11, Scalar m12,
-        Scalar m20, Scalar m21, Scalar m22)
+        public Matrix2x3(Scalar m00, Scalar m01, Scalar m02,
+        Scalar m10, Scalar m11, Scalar m12)
         {
             this.m00 = m00; this.m01 = m01; this.m02 = m02;
             this.m10 = m10; this.m11 = m11; this.m12 = m12;
-            this.m20 = m20; this.m21 = m21; this.m22 = m22;
         }
 
         /// <summary>
@@ -1208,22 +869,21 @@ namespace AdvanceMath
         /// <param name="xAxis"></param>
         /// <param name="yAxis"></param>
         /// <param name="zAxis"></param>
-        [InstanceConstructor("Rx,Ry,Rz")]
-        public Matrix3x3(Vector3D xAxis, Vector3D yAxis, Vector3D zAxis)
+        [InstanceConstructor("Rx,Ry")]
+        public Matrix2x3(Vector3D xAxis, Vector3D yAxis)
         {
             this.m00 = xAxis.X; this.m01 = xAxis.Y; this.m02 = xAxis.Z;
             this.m10 = yAxis.X; this.m11 = yAxis.Y; this.m12 = yAxis.Z;
-            this.m20 = zAxis.X; this.m21 = zAxis.Y; this.m22 = zAxis.Z;
         }
-        public Matrix3x3(Scalar[] values) : this(values, 0) { }
-        public Matrix3x3(Scalar[] values, int index)
+        public Matrix2x3(Scalar[] values) : this(values, 0) { }
+        public Matrix2x3(Scalar[] values, int index)
         {
             Copy(values, index, out this);
         }
         #endregion
         #region Properties
         [AdvBrowsable]
-        [System.ComponentModel.Description("The First row of the Matrix3x3")]
+        [System.ComponentModel.Description("The First row of the Matrix3x2")]
         public Vector3D Rx
         {
             get
@@ -1242,7 +902,7 @@ namespace AdvanceMath
             }
         }
         [AdvBrowsable]
-        [System.ComponentModel.Description("The Second row of the Matrix3x3")]
+        [System.ComponentModel.Description("The Second row of the Matrix3x2")]
         public Vector3D Ry
         {
             get
@@ -1260,65 +920,43 @@ namespace AdvanceMath
                 m12 = value.Z;
             }
         }
-        [AdvBrowsable]
-        [System.ComponentModel.Description("The Third row of the Matrix3x3")]
-        public Vector3D Rz
-        {
-            get
-            {
-                Vector3D value;
-                value.X = m20;
-                value.Y = m21;
-                value.Z = m22;
-                return value;
-            }
-            set
-            {
-                m20 = value.X;
-                m21 = value.Y;
-                m22 = value.Z;
-            }
-        }
         [XmlIgnore]
-        public Vector3D Cx
+        public Vector2D Cx
         {
             get
             {
-                return new Vector3D(m00, m10, m20);
+                return new Vector2D(m00, m10);
             }
             set
             {
                 this.m00 = value.X;
                 this.m10 = value.Y;
-                this.m20 = value.Z;
             }
         }
         [XmlIgnore]
-        public Vector3D Cy
+        public Vector2D Cy
         {
             get
             {
-                return new Vector3D(m01, m11, m21);
+                return new Vector2D(m01, m11);
             }
             set
             {
                 this.m01 = value.X;
                 this.m11 = value.Y;
-                this.m21 = value.Z;
             }
         }
         [XmlIgnore]
-        public Vector3D Cz
+        public Vector2D Cz
         {
             get
             {
-                return new Vector3D(m02, m12, m22);
+                return new Vector2D(m02, m12);
             }
             set
             {
                 this.m02 = value.X;
                 this.m12 = value.Y;
-                this.m22 = value.Z;
             }
         }
 
@@ -1335,38 +973,39 @@ namespace AdvanceMath
         /// Swap the rows of the matrix with the columns.
         /// </summary>
         /// <returns>A transposed Matrix.</returns>
-        public Matrix3x3 Transposed
+        public Matrix2x3 Transposed
         {
             get
             {
-                Matrix3x3 result;
+                throw new NotSupportedException();
+              /*  Matrix3x2 result;
                 Transpose(ref this, out result);
-                return result;
+                return result;*/
             }
         }
-        public Matrix3x3 Adjoint
+        public Matrix2x3 Adjoint
         {
             get
             {
-                Matrix3x3 result;
+                Matrix2x3 result;
                 GetAdjoint(ref this, out result);
                 return result;
             }
         }
-        public Matrix3x3 Cofactor
+        public Matrix2x3 Cofactor
         {
             get
             {
-                Matrix3x3 result;
+                Matrix2x3 result;
                 GetCofactor(ref this, out result);
                 return result;
             }
         }
-        public Matrix3x3 Inverted
+        public Matrix2x3 Inverted
         {
             get
             {
-                Matrix3x3 result;
+                Matrix2x3 result;
                 Invert(ref this, out result);
                 return result;
             }
@@ -1378,7 +1017,7 @@ namespace AdvanceMath
         #endregion Properties
         #region Methods
 
-        public Vector3D GetColumn(int columnIndex)
+        public Vector2D GetColumn(int columnIndex)
         {
             switch (columnIndex)
             {
@@ -1391,9 +1030,8 @@ namespace AdvanceMath
             }
             throw ThrowHelper.GetThrowIndex("columnIndex", ColumnCount);
         }
-        public void SetColumn(int columnIndex, Vector3D value)
+        public void SetColumn(int columnIndex, Vector2D value)
         {
-
             switch (columnIndex)
             {
                 case 0:
@@ -1416,8 +1054,6 @@ namespace AdvanceMath
                     return Rx;
                 case 1:
                     return Ry;
-                case 2:
-                    return Rz;
             }
             throw ThrowHelper.GetThrowIndex("rowIndex", RowCount);
         }
@@ -1431,24 +1067,22 @@ namespace AdvanceMath
                 case 1:
                     Ry = value;
                     return;
-                case 2:
-                    Rz = value;
-                    return;
             }
             throw ThrowHelper.GetThrowIndex("rowIndex", RowCount);
         }
 
         public Scalar[,] ToMatrixArray()
         {
-            return new Scalar[RowCount, ColumnCount] { { m00, m01, m02 }, { m10, m11, m12 }, { m20, m21, m22 } };
+            return new Scalar[RowCount, ColumnCount]{ { m00, m01, m02 }, { m10, m11, m12 } };
         }
         public Scalar[] ToArray()
         {
-            return new Scalar[Count] { m00, m01, m02, m10, m11, m12, m20, m21, m22 };
+            return new Scalar[Count] { m00, m01, m02, m10, m11, m12 };
         }
         public Scalar[] ToTransposedArray()
         {
-            return new Scalar[Count] { m00, m10, m20, m01, m11, m21, m02, m12, m22 };
+            throw new NotSupportedException();
+          //  return new Scalar[Count] { m00, m10, m20, m01, m11, m21, m02, m12, m22 };
         }
 
         public Matrix4x4 ToMatrix4x4From2D()
@@ -1456,7 +1090,6 @@ namespace AdvanceMath
             Matrix4x4 result = Matrix4x4.Identity;
             result.m00 = this.m00; result.m01 = this.m01; result.m03 = this.m02;
             result.m10 = this.m10; result.m11 = this.m11; result.m13 = this.m12;
-            result.m30 = this.m20; result.m31 = this.m21; result.m33 = this.m22;
             return result;
         }
         public Matrix4x4 ToMatrix4x4()
@@ -1464,7 +1097,6 @@ namespace AdvanceMath
             Matrix4x4 result = Matrix4x4.Identity;
             result.m00 = this.m00; result.m01 = this.m01; result.m02 = this.m02;
             result.m10 = this.m10; result.m11 = this.m11; result.m12 = this.m12;
-            result.m20 = this.m20; result.m21 = this.m21; result.m22 = this.m22;
             return result;
         }
 
@@ -1474,7 +1106,8 @@ namespace AdvanceMath
         }
         public void CopyTransposedTo(Scalar[] array, int index)
         {
-            CopyTranspose(ref this, array, index);
+            throw new NotSupportedException();
+           // CopyTranspose(ref this, array, index);
         }
         public void CopyFrom(Scalar[] array, int index)
         {
@@ -1482,7 +1115,8 @@ namespace AdvanceMath
         }
         public void CopyTransposedFrom(Scalar[] array, int index)
         {
-            CopyTranspose(array, index, out this);
+            throw new NotSupportedException();
+           // CopyTranspose(array, index, out this);
         }
 
 
@@ -1491,8 +1125,7 @@ namespace AdvanceMath
         {
             return string.Format(FormatString,
             m00, m01, m02,
-            m10, m11, m12,
-            m20, m21, m22);
+            m10, m11, m12);
         }
         public string ToString(string format)
         {
@@ -1507,17 +1140,16 @@ namespace AdvanceMath
         {
             return
             m00.GetHashCode() ^ m01.GetHashCode() ^ m02.GetHashCode() ^
-            m10.GetHashCode() ^ m11.GetHashCode() ^ m12.GetHashCode() ^
-            m20.GetHashCode() ^ m21.GetHashCode() ^ m22.GetHashCode();
+            m10.GetHashCode() ^ m11.GetHashCode() ^ m12.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
             return
-                (obj is Matrix3x3) &&
-                Equals((Matrix3x3)obj);
+                (obj is Matrix2x3) &&
+                Equals((Matrix2x3)obj);
         }
-        public bool Equals(Matrix3x3 other)
+        public bool Equals(Matrix2x3 other)
         {
             return Equals(ref this, ref other);
         }
@@ -1600,35 +1232,31 @@ namespace AdvanceMath
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator *(Matrix3x3 left, Matrix3x3 right)
+        public static Matrix2x3 operator *(Matrix2x3 left, Matrix2x3 right)
         {
 
-            Matrix3x3 result;
+            Matrix2x3 result;
 
-            result.m00 = left.m00 * right.m00 + left.m01 * right.m10 + left.m02 * right.m20;
-            result.m01 = left.m00 * right.m01 + left.m01 * right.m11 + left.m02 * right.m21;
-            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 * right.m22;
+            result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
+            result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
+            result.m02 = left.m00 * right.m02 + left.m01 * right.m12 + left.m02 ;
 
-            result.m10 = left.m10 * right.m00 + left.m11 * right.m10 + left.m12 * right.m20;
-            result.m11 = left.m10 * right.m01 + left.m11 * right.m11 + left.m12 * right.m21;
-            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12 * right.m22;
-
-            result.m20 = left.m20 * right.m00 + left.m21 * right.m10 + left.m22 * right.m20;
-            result.m21 = left.m20 * right.m01 + left.m21 * right.m11 + left.m22 * right.m21;
-            result.m22 = left.m20 * right.m02 + left.m21 * right.m12 + left.m22 * right.m22;
+            result.m10 = left.m10 * right.m00 + left.m11 * right.m10;
+            result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
+            result.m12 = left.m10 * right.m02 + left.m11 * right.m12 + left.m12 ;
 
             return result;
         }
         /// <summary>
-        /// Multiply (concatenate) a Matrix3x3 and a Matrix2x2
+        /// Multiply (concatenate) a Matrix3x2 and a Matrix2x2
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator *(Matrix2x2 left, Matrix3x3 right)
+        public static Matrix2x3 operator *(Matrix2x2 left, Matrix2x3 right)
         {
 
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
             result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
@@ -1638,22 +1266,18 @@ namespace AdvanceMath
             result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
             result.m12 = left.m10 * right.m02 + left.m11 * right.m12;
 
-            result.m20 = right.m20;
-            result.m21 = right.m21;
-            result.m22 = right.m22;
-
             return result;
         }
         /// <summary>
-        /// Multiply (concatenate) a Matrix3x3 and a Matrix2x2
+        /// Multiply (concatenate) a Matrix3x2 and a Matrix2x2
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator *(Matrix3x3 left, Matrix2x2 right)
+        public static Matrix2x3 operator *(Matrix2x3 left, Matrix2x2 right)
         {
 
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 * right.m00 + left.m01 * right.m10;
             result.m01 = left.m00 * right.m01 + left.m01 * right.m11;
@@ -1663,10 +1287,6 @@ namespace AdvanceMath
             result.m11 = left.m10 * right.m01 + left.m11 * right.m11;
             result.m12 = left.m12;
 
-            result.m20 = left.m20 * right.m00 + left.m21 * right.m10;
-            result.m21 = left.m20 * right.m01 + left.m21 * right.m11;
-            result.m22 = left.m22;
-
             return result;
         }
 
@@ -1676,9 +1296,9 @@ namespace AdvanceMath
         /// <param name="matrix"></param>
         /// <param name="scalar"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator *(Matrix3x3 matrix, Scalar scalar)
+        public static Matrix2x3 operator *(Matrix2x3 matrix, Scalar scalar)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = matrix.m00 * scalar;
             result.m01 = matrix.m01 * scalar;
@@ -1686,9 +1306,6 @@ namespace AdvanceMath
             result.m10 = matrix.m10 * scalar;
             result.m11 = matrix.m11 * scalar;
             result.m12 = matrix.m12 * scalar;
-            result.m20 = matrix.m20 * scalar;
-            result.m21 = matrix.m21 * scalar;
-            result.m22 = matrix.m22 * scalar;
 
             return result;
         }
@@ -1698,9 +1315,9 @@ namespace AdvanceMath
         /// <param name="matrix"></param>
         /// <param name="scalar"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator *(Scalar scalar, Matrix3x3 matrix)
+        public static Matrix2x3 operator *(Scalar scalar, Matrix2x3 matrix)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = matrix.m00 * scalar;
             result.m01 = matrix.m01 * scalar;
@@ -1708,9 +1325,6 @@ namespace AdvanceMath
             result.m10 = matrix.m10 * scalar;
             result.m11 = matrix.m11 * scalar;
             result.m12 = matrix.m12 * scalar;
-            result.m20 = matrix.m20 * scalar;
-            result.m21 = matrix.m21 * scalar;
-            result.m22 = matrix.m22 * scalar;
 
             return result;
         }
@@ -1720,9 +1334,9 @@ namespace AdvanceMath
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator +(Matrix3x3 left, Matrix3x3 right)
+        public static Matrix2x3 operator +(Matrix2x3 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 + right.m00;
             result.m01 = left.m01 + right.m01;
@@ -1732,21 +1346,18 @@ namespace AdvanceMath
             result.m11 = left.m11 + right.m11;
             result.m12 = left.m12 + right.m12;
 
-            result.m20 = left.m20 + right.m20;
-            result.m21 = left.m21 + right.m21;
-            result.m22 = left.m22 + right.m22;
 
             return result;
         }
-        public static Matrix3x3 operator +(Matrix2x2 left, Matrix3x3 right)
+        public static Matrix2x3 operator +(Matrix2x2 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Add(ref left, ref right, out result);
             return result;
         }
-        public static Matrix3x3 operator +(Matrix3x3 left, Matrix2x2 right)
+        public static Matrix2x3 operator +(Matrix2x3 left, Matrix2x2 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Add(ref left, ref right, out result);
             return result;
         }
@@ -1756,9 +1367,9 @@ namespace AdvanceMath
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator -(Matrix3x3 left, Matrix3x3 right)
+        public static Matrix2x3 operator -(Matrix2x3 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = left.m00 - right.m00;
             result.m01 = left.m01 - right.m01;
@@ -1768,21 +1379,18 @@ namespace AdvanceMath
             result.m11 = left.m11 - right.m11;
             result.m12 = left.m12 - right.m12;
 
-            result.m20 = left.m20 - right.m20;
-            result.m21 = left.m21 - right.m21;
-            result.m22 = left.m22 - right.m22;
 
             return result;
         }
-        public static Matrix3x3 operator -(Matrix2x2 left, Matrix3x3 right)
+        public static Matrix2x3 operator -(Matrix2x2 left, Matrix2x3 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Subtract(ref left, ref right, out result);
             return result;
         }
-        public static Matrix3x3 operator -(Matrix3x3 left, Matrix2x2 right)
+        public static Matrix2x3 operator -(Matrix2x3 left, Matrix2x2 right)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
             Subtract(ref left, ref right, out result);
             return result;
         }
@@ -1791,9 +1399,9 @@ namespace AdvanceMath
         /// </summary>
         /// <param name="matrix"></param>
         /// <returns></returns>
-        public static Matrix3x3 operator -(Matrix3x3 matrix)
+        public static Matrix2x3 operator -(Matrix2x3 matrix)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = -matrix.m00;
             result.m01 = -matrix.m01;
@@ -1801,9 +1409,6 @@ namespace AdvanceMath
             result.m10 = -matrix.m10;
             result.m11 = -matrix.m11;
             result.m12 = -matrix.m12;
-            result.m20 = -matrix.m20;
-            result.m21 = -matrix.m21;
-            result.m22 = -matrix.m22;
 
             return result;
         }
@@ -1813,22 +1418,21 @@ namespace AdvanceMath
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static bool operator ==(Matrix3x3 left, Matrix3x3 right)
+        public static bool operator ==(Matrix2x3 left, Matrix2x3 right)
         {
             return
             left.m00 == right.m00 && left.m01 == right.m01 && left.m02 == right.m02 &&
-            left.m10 == right.m10 && left.m11 == right.m11 && left.m12 == right.m12 &&
-            left.m20 == right.m20 && left.m21 == right.m21 && left.m22 == right.m22;
+            left.m10 == right.m10 && left.m11 == right.m11 && left.m12 == right.m12;
         }
-        public static bool operator !=(Matrix3x3 left, Matrix3x3 right)
+        public static bool operator !=(Matrix2x3 left, Matrix2x3 right)
         {
             return !(left == right);
         }
 
 
-        public static explicit operator Matrix3x3(Matrix4x4 source)
+        public static explicit operator Matrix2x3(Matrix4x4 source)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = source.m00;
             result.m01 = source.m01;
@@ -1838,15 +1442,12 @@ namespace AdvanceMath
             result.m11 = source.m11;
             result.m12 = source.m12;
 
-            result.m20 = source.m20;
-            result.m21 = source.m21;
-            result.m22 = source.m22;
 
             return result;
         }
-        public static explicit operator Matrix3x3(Matrix2x2 source)
+        public static explicit operator Matrix2x3(Matrix2x2 source)
         {
-            Matrix3x3 result;
+            Matrix2x3 result;
 
             result.m00 = source.m00;
             result.m01 = source.m01;
@@ -1856,9 +1457,6 @@ namespace AdvanceMath
             result.m11 = source.m11;
             result.m12 = 0;
 
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
 
 
 
@@ -1868,5 +1466,7 @@ namespace AdvanceMath
         }
 
         #endregion
+
+
     }
 }

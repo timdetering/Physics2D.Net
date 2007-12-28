@@ -30,39 +30,22 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
+using System.Collections.Generic;
 
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Physics2DDotNet.Math2D;
 
-namespace Physics2DDotNet
+
+namespace Physics2DDotNet.Shapes
 {
     /// <summary>
     /// A shape that contains multiple polygons.
     /// </summary>
     [Serializable]
-    public sealed class MultipartPolygon : Shape
+    public sealed class MultiPolygonShape : Shape, IRaySegmentsCollidable, ILineFluidAffectable, IExplosionAffectable
     {
-        sealed class StubComparer : System.Collections.Generic.IComparer<SAPNode>
-        {
-            public int Compare(SAPNode left, SAPNode right)
-            {
-                if (left.value < right.value) { return -1; }
-                if (left.value > right.value) { return 1; }
-                return ((left == right) ? (0) : ((left.begin) ? (-1) : (1)));
-            }
-        }
-        sealed class SAPNode
-        {
-            public bool begin;
-            public Scalar value;
-            public SAPNode(Scalar value, bool begin)
-            {
-                this.value = value;
-                this.begin = begin;
-            }
-        }
-        static StubComparer comparer = new StubComparer();
+
+        #region static
 
 
         public static Vector2D[][] CreateFromBitmap(bool[,] bitmap)
@@ -86,6 +69,7 @@ namespace Physics2DDotNet
             {
                 polygon = polygons[index];
                 if (polygon == null) { throw new ArgumentNullException("polygons"); }
+                if (polygon.Length < 3) { throw new ArgumentException("too few", "polygons"); }
                 totalLength += polygon.Length;
             }
             Vector2D[] result = new Vector2D[totalLength];
@@ -206,7 +190,7 @@ namespace Physics2DDotNet
             Vector2D[][] result = new Vector2D[polygons.Length][];
             for (int index = 0; index < polygons.Length; ++index)
             {
-                result[index] = Polygon.Reduce(polygons[index], areaTolerance);
+                result[index] = PolygonShape.Reduce(polygons[index], areaTolerance);
             }
             return result;
         }
@@ -219,36 +203,43 @@ namespace Physics2DDotNet
             Vector2D[][] result = new Vector2D[polygons.Length][];
             for (int index = 0; index < polygons.Length; ++index)
             {
-                result[index] = Polygon.Subdivide(polygons[index], maxLength, loop);
+                result[index] = PolygonShape.Subdivide(polygons[index], maxLength, loop);
             }
             return result;
         }
 
+
+
+        #endregion
+        #region fields
         private Vector2D[][] polygons;
 
 
         private DistanceGrid grid;
 
+        #endregion
         #region constructors
         [CLSCompliant(false)]
-        public MultipartPolygon(Vector2D[][] polygons, Scalar gridSpacing)
+        public MultiPolygonShape(Vector2D[][] polygons, Scalar gridSpacing)
             : this(polygons, gridSpacing, InertiaOfMultipartPolygon(polygons)) { }
-
-        public MultipartPolygon(Vector2D[][] polygons, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
+        public MultiPolygonShape(Vector2D[][] polygons, Scalar gridSpacing, Scalar momentOfInertiaMultiplier)
             : base(ConcatVertexes(polygons), momentOfInertiaMultiplier)
         {
             if (gridSpacing <= 0) { throw new ArgumentOutOfRangeException("gridSpacing"); }
             this.polygons = polygons;
+            this.Normals = CalculateNormals();
             this.grid = new DistanceGrid(this, gridSpacing);
         }
-
-        private MultipartPolygon(MultipartPolygon copy)
-            : base(copy)
-        {
-            this.grid = copy.grid;
-            this.polygons = copy.polygons;
-        }
         #endregion
+        #region properties
+        public Vector2D Centroid
+        {
+            get { return GetCentroid(polygons); }
+        }
+        public Scalar Area
+        {
+            get { return GetArea(polygons); }
+        }
 
         public Vector2D[][] Polygons
         {
@@ -259,7 +250,6 @@ namespace Physics2DDotNet
         {
             get { return true; }
         }
-
         public override bool CanGetDistance
         {
             get { return true; }
@@ -272,38 +262,29 @@ namespace Physics2DDotNet
         {
             get { return false; }
         }
-        public override bool CanGetDragInfo
+        #endregion
+        #region methods
+        private Vector2D[] CalculateNormals()
         {
-            get { return true; }
+            Vector2D[] result = new Vector2D[Vertexes.Length];
+            int offset = 0;
+            for (int index = 0; index < polygons.Length; ++index)
+            {
+                Vector2D[] polygon = polygons[index];
+                ShapeHelper.CalculateNormals(polygon, result, offset);
+                offset += polygon.Length;
+            }
+            return result;
         }
-        public override bool CanGetCentroid
+
+        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
         {
-            get { return true; }
-        }
-        public override bool CanGetArea
-        {
-            get { return true; }
-        }
-        public override bool CanGetInertia
-        {
-            get { return true; }
-        }
-        protected override void CalcBoundingRectangle()
-        {
-            BoundingRectangle.FromVectors(base.vertexes, out rect);
+            BoundingRectangle.FromVectors(ref matrices.ToWorld, Vertexes, out rectangle);
         }
 
         public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
-            Vector2D local;
-            Vector2D.Transform(ref matrix2DInv.VertexMatrix, ref point, out local);
-            if (grid.TryGetIntersection(local, out info))
-            {
-                Vector2D.Transform(ref matrix2D.NormalMatrix, ref info.Normal, out info.Normal);
-                info.Position = point;
-                return true;
-            }
-            return false;
+            return grid.TryGetIntersection(point, out info);
         }
 
         public override void GetDistance(ref Vector2D point, out Scalar result)
@@ -319,82 +300,108 @@ namespace Physics2DDotNet
                 }
             }
         }
-        public override bool TryGetCustomIntersection(Body other, out object customIntersectionInfo)
+        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }
 
-
-        public override DragInfo GetDragInfo(Vector2D tangent)
+        bool IRaySegmentsCollidable.TryGetRayCollision(Body thisBody, Body raysBody, RaySegmentsShape raySegments, out RaySegmentIntersectionInfo info)
         {
-            // direction = body.Shape.MatrixInv.NormalMatrix * direction;
-            Scalar min, max;
-            Scalar avg;
+            bool intersects = false;
+            RaySegment[] segments = raySegments.Segments;
+            Scalar[] result = new Scalar[segments.Length];
+            Scalar temp;
+            Vector2D[][] polygons = this.Polygons;
+            for (int index = 0; index < segments.Length; ++index)
+            {
+                result[index] = -1;
+            }
+            Matrix2x3 matrix = raysBody.Matrices.ToBody* thisBody.Matrices.ToWorld ;
+            for (int polyIndex = 0; polyIndex < polygons.Length; ++polyIndex)
+            {
+                Vector2D[] unTrans = polygons[polyIndex];
+                Vector2D[] polygon = new Vector2D[unTrans.Length];
+                for (int index = 0; index < unTrans.Length; ++index)
+                {
+                    Vector2D.Transform(ref matrix, ref unTrans[index], out polygon[index]);
+                }
+                BoundingRectangle rect;
+                BoundingRectangle.FromVectors(polygon, out rect);
+                BoundingPolygon poly = new BoundingPolygon(polygon);
+                for (int index = 0; index < segments.Length; ++index)
+                {
+                    RaySegment segment = segments[index];
+                    rect.Intersects(ref segment.RayInstance, out temp);
+                    if (temp >= 0 && temp <= segment.Length)
+                    {
+                        poly.Intersects(ref segment.RayInstance, out temp);
+                        if (temp >= 0 && temp <= segment.Length)
+                        {
+                            if (result[index] == -1 || temp < result[index])
+                            {
+                                result[index] = temp;
+                            }
+                            intersects = true;
+                        }
+                    }
+                }
+            }
+            if (intersects)
+            {
+                info = new RaySegmentIntersectionInfo(result);
+            }
+            else
+            {
+                info = null;
+            }
+            return intersects;
+        }
+        DragInfo IGlobalFluidAffectable.GetFluidInfo(Vector2D tangent)
+        {
+            Vector2D dragCenter;
+            Scalar dragArea;
+            ShapeHelper.GetFluidInfo(polygons, tangent, out dragCenter, out dragArea);
+            return new DragInfo(dragCenter, dragArea);
+        }
+        FluidInfo ILineFluidAffectable.GetFluidInfo(GetTangentCallback callback, Line line)
+        {
             if (polygons.Length == 1)
             {
-                GetProjectedBounds(
-                    vertexes, 0,
-                    vertexes.Length,
-                    tangent, out min, out max);
-                Vector2D.Dot(ref tangent, ref  Parent.State.Position.Linear, out avg);
-                avg = (max + min) / 2 - avg;
-                return new DragInfo(tangent * avg, max - min);
+                return ShapeHelper.GetFluidInfo(Vertexes,callback, line);
             }
-            SAPNode[] sapNodes = new SAPNode[polygons.Length * 2];
-            int offset = 0;
+            List<Vector2D[]> submerged = new List<Vector2D[]>(polygons.Length);
             for (int index = 0; index < polygons.Length; ++index)
             {
-                GetProjectedBounds(vertexes, offset, polygons[index].Length, tangent, out min, out max);
-                sapNodes[index * 2] = new SAPNode(min, true);
-                sapNodes[(index * 2) + 1] = new SAPNode(max, false);
-                offset += polygons[index].Length;
+                Vector2D[] vertexes = ShapeHelper.GetIntersection(polygons[index], line);
+                if (vertexes.Length >= 3) { submerged.Add(vertexes); }
             }
-            Array.Sort<SAPNode>(sapNodes, comparer);
-            int depth = 0;
-            Scalar result = 0;
-            Scalar start = 0;
-            for (int index = 0; index < sapNodes.Length; ++index)
+            if (submerged.Count == 0) { return null; }
+            Vector2D[][] newPolygons = submerged.ToArray();
+            Vector2D centroid = MultiPolygonShape.GetCentroid(newPolygons);
+            Scalar area = MultiPolygonShape.GetArea(newPolygons);
+            Vector2D tangent = callback(centroid);
+            Vector2D dragCenter;
+            Scalar dragArea;
+            ShapeHelper.GetFluidInfo(newPolygons, tangent, out dragCenter, out dragArea);
+            return new FluidInfo(dragCenter, dragArea, centroid, area);
+        }
+
+        DragInfo IExplosionAffectable.GetExplosionInfo(Matrix2x3 matrix, float radius, GetTangentCallback callback)
+        {
+            Vector2D[] vertexes2 = new Vector2D[Vertexes.Length];
+            for (int index = 0; index < vertexes2.Length; ++index)
             {
-                SAPNode node = sapNodes[index];
-                if (node.begin)
-                {
-                    if (depth == 0)
-                    {
-                        start = node.value;
-                    }
-                    depth++;
-                }
-                else
-                {
-                    depth--;
-                    if (depth == 0)
-                    {
-                        result += node.value - start;
-                    }
-                }
+                vertexes2[index] = matrix * Vertexes[index];
             }
-            Vector2D.Dot(ref tangent, ref  Parent.State.Position.Linear, out avg);
-            avg = (sapNodes[0].value + sapNodes[sapNodes.Length - 1].value) / 2 - avg;
-            return new DragInfo(tangent * avg, result);
+            Vector2D[] inter = ShapeHelper.GetIntersection(vertexes2, radius);
+            if (inter.Length < 3) { return null; }
+            Vector2D centroid = PolygonShape.GetCentroid(inter);
+            Vector2D tangent = callback(centroid);
+            Scalar min, max;
+            ShapeHelper.GetProjectedBounds(inter, tangent, out min, out max);
+            Scalar avg = (max + min) / 2;
+            return new DragInfo(tangent * avg, max - min);
         }
-
-        public override Vector2D GetCentroid()
-        {
-            return GetCentroid(polygons);
-        }
-        public override Scalar GetArea()
-        {
-            return GetArea(polygons);
-        }
-        public override Scalar GetInertia()
-        {
-            return InertiaOfMultipartPolygon(polygons);
-        }
-
-
-        public override Shape Duplicate()
-        {
-            return new MultipartPolygon(this);
-        }
+#endregion
     }
 }

@@ -34,10 +34,13 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
+
 using Physics2DDotNet.Solvers;
 using Physics2DDotNet.Detectors;
 using Physics2DDotNet.Collections;
+using Physics2DDotNet.Shapes;
+using Physics2DDotNet.PhysicsLogics;
+using Physics2DDotNet.Joints;
 
 namespace Physics2DDotNet
 {
@@ -51,7 +54,7 @@ namespace Physics2DDotNet
         {
             public int Compare(PhysicsLogic x, PhysicsLogic y)
             {
-                return  x.Order.CompareTo(y.Order);
+                return x.Order.CompareTo(y.Order);
             }
         }
 
@@ -265,22 +268,33 @@ namespace Physics2DDotNet
         {
             if (collection == null) { throw new ArgumentNullException("collection"); }
             if (collection.Count == 0) { return; }
-
             lock (syncRoot)
             {
-                foreach (Body item in collection)
-                {
-                    PreCheckItem(item);
-                }
-                foreach (Body item in collection)
-                {
-                    CheckItem(item);
-                }
-                foreach (Body item in collection)
-                {
-                    item.OnPending(this);
-                }
+                PreCheckBodies(collection);
+                CheckBodies(collection);
+                BodiesOnPending(collection);
                 pendingBodies.AddRange(collection);
+            }
+        }
+        private void PreCheckBodies(ICollection<Body> collection)
+        {
+            foreach (Body item in collection)
+            {
+                PreCheckItem(item);
+            }
+        }
+        private void CheckBodies(ICollection<Body> collection)
+        {
+            foreach (Body item in collection)
+            {
+                CheckItem(item);
+            }
+        }
+        private void BodiesOnPending(ICollection<Body> collection)
+        {
+            foreach (Body item in collection)
+            {
+                item.OnPending(this);
             }
         }
 
@@ -365,9 +379,14 @@ namespace Physics2DDotNet
             PreCheckItem(item);
             lock (syncRoot)
             {
+                ReadOnlyCollection<Body> logicBodies = item.LogicBodies;
+                PreCheckBodies(logicBodies);
                 CheckLogic(item);
+                CheckBodies(logicBodies);
                 item.OnPendingInternal(this);
                 pendingLogics.Add(item);
+                BodiesOnPending(logicBodies);
+                pendingBodies.AddRange(logicBodies);
             }
         }
         /// <summary>
@@ -380,19 +399,25 @@ namespace Physics2DDotNet
             if (collection.Count == 0) { return; }
             lock (syncRoot)
             {
+                List<Body> logicBodies = new List<Body>();
                 foreach (PhysicsLogic item in collection)
                 {
                     PreCheckItem(item);
+                    logicBodies.AddRange(item.LogicBodies);
                 }
+                PreCheckBodies(logicBodies);
                 foreach (PhysicsLogic item in collection)
                 {
                     CheckLogic(item);
                 }
+                CheckBodies(logicBodies);
                 foreach (PhysicsLogic item in collection)
                 {
                     item.OnPendingInternal(this);
                 }
                 pendingLogics.AddRange(collection);
+                BodiesOnPending(logicBodies);
+                pendingBodies.AddRange(logicBodies);
             }
         }
         /// <summary>
@@ -407,10 +432,13 @@ namespace Physics2DDotNet
             if (collection.Count == 0) { return; }
             lock (syncRoot)
             {
+                List<Body> logicBodies = new List<Body>();
                 foreach (T item in collection)
                 {
                     PreCheckItem(item);
+                    logicBodies.AddRange(item.LogicBodies);
                 }
+                PreCheckBodies(logicBodies);
                 PhysicsLogic[] array = new PhysicsLogic[collection.Count];
                 int index = 0;
                 foreach (T item in collection)
@@ -418,11 +446,14 @@ namespace Physics2DDotNet
                     CheckLogic(item);
                     array[index++] = item;
                 }
+                CheckBodies(logicBodies);
                 foreach (T item in collection)
                 {
                     item.OnPendingInternal(this);
                 }
                 pendingLogics.AddRange(array);
+                BodiesOnPending(logicBodies);
+                pendingBodies.AddRange(logicBodies);
             }
         }
         /// <summary>
@@ -470,7 +501,7 @@ namespace Physics2DDotNet
                 }
                 UpdateTime(step);
                 solver.Solve(step);
-                OnStateChanged();
+                OnPositionChanged();
             }
             finally
             {
@@ -577,7 +608,7 @@ namespace Physics2DDotNet
                 logics[index].UpdateTime(step);
             }
         }
-        private void OnStateChanged()
+        private void OnPositionChanged()
         {
             int count = bodies.Count;
             for (int index = 0; index < count; ++index)
@@ -725,7 +756,7 @@ namespace Physics2DDotNet
             joint.BeforeAddCheckInternal(this);
             solver.CheckJoint(joint);
         }
-        private void CheckLogic(PhysicsLogic  logic)
+        private void CheckLogic(PhysicsLogic logic)
         {
             CheckItem(logic);
             logic.BeforeAddCheck(this);
@@ -737,42 +768,45 @@ namespace Physics2DDotNet
                 logics[index].RunLogic(step);
             }
         }
-        internal void HandleCollision(TimeStep step, Body first, Body second)
+        internal void HandleCollision(TimeStep step, Body body1, Body body2)
         {
-            if (first.Mass.MassInv == 0 && second.Mass.MassInv == 0) { return; }
+            if (body1.Mass.MassInv == 0 && body2.Mass.MassInv == 0) { return; }
+            Shape shape1 = body1.Shape;
+            Shape shape2 = body2.Shape;
 
-            if (first.Shape.CanGetCustomIntersection ||
-                second.Shape.CanGetCustomIntersection ||
-                first.Shape.BroadPhaseDetectionOnly ||
-                second.Shape.BroadPhaseDetectionOnly)
+
+            if (shape1.CanGetCustomIntersection ||
+                shape2.CanGetCustomIntersection ||
+                shape1.BroadPhaseDetectionOnly ||
+                shape2.BroadPhaseDetectionOnly)
             {
                 object customIntersectionInfo;
-                if (first.Shape.BroadPhaseDetectionOnly)
+                if (shape1.BroadPhaseDetectionOnly)
                 {
-                    first.OnCollision(second, null);
+                    body1.OnCollision(body2, null);
                 }
-                else if (first.Shape.CanGetCustomIntersection &&
-                         first.Shape.TryGetCustomIntersection(second, out  customIntersectionInfo))
+                else if (shape1.CanGetCustomIntersection &&
+                         shape1.TryGetCustomIntersection(body1, body2, out  customIntersectionInfo))
                 {
-                    first.OnCollision(second, customIntersectionInfo);
+                    body1.OnCollision(body2, customIntersectionInfo);
                 }
-                if (second.Shape.BroadPhaseDetectionOnly)
+                if (shape2.BroadPhaseDetectionOnly)
                 {
-                    second.OnCollision(first, null);
+                    body2.OnCollision(body1, null);
                 }
-                else if (second.Shape.CanGetCustomIntersection &&
-                         second.Shape.TryGetCustomIntersection(first, out  customIntersectionInfo))
+                else if (shape2.CanGetCustomIntersection &&
+                         shape2.TryGetCustomIntersection(body2, body1, out  customIntersectionInfo))
                 {
-                    second.OnCollision(first, customIntersectionInfo);
+                    body2.OnCollision(body1, customIntersectionInfo);
                 }
             }
             else
             {
                 ReadOnlyCollection<IContactInfo> contacts;
-                if (solver.TryGetIntersection(step, first, second, out contacts))
+                if (solver.TryGetIntersection(step, body1, body2, out contacts))
                 {
-                    first.OnCollision(second, contacts);
-                    second.OnCollision(first, contacts);
+                    body1.OnCollision(body2, contacts);
+                    body2.OnCollision(body1, contacts);
                 }
             }
 

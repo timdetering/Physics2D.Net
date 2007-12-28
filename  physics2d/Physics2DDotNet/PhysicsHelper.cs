@@ -30,11 +30,15 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
+using System.Collections.Generic;
 using AdvanceMath;
-using Physics2DDotNet.Math2D;
+using AdvanceMath.Geometry2D;
+
 
 namespace Physics2DDotNet
 {
+
+
     /// <summary>
     /// contains some methods to do physics calculations.
     /// </summary>

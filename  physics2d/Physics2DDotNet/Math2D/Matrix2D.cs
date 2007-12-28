@@ -35,21 +35,22 @@ using AdvanceMath.Design;
 
 namespace Physics2DDotNet.Math2D
 {
+    /*
     [StructLayout(LayoutKind.Sequential, Size = Matrix2D.Size), Serializable]
-    [AdvBrowsableOrder("NormalMatrix,VertexMatrix")]
+    [AdvBrowsableOrder("Normal,Vertex")]
 #if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2D>))]
 #endif
     public struct Matrix2D : IEquatable<Matrix2D>
     {
-        public const int Size = Matrix2x2.Size + Matrix3x3.Size;
+        public const int Size = Matrix2x2.Size + Matrix2x3.Size;
 
-        public static readonly Matrix2D Identity = new Matrix2D(Matrix2x2.Identity, Matrix3x3.Identity);
+        public static readonly Matrix2D Identity = new Matrix2D(Matrix2x2.Identity, Matrix2x3.Identity);
 
         public static void Invert(ref Matrix2D value, out Matrix2D result)
         {
-            Matrix2x2.Invert(ref value.NormalMatrix, out result.NormalMatrix);
-            Matrix3x3.Invert(ref value.VertexMatrix, out result.VertexMatrix);
+            Matrix2x2.Invert(ref value.Normal, out result.Normal);
+            Matrix2x3.Invert(ref value.Vertex, out result.Vertex);
         }
 
         public static Matrix2D FromALVector2D(ALVector2D source)
@@ -60,61 +61,67 @@ namespace Physics2DDotNet.Math2D
         }
         public static void FromALVector2D(ref ALVector2D source, out Matrix2D result)
         {
-            Matrix2x2.FromRotation(ref source.Angular, out result.NormalMatrix);
-            Matrix3x3.FromTranslate2D(ref source.Linear, out result.VertexMatrix);
-            Matrix3x3.Multiply(ref result.VertexMatrix, ref result.NormalMatrix, out result.VertexMatrix);
+            Matrix2x3 vertex;
+            vertex.m00 = MathHelper.Cos(source.Angular);
+            vertex.m10 = MathHelper.Sin(source.Angular);
+            vertex.m01 = -vertex.m10;
+            vertex.m11 = vertex.m00;
+            vertex.m02 = source.Linear.X;
+            vertex.m12 = source.Linear.Y;
+            result.Vertex = vertex;
+            Matrix2x2.Copy(ref vertex, out result.Normal);
         }
 
 
         [AdvBrowsable]
-        public Matrix2x2 NormalMatrix;
+        public Matrix2x2 Normal;
         [AdvBrowsable]
-        public Matrix3x3 VertexMatrix;
+        public Matrix2x3 Vertex;
 
-        [InstanceConstructor("NormalMatrix,VertexMatrix")]
-        public Matrix2D(Matrix2x2 normalMatrix, Matrix3x3 vertexMatrix)
+        [InstanceConstructor("Normal,Vertex")]
+        public Matrix2D(Matrix2x2 normal, Matrix2x3 vertex)
         {
-            this.NormalMatrix = normalMatrix;
-            this.VertexMatrix = vertexMatrix;
+            this.Normal = normal;
+            this.Vertex = vertex;
         }
 
 
 
         #region Operator overloads
-        public static Matrix2D Multiply(Matrix2D left, Matrix3x3 right)
+        public static Matrix2D Multiply(Matrix2D left, Matrix2x3 right)
         {
             Matrix2D result;
             Multiply(ref left, ref right, out result);
             return result;
         }
-        public static Matrix2D operator *(Matrix2D left, Matrix3x3 right)
+        public static Matrix2D operator *(Matrix2D left, Matrix2x3 right)
         {
             Matrix2D result;
             Multiply(ref left, ref right, out result);
             return result;
         }
-        public static void Multiply(ref Matrix2D left, ref Matrix3x3 right, out Matrix2D result)
+        public static void Multiply(ref Matrix2D left, ref Matrix2x3 right, out Matrix2D result)
         {
-            result.NormalMatrix = left.NormalMatrix;
-            Matrix3x3.Multiply(ref left.VertexMatrix, ref right, out result.VertexMatrix);
+            result.Normal = left.Normal;
+            Matrix2x3.Multiply(ref left.Vertex, ref right, out result.Vertex);
         }
 
-        public static Matrix2D operator *(Matrix3x3 left, Matrix2D right)
+        public static Matrix2D operator *(Matrix2x3 left, Matrix2D right)
         {
             Matrix2D result;
             Multiply(ref left, ref right, out result);
             return result;
         }
-        public static Matrix2D Multiply(Matrix3x3 left, Matrix2D right)
+        public static Matrix2D Multiply(Matrix2x3 left, Matrix2D right)
         {
             Matrix2D result;
             Multiply(ref left, ref right, out result);
             return result;
         }
-        public static void Multiply(ref Matrix3x3 left, ref Matrix2D right, out Matrix2D result)
+        public static void Multiply(ref Matrix2x3 left, ref Matrix2D right, out Matrix2D result)
         {
-            result.NormalMatrix = right.NormalMatrix;
-            Matrix3x3.Multiply(ref left, ref right.VertexMatrix, out result.VertexMatrix);
+            result.Normal = right.Normal;
+            Matrix2x3.Multiply(ref left, ref right.Vertex, out result.Vertex);
         }
 
         public static Matrix2D operator *(Matrix2D left, Matrix2x2 right)
@@ -131,8 +138,8 @@ namespace Physics2DDotNet.Math2D
         }
         public static void Multiply(ref Matrix2D left, ref Matrix2x2 right, out Matrix2D result)
         {
-            Matrix2x2.Multiply(ref left.NormalMatrix, ref right, out result.NormalMatrix);
-            Matrix3x3.Multiply(ref left.VertexMatrix, ref right, out result.VertexMatrix);
+            Matrix2x2.Multiply(ref left.Normal, ref right, out result.Normal);
+            Matrix2x3.Multiply(ref left.Vertex, ref right, out result.Vertex);
         }
 
         public static Matrix2D operator *(Matrix2x2 left, Matrix2D right)
@@ -149,8 +156,8 @@ namespace Physics2DDotNet.Math2D
         }
         public static void Multiply(ref Matrix2x2 left, ref Matrix2D right, out Matrix2D result)
         {
-            Matrix2x2.Multiply(ref left, ref right.NormalMatrix, out result.NormalMatrix);
-            Matrix3x3.Multiply(ref left, ref right.VertexMatrix, out result.VertexMatrix);
+            Matrix2x2.Multiply(ref left, ref right.Normal, out result.Normal);
+            Matrix2x3.Multiply(ref left, ref right.Vertex, out result.Vertex);
         }
 
         public static Matrix2D operator *(Matrix2D left, Matrix2D right)
@@ -167,8 +174,8 @@ namespace Physics2DDotNet.Math2D
         }
         public static void Multiply(ref Matrix2D left, ref Matrix2D right, out Matrix2D result)
         {
-            Matrix2x2.Multiply(ref left.NormalMatrix, ref right.NormalMatrix, out result.NormalMatrix);
-            Matrix3x3.Multiply(ref left.VertexMatrix, ref right.VertexMatrix, out result.VertexMatrix);
+            Matrix2x2.Multiply(ref right.Normal, ref left.Normal, out result.Normal);
+            Matrix2x3.Multiply(ref left.Vertex, ref right.Vertex, out result.Vertex);
         }
         #endregion
 
@@ -176,7 +183,7 @@ namespace Physics2DDotNet.Math2D
         #region Overrides
         public override int GetHashCode()
         {
-            return this.NormalMatrix.GetHashCode() ^ this.VertexMatrix.GetHashCode();
+            return this.Normal.GetHashCode() ^ this.Vertex.GetHashCode();
         }
         public override bool Equals(object obj)
         {
@@ -189,15 +196,15 @@ namespace Physics2DDotNet.Math2D
         public static bool Equals(Matrix2D left, Matrix2D right)
         {
             return
-                Matrix2x2.Equals(ref left.NormalMatrix, ref right.NormalMatrix) &&
-                Matrix3x3.Equals(ref left.VertexMatrix, ref right.VertexMatrix);
+                Matrix2x2.Equals(ref left.Normal, ref right.Normal) &&
+                Matrix2x3.Equals(ref left.Vertex, ref right.Vertex);
         }
         [CLSCompliant(false)]
         public static bool Equals(ref Matrix2D left, ref Matrix2D right)
         {
             return
-                Matrix2x2.Equals(ref left.NormalMatrix, ref right.NormalMatrix) &&
-                Matrix3x3.Equals(ref left.VertexMatrix, ref right.VertexMatrix);
+                Matrix2x2.Equals(ref left.Normal, ref right.Normal) &&
+                Matrix2x3.Equals(ref left.Vertex, ref right.Vertex);
         }
         public static bool operator ==(Matrix2D left, Matrix2D right)
         {
@@ -209,4 +216,5 @@ namespace Physics2DDotNet.Math2D
         } 
         #endregion
     }
+      */
 }
