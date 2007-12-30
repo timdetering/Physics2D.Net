@@ -54,7 +54,7 @@ namespace Physics2DDotNet.Ignorers
         {
             get { return false; }
         }
-        protected override bool CanCollide(Ignorer other)
+        public override bool CanCollide(Ignorer other)
         {
             OneWayPlatformIgnorer o = other as OneWayPlatformIgnorer;
             if (o != null)

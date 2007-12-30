@@ -66,7 +66,7 @@ namespace Physics2DDotNet.Ignorers
         {
             return !GroupCollection.Intersect(groups, other.groups);
         }
-        protected override bool CanCollide(Ignorer other)
+        public override bool CanCollide(Ignorer other)
         {
             GroupIgnorer value = other as GroupIgnorer;
             return

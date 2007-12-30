@@ -61,7 +61,7 @@ namespace Physics2DDotNet.Ignorers
         {
             return isInverted ^ CanCollide(other);
         }
-        protected abstract bool CanCollide(Ignorer other);
+        public abstract bool CanCollide(Ignorer other);
         public virtual void UpdateTime(TimeStep step) { }
     }
 

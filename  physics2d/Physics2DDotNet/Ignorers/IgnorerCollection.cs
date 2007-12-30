@@ -29,23 +29,38 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
+using System.Collections.Generic;
 
 namespace Physics2DDotNet.Ignorers
 {
-    /// <summary>
-    /// A collision ignorer that uses reference comparison. 
-    /// All Bodies with the same instance of this ignorer then they will not collide.
-    /// </summary>
-    [Serializable]
-    public class ObjectIgnorer : Ignorer
+    public class IgnorerCollection : Ignorer
     {
+        List<Ignorer> ignorer = new List<Ignorer>();
         public override bool BothNeeded
         {
-            get { return false; }
+            get
+            {
+                for (int index = 0; index < ignorer.Count; ++index)
+                {
+                    if (ignorer[index].BothNeeded)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
         public override bool CanCollide(Ignorer other)
         {
-            return other!= this;
+            for (int index = 0; index < ignorer.Count; ++index)
+            {
+                if (!ignorer[index].CanCollide(other))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
+        public List<Ignorer> Ignorers { get { return ignorer; } }
     }
 }
