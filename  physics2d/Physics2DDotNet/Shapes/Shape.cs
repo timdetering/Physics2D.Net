@@ -178,7 +178,7 @@ namespace Physics2DDotNet.Shapes
         #endregion
         #region methods
 
-        public abstract void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle);
+        public abstract void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle);
         /// <summary>
         /// 
         /// </summary>

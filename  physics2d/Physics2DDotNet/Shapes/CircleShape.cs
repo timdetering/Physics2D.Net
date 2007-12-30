@@ -115,9 +115,9 @@ namespace Physics2DDotNet.Shapes
         }
         #endregion
         #region methods
-        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
+        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
-            BoundingRectangle.FromCircle(ref matrices.ToWorld, ref radius, out rectangle);
+            BoundingRectangle.FromCircle(ref matrix, ref radius, out rectangle);
         }
         public override void GetDistance(ref Vector2D point, out Scalar result)
         {

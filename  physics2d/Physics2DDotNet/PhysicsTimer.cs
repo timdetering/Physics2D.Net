@@ -249,7 +249,14 @@ namespace Physics2DDotNet
                 }
             }
             state = TimerState.Disposed;
-        } 
+        }
+        public void RunOnCurrentThread()
+        {
+            if (this.engineThread != null) { throw new InvalidOperationException("Timer must be NotStarted"); }
+            this.engineThread = Thread.CurrentThread;
+            this.isRunning = true;
+            EngineProcess();
+        }
         #endregion
     }
 }

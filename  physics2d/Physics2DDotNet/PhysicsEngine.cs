@@ -783,21 +783,21 @@ namespace Physics2DDotNet
                 object customIntersectionInfo;
                 if (shape1.BroadPhaseDetectionOnly)
                 {
-                    body1.OnCollision(body2, null);
+                    body1.OnCollision(step,body2, null);
                 }
                 else if (shape1.CanGetCustomIntersection &&
                          shape1.TryGetCustomIntersection(body1, body2, out  customIntersectionInfo))
                 {
-                    body1.OnCollision(body2, customIntersectionInfo);
+                    body1.OnCollision(step, body2, customIntersectionInfo);
                 }
                 if (shape2.BroadPhaseDetectionOnly)
                 {
-                    body2.OnCollision(body1, null);
+                    body2.OnCollision(step, body1, null);
                 }
                 else if (shape2.CanGetCustomIntersection &&
                          shape2.TryGetCustomIntersection(body2, body1, out  customIntersectionInfo))
                 {
-                    body2.OnCollision(body1, customIntersectionInfo);
+                    body2.OnCollision(step, body1, customIntersectionInfo);
                 }
             }
             else
@@ -805,8 +805,8 @@ namespace Physics2DDotNet
                 ReadOnlyCollection<IContactInfo> contacts;
                 if (solver.TryGetIntersection(step, body1, body2, out contacts))
                 {
-                    body1.OnCollision(body2, contacts);
-                    body2.OnCollision(body1, contacts);
+                    body1.OnCollision(step, body2, contacts);
+                    body2.OnCollision(step, body1, contacts);
                 }
             }
 

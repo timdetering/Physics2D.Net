@@ -88,9 +88,9 @@ namespace Physics2DDotNet.Shapes
         }
         #endregion
         #region Methods
-        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
+        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
-            Vector2D.Transform(ref matrices.ToWorld, ref Zero, out rectangle.Max);
+            Vector2D.Transform(ref matrix, ref Zero, out rectangle.Max);
             rectangle.Min = rectangle.Max;
         }
         public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)

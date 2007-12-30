@@ -67,17 +67,20 @@ namespace Physics2DDotNet.PhysicsLogics
         {
             foreach (Body e in Bodies)
             {
-                if (e != body && !e.IgnoresGravity)
+                if (e == body ||
+                    e.IgnoresGravity ||
+                    e.IgnoresPhysicsLogics)
                 {
-                    Scalar magnitude;
-                    Vector2D gravity;
-                    Vector2D.Subtract(ref body.State.Position.Linear, ref e.State.Position.Linear, out gravity);
-                    Vector2D.Normalize(ref gravity, out magnitude, out gravity);
-                    magnitude = (body.Mass.AccelerationDueToGravity /
-                            (magnitude * magnitude * metersPerDistanceUnit * metersPerDistanceUnit));
-                    Vector2D.Multiply(ref gravity, ref magnitude, out gravity);
-                    Vector2D.Add(ref e.State.Acceleration.Linear, ref gravity, out e.State.Acceleration.Linear);
+                    continue;
                 }
+                Scalar magnitude;
+                Vector2D gravity;
+                Vector2D.Subtract(ref body.State.Position.Linear, ref e.State.Position.Linear, out gravity);
+                Vector2D.Normalize(ref gravity, out magnitude, out gravity);
+                magnitude = (body.Mass.AccelerationDueToGravity /
+                        (magnitude * magnitude * metersPerDistanceUnit * metersPerDistanceUnit));
+                Vector2D.Multiply(ref gravity, ref magnitude, out gravity);
+                Vector2D.Add(ref e.State.Acceleration.Linear, ref gravity, out e.State.Acceleration.Linear);
             }
         }
         protected internal override void BeforeAddCheck(PhysicsEngine engine)

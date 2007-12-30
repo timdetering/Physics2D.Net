@@ -41,6 +41,8 @@ Added: ExplosionLogic
 Changed: Removed ApplyMatrix from Body
 Changed: Renamed ApplyMatrix to ApplyPosition
 Added: SpatialHashDetector
+Added: Body.IgnoresPhysicsLogics
+Added: OneWayPlatformIgnorer
 
 AdvanceMath
 1.7.0.0:

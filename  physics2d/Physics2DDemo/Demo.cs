@@ -333,7 +333,7 @@ namespace Physics2DDemo
             ExplosionLogic logic = new ExplosionLogic(
                 new Vector2D(p.X, p.Y),
                 Vector2D.Zero,
-                2000, 3.1f, 80,
+                20000, 0.1f, 1000,
                 new Lifespan(1));
             engine.AddLogic(logic);
         }
@@ -514,10 +514,11 @@ namespace Physics2DDemo
             //sets the broadphase
             //engine.BroadPhase = new Physics2DDotNet.Detectors.BruteForceDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-            engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
-            //engine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
-
+            engine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector2();
+            
             //setups the Solver and sets it.
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
             solver.Iterations = 12;
@@ -616,8 +617,8 @@ namespace Physics2DDemo
             Lifespan avatarLifespan = new Lifespan();
 
             Sprite sprite = GetSprite("tank.png");
-            Vector2D[][] vertexes = sprite.Polygons;
-            MultiPolygonShape shape = new MultiPolygonShape(vertexes, 4);
+            Vector2D[][] polygons = sprite.Polygons;
+            MultiPolygonShape shape = new MultiPolygonShape(polygons, 4);
             shape.Tag = sprite;
 
             ObjectIgnorer ignorer = new ObjectIgnorer();
@@ -640,12 +641,11 @@ namespace Physics2DDemo
             Scalar wheelSpacing = -9;
             Scalar lenghtPercent = .84f;
             Matrix2x3 ident = Matrix2x3.Identity;
-            Matrices matri = new Matrices();
             BoundingRectangle rect;
-            shape.CalcBoundingRectangle(matri, out rect);
+            shape.CalcBoundingRectangle(ref ident, out rect);
             Scalar y = (rect.Max.Y +4)  ;
             Body lastWheel = null ;
-            BoundingPolygon polygon = new BoundingPolygon(vertexes[0]);
+            BoundingPolygon polygon = new BoundingPolygon(polygons[0]);
 
             Ray ray2 = new Ray(new Vector2D(rect.Max.X, y), -Vector2D.YAxis);
             Scalar y3 = y - polygon.Intersects(ray2);
@@ -780,7 +780,7 @@ namespace Physics2DDemo
             engine.AddBody(line);
             return line;
         }
-        void AddLine(Vector2D point1, Vector2D point2, Scalar thickness)
+        Body AddLine(Vector2D point1, Vector2D point2, Scalar thickness)
         {
             Vector2D line = point1 - point2;
             Vector2D avg = (point1 + point2) * .5f;
@@ -816,6 +816,7 @@ namespace Physics2DDemo
             body.IgnoresGravity = true;
             AddGlObject(body);
             engine.AddBody(body);
+            return body;
         }
         List<Body> AddChain(Vector2D position, Scalar boxLenght, Scalar boxWidth, Scalar boxMass, Scalar spacing, Scalar length)
         {
@@ -1345,7 +1346,14 @@ namespace Physics2DDemo
           //  b2.LinearDamping = .9f;
             //engine.AddProxy(b1, b2, Matrix2x2.FromRotation(MathHelper.PiOver2 ));
             b1.Transformation *= Matrix2x3.FromScale(new Vector2D(1, 1.8f));
-            b2.Transformation *= Matrix2x3.FromScale(new Vector2D(.9f, 1)); 
+            b2.Transformation *= Matrix2x3.FromScale(new Vector2D(.9f, 1));
+
+           Body line = AddLine(new Vector2D(200, 400), new Vector2D(400, 400),20);
+           line.IgnoresGravity = true;
+           line.CollisionIgnorer = new OneWayPlatformIgnorer(line,-Vector2D.YAxis,true);
+           b1.CollisionIgnorer = new OneWayPlatformIgnorer(b1,-Vector2D.YAxis, false) ;
+           b2.CollisionIgnorer = new OneWayPlatformIgnorer(b2, -Vector2D.YAxis, false);
+
 
             Body ball = AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             ball.Transformation *=
@@ -1696,16 +1704,21 @@ namespace Physics2DDemo
             rect.Max.X -= 100;
             rect.Max.Y -= 100;
 
-
             Scalar spacing = 10;
-            for (Scalar x = rect.Min.X; x < rect.Max.X; x += spacing)
+            int randSpacing = (int)(spacing/2 );
+            for (Scalar x = rect.Min.X; x < rect.Max.X; x += spacing )
             {
-                for (Scalar y = rect.Min.Y; y < rect.Max.Y; y += spacing)
+                for (Scalar y = rect.Min.Y; y < rect.Max.Y; y += spacing )
                 {
                     Scalar radius = rand.Next(2, 5);
-                    Body circle = AddCircle(radius, 10, radius * 2, new ALVector2D(0, x, y));
-                    circle.State.Velocity.Linear.X = rand.Next(-500, 501);
-                    circle.State.Velocity.Linear.Y = rand.Next(-500, 501);
+                    ALVector2D position = new ALVector2D(
+                        0, 
+                        x + rand.Next(-randSpacing, randSpacing),
+                        y + rand.Next(-randSpacing, randSpacing));
+
+                    Body circle = AddCircle(radius, 10, radius * 2, position);
+                    circle.State.Velocity.Linear.X = rand.Next(-1000, 1001);
+                    circle.State.Velocity.Linear.Y = rand.Next(-1000, 1001);
                 }
             }
 

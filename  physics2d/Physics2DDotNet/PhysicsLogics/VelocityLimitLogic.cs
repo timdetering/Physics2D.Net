@@ -50,6 +50,7 @@ namespace Physics2DDotNet.PhysicsLogics
         {
             foreach (Body e in Bodies)
             {
+                if (e.IgnoresPhysicsLogics) { continue; }
                 Scalar velocity;
                 Vector2D.GetMagnitude(ref e.State.Velocity.Linear, out velocity);
                 if (velocity > maxLinearVelocity)

@@ -43,7 +43,6 @@ using Physics2DDotNet.Joints;
 
 namespace Physics2DDotNet.Solvers
 {
-
     [Serializable]
     sealed class SequentialImpulsesTag
     {
@@ -57,6 +56,7 @@ namespace Physics2DDotNet.Solvers
     [Serializable]
     public sealed class SequentialImpulsesSolver : CollisionSolver
     {
+        #region sub-classes
         [Serializable]
         sealed class Contact : IContactInfo
         {
@@ -73,7 +73,7 @@ namespace Physics2DDotNet.Solvers
             public Vector2D r1;
             public Vector2D r2;
             Arbiter arbiter;
-            
+
             public Contact(Arbiter arbiter)
             {
                 this.arbiter = arbiter;
@@ -101,16 +101,18 @@ namespace Physics2DDotNet.Solvers
             }
         }
         [Serializable]
-        sealed class Arbiter 
+        sealed class Arbiter
         {
-            static Contact[]  Empty = new Contact[0];
-            CircleShape circle1;
-            CircleShape circle2;
-           
+            static Contact[] Empty = new Contact[0];
             static Scalar ZeroClamp(Scalar value)
             {
                 return ((value < 0) ? (0) : (value));
             }
+
+            int lastUpdate;
+
+            CircleShape circle1;
+            CircleShape circle2;
 
             LinkedList<Contact> contacts;
             Contact[] contactsArray;
@@ -124,7 +126,6 @@ namespace Physics2DDotNet.Solvers
             Scalar restitution;
 
             Scalar friction;
-            bool updated = false;
             public Arbiter(SequentialImpulsesSolver parent, Body body1, Body body2)
             {
                 if (body1.ID < body2.ID)
@@ -147,18 +148,16 @@ namespace Physics2DDotNet.Solvers
                 this.restitution = Math.Min(body1.Coefficients.Restitution, body2.Coefficients.Restitution);
                 this.parent = parent;
                 this.contacts = new LinkedList<Contact>();
+                this.lastUpdate = -1;
             }
-            public bool Updated
+            public int LastUpdate
             {
-                get { return updated; }
-                set { updated = value; }
+                get { return lastUpdate; }
             }
-
-            public void Update()
+            public void Update(TimeStep step)
             {
-                updated = true;
-
-                if (circle1 != null && circle2 != null&&
+                lastUpdate = step.UpdateCount;
+                if (circle1 != null && circle2 != null &&
                     !body1.IsTransformed && !body2.IsTransformed)
                 {
                     CollideCircles();
@@ -231,8 +230,8 @@ namespace Physics2DDotNet.Solvers
                 }
 
 
-                Vector2D normal,p1,p2;
-                Scalar distance,r2;
+                Vector2D normal, p1, p2;
+                Scalar distance, r2;
 
                 p1 = Vector2D.Zero;
                 p2 = Vector2D.Zero;
@@ -255,23 +254,23 @@ namespace Physics2DDotNet.Solvers
                     contact.normal = normal;
                     Vector2D.Multiply(ref r2, ref normal, out normal);
                     Vector2D.Subtract(ref p2, ref normal, out contact.position);
-                  //  contact.position = circle2.Position - normal * circle2.Radius;
+                    //  contact.position = circle2.Position - normal * circle2.Radius;
                 }
 
-             /*   Matrix2D inv = circle1.MatrixInv;
-                Matrix2D mat = circle1.Matrix;
+                /*   Matrix2D inv = circle1.MatrixInv;
+                   Matrix2D mat = circle1.Matrix;
 
-                Vector2D.Normalize(ref normal, out normal);
+                   Vector2D.Normalize(ref normal, out normal);
 
-                Vector2D.Transform(ref inv.NormalMatrix, ref normal, out normal);
-                Vector2D.Normalize(ref normal);
-                normal = normal * circle1.Radius;
-                Vector2D.Transform(ref mat.VertexMatrix, ref normal, out normal);
-                IntersectionInfo info;
-                circle2.TryGetIntersection(normal, out info);
-                contact.distance = info.Distance;
-                Vector2D.Negate(ref info.Normal, out contact.normal);
-                contact.position = info.Position;*/
+                   Vector2D.Transform(ref inv.NormalMatrix, ref normal, out normal);
+                   Vector2D.Normalize(ref normal);
+                   normal = normal * circle1.Radius;
+                   Vector2D.Transform(ref mat.VertexMatrix, ref normal, out normal);
+                   IntersectionInfo info;
+                   circle2.TryGetIntersection(normal, out info);
+                   contact.distance = info.Distance;
+                   Vector2D.Negate(ref info.Normal, out contact.normal);
+                   contact.position = info.Position;*/
             }
             void Collide()
             {
@@ -423,7 +422,7 @@ namespace Physics2DDotNet.Solvers
                         // Apply normal + friction impulse
                         Vector2D vect1, vect2, P;
 
-                        Scalar temp = (1+this.restitution) * c.Pn;
+                        Scalar temp = (1 + this.restitution) * c.Pn;
                         Vector2D.Multiply(ref c.normal, ref temp, out vect1);
                         Vector2D.Multiply(ref tangent, ref c.Pt, out vect2);
                         Vector2D.Add(ref vect1, ref vect2, out P);
@@ -445,8 +444,8 @@ namespace Physics2DDotNet.Solvers
                     // Initialize bias impulse to zero.
                     c.Pnb = 0;
                 }
-                    body1.ApplyProxy();
-                    body2.ApplyProxy();
+                body1.ApplyProxy();
+                body2.ApplyProxy();
             }
             public void Apply()
             {
@@ -633,7 +632,9 @@ namespace Physics2DDotNet.Solvers
                         new Physics2DDotNet.Collections.ImplicitCastCollection<IContactInfo, Contact>(contactsArray));
                 }
             }
-        }
+        } 
+        #endregion
+        #region static
         static bool IsJointRemoved(ISequentialImpulsesJoint joint)
         {
             return !joint.IsAdded;
@@ -642,8 +643,8 @@ namespace Physics2DDotNet.Solvers
         {
             return !tag.body.IsAdded;
         }
-
-
+        #endregion
+        #region fields
         Dictionary<long, Arbiter> arbiters;
         List<ISequentialImpulsesJoint> siJoints;
         List<SequentialImpulsesTag> tags;
@@ -654,15 +655,17 @@ namespace Physics2DDotNet.Solvers
 
         Scalar biasFactor = 0.7f;
         Scalar allowedPenetration = 0.1f;
-        int iterations = 12;
-
+        int iterations = 12; 
+        #endregion
+        #region constructors
         public SequentialImpulsesSolver()
         {
             arbiters = new Dictionary<long, Arbiter>();
             siJoints = new List<ISequentialImpulsesJoint>();
             tags = new List<SequentialImpulsesTag>();
         }
-
+        #endregion
+        #region properties
         public bool PositionCorrection
         {
             get { return positionCorrection; }
@@ -697,15 +700,16 @@ namespace Physics2DDotNet.Solvers
         {
             get { return iterations; }
             set { iterations = value; }
-        }
-
+        } 
+        #endregion
+        #region methods
         protected internal override bool TryGetIntersection(TimeStep step, Body first, Body second, out ReadOnlyCollection<IContactInfo> contacts)
         {
             long id = PairID.GetId(first.ID, second.ID);
             Arbiter arbiter;
             if (arbiters.TryGetValue(id, out arbiter))
             {
-                arbiter.Update();
+                arbiter.Update(step);
                 if (!arbiter.Collided)
                 {
                     arbiters.Remove(id);
@@ -714,7 +718,7 @@ namespace Physics2DDotNet.Solvers
             else
             {
                 arbiter = new Arbiter(this, first, second);
-                arbiter.Update();
+                arbiter.Update(step);
                 if (!first.IgnoresCollisionResponse &&
                     !second.IgnoresCollisionResponse &&
                     arbiter.Collided)
@@ -725,13 +729,13 @@ namespace Physics2DDotNet.Solvers
             contacts = arbiter.Contacts;
             return arbiter.Collided;
         }
-        void RemoveEmpty()
+        void RemoveEmpty(TimeStep step)
         {
             List<long> empty = new List<long>();
             foreach (KeyValuePair<long, Arbiter> pair in arbiters)
             {
                 Arbiter value = pair.Value;
-                if (!value.Collided || !value.Updated)
+                if (!value.Collided || value.LastUpdate != step.UpdateCount)
                 {
                     empty.Add(pair.Key);
                 }
@@ -744,12 +748,8 @@ namespace Physics2DDotNet.Solvers
 
         protected internal override void Solve(TimeStep step)
         {
-            foreach (Arbiter arb in arbiters.Values)
-            {
-                arb.Updated = false;
-            }
             Detect(step);
-            RemoveEmpty();
+            RemoveEmpty(step);
             this.Engine.RunLogic(step);
             for (int index = 0; index < tags.Count; ++index)
             {
@@ -838,6 +838,7 @@ namespace Physics2DDotNet.Solvers
             {
                 throw new ArgumentException("The joint must implement ISequentialImpulsesJoint to be added to this solver.");
             }
-        }
+        } 
+        #endregion
     }
 }

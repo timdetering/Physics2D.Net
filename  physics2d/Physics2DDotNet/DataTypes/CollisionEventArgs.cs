@@ -40,18 +40,28 @@ namespace Physics2DDotNet
     [Serializable]
     public class CollisionEventArgs : EventArgs
     {
+        TimeStep step;
         ReadOnlyCollection<IContactInfo> contacts;
         Body other;
         object customIntersectionInfo;
-        public CollisionEventArgs(Body other, ReadOnlyCollection<IContactInfo> contacts)
+        private CollisionEventArgs(TimeStep step, Body other)
         {
+            this.step = step;
             this.other = other;
+        }
+        public CollisionEventArgs(TimeStep step,Body other, ReadOnlyCollection<IContactInfo> contacts)
+            :this(step,other)
+        {
             this.contacts = contacts;
         }
-        public CollisionEventArgs(Body other, object customIntersectionInfo)
+        public CollisionEventArgs(TimeStep step,Body other, object customIntersectionInfo)
+            : this(step, other)
         {
-            this.other = other;
             this.customIntersectionInfo = customIntersectionInfo;
+        }
+        public TimeStep Step
+        {
+            get { return step; }
         }
         public Body Other
         {

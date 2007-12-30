@@ -357,6 +357,35 @@ namespace AdvanceMath
             return Matrix3x3.FromLookAt(origin, positiveZAxis, onPositiveY) * FromTranslation(-origin);
         }
 
+        public static Matrix4x4 FromOrthographic(
+                Scalar left, Scalar right,
+                Scalar bottom, Scalar top,
+                Scalar near, Scalar far)
+        {
+
+            Matrix4x4 result;
+            result.m00 = 2 / (right - left);
+            result.m01 = 0;
+            result.m02 = 0;
+            result.m03 = -(right + left) / (right - left);
+
+            result.m10 = 0;
+            result.m11 = 2 / (top - bottom);
+            result.m12 = 0;
+            result.m13 = -(top + bottom) / (top - bottom);
+
+            result.m20 = 0;
+            result.m21 = 0;
+            result.m22 = -2 / (far - near);
+            result.m23 = (far + near) / (far - near);
+
+            result.m30 = 0;
+            result.m31 = 0;
+            result.m32 = 0;
+            result.m33 = 1;
+            return result;
+        }
+
         public static Matrix4x4 From2DMatrix(Matrix3x3 source)
         {
             Matrix4x4 result;
@@ -384,6 +413,35 @@ namespace AdvanceMath
             result.m31 = source.m21;
             result.m32 = 0;
             result.m33 = source.m22;
+        }
+
+        public static Matrix4x4 From2DMatrix(Matrix2x3 source)
+        {
+            Matrix4x4 result;
+            From2DMatrix(ref source, out result);
+            return result;
+        }
+        public static void From2DMatrix(ref Matrix2x3 source, out Matrix4x4 result)
+        {
+            result.m00 = source.m00;
+            result.m01 = source.m01;
+            result.m02 = 0;
+            result.m03 = source.m02;
+
+            result.m10 = source.m10;
+            result.m11 = source.m11;
+            result.m12 = 0;
+            result.m13 = source.m12;
+
+            result.m20 = 0;
+            result.m21 = 0;
+            result.m22 = 1;
+            result.m23 = 0;
+
+            result.m30 = 0;
+            result.m31 = 0;
+            result.m32 = 0;
+            result.m33 = 1;
         }
 
         public static Matrix4x4 Multiply(Matrix4x4 left, Matrix4x4 right)

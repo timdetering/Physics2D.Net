@@ -58,6 +58,7 @@
     <Compile Include="Ignorers\GroupIgnorer.cs" />
     <Compile Include="Ignorers\Ignorer.cs" />
     <Compile Include="Ignorers\ObjectIgnorer.cs" />
+    <Compile Include="Ignorers\OneWayPlatformIgnorer.cs" />
     <Compile Include="Joints\AngleJoint.cs" />
     <Compile Include="Joints\FixedAngleJoint.cs" />
     <Compile Include="Joints\FixedHingeJoint.cs" />

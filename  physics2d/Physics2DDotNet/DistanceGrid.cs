@@ -52,8 +52,8 @@ namespace Physics2DDotNet
             if (shape == null) { throw new ArgumentNullException("shape"); }
             if (!shape.CanGetDistance) { throw new ArgumentException("The Shape must support Get Distance", "shape"); }
             if (spacing <= 0) { throw new ArgumentOutOfRangeException("spacing"); }
-            Matrices matrc = new Matrices();
-            shape.CalcBoundingRectangle(matrc, out this.rect);
+            Matrix2x3 ident = Matrix2x3.Identity;
+            shape.CalcBoundingRectangle(ref ident, out this.rect);
 
            // this.rect = shape.Rectangle;
             this.gridSpacing = spacing;

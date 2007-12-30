@@ -77,7 +77,7 @@ namespace Physics2DDotNet.Shapes
         }
         #endregion
         #region methods
-        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
+        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
             if (BoundingRectangleRequested != null)
             {

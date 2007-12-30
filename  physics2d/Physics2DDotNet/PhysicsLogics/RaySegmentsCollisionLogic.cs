@@ -117,6 +117,7 @@ namespace Physics2DDotNet.PhysicsLogics
 
         void OnCollided(object sender, CollisionEventArgs e)
         {
+            if (e.Other.IgnoresPhysicsLogics) { return; }
             RaySegmentIntersectionInfo info = e.CustomCollisionInfo as RaySegmentIntersectionInfo;
             if (info != null)
             {

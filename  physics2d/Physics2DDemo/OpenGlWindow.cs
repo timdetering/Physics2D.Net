@@ -84,7 +84,6 @@ namespace Physics2DDemo
 
         public void Run()
         {
-
             Video.WindowIcon();
             Video.WindowCaption = "Physics2D.Net Demo";
             screen = Video.SetVideoMode(width, height, true, true);

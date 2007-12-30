@@ -104,7 +104,7 @@ namespace Physics2DDotNet
         bool IgnoreVertexes { get;set;}
 
         void GetDistance(ref Vector2D point, out Scalar result);
-        void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle);
+        void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle);
         bool TryGetIntersection(Vector2D point, out IntersectionInfo info);
         bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo);
     }

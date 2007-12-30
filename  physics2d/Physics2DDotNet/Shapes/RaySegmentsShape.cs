@@ -149,9 +149,8 @@ namespace Physics2DDotNet.Shapes
         {
             throw new NotSupportedException();
         }
-        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
+        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
-            Matrix2x3 matrix = matrices.ToWorld;
             Vector2D v1, v2;
             RaySegment segment = segments[0];
             v1 = segment.RayInstance.Origin;

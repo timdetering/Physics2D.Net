@@ -75,7 +75,7 @@ namespace Physics2DDotNet
             this.ToWorldNormal = copy.ToWorldNormal;
             this.ToBodyNormal = copy.ToBodyNormal;
         }
-        internal void Set(ref Matrix2x3 toWorld)
+        public void SetToWorld(ref Matrix2x3 toWorld)
         {
             this.ToWorld = toWorld;
             Matrix2x3.Invert(ref toWorld, out ToBody);

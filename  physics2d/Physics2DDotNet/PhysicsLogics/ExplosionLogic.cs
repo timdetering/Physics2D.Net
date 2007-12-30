@@ -91,6 +91,8 @@ namespace Physics2DDotNet.PhysicsLogics
         public Body ExplosionBody { get { return explosionBody; } }
         void OnCollided(object sender, CollisionEventArgs e)
         {
+            if (e.Other.IgnoresPhysicsLogics||
+                Scalar.IsPositiveInfinity(e.Other.Mass.Mass)) { return; }
             IExplosionAffectable affectable = e.Other.Shape as IExplosionAffectable;
             if (affectable != null)
             {
@@ -123,7 +125,7 @@ namespace Physics2DDotNet.PhysicsLogics
             ALVector2D.ToMatrix2x3(ref explosionBody.State.Position, out temp);
 
             Matrices matrices = new Matrices();
-            matrices.Set(ref temp);
+            matrices.SetToWorld(ref temp);
 
 
             Vector2D relativeVelocity = Vector2D.Zero;

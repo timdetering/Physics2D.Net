@@ -55,10 +55,13 @@ namespace Physics2DDotNet.PhysicsLogics
         {
             foreach (Body e in this.Bodies)
             {
-                if (!e.IgnoresGravity)
+                if (e.IgnoresGravity ||
+                    e.IgnoresPhysicsLogics)
                 {
-                    Vector2D.Add(ref e.State.Acceleration.Linear, ref gravity, out e.State.Acceleration.Linear);
+                    continue;
                 }
+                Vector2D.Add(ref e.State.Acceleration.Linear, ref gravity, out e.State.Acceleration.Linear);
+
             }
         }
     }

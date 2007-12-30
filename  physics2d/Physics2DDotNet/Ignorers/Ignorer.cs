@@ -30,7 +30,6 @@ using Scalar = System.Single;
 #endif
 using System;
 
-
 namespace Physics2DDotNet.Ignorers
 {
     /// <summary>
@@ -65,4 +64,6 @@ namespace Physics2DDotNet.Ignorers
         protected abstract bool CanCollide(Ignorer other);
         public virtual void UpdateTime(TimeStep step) { }
     }
+
+
 }

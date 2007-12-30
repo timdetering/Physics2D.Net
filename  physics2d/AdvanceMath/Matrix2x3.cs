@@ -164,6 +164,17 @@ namespace AdvanceMath
             destArray[10] = 1;
             destArray[15] = 1;
         }
+        public static void Copy2DFromOpenGlMatrix(Scalar[] destArray, out Matrix2x3 result)
+        {
+            result.m00 = destArray[0];
+            result.m10 = destArray[1];
+
+            result.m01 = destArray[4];
+            result.m11 = destArray[5];
+
+            result.m02 = destArray[12];
+            result.m12 = destArray[13];
+        }
 
         public static Matrix2x3 Lerp(Matrix2x3 left, Matrix2x3 right, Scalar amount)
         {

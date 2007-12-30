@@ -69,9 +69,9 @@ namespace Physics2DDotNet.Collections
 
         AdvReaderWriterLock rwLock;
         List<T> self;
-        public ReadOnlyThreadSafeCollection(AdvReaderWriterLock swLock, List<T> self)
+        public ReadOnlyThreadSafeCollection(AdvReaderWriterLock rwLock, List<T> self)
         {
-            this.rwLock = swLock;
+            this.rwLock = rwLock;
             this.self = self;
         }
 

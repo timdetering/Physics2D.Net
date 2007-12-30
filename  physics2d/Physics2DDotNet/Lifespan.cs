@@ -77,6 +77,10 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+        public int LastUpdate
+        {
+            get { return lastUpdate; }
+        }
         /// <summary>
         /// Gets and Sets if it IsExpired and should be removed from the engine.
         /// </summary>
@@ -164,6 +168,14 @@ namespace Physics2DDotNet
             {
                 age += step.Dt;
                 lastUpdate = step.UpdateCount;
+            }
+        }
+        public void Update(Scalar dt, int updateCount)
+        {
+            if (updateCount != lastUpdate)
+            {
+                age += dt;
+                lastUpdate = updateCount;
             }
         }
         public Lifespan Duplicate()

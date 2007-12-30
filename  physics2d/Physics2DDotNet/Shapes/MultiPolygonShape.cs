@@ -277,9 +277,9 @@ namespace Physics2DDotNet.Shapes
             return result;
         }
 
-        public override void CalcBoundingRectangle(Matrices matrices, out BoundingRectangle rectangle)
+        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
-            BoundingRectangle.FromVectors(ref matrices.ToWorld, Vertexes, out rectangle);
+            BoundingRectangle.FromVectors(ref matrix, Vertexes, out rectangle);
         }
 
         public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)

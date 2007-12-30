@@ -138,6 +138,7 @@ namespace Physics2DDotNet.PhysicsLogics
                 Wrapper wrapper = items[index];
                 Body body = wrapper.body;
                 if (wrapper.affectable == null ||
+                    body.IgnoresPhysicsLogics ||
                    Scalar.IsPositiveInfinity(body.Mass.Mass))
                 {
                     continue;

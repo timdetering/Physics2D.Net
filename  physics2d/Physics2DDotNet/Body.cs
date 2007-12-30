@@ -150,9 +150,9 @@ namespace Physics2DDotNet
         internal int jointCount;
         internal bool isChecked;
         private bool ignoresGravity;
+        private bool ignoresPhysicsLogics;
         private bool ignoresCollisionResponce;
         private bool isAdded;
-       // private bool isPending;
         private bool isCollidable;
         private bool isTransformed;
 
@@ -445,6 +445,14 @@ namespace Physics2DDotNet
             set { ignoresGravity = value; }
         }
         /// <summary>
+        /// Ignores all Physics Logics
+        /// </summary>
+        public bool IgnoresPhysicsLogics
+        {
+            get { return ignoresPhysicsLogics; }
+            set { ignoresPhysicsLogics = value; }
+        }
+        /// <summary>
         /// Gets and Sets if the Object will ignore the collison Responce but still generate the Collision event.
         /// </summary>
         public bool IgnoresCollisionResponse
@@ -610,8 +618,8 @@ namespace Physics2DDotNet
             Matrix2x3 matrix;
             ALVector2D.ToMatrix2x3(ref state.Position, out matrix);
             Matrix2x3.Multiply(ref matrix, ref transformation, out matrix);
-            matrices.Set(ref matrix);
-            shape.CalcBoundingRectangle(matrices, out rectangle);
+            matrices.SetToWorld(ref matrix);
+            shape.CalcBoundingRectangle(ref matrix, out rectangle);
             if (engine == null || !engine.inUpdate)
             {
                 OnPositionChanged();
@@ -730,22 +738,22 @@ namespace Physics2DDotNet
             return Duplicate();
         }
 
-        internal void OnCollision(Body other, ReadOnlyCollection<IContactInfo> contacts)
+        internal void OnCollision(TimeStep step, Body other, ReadOnlyCollection<IContactInfo> contacts)
         {
             if (Collided != null &&
                 (eventIgnorer == null ||
                 Ignorer.CanCollide(eventIgnorer,other.eventIgnorer)))
             {
-                Collided(this, new CollisionEventArgs(other, contacts));
+                Collided(this, new CollisionEventArgs(step,other, contacts));
             }
         }
-        internal void OnCollision(Body other, object customIntersectionInfo)
+        internal void OnCollision(TimeStep step, Body other, object customIntersectionInfo)
         {
             if (Collided != null &&
                 (eventIgnorer == null ||
                 Ignorer.CanCollide(eventIgnorer,other.eventIgnorer)))
             {
-                Collided(this, new CollisionEventArgs(other, customIntersectionInfo));
+                Collided(this, new CollisionEventArgs(step,other, customIntersectionInfo));
             }
         }
 

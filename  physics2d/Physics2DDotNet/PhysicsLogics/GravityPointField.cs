@@ -53,7 +53,8 @@ namespace Physics2DDotNet.PhysicsLogics
             this.location = location;
             this.gravity = gravity;
         }
-        public Vector2D Location {
+        public Vector2D Location
+        {
             get { return location; }
             set { location = value; }
         }
@@ -66,14 +67,17 @@ namespace Physics2DDotNet.PhysicsLogics
         {
             foreach (Body e in this.Bodies)
             {
-                if (!e.IgnoresGravity)
+                if (e.IgnoresGravity ||
+                    e.IgnoresPhysicsLogics)
                 {
-                    Vector2D vect;
-                    Vector2D.Subtract(ref location, ref e.State.Position.Linear, out vect);
-                    Vector2D.Normalize(ref vect, out vect);
-                    Vector2D.Multiply(ref vect, ref gravity, out vect);
-                    Vector2D.Add(ref e.State.Acceleration.Linear, ref vect, out e.State.Acceleration.Linear);
+                    continue;
                 }
+                Vector2D vect;
+                Vector2D.Subtract(ref location, ref e.State.Position.Linear, out vect);
+                Vector2D.Normalize(ref vect, out vect);
+                Vector2D.Multiply(ref vect, ref gravity, out vect);
+                Vector2D.Add(ref e.State.Acceleration.Linear, ref vect, out e.State.Acceleration.Linear);
+
             }
         }
     }
