@@ -40,10 +40,17 @@ namespace Physics2DDotNet.Ignorers
     /// </summary>
     public class OneWayPlatformIgnorer : Ignorer
     {
+        Scalar depthAllowed;
         Vector2D allowedDirection;
-        public OneWayPlatformIgnorer(Vector2D allowedDirection)
+        Matrix2x2 directionMatrix;
+        public OneWayPlatformIgnorer(Vector2D allowedDirection, Scalar depthAllowed)
         {
             this.allowedDirection = allowedDirection.Normalized;
+            this.depthAllowed = depthAllowed;
+            this.directionMatrix.m00 = allowedDirection.X;
+            this.directionMatrix.m10 = allowedDirection.Y;
+            this.directionMatrix.m01 = -directionMatrix.m10;
+            this.directionMatrix.m11 = directionMatrix.m00;
         }
         public override bool BothNeeded
         {
@@ -56,25 +63,13 @@ namespace Physics2DDotNet.Ignorers
             {
                 return true;
             }
-            Vector2D relativeVelocity = otherBody.State.Velocity.Linear - thisBody.State.Velocity.Linear;
-            if (relativeVelocity * allowedDirection > 0)
-            {
-                return false;
-            }
-            Matrix2x2 result;
-            result.m00 = allowedDirection.X;
-            result.m10 = allowedDirection.Y;
-            result.m01 = -result.m10;
-            result.m11 = result.m00;
-
-            Matrix2x3 m1 = result * thisBody.Matrices.ToWorld;
-            Matrix2x3 m2 = result * otherBody.Matrices.ToWorld;
-            BoundingRectangle r1;
+            Matrix2x3 m1, m2;
+            Matrix2x3.Multiply(ref directionMatrix, ref thisBody.Matrices.ToWorld, out m1);
+            Matrix2x3.Multiply(ref directionMatrix, ref otherBody.Matrices.ToWorld, out m2);
+            BoundingRectangle r1, r2;
             thisBody.Shape.CalcBoundingRectangle(ref m1, out r1);
-            BoundingRectangle r2;
             otherBody.Shape.CalcBoundingRectangle(ref m2, out r2);
-
-            return (r1.Max.X + r2.Max.X) * .5f > r2.Max.X;
+            return r1.Min.X + depthAllowed > r2.Max.X;
         }
     }
 }

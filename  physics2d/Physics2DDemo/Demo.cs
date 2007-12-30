@@ -1340,18 +1340,17 @@ namespace Physics2DDemo
                 Body b = AddShape(shape, 40, new ALVector2D(1, new Vector2D(600, 272 + i)));
                 //b.Transformation *= Matrix2x3.FromScale(new Vector2D(1, .5f));
             }
-            Body b1 = AddShape(shape, 40, new ALVector2D(1, new Vector2D(400,400)));
+            Body b1 = AddShape(shape, 40, new ALVector2D(1, new Vector2D(400, 400)));
             Body b2 = AddShape(shape, 40, new ALVector2D(1, new Vector2D(400, 200)));
             //b1.LinearDamping = .9f;
-          //  b2.LinearDamping = .9f;
+            //  b2.LinearDamping = .9f;
             //engine.AddProxy(b1, b2, Matrix2x2.FromRotation(MathHelper.PiOver2 ));
             b1.Transformation *= Matrix2x3.FromScale(new Vector2D(1, 1.8f));
             b2.Transformation *= Matrix2x3.FromScale(new Vector2D(.9f, 1));
 
-           Body line = AddLine(new Vector2D(200, 400), new Vector2D(400, 400),20);
-           line.IgnoresGravity = true;
-           line.CollisionIgnorer = new OneWayPlatformIgnorer(-Vector2D.YAxis);
-
+            Body line = AddLine(new Vector2D(200, 400), new Vector2D(400, 400), 20);
+            line.IgnoresGravity = true;
+            line.CollisionIgnorer = new OneWayPlatformIgnorer(-Vector2D.YAxis, 10);
 
             Body ball = AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             ball.Transformation *=
