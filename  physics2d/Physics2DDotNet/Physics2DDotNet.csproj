@@ -50,7 +50,6 @@
     <Compile Include="DataTypes\TimeStep.cs" />
     <Compile Include="Detectors\BroadPhaseCollisionDetector.cs" />
     <Compile Include="Detectors\BruteForceDetector.cs" />
-    <Compile Include="Ignorers\IgnorerCollection.cs" />
     <Compile Include="Detectors\SelectiveSweepDetector.cs" />
     <Compile Include="Detectors\FrameCoherentSAPDetector.cs" />
     <Compile Include="Detectors\SpatialHashDetector.cs" />
