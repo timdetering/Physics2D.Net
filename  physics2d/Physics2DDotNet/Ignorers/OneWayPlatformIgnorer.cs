@@ -56,6 +56,11 @@ namespace Physics2DDotNet.Ignorers
             {
                 return true;
             }
+            Vector2D relativeVelocity = otherBody.State.Velocity.Linear - thisBody.State.Velocity.Linear;
+            if (relativeVelocity * allowedDirection > 0)
+            {
+                return false;
+            }
             Matrix2x2 result;
             result.m00 = allowedDirection.X;
             result.m10 = allowedDirection.Y;
