@@ -39,9 +39,9 @@ namespace Physics2DDotNet.Ignorers
     public abstract class Ignorer
     {
         bool isInverted;
-        internal static bool CanCollide(Ignorer left, Ignorer right)
+        internal static bool CanCollide(Body leftBody, Body rightBody, Ignorer left, Ignorer right)
         {
-            return left.CanCollideInternal(right);
+            return left.CanCollideInternal(leftBody, rightBody, right);
         }
         protected Ignorer() { }
         protected Ignorer(Ignorer copy)
@@ -57,11 +57,11 @@ namespace Physics2DDotNet.Ignorers
             set { isInverted = value; }
         }
         public abstract bool BothNeeded { get;}
-        private bool CanCollideInternal(Ignorer other)
+        private bool CanCollideInternal(Body thisBody, Body otherBody, Ignorer other)
         {
-            return isInverted ^ CanCollide(other);
+            return isInverted ^ CanCollide(thisBody, otherBody, other);
         }
-        public abstract bool CanCollide(Ignorer other);
+        protected abstract bool CanCollide(Body thisBody, Body otherBody, Ignorer other);
         public virtual void UpdateTime(TimeStep step) { }
     }
 

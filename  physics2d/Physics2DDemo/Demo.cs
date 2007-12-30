@@ -1350,9 +1350,7 @@ namespace Physics2DDemo
 
            Body line = AddLine(new Vector2D(200, 400), new Vector2D(400, 400),20);
            line.IgnoresGravity = true;
-           line.CollisionIgnorer = new OneWayPlatformIgnorer(line,-Vector2D.YAxis,true);
-           b1.CollisionIgnorer = new OneWayPlatformIgnorer(b1,-Vector2D.YAxis, false) ;
-           b2.CollisionIgnorer = new OneWayPlatformIgnorer(b2, -Vector2D.YAxis, false);
+           line.CollisionIgnorer = new OneWayPlatformIgnorer(-Vector2D.YAxis);
 
 
             Body ball = AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));

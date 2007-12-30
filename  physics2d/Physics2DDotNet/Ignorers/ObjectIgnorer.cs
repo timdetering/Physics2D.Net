@@ -43,7 +43,7 @@ namespace Physics2DDotNet.Ignorers
         {
             get { return false; }
         }
-        public override bool CanCollide(Ignorer other)
+        protected override bool CanCollide(Body thisBody, Body otherBody, Ignorer other)
         {
             return other!= this;
         }

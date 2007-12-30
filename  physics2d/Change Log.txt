@@ -43,6 +43,7 @@ Changed: Renamed ApplyMatrix to ApplyPosition
 Added: SpatialHashDetector
 Added: Body.IgnoresPhysicsLogics
 Added: OneWayPlatformIgnorer
+Changed: Ignorer.CanCollide to take bodies as well as the other Ignorer
 
 AdvanceMath
 1.7.0.0:

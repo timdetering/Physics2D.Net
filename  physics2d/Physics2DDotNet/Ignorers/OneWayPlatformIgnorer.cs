@@ -37,56 +37,37 @@ namespace Physics2DDotNet.Ignorers
 {
     /// <summary>
     /// this allows you to have platforms that are one way.
-    /// Both the object going though and the platform must have this assigned.
     /// </summary>
     public class OneWayPlatformIgnorer : Ignorer
     {
         Vector2D allowedDirection;
-        bool isPlatform;
-        Body parent;
-        public OneWayPlatformIgnorer(Body parent, Vector2D allowedDirection, bool isPlatform)
+        public OneWayPlatformIgnorer(Vector2D allowedDirection)
         {
-            this.parent = parent;
             this.allowedDirection = allowedDirection.Normalized;
-            this.isPlatform = isPlatform;
         }
         public override bool BothNeeded
         {
-            get { return false; }
+            get { return true; }
         }
-        public override bool CanCollide(Ignorer other)
+        protected override bool CanCollide(Body thisBody, Body otherBody, Ignorer other)
         {
-            OneWayPlatformIgnorer o = other as OneWayPlatformIgnorer;
-            if (o != null)
+            if (otherBody.IgnoresPhysicsLogics ||
+                otherBody.Shape.BroadPhaseDetectionOnly)
             {
-                if (isPlatform ^ o.isPlatform)
-                {
-                    if (isPlatform)
-                    {
-                        return CanCollide(allowedDirection, parent, o.parent);
-                    }
-                    else
-                    {
-                        return CanCollide(allowedDirection, o.parent, parent);
-                    }
-                }
+                return true;
             }
-            return true;
-        }
-        private static bool CanCollide(Vector2D allowedDirection, Body b1, Body b2)
-        {
             Matrix2x2 result;
             result.m00 = allowedDirection.X;
             result.m10 = allowedDirection.Y;
             result.m01 = -result.m10;
             result.m11 = result.m00;
 
-            Matrix2x3 m1 = result * b1.Matrices.ToWorld;
-            Matrix2x3 m2 = result * b2.Matrices.ToWorld;
+            Matrix2x3 m1 = result * thisBody.Matrices.ToWorld;
+            Matrix2x3 m2 = result * otherBody.Matrices.ToWorld;
             BoundingRectangle r1;
-            b1.Shape.CalcBoundingRectangle(ref m1, out r1);
+            thisBody.Shape.CalcBoundingRectangle(ref m1, out r1);
             BoundingRectangle r2;
-            b2.Shape.CalcBoundingRectangle(ref m2, out r2);
+            otherBody.Shape.CalcBoundingRectangle(ref m2, out r2);
 
             return (r1.Max.X + r2.Max.X) * .5f > r2.Max.X;
         }
