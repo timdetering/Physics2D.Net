@@ -23,7 +23,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;XBOX360</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -38,7 +38,10 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="Tao.OpenGl, Version=2.1.0.4, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
       <HintPath>..\lib\Tao.OpenGl.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -49,9 +52,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Demo.cs" />
-    <Compile Include="OpenGlObject.cs" />
-    <Compile Include="OpenGlWindow.cs" />
+    <Compile Include="Demo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="OpenGlObject.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="OpenGlWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -59,6 +68,14 @@
     <ProjectReference Include="..\AdvanceMath\AdvanceMath.csproj">
       <Project>{A979FDB4-7AB7-444E-9632-77D69D22D743}</Project>
       <Name>AdvanceMath</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Graphics2DDotNet\Graphics2DDotNet.csproj">
+      <Project>{3519FB5B-9D32-41A4-AA2C-D4C3E6730831}</Project>
+      <Name>Graphics2DDotNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics2DDotNet.Demo\Physics2DDotNet.Demo.csproj">
+      <Project>{9AAE3AC7-59FF-462B-ADB7-2B7D3FAF6ED8}</Project>
+      <Name>Physics2DDotNet.Demo</Name>
     </ProjectReference>
     <ProjectReference Include="..\Physics2DDotNet\Physics2DDotNet.csproj">
       <Project>{C024C0B1-401B-4644-8918-D87C28716898}</Project>

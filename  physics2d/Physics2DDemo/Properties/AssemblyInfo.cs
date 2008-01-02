@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security.Permissions;
 
 using System.Runtime.InteropServices;
 
@@ -10,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Physics2DDotNet")]
-[assembly: AssemblyCopyright("Copyright © 2007 Jonathan Mark Porter.")]
+[assembly: AssemblyCopyright("Copyright © 2008 Jonathan Mark Porter.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

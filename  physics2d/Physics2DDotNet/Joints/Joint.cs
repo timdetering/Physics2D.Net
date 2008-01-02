@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -144,8 +144,7 @@ namespace Physics2DDotNet.Joints
         {
             this.isChecked = false;
             this.engine = engine;
-            OnPending();
-            if (Pending != null) { Pending(this, EventArgs.Empty); }
+            OnPending(EventArgs.Empty);
         }
         internal void OnAddedInternal(PhysicsEngine engine)
         {
@@ -154,10 +153,9 @@ namespace Physics2DDotNet.Joints
             foreach (Body b in Bodies)
             {
                 b.Removed += OnBodyRemoved;
-                b.jointCount++;
+                b.joints.Add(this);
             }
-            OnAdded();
-            if (Added != null) { Added(this, EventArgs.Empty); }
+            OnAdded(EventArgs.Empty);
         }
         internal void OnRemovedInternal()
         {
@@ -166,7 +164,7 @@ namespace Physics2DDotNet.Joints
             {
                 if (!isPending)
                 {
-                    b.jointCount--;
+                    b.joints.Remove(this);
                 }
                 b.Removed -= OnBodyRemoved;
             }
@@ -174,21 +172,29 @@ namespace Physics2DDotNet.Joints
             bool wasPending = isPending;
             this.isAdded = false;
             this.engine = null;
-            OnRemoved(engine, wasPending);
-            if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }
+            OnRemoved(new RemovedEventArgs(engine, wasPending));
         }
         void OnBodyRemoved(object sender, EventArgs e)
         {
             this.lifetime.IsExpired = true;
         }
-        protected virtual void OnPending() { }
-        protected virtual void OnAdded() { }
-        protected virtual void OnRemoved(PhysicsEngine engine, bool wasPending) { }
+        protected virtual void OnPending(EventArgs e)
+        {
+            if (Pending != null) { Pending(this, e); }
+        }
+        protected virtual void OnAdded(EventArgs e)
+        {
+            if (Added != null) { Added(this, e); }
+        }
+        protected virtual void OnRemoved(RemovedEventArgs e)
+        {
+            if (Removed != null) { Removed(this, e); }
+        }
         /// <summary>
         /// Before the item is allowed to be added to pending this method is called to 
         /// throw any exceptions without corrupting the state of the Physics engine.
         /// </summary>
         /// <param name="engine">The engine the item is about to be added too.</param>
-        protected virtual void BeforeAddCheck(PhysicsEngine engine) { } 
+        protected virtual void BeforeAddCheck(PhysicsEngine engine) { }
     }
 }

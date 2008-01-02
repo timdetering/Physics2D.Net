@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AdvanceMath")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A Matrix, Vector, and Geometry Math Library for .Net")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("AdvanceMath")]
-[assembly: AssemblyCopyright("Copyright ©  2005-2007 Jonathan Mark Porter.")]
+[assembly: AssemblyCopyright("Copyright ©  2005-2008 Jonathan Mark Porter.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]

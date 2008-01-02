@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -154,13 +154,6 @@ namespace Physics2DDotNet.Shapes
         public abstract bool CanGetIntersection { get;}
         public abstract bool CanGetDistance { get;}
         public abstract bool CanGetCustomIntersection { get;}
-        /// <summary>
-        /// Gets if this detects collisions only with bounding boxes 
-        /// and if it does then only bodies colliding it will also generate collision events as well.
-        /// if this is true it can allow you to write your own collision Solver just for this Shape. 
-        /// Or you can use this to do clipping.
-        /// </summary>
-        public abstract bool BroadPhaseDetectionOnly { get;}
         /// <summary>
         /// Gets the Moment of Inertia Multiplier. Which is the ratio of inertia to mass of a Body.
         /// </summary>

@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -777,11 +777,11 @@ namespace Physics2DDotNet
 
             if (shape1.CanGetCustomIntersection ||
                 shape2.CanGetCustomIntersection ||
-                shape1.BroadPhaseDetectionOnly ||
-                shape2.BroadPhaseDetectionOnly)
+                body1.IsBroadPhaseOnly ||
+                body2.IsBroadPhaseOnly)
             {
                 object customIntersectionInfo;
-                if (shape1.BroadPhaseDetectionOnly)
+                if (body1.IsBroadPhaseOnly)
                 {
                     body1.OnCollision(step,body2, null);
                 }
@@ -790,7 +790,7 @@ namespace Physics2DDotNet
                 {
                     body1.OnCollision(step, body2, customIntersectionInfo);
                 }
-                if (shape2.BroadPhaseDetectionOnly)
+                if (body2.IsBroadPhaseOnly)
                 {
                     body2.OnCollision(step, body1, null);
                 }

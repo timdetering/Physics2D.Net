@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -69,10 +69,10 @@ namespace Physics2DDotNet.Shapes
         /// <summary>
         /// creates vertexes that describe a Rectangle.
         /// </summary>
-        /// <param name="height">The length of the Rectangle</param>
         /// <param name="width"></param>
+        /// <param name="height">The length of the Rectangle</param>
         /// <returns>array of vectors the describe a rectangle</returns>
-        public static Vector2D[] CreateRectangle(Scalar height, Scalar width)
+        public static Vector2D[] CreateRectangle(Scalar width, Scalar height)
         {
             if (height <= 0) { throw new ArgumentOutOfRangeException("height", "must be greater then 0"); }
             if (width <= 0) { throw new ArgumentOutOfRangeException("width", "must be greater then 0"); }
@@ -279,10 +279,6 @@ namespace Physics2DDotNet.Shapes
         public override bool CanGetDistance
         {
             get { return true; }
-        }
-        public override bool BroadPhaseDetectionOnly
-        {
-            get { return false; }
         }
         public override bool CanGetCustomIntersection
         {

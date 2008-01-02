@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -35,6 +35,7 @@ using System.Collections.ObjectModel;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet.Shapes;
+using Physics2DDotNet.Joints;
 using Physics2DDotNet.Ignorers;
 
 
@@ -134,6 +135,7 @@ namespace Physics2DDotNet
         #endregion
         #region fields
         internal LinkedList<BodyProxy> proxies;
+        internal List<Joint> joints;
         private PhysicsEngine engine;
         private Shape shape;
         private PhysicsState state;
@@ -146,8 +148,11 @@ namespace Physics2DDotNet
         private Ignorer eventIgnorer;
         private Ignorer collisionIgnorer;
         private ALVector2D lastPosition;
-        private int id = -1;
-        internal int jointCount;
+        
+        private int id;
+        private Scalar linearDamping;
+        private Scalar angularDamping;
+        
         internal bool isChecked;
         private bool ignoresGravity;
         private bool ignoresPhysicsLogics;
@@ -155,9 +160,11 @@ namespace Physics2DDotNet
         private bool isAdded;
         private bool isCollidable;
         private bool isTransformed;
+        private bool isEventable;
+        private bool isBroadPhaseOnly;
 
-        private Scalar linearDamping;
-        private Scalar angularDamping;
+
+
         private object tag;
         private object solverTag;
         private object detectorTag;
@@ -201,23 +208,25 @@ namespace Physics2DDotNet
             if (massInfo == null) { throw new ArgumentNullException("massInfo"); }
             if (coefficients == null) { throw new ArgumentNullException("coefficients"); }
             if (lifetime == null) { throw new ArgumentNullException("lifetime"); }
+            Initialize();
             this.matrices = new Matrices();
             this.transformation = Matrix2x3.Identity;
-            this.proxies = new LinkedList<BodyProxy>();
+
             this.state = new PhysicsState(state);
             this.Shape = shape;
             this.massInfo = massInfo;
             this.coefficients = coefficients;
             this.lifetime = lifetime;
-            this.isCollidable = true;
             this.linearDamping = 1;
             this.angularDamping = 1;
+            this.isCollidable = true;
+            this.isEventable = true;
             this.ApplyPosition();
         }
 
         private Body(Body copy)
         {
-            this.proxies = new LinkedList<BodyProxy>();
+            Initialize();
             this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
             this.shape = copy.shape;
             this.massInfo = copy.massInfo;
@@ -233,11 +242,19 @@ namespace Physics2DDotNet
 
             this.ignoresCollisionResponce = copy.ignoresCollisionResponce;
             this.ignoresGravity = copy.ignoresGravity;
-            this.isCollidable = copy.isCollidable;
-            this.ignoresGravity = copy.ignoresGravity;
+            this.ignoresPhysicsLogics = copy.ignoresPhysicsLogics;
             this.isTransformed = copy.isTransformed;
+            this.isCollidable = copy.isCollidable;
+            this.isEventable = copy.isEventable;
 
-            this.tag = (copy.tag is ICloneable) ? (((ICloneable)copy.tag).Clone()) : (copy.tag);
+            this.tag = copy.tag;
+        }
+
+        private void Initialize()
+        {
+            this.id = -1;
+            this.joints = new List<Joint>();
+            this.proxies = new LinkedList<BodyProxy>();
         }
         #endregion
         #region properties
@@ -304,7 +321,6 @@ namespace Physics2DDotNet
         /// The number of proxies that this body has.
         /// </summary>
         public int ProxiesCount { get { return proxies.Count; } }
-
         /// <summary>
         /// Unique ID of a PhysicsEntity in the PhysicsEngine
         /// Assigned on being Added.
@@ -430,12 +446,9 @@ namespace Physics2DDotNet
             internal set { detectorTag = value; }
         }
         /// <summary>
-        /// the number of Joints attached to this body.
+        /// Gets the Joints attached to this body.
         /// </summary>
-        public int JointCount
-        {
-            get { return jointCount; }
-        }
+        public ReadOnlyCollection<Joint> Joints { get { return new ReadOnlyCollection<Joint>(joints); } }
         /// <summary>
         /// Gets and Sets if the Body will ignore Gravity.
         /// </summary>
@@ -445,7 +458,7 @@ namespace Physics2DDotNet
             set { ignoresGravity = value; }
         }
         /// <summary>
-        /// Ignores all Physics Logics
+        /// Gets and Sets if the Body will Ignore all Physics Logics
         /// </summary>
         public bool IgnoresPhysicsLogics
         {
@@ -484,6 +497,23 @@ namespace Physics2DDotNet
         {
             get { return isCollidable; }
             set { isCollidable = value; }
+        }
+        /// <summary>
+        /// Gets and Sets if other objects will have their collided 
+        /// event raised when colliding with this body
+        /// </summary>
+        public bool IsEventable
+        {
+            get { return isEventable; }
+            set { isEventable = value; }
+        }
+        /// <summary>
+        /// Gets and Sets if the Body will trigger the Collided event at the broadphase level
+        /// </summary>
+        public bool IsBroadPhaseOnly
+        {
+            get { return isBroadPhaseOnly; }
+            set { isBroadPhaseOnly = value; }
         }
         /// <summary>
         /// Gets the Total Kinetic Energy of the Body.
@@ -741,6 +771,7 @@ namespace Physics2DDotNet
         internal void OnCollision(TimeStep step, Body other, ReadOnlyCollection<IContactInfo> contacts)
         {
             if (Collided != null &&
+                other.IsEventable &&
                 (eventIgnorer == null ||
                 Ignorer.CanCollide(this,other, eventIgnorer,other.eventIgnorer)))
             {
@@ -750,6 +781,7 @@ namespace Physics2DDotNet
         internal void OnCollision(TimeStep step, Body other, object customIntersectionInfo)
         {
             if (Collided != null &&
+                other.IsEventable &&
                 (eventIgnorer == null ||
                 Ignorer.CanCollide(this, other, eventIgnorer, other.eventIgnorer)))
             {

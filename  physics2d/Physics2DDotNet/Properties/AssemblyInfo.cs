@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Physics2D.Net")]
-[assembly: AssemblyCopyright("Copyright ©  2005-2007 Jonathan Mark Porter")]
+[assembly: AssemblyCopyright("Copyright ©  2005-2008 Jonathan Mark Porter")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
@@ -28,6 +28,9 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("4d91d66b-dd28-4932-9b25-a6270af17418")]
+
+
+//[assembly: FileDialogPermission(SecurityAction.Demand, Unrestricted = true)]
 
 // Version information for an assembly consists of the following four values:
 //

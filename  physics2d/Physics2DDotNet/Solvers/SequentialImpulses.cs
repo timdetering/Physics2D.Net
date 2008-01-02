@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -216,69 +216,12 @@ namespace Physics2DDotNet.Solvers
                     contact.position.Y = center2.Y - normal.Y * circle2.Radius;
                 }
             }
-            void CollideCirclesOLD()
-            {
-                Contact contact;
-                if (contacts.First == null)
-                {
-                    contact = new Contact(this);
-                    contacts.AddLast(contact);
-                }
-                else
-                {
-                    contact = contacts.First.Value;
-                }
-
-
-                Vector2D normal, p1, p2;
-                Scalar distance, r2;
-
-                p1 = Vector2D.Zero;
-                p2 = Vector2D.Zero;
-                Vector2D.Transform(ref body1.Matrices.ToWorld, ref  p1, out p1);
-                Vector2D.Transform(ref body2.Matrices.ToWorld, ref  p2, out p2);
-                //p1 = circle1.Position;
-                //p2 = circle2.Position;
-                r2 = circle2.Radius;
-                //diff = circle2.Position - circle1.Position;
-                Vector2D.Subtract(ref  p2, ref p1, out normal);
-                Vector2D.Normalize(ref normal, out distance, out normal);
-                distance -= r2 + circle1.Radius;
-                if (distance > 0)
-                {
-                    contacts.Clear();
-                }
-                else
-                {
-                    contact.distance = distance;
-                    contact.normal = normal;
-                    Vector2D.Multiply(ref r2, ref normal, out normal);
-                    Vector2D.Subtract(ref p2, ref normal, out contact.position);
-                    //  contact.position = circle2.Position - normal * circle2.Radius;
-                }
-
-                /*   Matrix2D inv = circle1.MatrixInv;
-                   Matrix2D mat = circle1.Matrix;
-
-                   Vector2D.Normalize(ref normal, out normal);
-
-                   Vector2D.Transform(ref inv.NormalMatrix, ref normal, out normal);
-                   Vector2D.Normalize(ref normal);
-                   normal = normal * circle1.Radius;
-                   Vector2D.Transform(ref mat.VertexMatrix, ref normal, out normal);
-                   IntersectionInfo info;
-                   circle2.TryGetIntersection(normal, out info);
-                   contact.distance = info.Distance;
-                   Vector2D.Negate(ref info.Normal, out contact.normal);
-                   contact.position = info.Position;*/
-            }
             void Collide()
             {
                 BoundingRectangle bb1 = body1.Rectangle;
                 BoundingRectangle bb2 = body2.Rectangle;
                 BoundingRectangle targetArea;
                 BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
-
                 LinkedListNode<Contact> node = contacts.First;
                 if (!body2.Shape.IgnoreVertexes &&
                     body1.Shape.CanGetIntersection)
@@ -319,8 +262,11 @@ namespace Physics2DDotNet.Solvers
                         Vector2D bodyVertex;
                         Vector2D.Transform(ref b1ToBody, ref worldVertex, out bodyVertex);
                         isBad = !b1.Shape.TryGetIntersection(bodyVertex, out info);
-                        if (!isBad && normals != null)
+                        if (!isBad && normals != null &&
+                            !body1.IgnoresCollisionResponse&&
+                            !body2.IgnoresCollisionResponse)
                         {
+
                             Vector2D normal;
                             Vector2D.Transform(ref normalM, ref  normals[index], out normal);
                             Scalar temp;

@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -87,20 +87,22 @@ namespace Physics2DDotNet.PhysicsLogics
         {
             if (body.Engine != engine) { throw new InvalidOperationException("The Body must be added to the Engine before the GravityPointMass."); }
         }
-        protected override void OnAdded()
+        protected override void OnAdded(EventArgs e)
         {
             this.body.Removed += OnBodyRemoved;
+            base.OnAdded(e);
         }
         void OnBodyRemoved(object sender, RemovedEventArgs e)
         {
             this.Lifetime.IsExpired = true;
         }
-        protected override void OnRemoved(PhysicsEngine engine, bool wasPending)
+        protected override void OnRemoved(RemovedEventArgs e)
         {
-            if (!wasPending)
+            if (!e.WasPending)
             {
                 this.body.Removed -= OnBodyRemoved;
             }
+            base.OnRemoved(e);
         }
     }
 

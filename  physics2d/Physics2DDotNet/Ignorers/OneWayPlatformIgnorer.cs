@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -36,7 +36,7 @@ using AdvanceMath.Geometry2D;
 namespace Physics2DDotNet.Ignorers
 {
     /// <summary>
-    /// this allows you to have platforms that are one way.
+    /// this allows you to have platforms that are one way. like in platform games.
     /// </summary>
     public class OneWayPlatformIgnorer : Ignorer
     {
@@ -59,7 +59,7 @@ namespace Physics2DDotNet.Ignorers
         protected override bool CanCollide(Body thisBody, Body otherBody, Ignorer other)
         {
             if (otherBody.IgnoresPhysicsLogics ||
-                otherBody.Shape.BroadPhaseDetectionOnly)
+                otherBody.IsBroadPhaseOnly)
             {
                 return true;
             }

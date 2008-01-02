@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -104,10 +104,6 @@ namespace Physics2DDotNet.Shapes
         public override bool CanGetDistance
         {
             get { return true; }
-        }
-        public override bool BroadPhaseDetectionOnly
-        {
-            get { return false; }
         }
         public override bool CanGetCustomIntersection
         {

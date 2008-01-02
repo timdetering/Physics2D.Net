@@ -82,6 +82,7 @@
     <Compile Include="PhysicsLogics\GravityPointField.cs" />
     <Compile Include="PhysicsLogics\GravityPointMass.cs" />
     <Compile Include="PhysicsLogics\LineFluidLogic.cs" />
+    <Compile Include="PhysicsLogics\MousePickingLogic.cs" />
     <Compile Include="PhysicsLogics\PhysicsLogic.cs" />
     <Compile Include="PhysicsLogics\RaySegmentsCollisionLogic.cs" />
     <Compile Include="PhysicsLogics\VelocityLimitLogic.cs" />
@@ -92,7 +93,6 @@
     <Compile Include="Shapes\ParticleShape.cs" />
     <Compile Include="Shapes\PolygonShape.cs" />
     <Compile Include="Shapes\RaySegmentsShape.cs" />
-    <Compile Include="Shapes\RectangleShape.cs" />
     <Compile Include="Shapes\ShapeHelper.cs" />
     <Compile Include="Solvers\CollisionSolver.cs" />
     <Compile Include="Solvers\ISequentialImpulsesJoint.cs" />

@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -114,9 +114,10 @@ namespace Physics2DDotNet.Joints
         {
             get { return new ReadOnlyCollection<Body>(new Body[2] { body1, body2 }); }
         }
-        protected override void OnAdded()
+        protected override void OnAdded(EventArgs e)
         {
             this.solver = (Solvers.SequentialImpulsesSolver)Engine.Solver;
+            base.OnAdded(e);
         }
         void Solvers.ISequentialImpulsesJoint.PreStep(TimeStep step)
         {

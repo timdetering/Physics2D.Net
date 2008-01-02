@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -68,7 +68,6 @@ namespace Physics2DDemo
         Dictionary<string,Sprite> sprites = new Dictionary<string,Sprite>();
         Body bomb;
         Body clipper;
-        RectangleShape clippersShape;
         Vector2D bombTarget;
         Coefficients coefficients = new Coefficients(.5f, .4f);
 
@@ -188,7 +187,7 @@ namespace Physics2DDemo
                 IntersectionInfo info;
                 foreach (Body b in engine.Bodies)
                 {
-                    if (b.IsCollidable && !b.Shape.BroadPhaseDetectionOnly &&
+                    if (b.IsCollidable && !b.IsBroadPhaseOnly &&
                         b.Shape.CanGetIntersection)
                     {
                         Vector2D temp = b.Matrices.ToBody * point;
@@ -514,9 +513,9 @@ namespace Physics2DDemo
             //sets the broadphase
             //engine.BroadPhase = new Physics2DDotNet.Detectors.BruteForceDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
-            //engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.FrameCoherentSAPDetector();
-            engine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
+            //engine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
             //engine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector2();
             
             //setups the Solver and sets it.
@@ -534,9 +533,19 @@ namespace Physics2DDemo
 
         void CreateClipper()
         {
-            clippersShape = new RectangleShape();
-            clipper = new Body(new PhysicsState(), clippersShape, 0, new Coefficients(0, 0), new Lifespan());
+            int width = 800;
+            int height = 600;
+
+            PolygonShape shape = new PolygonShape(PolygonShape.CreateRectangle(width, height), 100);
+            clipper = new Body(new PhysicsState(), shape,1, new Coefficients(0, 0), new Lifespan());
+            clipper.State.Position.Linear.X = width / 2f;
+            clipper.State.Position.Linear.Y = height / 2f;
+            clipper.ApplyPosition();
+
+            clipper.IsBroadPhaseOnly = true;
+            clipper.IsEventable = false;
             clipper.IgnoresGravity = true;
+            clipper.IgnoresPhysicsLogics = true;
             clipper.Collided += new EventHandler<CollisionEventArgs>(clipper_Collided);
             clipper.Updated += new EventHandler<UpdatedEventArgs>(clipper_Updated);
         }
@@ -771,7 +780,7 @@ namespace Physics2DDemo
         {
             Body line = new Body(
                 new PhysicsState(position),
-                new PolygonShape(PolygonShape.CreateRectangle(60, 2000), 40),
+                new PolygonShape(PolygonShape.CreateRectangle(2000, 60), 40),
                 new MassInfo(Scalar.PositiveInfinity, Scalar.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
@@ -919,7 +928,7 @@ namespace Physics2DDemo
         }
         Body AddRectangle(Scalar height, Scalar width, Scalar mass, ALVector2D position)
         {
-            Vector2D[] vertices = PolygonShape.CreateRectangle(height, width);
+            Vector2D[] vertices = PolygonShape.CreateRectangle(width, height);
             vertices =PolygonShape.Subdivide(vertices, (height + width) / 9);
 
             Shape boxShape = new PolygonShape(vertices, Math.Min(height, width) / 2);
@@ -933,7 +942,6 @@ namespace Physics2DDemo
             AddGlObject(e);
             engine.AddBody(e);
             return e;
-
         }
         Body AddCircle(Scalar radius, int vertexCount, Scalar mass, ALVector2D position)
         {
@@ -1690,7 +1698,7 @@ namespace Physics2DDemo
         {
             BeginDemoChange();
             Reset(false);
-            BoundingRectangle rect = this.clippersShape.Rectangle;
+            BoundingRectangle rect = this.clipper.Rectangle;
             rect.Min.X -= 75;
             rect.Min.Y -= 75;
             rect.Max.X += 75;
@@ -1831,7 +1839,7 @@ namespace Physics2DDemo
             engine.AddLogic(new LineFluidLogic(new Line(0, -1, -400), 1.95f, .02f, new Vector2D(0, 0), new Lifespan()));
             AddGravityField();
 
-            BoundingRectangle rect = this.clippersShape.Rectangle;
+            BoundingRectangle rect = this.clipper.Rectangle;
             rect.Min.X -= 75;
             rect.Min.Y -= 75;
             rect.Max.X += 75;
@@ -1929,7 +1937,7 @@ namespace Physics2DDemo
         void DemoI_Body_Updated(object sender, UpdatedEventArgs e)
         {
             Body b = (Body)sender;
-            BoundingRectangle clip  = this.clippersShape.Rectangle;
+            BoundingRectangle clip = this.clipper.Rectangle;
             BoundingRectangle mainRect =b.Rectangle;
             ContainmentType inter = clip.Contains( mainRect);
             if (inter == ContainmentType.Intersects)
@@ -2082,7 +2090,9 @@ namespace Physics2DDemo
             {
                 s.Refresh();
             }
-            clippersShape.Rectangle=(new BoundingRectangle(0, 0, Video.Screen.Width, Video.Screen.Height));
+            clipper.Shape = new PolygonShape(PolygonShape.CreateRectangle(Video.Screen.Width, Video.Screen.Height), 100);
+            clipper.State.Position.Linear.X = Video.Screen.Width / 2f;
+            clipper.State.Position.Linear.Y = Video.Screen.Height / 2f;
             lock (objects)
             {
                 foreach (OpenGlObject obj in objects)
@@ -2233,7 +2243,7 @@ namespace Physics2DDemo
         private void DrawPaused()
         {
             Gl.glLoadIdentity();
-            BoundingRectangle rect = this.clippersShape.Rectangle;
+            BoundingRectangle rect = this.clipper.Rectangle;
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             Gl.glEnable(Gl.GL_BLEND);
             Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);

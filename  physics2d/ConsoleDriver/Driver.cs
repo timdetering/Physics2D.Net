@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -214,7 +214,7 @@ namespace ConsoleDriver
 
 
             Shape shape1 = new CircleShape(8, 7);
-            Shape shape2 = new PolygonShape(PolygonShape.CreateRectangle(10, 20), 3);
+            Shape shape2 = new PolygonShape(PolygonShape.CreateRectangle(20, 10), 3);
 
             Scalar mass = 5;
             Body body1 = new Body(new PhysicsState(), shape1, mass, coffecients, new Lifespan());

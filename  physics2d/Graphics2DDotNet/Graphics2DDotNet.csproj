@@ -1,0 +1,106 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3519FB5B-9D32-41A4-AA2C-D4C3E6730831}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Graphics2DDotNet</RootNamespace>
+    <AssemblyName>Graphics2DDotNet</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="SdlDotNet, Version=6.0.1.0, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\SdlDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SdlDotNet.OpenGl, Version=1.0.0.28006, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\SdlDotNet.OpenGl.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Tao.OpenGl, Version=2.1.0.7, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Tao.OpenGl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cache.cs" />
+    <Compile Include="CacheMethods\FontCacheMethods.cs" />
+    <Compile Include="CacheMethods\ICacheMethods.cs" />
+    <Compile Include="CacheMethods\SurfaceCacheMethods.cs" />
+    <Compile Include="CacheMethods\SurfacePolygonsCacheMethods.cs" />
+    <Compile Include="DataTypes\DrawEventArgs.cs" />
+    <Compile Include="DataTypes\ScalarColor3.cs" />
+    <Compile Include="DataTypes\ScalarColor4.cs" />
+    <Compile Include="DataTypes\SizeEventArgs.cs" />
+    <Compile Include="DataTypes\ViewportMouseButtonEventArgs.cs" />
+    <Compile Include="DataTypes\ViewportMouseMotionEventArgs.cs" />
+    <Compile Include="Drawables\BufferedDrawable.cs" />
+    <Compile Include="Drawables\Colored3MultiPolygonDrawable.cs" />
+    <Compile Include="Drawables\Colored3PolygonDrawable.cs" />
+    <Compile Include="Drawables\Colored4MultiPolygonDrawable.cs" />
+    <Compile Include="Drawables\Colored4PolygonDrawable.cs" />
+    <Compile Include="Drawables\IDrawable.cs" />
+    <Compile Include="Drawables\MultiPolygonDrawable.cs" />
+    <Compile Include="Drawables\PolygonDrawable.cs" />
+    <Compile Include="Drawables\SpriteDrawable.cs" />
+    <Compile Include="DataTypes\DrawInfo.cs" />
+    <Compile Include="DrawProperties\Color3Property.cs" />
+    <Compile Include="DrawProperties\Color4Property.cs" />
+    <Compile Include="Factories\DrawableFactory.cs" />
+    <Compile Include="Factories\ShapeFactory.cs" />
+    <Compile Include="GlHelper.cs" />
+    <Compile Include="Graphics\BodyGraphic.cs" />
+    <Compile Include="Graphics\IGraphic.cs" />
+    <Compile Include="Graphics\SimpleGraphic.cs" />
+    <Compile Include="Animations\IAnimation.cs" />
+    <Compile Include="DrawProperties\IDrawProperty.cs" />
+    <Compile Include="Window.cs" />
+    <Compile Include="Layer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SurfaceBitmap.cs" />
+    <Compile Include="DataTypes\SurfacePolygons.cs" />
+    <Compile Include="Viewport.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AdvanceMath\AdvanceMath.csproj">
+      <Project>{A979FDB4-7AB7-444E-9632-77D69D22D743}</Project>
+      <Name>AdvanceMath</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics2DDotNet\Physics2DDotNet.csproj">
+      <Project>{C024C0B1-401B-4644-8918-D87C28716898}</Project>
+      <Name>Physics2DDotNet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

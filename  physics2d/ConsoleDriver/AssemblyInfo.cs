@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -35,7 +35,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Physics2DDotNet")]
-[assembly: AssemblyCopyright("Copyright ©  2005-2007 Jonathan Mark Porter.")]
+[assembly: AssemblyCopyright("Copyright ©  2005-2008 Jonathan Mark Porter.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
 

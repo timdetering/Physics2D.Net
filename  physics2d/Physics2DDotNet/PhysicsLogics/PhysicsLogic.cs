@@ -1,6 +1,6 @@
 #region MIT License
 /*
- * Copyright (c) 2005-2007 Jonathan Mark Porter. http://physics2d.googlepages.com/
+ * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal 
@@ -174,17 +174,13 @@ namespace Physics2DDotNet.PhysicsLogics
         {
             this.isChecked = true;
             this.engine = engine;
-            OnPending();
-            if (Pending != null) { Pending(this, EventArgs.Empty); }
+            OnPending(EventArgs.Empty);
         }
-        protected virtual void OnPending() { }
-
         internal void OnAddedInternal()
         {
             this.isAdded = true;
             AddBodyRange(engine.bodies);
-            OnAdded();
-            if (Added != null) { Added(this, EventArgs.Empty); }
+            OnAdded(EventArgs.Empty);
         }
         internal void OnRemovedInternal()
         {
@@ -193,12 +189,20 @@ namespace Physics2DDotNet.PhysicsLogics
             PhysicsEngine engine = this.engine;
             this.isAdded = false;
             this.engine = null;
-            OnRemoved(engine, wasPending);
-            if (Removed != null) { Removed(this, new RemovedEventArgs(engine, wasPending)); }
+            OnRemoved(new RemovedEventArgs(engine, wasPending));
         }
-
-        protected virtual void OnAdded() { }
-        protected virtual void OnRemoved(PhysicsEngine engine, bool wasPending) { }
+        protected virtual void OnPending(EventArgs e)
+        {
+            if (Pending != null) { Pending(this, e); }
+        }
+        protected virtual void OnAdded(EventArgs e)
+        {
+            if (Added != null) { Added(this, e); }
+        }
+        protected virtual void OnRemoved(RemovedEventArgs e)
+        {
+            if (Removed != null) { Removed(this, e); }
+        }
         protected internal virtual void UpdateTime(TimeStep step)
         {
             this.lifetime.Update(step);
