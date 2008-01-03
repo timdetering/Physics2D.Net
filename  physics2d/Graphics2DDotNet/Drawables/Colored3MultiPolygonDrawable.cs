@@ -109,8 +109,8 @@ namespace Graphics2DDotNet
         }
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteBuffersARB(vertexNames);
-            GlHelper.GlDeleteBuffersARB(colorNames);
+            GlHelper.GlDeleteBuffersARB(LastRefresh, vertexNames);
+            GlHelper.GlDeleteBuffersARB(LastRefresh, colorNames);
         }
     }
 

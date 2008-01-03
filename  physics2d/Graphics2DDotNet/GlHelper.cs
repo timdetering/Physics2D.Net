@@ -153,6 +153,22 @@ namespace Graphics2DDotNet
                 handle.Free();
             }
         }
+        public static void GlVertexPointer(int size, int type, int stride, Array array)
+        {
+            GCHandle handle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                Gl.glVertexPointer(
+                    size,
+                    type, 
+                    stride, 
+                    handle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                handle.Free();
+            }
+        }
 
         public static void GlColor3(Scalar red, Scalar green, Scalar blue)
         {
@@ -173,29 +189,38 @@ namespace Graphics2DDotNet
 
 
 
-        static List<int> buffersARB = new List<int>();
-        public static void GlDeleteBuffersARB(int name)
+        class DeleteInfo
+        {
+            public int lastRefresh;
+            public int[] names;
+            public DeleteInfo(int lastRefresh, int[] names)
+            {
+                this.lastRefresh = lastRefresh;
+                this.names = names;
+            }
+        }
+        static List<DeleteInfo> buffersARB = new List<DeleteInfo>();
+        public static void GlDeleteBuffersARB(int lastRefresh, int[] names)
         {
             lock (buffersARB)
             {
-                buffersARB.Add(name);
+                buffersARB.Add(new DeleteInfo(lastRefresh, names));
             }
         }
-        public static void GlDeleteBuffersARB(int[] names)
-        {
-            lock (buffersARB)
-            {
-                buffersARB.AddRange(names);
-            }
-        }
-        public static void DoGlDeleteBuffersARB()
+        public static void DoGlDeleteBuffersARB(int lastRefresh)
         {
             lock (buffersARB)
             {
                 if(buffersARB.Count > 0)
                 {
-                    int[] array = buffersARB.ToArray();
-                    Gl.glDeleteBuffersARB(array.Length, array);
+                    for (int index = 0; index < buffersARB.Count; ++index)
+                    {
+                        DeleteInfo info = buffersARB[index];
+                        if (info.lastRefresh == lastRefresh)
+                        {
+                            Gl.glDeleteBuffersARB(info.names.Length, info.names);
+                        }
+                    }
                     buffersARB.Clear();
                 }
             }

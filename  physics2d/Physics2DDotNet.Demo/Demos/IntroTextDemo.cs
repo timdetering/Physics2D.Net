@@ -50,9 +50,7 @@ namespace Physics2DDotNet.Demo.Demos
         DisposeCallback dispose;
         protected override void Open()
         {
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
-            dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
-            dispose += DemoHelper.RegisterMousePicking(DemoInfo);
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
             DemoHelper.AddText(DemoInfo,
 @"WELCOME TO THE PHYSICS2D.NET DEMO.

@@ -50,9 +50,7 @@ namespace Physics2DDotNet.Demo.Demos
         DisposeCallback dispose;
         protected override void Open()
         {
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
-            dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
-            dispose += DemoHelper.RegisterMousePicking(DemoInfo);
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
             Rectangle rect1 = Viewport.Rectangle;
             BoundingRectangle rect = new BoundingRectangle(rect1.Left, rect1.Top, rect1.Right, rect1.Bottom);
@@ -68,7 +66,7 @@ namespace Physics2DDotNet.Demo.Demos
             Shape shape = ShapeFactory.CreateColoredCircle(3, 7);
             DemoHelper.AddGrid(DemoInfo, shape, 40,
                 rect,
-                1, 1).ForEach(delegate(Body b) { b.State.Velocity.Linear = new Vector2D(DemoHelper.RandomInstance.Next(-100, 100), DemoHelper.RandomInstance.Next(-100, 100)); });
+                1, 1).ForEach(delegate(Body b) { b.State.Velocity.Linear = new Vector2D(DemoHelper.Rand.Next(-100, 100), DemoHelper.Rand.Next(-100, 100)); });
         }
         protected override void Dispose(bool disposing)
         {

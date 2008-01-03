@@ -107,12 +107,15 @@ namespace Graphics2DDotNet
         protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
         {
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, texture.TextureId);
+            
             Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
             Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
 
             Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, coordName);
             Gl.glTexCoordPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
+            
             GlHelper.GlColor4(color.Red, color.Green, color.Blue, color.Alpha);
+            
             Gl.glDrawArrays(Gl.GL_POLYGON, 0, vertexes.Length);
         }
 
@@ -127,8 +130,7 @@ namespace Graphics2DDotNet
             {
                 texture.Dispose();
             }
-            GlHelper.GlDeleteBuffersARB(vertexName);
-            GlHelper.GlDeleteBuffersARB(coordName);
+            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName, coordName });
         }
     }
 

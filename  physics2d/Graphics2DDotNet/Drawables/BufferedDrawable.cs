@@ -47,6 +47,11 @@ namespace Graphics2DDotNet
     {
         object tag;
         int lastRefresh;
+        public int LastRefresh
+        {
+            get { return lastRefresh; }
+        }
+        bool isDisposed;
         protected BufferedDrawable()
         {
             this.lastRefresh = -1;
@@ -66,6 +71,7 @@ namespace Graphics2DDotNet
         protected abstract void DrawData(DrawInfo drawInfo, IDrawableState state);
         public void Draw(DrawInfo drawInfo, IDrawableState state)
         {
+            if (isDisposed) { throw new ObjectDisposedException(this.ToString()); }
             EnableState();
             if (lastRefresh != drawInfo.RefreshCount)
             {
@@ -81,6 +87,7 @@ namespace Graphics2DDotNet
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+            isDisposed = true;
         }
     }
 

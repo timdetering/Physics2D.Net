@@ -51,7 +51,12 @@ namespace Graphics2DDotNet
         {
             public int Compare(IGraphic x, IGraphic y)
             {
-                return x.ZOrder.CompareTo(y.ZOrder);
+                int result = x.ZOrder.CompareTo(y.ZOrder);
+                if (result == 0)
+                {
+                    result = x.ID.CompareTo(y.ID);
+                }
+                return result;
             }
         }
         static ZOrderComparer zOrderComparer = new ZOrderComparer();
@@ -138,7 +143,11 @@ namespace Graphics2DDotNet
                 }
                 for (int index = 0; index < graphics.Count; ++index)
                 {
-                    graphics[index].Draw(drawInfo);
+                    IGraphic graphic = graphics[index];
+                    if (graphic.ShouldDraw)
+                    {
+                        graphic.Draw(drawInfo);
+                    }
                 }
             }
             finally

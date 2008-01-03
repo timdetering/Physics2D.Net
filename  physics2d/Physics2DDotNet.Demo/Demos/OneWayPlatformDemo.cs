@@ -50,12 +50,11 @@ namespace Physics2DDotNet.Demo.Demos
         DisposeCallback dispose;
         protected override void Open()
         {
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
+            dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
+
             Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
-            dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
-            dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
-            dispose += DemoHelper.RegisterMousePicking(DemoInfo);
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 
             Shape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 3, 16, 4);

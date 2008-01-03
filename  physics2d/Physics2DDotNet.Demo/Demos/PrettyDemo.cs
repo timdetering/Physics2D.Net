@@ -52,7 +52,8 @@ A large number of particles being pushed arround by 2 spinning guys
         DisposeCallback dispose;
         protected override void Open()
         {
-            dispose += DemoHelper.RegisterMousePicking(DemoInfo, SdlDotNet.Input.MouseButton.PrimaryButton);
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
+
             Shape fighterShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 4, 50, 5);
             Body fighter = new Body(new PhysicsState(new ALVector2D(0, 300, 300)), fighterShape, 5000, new Coefficients(0, 1), new Lifespan());
             fighter.State.Velocity.Angular = 9;

@@ -228,10 +228,10 @@ namespace Physics2DDotNet.Shapes
         public static void CalculateNormals(Vector2D[] vertexes, Vector2D[] normals, int offset)
         {
             Vector2D[] edges = new Vector2D[vertexes.Length];
-            Vector2D last = vertexes[vertexes.Length - 1];
+            Vector2D last = vertexes[0];
             Vector2D current;
             Vector2D temp;
-            for (int index = 0; index < vertexes.Length; ++index, last = current)
+            for (int index = vertexes.Length - 1; index > -1; --index, last = current)
             {
                 current = vertexes[index];
                 Vector2D.Subtract(ref current, ref last, out temp);

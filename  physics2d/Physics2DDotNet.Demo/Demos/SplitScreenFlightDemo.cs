@@ -91,7 +91,6 @@ namespace Physics2DDotNet.Demo.Demos
             {
                 viewport2.IsExpired = true;
                 Viewport.Rectangle = new Rectangle(0, 0, Window.Size.Width, Window.Size.Height);
-
             };
         }
         protected override void Dispose(bool disposing)

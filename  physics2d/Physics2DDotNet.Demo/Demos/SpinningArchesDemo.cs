@@ -50,9 +50,9 @@ namespace Physics2DDotNet.Demo.Demos
         DisposeCallback dispose;
         protected override void Open()
         {
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
-            dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
-            dispose += DemoHelper.RegisterMousePicking(DemoInfo);
+
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
+
 
             Vector2D gravityCenter = new Vector2D(500, 500);
             Scalar gravityPower = 200;

@@ -62,6 +62,7 @@
     <Compile Include="Demos\BoxesStressDemo.cs" />
     <Compile Include="Demos\CirclesContainedStressDemo.cs" />
     <Compile Include="Demos\CirclesStressDemo.cs" />
+    <Compile Include="Demos\PyramidStressDemo.cs" />
     <Compile Include="Demos\DynamicGravityDemo.cs" />
     <Compile Include="Demos\FluidDragBuoyancyDemo.cs" />
     <Compile Include="Demos\IntroTextDemo.cs" />

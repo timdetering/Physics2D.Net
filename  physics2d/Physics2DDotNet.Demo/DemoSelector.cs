@@ -162,6 +162,5 @@ namespace Physics2DDotNet.Demo
         {
             SelectionChanged();
         }
-
     }
 }

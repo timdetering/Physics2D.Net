@@ -121,7 +121,7 @@ namespace Physics2DDotNet.Detectors
                              Body.CanCollide(body1, body2) &&
                              body1.Rectangle.Intersects(body2.Rectangle))
                         {
-                            long key = PairID.GetHash(body1.ID, body2.ID);
+                            long key = PairID.GetId(body1.ID, body2.ID);
                             if (!filter.ContainsKey(key))
                             {
                                 filter.Add(key, null);

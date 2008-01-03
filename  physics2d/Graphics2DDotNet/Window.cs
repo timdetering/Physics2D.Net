@@ -101,7 +101,7 @@ namespace Graphics2DDotNet
                 Resize();
                 isResized = false;
             }
-            GlHelper.DoGlDeleteBuffersARB();
+            GlHelper.DoGlDeleteBuffersARB(refreshCount);
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             RemoveExpired();
             AddPending();

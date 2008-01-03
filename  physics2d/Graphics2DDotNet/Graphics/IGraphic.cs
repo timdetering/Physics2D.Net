@@ -45,6 +45,7 @@ namespace Graphics2DDotNet
     {
         event EventHandler ZOrderChanged;
         object Tag { get;set;}
+        int ID { get;}
         int ZOrder { get;set;}
         Lifespan Lifetime { get;set;}
         Layer Parent { get;}

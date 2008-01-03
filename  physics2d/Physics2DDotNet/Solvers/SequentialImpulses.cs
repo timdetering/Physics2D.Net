@@ -266,12 +266,11 @@ namespace Physics2DDotNet.Solvers
                             !body1.IgnoresCollisionResponse&&
                             !body2.IgnoresCollisionResponse)
                         {
-
                             Vector2D normal;
                             Vector2D.Transform(ref normalM, ref  normals[index], out normal);
                             Scalar temp;
                             Vector2D.Dot(ref info.Normal, ref normal, out temp);
-                            isBad = temp > 0;
+                            isBad = temp <= 0;
                         }
                     }
 

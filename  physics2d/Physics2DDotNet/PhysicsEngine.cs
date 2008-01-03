@@ -122,6 +122,7 @@ namespace Physics2DDotNet
         /// Generated when a PhysicsLogics are removed to the Engine.
         /// </summary>
         public event EventHandler<CollectionEventArgs<PhysicsLogic>> LogicsRemoved;
+        public event EventHandler<UpdatedEventArgs> Updated;
         #endregion
         #region fields
         private int updateCount;
@@ -607,6 +608,7 @@ namespace Physics2DDotNet
             {
                 logics[index].UpdateTime(step);
             }
+            if (Updated != null) { Updated(this, new UpdatedEventArgs(step)); }
         }
         private void OnPositionChanged()
         {

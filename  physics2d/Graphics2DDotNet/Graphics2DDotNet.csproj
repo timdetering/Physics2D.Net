@@ -26,6 +26,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SdlDotNet, Version=6.0.1.0, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
@@ -65,6 +66,7 @@
     <Compile Include="Drawables\IDrawable.cs" />
     <Compile Include="Drawables\MultiPolygonDrawable.cs" />
     <Compile Include="Drawables\PolygonDrawable.cs" />
+    <Compile Include="Drawables\RaysSegmentsDrawable.cs" />
     <Compile Include="Drawables\SpriteDrawable.cs" />
     <Compile Include="DataTypes\DrawInfo.cs" />
     <Compile Include="DrawProperties\Color3Property.cs" />

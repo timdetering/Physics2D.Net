@@ -39,9 +39,7 @@ using Physics2DDotNet.Ignorers;
 using Physics2DDotNet.Joints;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.PhysicsLogics;
-using SdlDotNet;
-using SdlDotNet.Input;
-using SdlDotNet.Graphics;
+
 namespace Physics2DDotNet.Demo.Demos
 {
     [PhysicsDemo("Simple", "Towers", "There are many towers.\r\nIts like dominoes, but different!")]
@@ -50,11 +48,11 @@ namespace Physics2DDotNet.Demo.Demos
         DisposeCallback dispose;
         protected override void Open()
         {
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
-            dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
+
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
-            dispose += DemoHelper.RegisterMousePicking(DemoInfo);
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
+
+            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 
             Shape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);

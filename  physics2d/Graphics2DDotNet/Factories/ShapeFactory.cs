@@ -206,6 +206,13 @@ namespace Graphics2DDotNet
             shape.Tag = DrawableFactory.CreateSprite(surfacePolygons.Surface, centroid);
             return shape;
         }
+
+        public static RaySegmentsShape CreateRays(RaySegment[] raySegments)
+        {
+            RaySegmentsShape rayShape = new RaySegmentsShape(raySegments);
+            rayShape.Tag = new RaysSegmentsDrawable(rayShape);
+            return rayShape;
+        }
     }
 
 }

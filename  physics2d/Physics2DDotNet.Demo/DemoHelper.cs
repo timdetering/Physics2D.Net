@@ -56,15 +56,74 @@ using Graphics2DDotNet;
 namespace Physics2DDotNet.Demo
 {
     public delegate void DisposeCallback();
+    public delegate IPhysicsEntity SpawnCallback(Vector2D position);
 
     public static class DemoHelper
     {
         public static Coefficients Coefficients = new Coefficients(.5f, 1);
 
-        public static readonly Random RandomInstance = new Random();
+        public static readonly Random Rand = new Random();
+
         static DemoHelper()
         {
             ParticleShape.Default.Tag = DrawableFactory.CreateSprite(Cache<Surface>.GetItem("particle.png"), new Vector2D(8, 8));
+        }
+
+        public static Scalar NextScalar()
+        {
+            return (Scalar)Rand.NextDouble();
+        }
+
+        public static DisposeCallback BasicDemoSetup(DemoOpenInfo info)
+        {
+            DisposeCallback dispose = null;
+            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
+            dispose += DemoHelper.RegisterBombLaunching(info, bombShape, 120);
+            dispose += DemoHelper.RegisterMousePicking(info);
+
+            dispose += DemoHelper.RegisterBodyStreamSpawning(info,
+                new Body(new PhysicsState(), ParticleShape.Default, 1, Coefficients.Duplicate(), new Lifespan(5)), 2, 120, 1000, Key.B);
+            dispose += DemoHelper.RegisterMaintainSpawning(info, SdlDotNet.Input.Key.N,
+                delegate(Vector2D position)
+                {
+                    ExplosionLogic result = new ExplosionLogic(position, Vector2D.Zero, 9000, .4f, 600, new Lifespan(1));
+                    info.Layer.Engine.AddLogic(result);
+                    return result;
+                });
+
+
+
+
+
+
+
+
+            List<RaySegment> segments = new List<RaySegment>();
+
+            for (Scalar angle = 0; angle < MathHelper.PiOver2; angle += .05f)
+            {
+                RaySegment seg = new RaySegment();
+                seg.Length = 500;
+                seg.RayInstance = new Ray(Vector2D.Zero, Vector2D.FromLengthAndAngle(1, angle));
+                segments.Add(seg);
+            }
+
+            Shape rayShape = ShapeFactory.CreateRays(segments.ToArray());
+            dispose += DemoHelper.RegisterMaintainSpawning(info, SdlDotNet.Input.Key.M,
+                delegate(Vector2D position)
+                {
+                    Body lazer = new Body(new PhysicsState(), rayShape, 1, new Coefficients(1, 1), new Lifespan());
+                    lazer.State.Position.Linear = position;
+                    lazer.State.Velocity.Angular = .91f;
+                    lazer.IgnoresGravity = true;
+                    lazer.ApplyPosition();
+                    info.Layer.AddGraphic(new BodyGraphic(lazer));
+                    return lazer;
+                });
+
+
+
+            return dispose;
         }
 
         public static DisposeCallback CreateTank(DemoOpenInfo info, Vector2D position)
@@ -210,6 +269,7 @@ namespace Physics2DDotNet.Demo
                 Events.KeyboardUp -= keyUpHandler;
             };
         }
+
         public static DisposeCallback RegisterMousePicking(DemoOpenInfo info)
         {
             return RegisterMousePicking(info, MouseButton.PrimaryButton);
@@ -282,8 +342,8 @@ namespace Physics2DDotNet.Demo
             {
                 if (e.Button == button)
                 {
-                    Vector2D position = new Vector2D(RandomInstance.Next(0, 1400), 0);
-                    Scalar velocityMag = RandomInstance.Next(2000, 3000);
+                    Vector2D position = new Vector2D(Rand.Next(0, 1400), 0);
+                    Scalar velocityMag = Rand.Next(2000, 3000);
                     Vector2D velocity = Vector2D.SetMagnitude(e.Position - position, velocityMag);
                     Body newbomb = new Body(
                         new PhysicsState(
@@ -301,6 +361,191 @@ namespace Physics2DDotNet.Demo
                 info.Viewport.MouseDown -= mouseDown;
             };
         }
+        public static DisposeCallback RegisterBodyMovement(DemoOpenInfo info, Body body, ALVector2D force)
+        {
+            return RegisterBodyMovement(info, body, force, Key.UpArrow, Key.DownArrow, Key.LeftArrow, Key.RightArrow);
+        }
+        public static DisposeCallback RegisterBodyMovement(
+            DemoOpenInfo info, Body body, ALVector2D force,
+            Key forward, Key back, Key left, Key right)
+        {
+            ALVector2D currentForce = ALVector2D.Zero;
+
+            EventHandler<KeyboardEventArgs> downHandler = delegate(object sender, KeyboardEventArgs e)
+            {
+                if (e.Key == forward)
+                {
+                    currentForce.Linear += force.Linear;
+                }
+                else if (e.Key == back)
+                {
+                    currentForce.Linear -= force.Linear;
+                }
+                else if (e.Key == left)
+                {
+                    currentForce.Angular -= force.Angular;
+                }
+                else if (e.Key == right)
+                {
+                    currentForce.Angular += force.Angular;
+                }
+            };
+            EventHandler<KeyboardEventArgs> upHandler = delegate(object sender, KeyboardEventArgs e)
+            {
+                if (e.Key == forward)
+                {
+                    currentForce.Linear -= force.Linear;
+                }
+                else if (e.Key == back)
+                {
+                    currentForce.Linear += force.Linear;
+                }
+                else if (e.Key == left)
+                {
+                    currentForce.Angular += force.Angular;
+                }
+                else if (e.Key == right)
+                {
+                    currentForce.Angular -= force.Angular;
+                }
+            };
+            EventHandler<UpdatedEventArgs> update = delegate(object sender, UpdatedEventArgs e)
+            {
+                Vector2D force2 = body.Matrices.ToWorldNormal * currentForce.Linear;
+                body.State.ForceAccumulator.Linear += force2;
+                body.State.ForceAccumulator.Angular += currentForce.Angular;
+            };
+
+            body.Updated += update;
+            Events.KeyboardDown += downHandler;
+            Events.KeyboardUp += upHandler;
+            return delegate()
+            {
+                body.Updated -= update;
+                Events.KeyboardDown -= downHandler;
+                Events.KeyboardUp -= upHandler;
+            };
+        }
+
+
+        public static DisposeCallback RegisterBodyTracking(DemoOpenInfo info, Body body, Matrix2x3 transformation)
+        {
+            EventHandler handler = delegate(object sender, EventArgs e)
+            {
+                info.Viewport.ToScreen =
+                    Matrix2x3.FromTranslate2D(new Vector2D(info.Viewport.X + info.Viewport.Width * .5f, info.Viewport.Y + info.Viewport.Height * .5f)) *
+                    transformation *
+                    body.Matrices.ToBody
+                    ;
+            };
+            body.PositionChanged += handler;
+            return delegate()
+            {
+                body.PositionChanged -= handler;
+            };
+        }
+
+        public static DisposeCallback RegisterBodyStreamSpawning(
+            DemoOpenInfo info, Body body, int count,
+            Scalar minVelocity, Scalar maxVelocity, Key key)
+        {
+            bool isSpawning = false;
+            Scalar range = maxVelocity - minVelocity;
+            EventHandler<KeyboardEventArgs> downHandler = delegate(object sender, KeyboardEventArgs e)
+            {
+                if (e.Key == key)
+                {
+                    isSpawning = true;
+                }
+            };
+            EventHandler<KeyboardEventArgs> upHandler = delegate(object sender, KeyboardEventArgs e)
+            {
+                if (e.Key == key)
+                {
+                    isSpawning = false;
+                }
+            };
+            EventHandler<UpdatedEventArgs> updatedHandler = delegate(object sender, UpdatedEventArgs e)
+            {
+                if (!isSpawning) { return; }
+                Vector2D position = info.Viewport.MousePosition;
+                if (count == 1)
+                {
+                    Body dub = body.Duplicate();
+                    Vector2D velocityDirection = Vector2D.FromLengthAndAngle(1, NextScalar() * MathHelper.Pi);
+                    dub.State.Position.Linear = position + velocityDirection;
+                    dub.ApplyPosition();
+                    dub.State.Velocity.Linear = velocityDirection * (minVelocity + NextScalar() * range);
+                    info.Layer.AddGraphic(new BodyGraphic(dub));
+                }
+                else
+                {
+                    IGraphic[] graphics = new IGraphic[count];
+                    for (int index = 0; index < count; ++index)
+                    {
+                        Body dub = body.Duplicate();
+                        Vector2D velocityDirection = Vector2D.FromLengthAndAngle(1, NextScalar() * MathHelper.TwoPi);
+                        dub.State.Position.Linear = position + velocityDirection;
+                        dub.ApplyPosition();
+                        dub.State.Velocity.Linear = velocityDirection * (minVelocity + NextScalar() * range);
+                        graphics[index] = new BodyGraphic(dub);
+                    }
+                    info.Layer.AddGraphicRange(graphics);
+                }
+            };
+            info.Layer.Engine.Updated += updatedHandler;
+            Events.KeyboardDown += downHandler;
+            Events.KeyboardUp += upHandler;
+            return delegate()
+            {
+                info.Layer.Engine.Updated -= updatedHandler;
+                Events.KeyboardDown -= downHandler;
+                Events.KeyboardUp -= upHandler;
+            };
+        }
+
+
+        public static DisposeCallback RegisterMaintainSpawning(DemoOpenInfo info, Key key, Body body)
+        {
+            return RegisterMaintainSpawning(info, key,
+                delegate(Vector2D position)
+                {
+                    Body dub = body.Duplicate();
+                    dub.State.Position.Linear = position;
+                    dub.ApplyPosition();
+                    info.Layer.AddGraphic(new BodyGraphic(dub));
+                    return dub;
+                });
+        }
+        public static DisposeCallback RegisterMaintainSpawning(DemoOpenInfo info, Key key, SpawnCallback callback)
+        {
+            IPhysicsEntity current = null;
+            EventHandler<KeyboardEventArgs> downHandler = delegate(object sender, KeyboardEventArgs e)
+            {
+                if (e.Key == key)
+                {
+                    current = callback(info.Viewport.MousePosition);
+                }
+            };
+            EventHandler<KeyboardEventArgs> upHandler = delegate(object sender, KeyboardEventArgs e)
+            {
+                if (e.Key == key)
+                {
+                    if (current != null)
+                    {
+                        current.Lifetime.IsExpired = true;
+                        current = null;
+                    }
+                }
+            };
+            Events.KeyboardDown += downHandler;
+            Events.KeyboardUp += upHandler;
+            return delegate()
+            {
+                Events.KeyboardDown -= downHandler;
+                Events.KeyboardUp -= upHandler;
+            };
+        }
 
         public static void AddParticles(DemoOpenInfo info, Vector2D position, Vector2D velocity, int count)
         {
@@ -314,9 +559,9 @@ namespace Physics2DDotNet.Demo
                     1f,
                    new Coefficients(1, .5f),// coefficients.Duplicate(),
                     new Lifespan(.9f));
-                Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((Scalar)RandomInstance.NextDouble() - .5f) * angle);
+                Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((Scalar)Rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
-                particle.State.Velocity.Linear = direction * RandomInstance.Next(200, 1001) + velocity;
+                particle.State.Velocity.Linear = direction * Rand.Next(200, 1001) + velocity;
                 //particle.Collided += new EventHandler<CollisionEventArgs>(particle_Collided);
                 BodyGraphic graphic = new BodyGraphic(particle);
                 graphics[index] = graphic;
@@ -511,7 +756,6 @@ namespace Physics2DDotNet.Demo
             Scalar Wd2 = 25 / 2;
             Vector2D[] vertexes = new Vector2D[]
             {
-                new Vector2D(Wd2, 0),
                 new Vector2D(Wd2, Ld2),
                 new Vector2D(5, Ld2+7),
                 new Vector2D(-5, Ld2+7),
@@ -522,6 +766,7 @@ namespace Physics2DDotNet.Demo
                 new Vector2D(0, -Ld2),
                 new Vector2D(Wd2-2, -Ld2),
                 new Vector2D(Wd2+4, -Ld2/2+6),
+                new Vector2D(Wd2, 0),
             };
 
             Shape shape = ShapeFactory.CreateColoredPolygon(vertexes, 5);
@@ -626,7 +871,7 @@ namespace Physics2DDotNet.Demo
                 else
                 {
                     object[] temp;
-                    Shape shape ;
+                    Shape shape;
                     SurfacePolygons surfacePolygons;
                     if (chars.TryGetValue(c, out temp))
                     {
@@ -635,7 +880,7 @@ namespace Physics2DDotNet.Demo
                     }
                     else
                     {
-                        surfacePolygons = Cache<SurfacePolygons>.GetItem(c + "|FreeSans.ttf:40",System.Drawing.Color.Black);
+                        surfacePolygons = Cache<SurfacePolygons>.GetItem(c + "|FreeSans.ttf:40", System.Drawing.Color.Black);
                         shape = ShapeFactory.CreateSprite(
                            surfacePolygons,
                            2, 5, 2);
@@ -651,150 +896,5 @@ namespace Physics2DDotNet.Demo
             }
             return result;
         }
-
-        public static DisposeCallback RegisterBodyMovement(
-            DemoOpenInfo info, Body body, ALVector2D force)
-        {
-            ALVector2D currentForce = ALVector2D.Zero;
-
-            EventHandler<KeyboardEventArgs> downHandler = delegate(object sender, KeyboardEventArgs e)
-            {
-                switch (e.Key)
-                {
-                    case Key.RightArrow:
-                        currentForce.Angular += force.Angular;
-                        break;
-                    case Key.LeftArrow:
-                        currentForce.Angular -= force.Angular;
-                        break;
-                    case Key.UpArrow:
-                        currentForce.Linear += force.Linear;
-                        break;
-                    case Key.DownArrow:
-                        currentForce.Linear -= force.Linear;
-                        break;
-                }
-            };
-            EventHandler<KeyboardEventArgs> upHandler = delegate(object sender, KeyboardEventArgs e)
-            {
-                switch (e.Key)
-                {
-                    case Key.RightArrow:
-                        currentForce.Angular -= force.Angular;
-                        break;
-                    case Key.LeftArrow:
-                        currentForce.Angular += force.Angular;
-                        break;
-                    case Key.UpArrow:
-                        currentForce.Linear -= force.Linear;
-                        break;
-                    case Key.DownArrow:
-                        currentForce.Linear += force.Linear;
-                        break;
-                }
-            };
-            EventHandler<UpdatedEventArgs> update = delegate(object sender, UpdatedEventArgs e)
-            {
-                Vector2D force2 = body.Matrices.ToWorld * currentForce.Linear;
-                body.State.ForceAccumulator.Linear += force2;
-                body.State.ForceAccumulator.Angular += currentForce.Angular;
-            };
-
-            body.Updated += update;
-            Events.KeyboardDown += downHandler;
-            Events.KeyboardUp += upHandler;
-            return delegate()
-            {
-                body.Updated -= update;
-                Events.KeyboardDown -= downHandler;
-                Events.KeyboardUp -= upHandler;
-            };
-
-        }
-
-        public static DisposeCallback RegisterBodyMovement(
-            DemoOpenInfo info, Body body, ALVector2D force,
-            Key forward,Key back,Key left,Key right)
-        {
-            ALVector2D currentForce = ALVector2D.Zero;
-
-            EventHandler<KeyboardEventArgs> downHandler = delegate(object sender, KeyboardEventArgs e)
-            {
-                if (e.Key == forward)
-                {
-                    currentForce.Linear += force.Linear;
-
-                }
-                else if (e.Key == back)
-                {
-                    currentForce.Linear -= force.Linear;
-
-                }
-                else if (e.Key == left)
-                {
-                    currentForce.Angular -= force.Angular;
-                }
-                else if (e.Key == right)
-                {
-                    currentForce.Angular += force.Angular;
-                }
-            };
-            EventHandler<KeyboardEventArgs> upHandler = delegate(object sender, KeyboardEventArgs e)
-            {
-                if (e.Key == forward)
-                {
-                    currentForce.Linear -= force.Linear;
-                }
-                else if (e.Key == back)
-                {
-                    currentForce.Linear += force.Linear;
-                }
-                else if (e.Key == left)
-                {
-                    currentForce.Angular += force.Angular;
-                }
-                else if (e.Key == right)
-                {
-                    currentForce.Angular -= force.Angular;
-                }
-            };
-            EventHandler<UpdatedEventArgs> update = delegate(object sender, UpdatedEventArgs e)
-            {
-                Vector2D force2 = body.Matrices.ToWorld * currentForce.Linear;
-                body.State.ForceAccumulator.Linear += force2;
-                body.State.ForceAccumulator.Angular += currentForce.Angular;
-            };
-
-            body.Updated += update;
-            Events.KeyboardDown += downHandler;
-            Events.KeyboardUp += upHandler;
-            return delegate()
-            {
-                body.Updated -= update;
-                Events.KeyboardDown -= downHandler;
-                Events.KeyboardUp -= upHandler;
-            };
-
-        }
-
-
-        public static DisposeCallback RegisterBodyTracking(DemoOpenInfo info, Body body,Matrix2x3 transformation)
-        {
-            EventHandler handler = delegate(object sender, EventArgs e)
-            {
-                info.Viewport.ToScreen =
-                    Matrix2x3.FromTranslate2D(new Vector2D(info.Viewport.X+info.Viewport.Width * .5f,info.Viewport.Y+ info.Viewport.Height * .5f)) *
-                    transformation*
-                    body.Matrices.ToBody
-                    ;
-            };
-            body.PositionChanged += handler;
-            return delegate()
-            {
-                body.PositionChanged -= handler;
-            };
-        }
     }
-
-
 }

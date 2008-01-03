@@ -82,7 +82,7 @@ namespace Graphics2DDotNet
         }
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteBuffersARB(vertexName);
+            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName });
         }
     }
 

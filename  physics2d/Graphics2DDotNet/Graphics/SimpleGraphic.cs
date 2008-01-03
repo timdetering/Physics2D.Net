@@ -43,10 +43,11 @@ namespace Graphics2DDotNet
 {
     public class SimpleGraphic : IGraphic
     {
+        static int idCounter = int.MaxValue;
         public event EventHandler ZOrderChanged;
         object tag;
 
-
+        int id;
         Scalar[] matrixArray;
         Layer parent;
         IDrawable drawable;
@@ -60,6 +61,7 @@ namespace Graphics2DDotNet
         {
             if (drawable == null) { throw new ArgumentNullException("drawable"); }
             if (lifetime == null) { throw new ArgumentNullException("lifetime"); }
+            Initialize();
             this.drawProperties = new List<IDrawProperty>();
             this.drawable = drawable;
             this.drawableState = drawable.CreateState();
@@ -70,6 +72,7 @@ namespace Graphics2DDotNet
         }
         protected SimpleGraphic(SimpleGraphic copy)
         {
+            Initialize();
             this.drawProperties = new List<IDrawProperty>(copy.drawProperties);
             this.drawable = copy.drawable;
             this.drawableState = drawable.CreateState();
@@ -77,6 +80,11 @@ namespace Graphics2DDotNet
             this.matrixArray = (Scalar[])copy.matrixArray.Clone();
             this.shouldDraw = copy.shouldDraw;
         }
+        private void Initialize()
+        {
+            id = System.Threading.Interlocked.Decrement(ref  idCounter);
+        }
+
         public bool ShouldDraw
         {
             get { return shouldDraw; }
@@ -86,6 +94,7 @@ namespace Graphics2DDotNet
             }
         }
 
+        public int ID { get { return id; } }
         public Matrix2x3 Matrix
         {
             get
