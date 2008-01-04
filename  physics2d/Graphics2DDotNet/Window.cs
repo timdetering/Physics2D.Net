@@ -108,7 +108,7 @@ namespace Graphics2DDotNet
         {
             get { return isRunning; }
         }
-        private void GraphicsProcess(Scalar dt)
+        private void GraphicsProcess(Scalar dt,Scalar trueDt)
         {
             while (Events.Poll()) { }
             if (isResized)
@@ -121,13 +121,13 @@ namespace Graphics2DDotNet
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             RemoveExpired();
             AddPending();
-            Draw(dt);
+            Draw(dt, trueDt);
             Video.GLSwapBuffers();
         }
-        void Draw(Scalar dt)
+        void Draw(Scalar dt, Scalar trueDt)
         {
             drawCount++;
-            DrawInfo drawInfo = new DrawInfo(dt, drawCount, refreshCount);
+            DrawInfo drawInfo = new DrawInfo(dt,trueDt, drawCount, refreshCount);
             if (zOrderChanged)
             {
                 zOrderChanged = false;
@@ -217,7 +217,6 @@ namespace Graphics2DDotNet
                 }
             }
         }
-
         void OnZOrderChanged(object sender, EventArgs e)
         {
             this.zOrderChanged = true;

@@ -41,20 +41,24 @@ namespace Graphics2DDotNet
 {
     public sealed class DrawInfo
     {
-        private int refreshCount;
+        private Scalar trueDt;
+        private Scalar trueDtInv;
         private Scalar dt;
         private Scalar dtInv;
         private int drawCount;
+        private int refreshCount;
         /// <summary>
         /// Creates a new DrawInfo Instance.
         /// </summary>
         /// <param name="dt"> The current change in time. (seconds)</param>
         /// <param name="updateCount"></param>
         /// <param name="refreshCount"></param>
-        public DrawInfo(Scalar dt, int drawCount, int refreshCount)
+        public DrawInfo(Scalar dt, Scalar trueDt, int drawCount, int refreshCount)
         {
             this.dt = dt;
             this.dtInv = (dt > 0) ? (1 / dt) : (0);
+            this.trueDt = trueDt;
+            this.trueDtInv = (trueDt > 0) ? (1 / trueDt) : (0);
             this.drawCount = drawCount;
             this.refreshCount = refreshCount;
         }
@@ -70,6 +74,14 @@ namespace Graphics2DDotNet
         /// The inverse of the change in time. (0 if dt is 0)
         /// </summary>
         public Scalar DtInv { get { return dtInv; } }
+        /// <summary>
+        /// The actaul change in time. (seconds)
+        /// </summary>
+        public Scalar TrueDt { get { return trueDt; } }
+        /// <summary>
+        /// The inverse of the actaul change in time. (0 if dt is 0)
+        /// </summary>
+        public Scalar TrueDtInv { get { return trueDtInv; } }
         /// <summary>
         /// The number for the current draw.
         /// </summary>

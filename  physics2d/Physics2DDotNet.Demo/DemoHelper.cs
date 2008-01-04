@@ -124,8 +124,11 @@ namespace Physics2DDotNet.Demo
 
         public static DisposeCallback CreateTank(DemoOpenInfo info, Vector2D position)
         {
+            return CreateTank(info, position, new List<Body>());
+        }
+        public static DisposeCallback CreateTank(DemoOpenInfo info, Vector2D position,List<Body> result)
+        {
             Lifespan avatarLifespan = new Lifespan();
-
 
             IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("tank.png"), 4, 18, 2);
 
@@ -135,6 +138,7 @@ namespace Physics2DDotNet.Demo
                 300,//new MassInfo(40, Scalar.PositiveInfinity),
                 new Coefficients(0, 1),
                 avatarLifespan);
+            result.Add(tankBody);
             tankBody.State.Position.Linear += position;
             tankBody.ApplyPosition();
 
@@ -176,6 +180,7 @@ namespace Physics2DDotNet.Demo
                     10,
                     new Coefficients(0, 3),//  coefficients.Duplicate(),
                     avatarLifespan);
+                result.Add(wheel);
 
                 wheel.CollisionIgnorer = ignorer;
                 wheel.AngularDamping = .9f;
@@ -911,6 +916,5 @@ namespace Physics2DDotNet.Demo
             stargraphic.DrawProperties.Add(new PointSizeProperty(1));
             info.Layer.AddGraphic(stargraphic);
         }
-
     }
 }

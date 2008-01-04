@@ -172,9 +172,9 @@ namespace Graphics2DDotNet
         {
             graphics.RemoveAll(IsGraphicExpired);
         }
-        protected virtual void Update(Scalar dt)
+        protected virtual void Update(Scalar dt,Scalar trueDt)
         {
-            engine.Update(dt);
+            engine.Update(dt, trueDt);
         }
         public virtual void Begin()
         {

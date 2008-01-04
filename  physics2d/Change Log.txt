@@ -65,6 +65,7 @@ Added: Body.JointRemoved
 Changed: Moved: Shape.IgnoreVertexes To Body
 Changed: Moved all static methods in the Shape classes into the new VertexHelper class.
 Removed: the shape object now all shape directly impliment IShape.
+Added: GroupedOneWayPlatformIgnorer
 
 AdvanceMath
 1.7.0.0:

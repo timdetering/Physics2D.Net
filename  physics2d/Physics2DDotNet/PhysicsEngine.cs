@@ -487,12 +487,12 @@ namespace Physics2DDotNet
         /// A complete call to this method is also known as a timestep.
         /// </summary>
         /// <param name="dt">The change in time since the last call to this method. (In Seconds)</param>
-        public void Update(Scalar dt)
+        public void Update(Scalar dt,Scalar trueDt)
         {
             if (dt < 0) { throw new ArgumentOutOfRangeException("dt"); }
             CheckState();
             rwLock.EnterWrite();
-            TimeStep step = new TimeStep(dt, updateCount++);
+            TimeStep step = new TimeStep(dt,trueDt, updateCount++);
             inUpdate = true;
             try
             {

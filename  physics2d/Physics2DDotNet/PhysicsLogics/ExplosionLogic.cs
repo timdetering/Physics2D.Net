@@ -145,7 +145,7 @@ namespace Physics2DDotNet.PhysicsLogics
 
                 if (containmentType == ContainmentType.Intersects)
                 {
-
+                    return;
                     GetTangentCallback callback = delegate(Vector2D centroid)
                     {
                         centroid = body.Matrices.ToWorld * centroid;

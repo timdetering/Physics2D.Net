@@ -320,7 +320,7 @@ namespace ConsoleDriver
             joint.Lifetime.IsExpired = true;
 
             engine.AddJoint(new HingeJoint(body1, body2, Vector2D.Zero, new Lifespan()));
-            engine.Update(0);
+            engine.Update(0,0);
 
             body1.Lifetime.IsExpired = true;
 

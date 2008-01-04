@@ -2075,9 +2075,9 @@ namespace Physics2DDemo
         double time = 0;
         int updates = 0;
         DateTime last = DateTime.Now;
-        public void Update(Scalar dt)
+        public void Update(Scalar dt, Scalar trueDt)
         {
-            engine.Update(dt);
+            engine.Update(dt, trueDt);
             updated = true;
             updates++;
         }

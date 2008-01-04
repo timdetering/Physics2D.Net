@@ -67,7 +67,7 @@ namespace Physics2DDotNet
     /// A Callback used by the PhysicsTimer
     /// </summary>
     /// <param name="dt">The change in time.</param>
-    public delegate void PhysicsCallback(Scalar dt);
+    public delegate void PhysicsCallback(Scalar dt, Scalar trueDt);
 
     /// <summary>
     /// A class to update the PhysicsEngine at regular intervals.
@@ -237,7 +237,7 @@ namespace Physics2DDotNet
                             state = TimerState.Normal;
                         }
                         lastRun = now;
-                        callback(targetInterval);
+                        callback(targetInterval,dt*(1/1000f));
                     }
                 }
                 else

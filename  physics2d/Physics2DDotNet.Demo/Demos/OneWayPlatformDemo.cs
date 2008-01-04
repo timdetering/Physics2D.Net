@@ -52,6 +52,8 @@ namespace Physics2DDotNet.Demo.Demos
         {
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
+            List<Body> bodies = new List<Body>();
+            dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(250, 0), bodies);
 
             Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
@@ -64,9 +66,11 @@ namespace Physics2DDotNet.Demo.Demos
                 //b.Transformation *= Matrix2x3.FromScale(new Vector2D(1, .5f));
             }
 
-            Body line = DemoHelper.AddLine(DemoInfo, new Vector2D(300, 400), new Vector2D(400, 400), 20, Scalar.PositiveInfinity);
+            Body line = DemoHelper.AddLine(DemoInfo, new Vector2D(300, 400), new Vector2D(600, 400), 20, Scalar.PositiveInfinity);
             line.IgnoresGravity = true;
-            line.CollisionIgnorer = new OneWayPlatformIgnorer(-Vector2D.YAxis, 10);
+            GroupedOneWayPlatformIgnorer ignorer = new GroupedOneWayPlatformIgnorer(-Vector2D.YAxis, 10);
+            ignorer.AddGroup(bodies.ToArray());
+            line.CollisionIgnorer = ignorer;
 
             Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));// //AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
             ball.Transformation *=

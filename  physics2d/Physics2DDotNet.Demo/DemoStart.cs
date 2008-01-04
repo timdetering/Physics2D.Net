@@ -74,7 +74,6 @@ namespace Physics2DDotNet.Demo
             physicsEngine2.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
             physicsEngine2.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
-
             //Get the layers physics engine
             PhysicsEngine physicsEngine = layer.Engine;
             //initialize the engine 
@@ -116,7 +115,7 @@ namespace Physics2DDotNet.Demo
             selector.Initialize(window, viewport, layer);
             //Create the window
             window.Intialize();
-
+            window.DrawingInterval = .02f;
             //Add some intro text
             DemoHelper.AddText(
                 new DemoOpenInfo(window, viewport, layer),
@@ -176,10 +175,12 @@ THIS TEXT.", new Vector2D(20, 20),40);
                     frameSeconds /= 2;
                 }
                 frames++;
-                DateTime now = DateTime.Now;
+               /* DateTime now = DateTime.Now;
                 frameSeconds += (Scalar)(now.Subtract(lastfps).TotalSeconds);
-                lastfps = now;
+                lastfps = now;*/
+                frameSeconds += e.Step.TrueDt;
                 int ups = (int)(frames / frameSeconds);
+                if (ups < 0) { ups = 0; }
                 string val = ups.ToString();
                 int offset = 3 - val.Length;
                 for (int index = 0; index < offset; ++index)
@@ -213,10 +214,12 @@ THIS TEXT.", new Vector2D(20, 20),40);
                     frameSeconds /= 2;
                 }
                 frames++;
-                DateTime now = DateTime.Now;
-                frameSeconds += (Scalar)(now.Subtract(lastfps).TotalSeconds);
-                lastfps = now;
+               // DateTime now = DateTime.Now;
+               // frameSeconds += (Scalar)(now.Subtract(lastfps).TotalSeconds);
+               // lastfps = now;
+                frameSeconds += e.DrawInfo.TrueDt;
                 int ups = (int)(frames / frameSeconds);
+                if (ups < 0) { ups = 0; }
                 string val = ups.ToString();
                 int offset = 3 - val.Length;
                 for (int index = 0; index < offset; ++index)
