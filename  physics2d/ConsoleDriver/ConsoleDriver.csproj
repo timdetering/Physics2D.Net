@@ -20,8 +20,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>ConsoleDriver</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>ConsoleDriver.Driver</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>

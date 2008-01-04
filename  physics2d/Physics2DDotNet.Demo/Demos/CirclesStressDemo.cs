@@ -52,7 +52,7 @@ namespace Physics2DDotNet.Demo.Demos
         {
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
-            Shape shape = ShapeFactory.CreateColoredCircle(8, 15);
+            IShape shape = ShapeFactory.CreateColoredCircle(8, 15);
             DemoHelper.AddGrid(DemoInfo, shape, 40,
                 new BoundingRectangle(-200, -200, 1100, 1100),
                 5, 5);

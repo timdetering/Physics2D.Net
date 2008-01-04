@@ -109,30 +109,43 @@ namespace Physics2DDotNet.Detectors
         }
         private void RunHash(TimeStep step)
         {
-            foreach (List<Body> list in hash.Values)
+            List<long> keysToRemove = new List<long>(hash.Count);
+            foreach (KeyValuePair<long, List<Body>> pair in hash)
             {
-                for (int index1 = 0; index1 < list.Count - 1; index1++)
+                List<Body> list = pair.Value;
+                if (list.Count == 0)
                 {
-                    Body body1 = list[index1];
-                    for (int index2 = index1 + 1; index2 < list.Count; index2++)
+                    keysToRemove.Add(pair.Key);
+                }
+                else
+                {
+                    for (int index1 = 0; index1 < list.Count - 1; index1++)
                     {
-                        Body body2 = list[index2];
-                        if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
-                             Body.CanCollide(body1, body2) &&
-                             body1.Rectangle.Intersects(body2.Rectangle))
+                        Body body1 = list[index1];
+                        for (int index2 = index1 + 1; index2 < list.Count; index2++)
                         {
-                            long key = PairID.GetId(body1.ID, body2.ID);
-                            if (!filter.ContainsKey(key))
+                            Body body2 = list[index2];
+                            if ((body1.Mass.MassInv != 0 || body2.Mass.MassInv != 0) &&
+                                 Body.CanCollide(body1, body2) &&
+                                 body1.Rectangle.Intersects(body2.Rectangle))
                             {
-                                filter.Add(key, null);
-                                OnCollision(step, body1, body2);
+                                long key = PairID.GetId(body1.ID, body2.ID);
+                                if (!filter.ContainsKey(key))
+                                {
+                                    filter.Add(key, null);
+                                    OnCollision(step, body1, body2);
+                                }
                             }
                         }
                     }
+                    list.Clear();
                 }
-                list.Clear();
             }
             filter.Clear();
+            for (int index = 0; index < keysToRemove.Count; ++index)
+            {
+                hash.Remove(keysToRemove[index]);
+            }
         }
         protected internal override void Clear()
         {

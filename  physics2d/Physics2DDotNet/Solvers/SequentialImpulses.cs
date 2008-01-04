@@ -223,12 +223,12 @@ namespace Physics2DDotNet.Solvers
                 BoundingRectangle targetArea;
                 BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
                 LinkedListNode<Contact> node = contacts.First;
-                if (!body2.Shape.IgnoreVertexes &&
+                if (!body2.IgnoreVertexes &&
                     body1.Shape.CanGetIntersection)
                 {
                     Collide(ref node, this.body1, this.body2, false, ref targetArea);
                 }
-                if (!body1.Shape.IgnoreVertexes &&
+                if (!body1.IgnoreVertexes &&
                     body2.Shape.CanGetIntersection)
                 {
                     Collide(ref node, this.body2, this.body1, true, ref targetArea);
@@ -237,7 +237,7 @@ namespace Physics2DDotNet.Solvers
             void Collide(ref LinkedListNode<Contact> node, Body b1, Body b2, bool inverse, ref BoundingRectangle targetArea)
             {
                 Vector2D[] vertexes = b2.Shape.Vertexes;
-                Vector2D[] normals = b2.Shape.Normals;
+                Vector2D[] normals = b2.Shape.VertexNormals;
 
 
                 Matrix2x3 b2ToWorld = b2.Matrices.ToWorld;
@@ -270,7 +270,7 @@ namespace Physics2DDotNet.Solvers
                             Vector2D.Transform(ref normalM, ref  normals[index], out normal);
                             Scalar temp;
                             Vector2D.Dot(ref info.Normal, ref normal, out temp);
-                            isBad = temp <= 0;
+                            isBad = temp >= 0;
                         }
                     }
 

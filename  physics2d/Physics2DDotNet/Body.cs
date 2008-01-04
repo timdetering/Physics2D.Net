@@ -41,6 +41,18 @@ using Physics2DDotNet.Ignorers;
 
 namespace Physics2DDotNet
 {
+    public class BodyJointEventArgs : EventArgs
+    {
+        Joint joint;
+        public BodyJointEventArgs(Joint joint)
+        {
+            this.joint = joint; 
+        }
+        public Joint Joint
+        {
+            get { return joint; }
+        }
+    }
 
 
     /// <summary>
@@ -50,10 +62,10 @@ namespace Physics2DDotNet
     public sealed class Body : IPhysicsEntity, IDuplicateable<Body>
     {
         #region static methods
-        private static MassInfo GetMassInfo(Scalar mass, Shape shape)
+        private static MassInfo GetMassInfo(Scalar mass, IShape shape)
         {
             if (shape == null) { throw new ArgumentNullException("shape"); }
-            return new MassInfo(mass, shape.MomentofInertiaMultiplier * mass);
+            return new MassInfo(mass, shape.Inertia * mass);
         }
         public static bool CanCollide(Body body1, Body body2)
         {
@@ -108,6 +120,10 @@ namespace Physics2DDotNet
         /// </summary>
         public event EventHandler ShapeChanged;
         /// <summary>
+        /// Raised when the object is Added to the engine but is not yet part of the update process.
+        /// </summary>
+        public event EventHandler Pending;
+        /// <summary>
         /// Raised when the object is added to a Physics Engine.
         /// </summary>
         public event EventHandler Added;
@@ -115,10 +131,6 @@ namespace Physics2DDotNet
         /// Raised when the object is Removed from a Physics Engine. 
         /// </summary>
         public event EventHandler<RemovedEventArgs> Removed;
-        /// <summary>
-        /// Raised when the object is Added to the engine but is not yet part of the update process.
-        /// </summary>
-        public event EventHandler Pending;
         /// <summary>
         /// Raised when the Position has been Changed.
         /// Raised by either the Solver or a call to ApplyMatrix.
@@ -132,12 +144,21 @@ namespace Physics2DDotNet
         /// Raised when the Body collides with another.
         /// </summary>
         public event EventHandler<CollisionEventArgs> Collided;
+        /// <summary>
+        /// Raised when a joint is added that affects this body.
+        /// </summary>
+        public event EventHandler<BodyJointEventArgs> JointAdded;
+        /// <summary>
+        /// Raised when a joint is removed that affects this body.
+        /// </summary>
+        public event EventHandler<BodyJointEventArgs> JointRemoved;
+
         #endregion
         #region fields
         internal LinkedList<BodyProxy> proxies;
-        internal List<Joint> joints;
+        private List<Joint> joints;
         private PhysicsEngine engine;
-        private Shape shape;
+        private IShape shape;
         private PhysicsState state;
         private Matrices matrices;
         private MassInfo massInfo;
@@ -147,13 +168,14 @@ namespace Physics2DDotNet
         private Lifespan lifetime;
         private Ignorer eventIgnorer;
         private Ignorer collisionIgnorer;
+
         private ALVector2D lastPosition;
-        
         private int id;
         private Scalar linearDamping;
         private Scalar angularDamping;
         
         internal bool isChecked;
+        private bool ignoreVertexes;
         private bool ignoresGravity;
         private bool ignoresPhysicsLogics;
         private bool ignoresCollisionResponce;
@@ -162,8 +184,6 @@ namespace Physics2DDotNet
         private bool isTransformed;
         private bool isEventable;
         private bool isBroadPhaseOnly;
-
-
 
         private object tag;
         private object solverTag;
@@ -180,7 +200,7 @@ namespace Physics2DDotNet
         /// <param name="lifeTime">A object Describing how long the object will be in the engine.</param>
         public Body(
             PhysicsState state,
-            Shape shape,
+            IShape shape,
             Scalar mass,
             Coefficients coefficients,
             Lifespan lifetime)
@@ -198,7 +218,7 @@ namespace Physics2DDotNet
         /// <param name="lifeTime">A object Describing how long the object will be in the engine.</param>
         public Body(
             PhysicsState state,
-            Shape shape,
+            IShape shape,
             MassInfo massInfo,
             Coefficients coefficients,
             Lifespan lifetime)
@@ -272,7 +292,6 @@ namespace Physics2DDotNet
         {
             get { return matrices; }
         }
-
         /// <summary>
         /// Gets and Sets The value represents how much Linear velocity is kept each time step. 
         /// This Dampens the Body's Linear velocity a little per time step. Valid values are zero exclusive to one inclusive.  
@@ -286,7 +305,6 @@ namespace Physics2DDotNet
                 linearDamping = value;
             }
         }
-
         /// <summary>
         /// Gets and Sets The value represents how much Angular velocity is kept each time step. 
         /// This Dampens the Body's Angular velocity a little per time step. Valid values are zero exclusive to one inclusive.  
@@ -300,7 +318,6 @@ namespace Physics2DDotNet
                 angularDamping = value;
             }
         }
-
         /// <summary>
         /// These are bodies that are mirrors of this body. 
         /// It's useful for bodies that are being teleported.
@@ -348,7 +365,7 @@ namespace Physics2DDotNet
         /// Gets and Sets the Shape of the Body. 
         /// If setting the shape to a shape another body has it will duplicate the shape.
         /// </summary>
-        public Shape Shape
+        public IShape Shape
         {
             set
             {
@@ -474,6 +491,14 @@ namespace Physics2DDotNet
             set { ignoresCollisionResponce = value; }
         }
         /// <summary>
+        /// Gets and Sets if this body's shape's Vertexes will be used in collision detection.
+        /// </summary>
+        public bool IgnoreVertexes
+        {
+            get { return ignoreVertexes; }
+            set { ignoreVertexes = value; }
+        }
+        /// <summary>
         /// Gets if it has been added the the Engine's PendingQueue, but not yet added to the engine.
         /// </summary>
         public bool IsPending
@@ -527,7 +552,6 @@ namespace Physics2DDotNet
                 return
                     .5f * (velocityMag * velocityMag * massInfo.Mass +
                     state.Velocity.Angular * state.Velocity.Angular * massInfo.MomentOfInertia);
-
             }
         }
         /// <summary>
@@ -543,9 +567,20 @@ namespace Physics2DDotNet
             }
         }
         public bool IsTransformed{ get { return isTransformed; } }
-
         #endregion
         #region methods
+        internal void AddJoint(Joint joint)
+        {
+            this.joints.Add(joint);
+            if (JointAdded != null) { JointAdded(this, new BodyJointEventArgs(joint)); }
+        }
+        internal void RemoveJoint(Joint joint)
+        {
+            if (this.joints.Remove(joint))
+            {
+                if (JointRemoved != null) { JointRemoved(this, new BodyJointEventArgs(joint)); }
+            }
+        }
         /// <summary>
         /// This applys the proxy.
         /// This will cause all other bodies in the proxy list to have their velocity set 
@@ -635,7 +670,6 @@ namespace Physics2DDotNet
             if (collisionIgnorer != null) { collisionIgnorer.UpdateTime(step); }
             if (Updated != null) { Updated(this, new UpdatedEventArgs(step)); }
         }
-
 
         /// <summary>
         /// Updates all the values caluclated from the State.Position.
@@ -756,7 +790,6 @@ namespace Physics2DDotNet
             Scalar IInv = massInfo.MomentOfInertia;
             PhysicsHelper.AddImpulse(ref state.Velocity, ref impulse, ref position, ref massInv, ref IInv);
         }
-
 
 
         public Body Duplicate()

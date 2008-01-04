@@ -33,57 +33,27 @@ using System.Text;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
+using Physics2DDotNet.Joints;
+using Physics2DDotNet.PhysicsLogics;
 using Physics2DDotNet.Collections;
 using Tao.OpenGl;
 
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
+
 namespace Graphics2DDotNet
 {
-    public sealed class PolygonDrawable : BufferedDrawable
+    public sealed class PointSizeProperty : IDrawProperty
     {
-        int vertexName;
-        Vector2D[] vertexes;
-        public PolygonDrawable(Vector2D[] vertexes)
+        Scalar pointSize;
+        public PointSizeProperty(Scalar pointSize)
         {
-            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
-            this.vertexes = vertexes;
+            this.pointSize = pointSize;
         }
-        protected override void BufferData()
+        public void Apply()
         {
-            Gl.glGenBuffersARB(1, out vertexName);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
-            GlHelper.GlBufferDataARB(
-                Gl.GL_ARRAY_BUFFER_ARB,
-                vertexes,
-                vertexes.Length * Vector2D.Size,
-                Gl.GL_STATIC_DRAW_ARB);
+            Gl.glPointSize((System.Single)pointSize);
         }
-        protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
+        public void Remove()
         {
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
-            Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-            Gl.glDrawArrays(Gl.GL_POLYGON, 0, vertexes.Length);
-        }
-        protected override void EnableState()
-        {
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-        }
-        protected override void DisableState()
-        {
-            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
-        }
-        public override IDrawableState CreateState()
-        {
-            return null;
-        }
-        protected override void Dispose(bool disposing)
-        {
-            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName });
         }
     }
-
 }

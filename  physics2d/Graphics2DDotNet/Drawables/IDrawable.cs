@@ -56,6 +56,4 @@ namespace Graphics2DDotNet
 
         void Draw(DrawInfo drawInfo, IDrawableState state);
     }
-
-
 }

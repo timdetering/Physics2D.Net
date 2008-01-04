@@ -42,25 +42,25 @@ namespace Physics2DDotNet
     {
         T Duplicate();
     }
-
-    public interface IPhysicsEntity
+    public interface IPendable
     {
         event EventHandler Pending;
         event EventHandler Added;
         event EventHandler<RemovedEventArgs> Removed;
         event EventHandler LifetimeChanged;
-        PhysicsEngine Engine { get;}
         bool IsPending { get;}
         bool IsAdded { get;}
         Lifespan Lifetime { get; set;}
         object Tag { get; set;}
     }
-
+    public interface IPhysicsEntity : IPendable
+    {
+        PhysicsEngine Engine { get;}
+    }
     public interface IJoint : IPhysicsEntity
     {
         ReadOnlyCollection<Body> Bodies { get;}
     }
-
     /// <summary>
     /// Describes a Contact in a collision.
     /// </summary>
@@ -90,48 +90,6 @@ namespace Physics2DDotNet
         Body Body2 { get;}
     }
 
-    public interface IShape
-    {
-        object Tag { get;set;}
-        Vector2D[] Vertexes { get;}
-        Vector2D[] Normals { get;}
-        Scalar MomentofInertiaMultiplier { get;}
+ 
 
-        bool CanGetIntersection { get;}
-        bool CanGetDistance { get;}
-        bool CanGetCustomIntersection { get;}
-        bool IgnoreVertexes { get;set;}
-
-        void GetDistance(ref Vector2D point, out Scalar result);
-        void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle);
-        bool TryGetIntersection(Vector2D point, out IntersectionInfo info);
-        bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo);
-    }
-
-    public interface IRaySegmentsCollidable : IShape
-    {
-        bool TryGetRayCollision(Body thisBody, Body raysBody, RaySegmentsShape raySegments, out RaySegmentIntersectionInfo info);
-    }
-    public interface IHasArea : IShape
-    {
-        Scalar Area { get;}
-        Vector2D Centroid { get;}
-    }
-
-    public interface IGlobalFluidAffectable : IHasArea
-    {
-        DragInfo GetFluidInfo(Vector2D tangent);
-    }
-    public delegate Vector2D GetTangentCallback(Vector2D centroid);
-    public interface ILineFluidAffectable : IGlobalFluidAffectable
-    {
-        FluidInfo GetFluidInfo(GetTangentCallback callback, Line line);
-    }
-
-
-
-    public interface IExplosionAffectable : IGlobalFluidAffectable
-    {
-        DragInfo GetExplosionInfo(Matrix2x3 matrix, Scalar radius, GetTangentCallback callback);
-    }
 }

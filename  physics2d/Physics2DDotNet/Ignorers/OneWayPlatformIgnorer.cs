@@ -41,11 +41,10 @@ namespace Physics2DDotNet.Ignorers
     public class OneWayPlatformIgnorer : Ignorer
     {
         Scalar depthAllowed;
-        Vector2D allowedDirection;
         Matrix2x2 directionMatrix;
         public OneWayPlatformIgnorer(Vector2D allowedDirection, Scalar depthAllowed)
         {
-            this.allowedDirection = allowedDirection.Normalized;
+            Vector2D.Normalize(ref allowedDirection, out allowedDirection);
             this.depthAllowed = depthAllowed;
             this.directionMatrix.m00 = allowedDirection.X;
             this.directionMatrix.m10 = allowedDirection.Y;

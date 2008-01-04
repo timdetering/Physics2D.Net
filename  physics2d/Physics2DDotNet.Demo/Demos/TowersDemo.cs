@@ -55,7 +55,7 @@ namespace Physics2DDotNet.Demo.Demos
             Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 
-            Shape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
 
 
             DemoHelper.AddGrid(

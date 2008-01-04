@@ -119,6 +119,7 @@ namespace Physics2DDotNet.Demo
             this.lvDemos.MultiSelect = false;
             this.lvDemos.Name = "lvDemos";
             this.lvDemos.Size = new System.Drawing.Size(199, 198);
+            this.lvDemos.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.lvDemos.TabIndex = 6;
             this.lvDemos.UseCompatibleStateImageBehavior = false;
             this.lvDemos.View = System.Windows.Forms.View.Details;

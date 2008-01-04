@@ -88,39 +88,43 @@ namespace Physics2DDotNet.Shapes
     /// handle collisions with this shape.
     /// </summary>
     [Serializable]
-    public class RaySegmentsShape : Shape
+    public class RaySegmentsShape : IShape
     {
         #region fields
         RaySegment[] segments;
+        private object tag;
         #endregion
         #region constructors
         public RaySegmentsShape(params RaySegment[] segments)
-            : base(Empty, 1)
         {
             if (segments == null) { throw new ArgumentNullException("segments"); }
             this.segments = segments;
         } 
         #endregion
         #region properties
+        public object Tag
+        {
+            get { return tag; }
+            set { tag = value; }
+        }
+        public Vector2D[] Vertexes { get { return new Vector2D[0]; } }
+        public Vector2D[] VertexNormals { get { return null; } }
+        public Scalar Inertia { get { return 1; }}
         public RaySegment[] Segments
         {
             get { return segments; }
         }
-        public override bool CanGetIntersection
+        public  bool CanGetIntersection
         {
             get { return false; }
         }
-        public override bool CanGetDistance
-        {
-            get { return false; }
-        }
-        public override bool CanGetCustomIntersection
+        public  bool CanGetCustomIntersection
         {
             get { return true; }
         }
         #endregion
         #region methods
-        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
+        public  bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             IRaySegmentsCollidable rayCollidable = other.Shape as IRaySegmentsCollidable;
             RaySegmentIntersectionInfo info;
@@ -137,15 +141,11 @@ namespace Physics2DDotNet.Shapes
             }
         }
 
-        public override void GetDistance(ref Vector2D point, out Scalar result)
+        public  bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             throw new NotSupportedException();
         }
-        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
-        {
-            throw new NotSupportedException();
-        }
-        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
+        public  void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
             Vector2D v1, v2;
             RaySegment segment = segments[0];

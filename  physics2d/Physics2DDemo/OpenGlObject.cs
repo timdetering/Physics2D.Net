@@ -82,16 +82,16 @@ namespace Physics2DDemo
                     bitmap[x, y] = !(pixels[x, y].A == 0 || pixels[x, y].ToArgb() == blank);
                 }
             }
-            vertexes = MultiPolygonShape.CreateFromBitmap(bitmap);
+            vertexes = VertexHelper.CreateRangeFromBitmap(bitmap);
             Console.WriteLine("Before {0}", GetCount);
-            vertexes = MultiPolygonShape.Reduce(vertexes, 1);
-            vertexes = MultiPolygonShape.Reduce(vertexes, 2);
-            vertexes = MultiPolygonShape.Reduce(vertexes, 3);
+            vertexes = VertexHelper.ReduceRange(vertexes, 1);
+            vertexes = VertexHelper.ReduceRange(vertexes, 2);
+            vertexes = VertexHelper.ReduceRange(vertexes, 3);
             Console.WriteLine("After {0}", GetCount);
-            vertexes = MultiPolygonShape.Subdivide(vertexes, 10);
+            vertexes = VertexHelper.SubdivideRange(vertexes, 10);
             Console.WriteLine("Subdivide {0}", GetCount);
-            offset = MultiPolygonShape.GetCentroid(vertexes);
-            vertexes = MultiPolygonShape.MakeCentroidOrigin(vertexes);
+            offset = VertexHelper.GetCentroidOfRange(vertexes);
+            vertexes = VertexHelper.CenterVertexesRange(vertexes);
         }
         private int GetCount
         {

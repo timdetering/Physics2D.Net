@@ -122,6 +122,9 @@ namespace Physics2DDotNet
         /// Generated when a PhysicsLogics are removed to the Engine.
         /// </summary>
         public event EventHandler<CollectionEventArgs<PhysicsLogic>> LogicsRemoved;
+        /// <summary>
+        /// Generated when the engine is update;
+        /// </summary>
         public event EventHandler<UpdatedEventArgs> Updated;
         #endregion
         #region fields
@@ -773,8 +776,8 @@ namespace Physics2DDotNet
         internal void HandleCollision(TimeStep step, Body body1, Body body2)
         {
             if (body1.Mass.MassInv == 0 && body2.Mass.MassInv == 0) { return; }
-            Shape shape1 = body1.Shape;
-            Shape shape2 = body2.Shape;
+            IShape shape1 = body1.Shape;
+            IShape shape2 = body2.Shape;
 
 
             if (shape1.CanGetCustomIntersection ||

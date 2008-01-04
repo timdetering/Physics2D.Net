@@ -40,6 +40,7 @@ using Physics2DDotNet.Joints;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.PhysicsLogics;
 using SdlDotNet;
+using Tao.OpenGl;
 using SdlDotNet.Input;
 using SdlDotNet.Graphics;
 namespace Physics2DDotNet.Demo.Demos
@@ -67,7 +68,7 @@ namespace Physics2DDotNet.Demo.Demos
             DemoHelper.AddShell(DemoInfo, rect, 100, Scalar.PositiveInfinity).ForEach(delegate(Body b) { b.IgnoresGravity = true; });
 
 
-            Shape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 3, 16, 4);
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 3, 16, 4);
 
             DemoHelper.AddShape(DemoInfo, shape, 200, new ALVector2D(0, new Vector2D(200, 300)));
             DemoHelper.AddShape(DemoInfo, shape, 100, new ALVector2D(0, new Vector2D(500, 300)));
@@ -89,7 +90,7 @@ namespace Physics2DDotNet.Demo.Demos
                 new ScalarColor3(0,0,1),
                 new ScalarColor3(0,0,1)
             };
-            Colored3PolygonDrawable drawable = new Colored3PolygonDrawable(waterVertexes, waterColor);
+            Colored3VertexesDrawable drawable = new Colored3VertexesDrawable(Gl.GL_QUADS, waterVertexes, waterColor);
 
             SimpleGraphic graphic = new SimpleGraphic(drawable, Matrix2x3.Identity, new Lifespan());
             graphic.ZOrder = -1;

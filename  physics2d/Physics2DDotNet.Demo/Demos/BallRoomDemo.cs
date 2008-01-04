@@ -53,7 +53,7 @@ namespace Physics2DDotNet.Demo.Demos
 
 
             Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
+            IShape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
             dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
             dispose += DemoHelper.RegisterMousePicking(DemoInfo);
 

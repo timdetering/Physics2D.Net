@@ -57,6 +57,97 @@ using Scalar = System.Single;
 #endif
 namespace ConsoleDriver
 {
+    [global::System.AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+    public sealed class OperationFactoryAttribute : Attribute
+    {
+        readonly Type operation;
+        readonly Type left;
+        readonly Type right;
+        public OperationFactoryAttribute(Type operation, Type left, Type right)
+        {
+            this.operation = operation;
+            this.left = left;
+            this.right = right;
+        }
+    }
+    public interface IOperationSubFactory<TInput, TOuput>
+    {
+        IOperation<TOuput> Create(TInput left,TInput right);
+    }
+    public interface IOperation<TOuput>
+    {
+        TOuput Execute();
+    }
+    public static class OperationFactory<TInput, TOuput>
+    {
+        static Dictionary<Type, Dictionary<Type, Dictionary<Type, IOperationSubFactory<TInput, TOuput>>>> cache;
+        static OperationFactory()
+        {
+            cache = new Dictionary<Type, Dictionary<Type, Dictionary<Type, IOperationSubFactory<TInput, TOuput>>>>();
+        }
+        public static SpecificOperationFactory<TInput, TOuput> CreateFactory(Type operation)
+        {
+            Dictionary<Type, Dictionary<Type, IOperationSubFactory<TInput, TOuput>>> cache2;
+            if (cache.TryGetValue(operation, out cache2))
+            {
+                return new SpecificOperationFactory<TInput, TOuput>(operation,cache2);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public static bool TryCreate(Type operation, TInput left, TInput right,out IOperation<TOuput> result)
+        {
+            Dictionary<Type, Dictionary<Type, IOperationSubFactory<TInput, TOuput>>> cache2;
+            Dictionary<Type, IOperationSubFactory<TInput, TOuput>> cache3;
+            IOperationSubFactory<TInput, TOuput> factory;
+            result = default(IOperation<TOuput>);
+            if (cache.TryGetValue(operation, out cache2))
+            {
+                if (cache2.TryGetValue(left.GetType(), out cache3))
+                {
+                    if (cache3.TryGetValue(right.GetType(), out factory))
+                    {
+                        result = factory.Create(left, right);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+    public class SpecificOperationFactory<TInput, TOuput>
+    {
+        Type operation;
+        Dictionary<Type, Dictionary<Type, IOperationSubFactory<TInput, TOuput>>> cache;
+        internal SpecificOperationFactory(Type operation, Dictionary<Type, Dictionary<Type, IOperationSubFactory<TInput, TOuput>>> cache)
+        {
+            this.operation = operation;
+            this.cache = cache;
+        }
+        public Type Operation
+        {
+            get { return operation; }
+        }
+        public bool TryCreate(Type operation, TInput left, TInput right, out IOperation<TOuput> result)
+        {
+            Dictionary<Type, IOperationSubFactory<TInput, TOuput>> cache2;
+            IOperationSubFactory<TInput, TOuput> factory;
+            result = default(IOperation<TOuput>);
+            if (cache.TryGetValue(left.GetType(), out cache2))
+            {
+                if (cache2.TryGetValue(right.GetType(), out factory))
+                {
+                    result = factory.Create(left, right);
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+
 
     public class TestSubClass
     {
@@ -201,6 +292,8 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
+
+
             PhysicsEngine engine = new PhysicsEngine();
             engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             engine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
@@ -213,8 +306,8 @@ namespace ConsoleDriver
             Coefficients coffecients = new Coefficients(/*restitution*/1, /*friction*/.5f);
 
 
-            Shape shape1 = new CircleShape(8, 7);
-            Shape shape2 = new PolygonShape(PolygonShape.CreateRectangle(20, 10), 3);
+            IShape shape1 = new CircleShape(8, 7);
+            IShape shape2 = new PolygonShape(VertexHelper.CreateRectangle(20, 10), 3);
 
             Scalar mass = 5;
             Body body1 = new Body(new PhysicsState(), shape1, mass, coffecients, new Lifespan());

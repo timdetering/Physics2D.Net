@@ -43,14 +43,14 @@ using SdlDotNet.Input;
 using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
-    public sealed class Colored4MultiPolygonDrawable : BufferedDrawable
+    public sealed class Colored4MultiVertexesDrawable : BufferedDrawable
     {
         int[] vertexNames;
         int[] colorNames;
         Vector2D[][] polygon;
         ScalarColor4[][] colors;
-
-        public Colored4MultiPolygonDrawable(Vector2D[][] polygon, ScalarColor4[][] colors)
+        int mode;
+        public Colored4MultiVertexesDrawable( int mode,Vector2D[][] polygon, ScalarColor4[][] colors)
         {
             if (polygon == null) { throw new ArgumentNullException("vertexes"); }
             if (colors.Length != polygon.Length) { throw new ArgumentException("TODO length !="); }
@@ -58,6 +58,7 @@ namespace Graphics2DDotNet
             this.colors = colors;
             this.vertexNames = new int[polygon.Length];
             this.colorNames = new int[colors.Length];
+            this.mode = mode;
         }
         protected override void BufferData()
         {
@@ -90,7 +91,7 @@ namespace Graphics2DDotNet
                 Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorNames[index]);
                 Gl.glColorPointer(ScalarColor4.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
 
-                Gl.glDrawArrays(Gl.GL_POLYGON, 0, polygon[index].Length);
+                Gl.glDrawArrays(mode, 0, polygon[index].Length);
             }
         }
         protected override void EnableState()

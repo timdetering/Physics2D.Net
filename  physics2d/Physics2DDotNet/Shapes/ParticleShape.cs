@@ -42,7 +42,7 @@ namespace Physics2DDotNet.Shapes
     /// Represents a Single point.
     /// </summary>
     [Serializable]
-    public sealed class ParticleShape : Shape
+    public sealed class ParticleShape : IShape
     {
         #region static
         /// <summary>
@@ -50,56 +50,54 @@ namespace Physics2DDotNet.Shapes
         /// </summary>
         public static readonly ParticleShape Default = new ParticleShape();
         #endregion
+        #region fields
+        private object tag;
+        private Vector2D[] vertexes; 
+        #endregion
         #region constructors
         /// <summary>
         /// Creates a new Particle Instance.
         /// </summary>
         public ParticleShape()
-            : this(1)
-        { }
-        /// <summary>
-        /// Creates a new Particle Instance.
-        /// </summary>
-        /// <param name="momentOfInertiaMultiplier">
-        /// How hard it is to turn the shape. Depending on the construtor in the 
-        /// Body this will be multiplied with the mass to determine the moment of inertia.
-        /// </param>
-        public ParticleShape(Scalar momentOfInertiaMultiplier)
-            : base(new Vector2D[] { Vector2D.Zero }, momentOfInertiaMultiplier)
-        { }
+        {
+            this.vertexes = new Vector2D[1] { Vector2D.Zero };
+        }
         #endregion
         #region Properties
-
-        public override bool CanGetIntersection
+        public object Tag
+        {
+            get { return tag; }
+            set { tag = value; }
+        }
+        public Vector2D[] Vertexes { get { return vertexes; } }
+        public Vector2D[] VertexNormals { get { return null; } }
+        public Scalar Inertia
+        {
+            get { return 1; }
+        }
+        public bool CanGetIntersection
         {
             get { return false; }
         }
-        public override bool CanGetDistance
-        {
-            get { return true; }
-        }
-        public override bool CanGetCustomIntersection
+        public bool CanGetCustomIntersection
         {
             get { return false; }
         }
         #endregion
         #region Methods
-        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
+        public void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
-            Vector2D.Transform(ref matrix, ref Zero, out rectangle.Max);
+            rectangle.Max.X = matrix.m02;
+            rectangle.Max.Y = matrix.m12;
             rectangle.Min = rectangle.Max;
         }
-        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
+        public bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             throw new NotSupportedException();
         }
-        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
+        public bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
-        }
-        public override void GetDistance(ref Vector2D point, out Scalar result)
-        {
-            Vector2D.Distance(ref point, ref Zero, out result);
         }
         #endregion
     }

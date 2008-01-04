@@ -46,10 +46,25 @@ namespace Graphics2DDotNet
 {
     public class Window
     {
-        static bool IsViewportExpired(Viewport item)
+        class ZOrderComparer : IComparer<Viewport>
+        {
+            public int Compare(Viewport x, Viewport y)
+            {
+                int result = x.ZOrder.CompareTo(y.ZOrder);
+                if (result == 0)
+                {
+                    result = x.ID.CompareTo(y.ID);
+                }
+                return result;
+            }
+        }
+        static ZOrderComparer zOrderComparer = new ZOrderComparer();
+
+        bool IsViewportExpired(Viewport item)
         {
             if (item.IsExpired)
             {
+                item.ZOrderChanged -= OnZOrderChanged;
                 item.OnRemoved();
                 return true;
             }
@@ -69,6 +84,7 @@ namespace Graphics2DDotNet
         int refreshCount;
         PhysicsTimer drawTimer;
         bool isRunning;
+        bool zOrderChanged;
         public Window(Size size)
         {
             this.size = size;
@@ -112,6 +128,11 @@ namespace Graphics2DDotNet
         {
             drawCount++;
             DrawInfo drawInfo = new DrawInfo(dt, drawCount, refreshCount);
+            if (zOrderChanged)
+            {
+                zOrderChanged = false;
+                viewports.Sort(zOrderComparer);
+            }
             foreach (Viewport viewport in viewports)
             {
                 viewport.Draw(drawInfo);
@@ -183,9 +204,23 @@ namespace Graphics2DDotNet
         {
             lock (syncRoot)
             {
-                viewports.AddRange(pendingViewports);
-                pendingViewports.Clear();
+                if (pendingViewports.Count > 0)
+                {
+                    viewports.AddRange(pendingViewports);
+                    foreach (Viewport item in pendingViewports)
+                    {
+                        item.ZOrderChanged += OnZOrderChanged;
+
+                    }
+                    pendingViewports.Clear();
+                    zOrderChanged = true;
+                }
             }
+        }
+
+        void OnZOrderChanged(object sender, EventArgs e)
+        {
+            this.zOrderChanged = true;
         }
         public Viewport CreateViewport(Rectangle rectangle, Matrix2x3 projection, Layer layer)
         {

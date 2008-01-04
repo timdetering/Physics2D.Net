@@ -63,7 +63,7 @@ namespace Physics2DDotNet.Demo.Demos
             rect.Min.Y += 110;
             rect.Max.X -= 110;
             rect.Max.Y -= 110;
-            Shape shape = ShapeFactory.CreateColoredCircle(3, 7);
+            IShape shape = ShapeFactory.CreateColoredCircle(3, 7);
             DemoHelper.AddGrid(DemoInfo, shape, 40,
                 rect,
                 1, 1).ForEach(delegate(Body b) { b.State.Velocity.Linear = new Vector2D(DemoHelper.Rand.Next(-100, 100), DemoHelper.Rand.Next(-100, 100)); });

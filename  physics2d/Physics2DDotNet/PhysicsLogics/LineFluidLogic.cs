@@ -67,7 +67,7 @@ namespace Physics2DDotNet.PhysicsLogics
             }
             void CalculatePart()
             {
-                Shape shape = body.Shape;
+                IShape shape = body.Shape;
                 affectable = shape as ILineFluidAffectable;
                 if (affectable != null)
                 {
@@ -146,7 +146,7 @@ namespace Physics2DDotNet.PhysicsLogics
                 {
                     continue;
                 }
-                Shape shape = body.Shape;
+                IShape shape = body.Shape;
                 int isInsideCount = 0;
                 foreach (Vector2D corner in body.Rectangle.Corners())
                 {
@@ -167,7 +167,7 @@ namespace Physics2DDotNet.PhysicsLogics
                     
                     
                     Line bodyLine;
-                    ShapeHelper.Transform(ref body.Matrices.ToBody, ref line, out bodyLine);
+                    Line.Transform(ref body.Matrices.ToBody, ref line, out bodyLine);
 
 
                     GetTangentCallback callback = delegate(Vector2D centTemp)

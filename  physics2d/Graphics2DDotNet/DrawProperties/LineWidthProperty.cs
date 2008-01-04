@@ -28,47 +28,33 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Collections.ObjectModel;
 using System.Text;
-using System.Drawing;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Graphics2DDotNet;
 using Physics2DDotNet;
-using Physics2DDotNet.Ignorers;
 using Physics2DDotNet.Joints;
-using Physics2DDotNet.Shapes;
 using Physics2DDotNet.PhysicsLogics;
-using SdlDotNet;
-using SdlDotNet.Input;
-using SdlDotNet.Graphics;
-namespace Physics2DDotNet.Demo.Demos
+using Physics2DDotNet.Collections;
+using Tao.OpenGl;
+
+
+namespace Graphics2DDotNet
 {
-    [PhysicsDemo("Simple", "Pyramid", "There is a Pyramid.\r\nYou always wanted to blow up a Pyramid now you can!")]
-    public class PyramidDemo : BaseDemo
+    public sealed class LineWidthProperty : IDrawProperty
     {
-        DisposeCallback dispose;
-        protected override void Open()
+        Scalar lineWidth;
+        public LineWidthProperty(Scalar lineWidth)
         {
-            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
-            dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
-
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
-            DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
-
-            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
-
-
-            DemoHelper.AddPyramid(
-                DemoInfo, shape, 20,
-                new BoundingRectangle(300, 200, 900, 710),
-                5, 4);
-
-            Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));// //AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
+            this.lineWidth = lineWidth;
         }
-        protected override void Dispose(bool disposing)
+        public void Apply()
         {
-            if (dispose != null) { dispose(); }
+            Gl.glLineWidth((System.Single)lineWidth);
+        }
+        public void Remove()
+        {
         }
     }
+
 }

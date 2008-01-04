@@ -536,7 +536,7 @@ namespace Physics2DDemo
             int width = 800;
             int height = 600;
 
-            PolygonShape shape = new PolygonShape(PolygonShape.CreateRectangle(width, height), 100);
+            PolygonShape shape = new PolygonShape(VertexHelper.CreateRectangle(width, height), 100);
             clipper = new Body(new PhysicsState(), shape,1, new Coefficients(0, 0), new Lifespan());
             clipper.State.Position.Linear.X = width / 2f;
             clipper.State.Position.Linear.Y = height / 2f;
@@ -554,7 +554,7 @@ namespace Physics2DDemo
         {
              
             Sprite sprite = GetSprite("rocket.png");
-            Vector2D[][] vertexes = MultiPolygonShape.Subdivide(sprite.Polygons, 10);
+            Vector2D[][] vertexes = VertexHelper.SubdivideRange(sprite.Polygons, 10);
             MultiPolygonShape shape = new MultiPolygonShape(vertexes, 4);
             shape.Tag = sprite;
 
@@ -589,7 +589,7 @@ namespace Physics2DDemo
                 else
                 {
                     Sprite sprite = GetLetter(c);
-                    Vector2D[][] vertexes = MultiPolygonShape.Subdivide(sprite.Polygons, 3);
+                    Vector2D[][] vertexes = VertexHelper.SubdivideRange(sprite.Polygons, 3);
                     BoundingRectangle rect = BoundingRectangle.FromVectors(sprite.Polygons[0]);
                     MultiPolygonShape shape = new MultiPolygonShape(
                         vertexes,
@@ -780,7 +780,7 @@ namespace Physics2DDemo
         {
             Body line = new Body(
                 new PhysicsState(position),
-                new PolygonShape(PolygonShape.CreateRectangle(2000, 60), 40),
+                new PolygonShape(VertexHelper.CreateRectangle(2000, 60), 40),
                 new MassInfo(Scalar.PositiveInfinity, Scalar.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
@@ -821,7 +821,7 @@ namespace Physics2DDemo
                 new MassInfo(Scalar.PositiveInfinity, Scalar.PositiveInfinity),
                 coefficients.Duplicate(),
                 new Lifespan());
-            body.Shape.IgnoreVertexes = true;
+            body.IgnoreVertexes = true;
             body.IgnoresGravity = true;
             AddGlObject(body);
             engine.AddBody(body);
@@ -907,7 +907,7 @@ namespace Physics2DDemo
                 }
             }
         }
-        Body AddShape(Shape shape, Scalar mass, ALVector2D position)
+        Body AddShape(IShape shape, Scalar mass, ALVector2D position)
         {
             Body e =
                 new Body(
@@ -928,10 +928,10 @@ namespace Physics2DDemo
         }
         Body AddRectangle(Scalar height, Scalar width, Scalar mass, ALVector2D position)
         {
-            Vector2D[] vertices = PolygonShape.CreateRectangle(width, height);
-            vertices =PolygonShape.Subdivide(vertices, (height + width) / 9);
+            Vector2D[] vertexes = VertexHelper.CreateRectangle(width, height);
+            vertexes = VertexHelper.Subdivide(vertexes, (height + width) / 9);
 
-            Shape boxShape = new PolygonShape(vertices, Math.Min(height, width) / 2);
+            IShape boxShape = new PolygonShape(vertexes, Math.Min(height, width) / 2);
             Body e =
                 new Body(
                      new PhysicsState(position),
@@ -946,7 +946,7 @@ namespace Physics2DDemo
         Body AddCircle(Scalar radius, int vertexCount, Scalar mass, ALVector2D position)
         {
 
-            Shape circleShape = new CircleShape(radius, vertexCount); ;
+            IShape circleShape = new CircleShape(radius, vertexCount); ;
             Body e =
                 new Body(
                      new PhysicsState(position),
@@ -1112,7 +1112,7 @@ namespace Physics2DDemo
                 new Vector2D(Wd2-2, -Ld2),
                 new Vector2D(Wd2+4, -Ld2/2+6),
             };
-            Shape shape = new PolygonShape(vertexes, 5);
+            IShape shape = new PolygonShape(vertexes, 5);
 
             Body torso = AddShape(shape, mass * 4, new ALVector2D(0, location + new Vector2D(0, 40)));
 
@@ -1587,8 +1587,8 @@ namespace Physics2DDemo
                      Vector2D.FromLengthAndAngle(distance+l2,da/2),
                 };
                 //da *= 2;
-                Vector2D[] vertexes2 = PolygonShape.MakeCentroidOrigin(vertexes);
-                vertexes = PolygonShape.Subdivide(vertexes2, 5);
+                Vector2D[] vertexes2 = VertexHelper.CenterVertexes(vertexes);
+                vertexes = VertexHelper.Subdivide(vertexes2, 5);
 
                 PolygonShape shape = new PolygonShape(vertexes, 1.5f);
                 for (Scalar angle = 0; angle < MathHelper.TwoPi; angle += da)
@@ -2090,7 +2090,7 @@ namespace Physics2DDemo
             {
                 s.Refresh();
             }
-            clipper.Shape = new PolygonShape(PolygonShape.CreateRectangle(Video.Screen.Width, Video.Screen.Height), 100);
+            clipper.Shape = new PolygonShape(VertexHelper.CreateRectangle(Video.Screen.Width, Video.Screen.Height), 100);
             clipper.State.Position.Linear.X = Video.Screen.Width / 2f;
             clipper.State.Position.Linear.Y = Video.Screen.Height / 2f;
             lock (objects)

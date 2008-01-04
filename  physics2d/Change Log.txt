@@ -10,6 +10,8 @@ AdvanceMath
 NextVersion:
 Added: the struct Matrix3x2 and changes to other classes to make it work.
 Fixed: Line's GetDistance method
+Added: Line.Transform
+
 
 Physics2D.Net
 NextVersion:
@@ -58,6 +60,11 @@ Removed: RectangleShape
 Removed: Shape.IsBroadPhaseDetectionOnly
 Added: Body.IsBroadPhaseOnly
 Added: MousePickingLogic
+Added: Body.JointAdded
+Added: Body.JointRemoved
+Changed: Moved: Shape.IgnoreVertexes To Body
+Changed: Moved all static methods in the Shape classes into the new VertexHelper class.
+Removed: the shape object now all shape directly impliment IShape.
 
 AdvanceMath
 1.7.0.0:

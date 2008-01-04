@@ -95,7 +95,7 @@ namespace Graphics2DDotNet
         public static PolygonShape CreateColoredPolygon(Vector2D[] vertexes, Scalar gridSpacing)
         {
             PolygonShape shape = new PolygonShape(vertexes, gridSpacing);
-            Vector2D[] reduced = PolygonShape.Reduce(vertexes);
+            Vector2D[] reduced = VertexHelper.Reduce(vertexes);
             shape.Tag = DrawableFactory.CreatePolygon(reduced, CreateColor3Array(reduced.Length));
             return shape;
         }
@@ -125,7 +125,7 @@ namespace Graphics2DDotNet
             return shape;
         }
 
-        public static Shape CreateMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing)
+        public static IShape CreateMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing)
         {
             if (polygons.Length == 1)
             {
@@ -138,7 +138,7 @@ namespace Graphics2DDotNet
                 return shape;
             }
         }
-        public static Shape CreateMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing, ScalarColor3[][] colors)
+        public static IShape CreateMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing, ScalarColor3[][] colors)
         {
             if (polygons.Length == 1)
             {
@@ -151,7 +151,7 @@ namespace Graphics2DDotNet
                 return shape;
             }
         }
-        public static Shape CreateMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing, ScalarColor4[][] colors)
+        public static IShape CreateMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing, ScalarColor4[][] colors)
         {
             if (polygons.Length == 1)
             {
@@ -164,7 +164,7 @@ namespace Graphics2DDotNet
                 return shape;
             }
         }
-        public static Shape CreateColoredMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing)
+        public static IShape CreateColoredMultiPolygon(Vector2D[][] polygons, Scalar gridSpacing)
         {
             if (polygons.Length == 1)
             {
@@ -177,7 +177,7 @@ namespace Graphics2DDotNet
                 Vector2D[][] reduced = new Vector2D[polygons.Length][];
                 for (int index = 0; index < polygons.Length; ++index)
                 {
-                    reduced[index] = PolygonShape.Reduce(polygons[index]);
+                    reduced[index] = VertexHelper.Reduce(polygons[index]);
                     colors[index] = CreateColor3Array(reduced[index].Length);
                 }
                 shape.Tag = DrawableFactory.CreateMultiPolygon(reduced, colors);
@@ -185,16 +185,16 @@ namespace Graphics2DDotNet
             }
         }
 
-        public static Shape CreateSprite(SurfacePolygons surfacePolygons, int reduce, Scalar subdivide, Scalar gridSpacing)
+        public static IShape CreateSprite(SurfacePolygons surfacePolygons, int reduce, Scalar subdivide, Scalar gridSpacing)
         {
             Vector2D[][] polygons = surfacePolygons.Polygons;
             for (int index = 1; index < reduce; index++)
             {
-                polygons = MultiPolygonShape.Reduce(polygons, index);
+                polygons = VertexHelper.ReduceRange(polygons, index);
             }
-            polygons = MultiPolygonShape.Subdivide(polygons, subdivide);
+            polygons = VertexHelper.SubdivideRange(polygons, subdivide);
             Vector2D centroid = surfacePolygons.Offset;
-            Shape shape;
+            IShape shape;
             if (polygons.Length == 1)
             {
                 shape = new PolygonShape(polygons[0], gridSpacing);

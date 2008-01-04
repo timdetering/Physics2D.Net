@@ -27,60 +27,65 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
-using System.Reflection;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.Collections;
 using Tao.OpenGl;
-using SdlDotNet;
+
+using SdlDotNet.Core;
 using SdlDotNet.Graphics;
-using Color = System.Drawing.Color;
+using SdlDotNet.Input;
+using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
-    public class SurfacePolygonsCacheMethods : ICacheMethods<SurfacePolygons>
+    public sealed class VertexesDrawable : BufferedDrawable
     {
-        public static Predicate<Color> DefaultIsOpaque = IsOpaqueInternal;
-        private static bool IsOpaqueInternal(Color color)
+        int vertexName;
+        Vector2D[] vertexes;
+        int mode;
+        public VertexesDrawable(int mode,Vector2D[] vertexes)
         {
-            return color.A != 0;
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            this.vertexes = vertexes;
+            this.mode = mode;
         }
-        public SurfacePolygons LoadItem(string name, object[] loadArgs)
+        protected override void BufferData()
         {
-            Predicate<Color> isOpaque = null;
-            if (loadArgs != null && loadArgs.Length == 1)
-            {
-                isOpaque = loadArgs[0] as Predicate<Color>;
-                if (isOpaque == null)
-                {
-                    if (loadArgs[0] is Color)
-                    {
-                        Color c = (Color)loadArgs[0];
-                        isOpaque = delegate(Color color)
-                        {
-                            return (c.ToArgb() != color.ToArgb());
-                        };
-                    }
-                }
-            }
-            if (isOpaque == null)
-            {
-                isOpaque = DefaultIsOpaque;
-            }
-            Surface surface = Cache<Surface>.GetItem(name);
-            Vector2D[][] polygons = VertexHelper.CreateRangeFromBitmap(new SurfaceBitmap(surface, isOpaque));
-            polygons = VertexHelper.ReduceRange(polygons);
-            Vector2D offset = VertexHelper.GetCentroidOfRange(polygons);
-            polygons = VertexHelper.CenterVertexesRange(polygons);
-            return new SurfacePolygons(surface, polygons, offset);
+            Gl.glGenBuffersARB(1, out vertexName);
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
+            GlHelper.GlBufferDataARB(
+                Gl.GL_ARRAY_BUFFER_ARB,
+                vertexes,
+                vertexes.Length * Vector2D.Size,
+                Gl.GL_STATIC_DRAW_ARB);
         }
-        public void DisposeItem(SurfacePolygons item)
-        { }
+        protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
+        {
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
+            Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
+            Gl.glDrawArrays(mode, 0, vertexes.Length);
+        }
+        protected override void EnableState()
+        {
+            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
+        }
+        protected override void DisableState()
+        {
+            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
+        }
+        public override IDrawableState CreateState()
+        {
+            return null;
+        }
+        protected override void Dispose(bool disposing)
+        {
+            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName });
+        }
     }
 
 }

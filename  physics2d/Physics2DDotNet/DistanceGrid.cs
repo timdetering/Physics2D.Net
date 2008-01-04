@@ -47,15 +47,13 @@ namespace Physics2DDotNet
         Scalar gridSpacingInv;
         BoundingRectangle rect;
         Scalar[][] nodes;
-        public DistanceGrid(Shape shape, Scalar spacing)
+        public DistanceGrid(IHasArea shape, Scalar spacing)
         {
             if (shape == null) { throw new ArgumentNullException("shape"); }
-            if (!shape.CanGetDistance) { throw new ArgumentException("The Shape must support Get Distance", "shape"); }
             if (spacing <= 0) { throw new ArgumentOutOfRangeException("spacing"); }
             Matrix2x3 ident = Matrix2x3.Identity;
             shape.CalcBoundingRectangle(ref ident, out this.rect);
-
-           // this.rect = shape.Rectangle;
+            
             this.gridSpacing = spacing;
             this.gridSpacingInv = 1 / spacing;
             int xSize = (int)Math.Ceiling((rect.Max.X - rect.Min.X) * gridSpacingInv) + 2;
@@ -76,8 +74,6 @@ namespace Physics2DDotNet
                     shape.GetDistance(ref point, out nodes[x][y]);
                 }
             }
-            //restore the shape
-           // shape.ApplyMatrix(ref old);
         }
         public bool TryGetIntersection(Vector2D point, out IntersectionInfo result)
         {

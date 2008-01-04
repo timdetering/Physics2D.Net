@@ -69,10 +69,17 @@ namespace Physics2DDotNet.Demo
 
             //Create a new Layer 
             Layer layer = new Layer();
+            Layer layer2 = new Layer();
+            PhysicsEngine physicsEngine2 = layer2.Engine;
+            physicsEngine2.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
+            physicsEngine2.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+
             //Get the layers physics engine
             PhysicsEngine physicsEngine = layer.Engine;
             //initialize the engine 
             physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
             physicsEngine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
 
             //graphics engine is basically a window with some events that draws veiwports
@@ -84,14 +91,23 @@ namespace Physics2DDotNet.Demo
                 Matrix2x3.Identity, //how
                 layer); //who
 
+            Viewport viewport2 = window.CreateViewport(
+                new Rectangle(0, 0, window.Size.Width, window.Size.Height), //where
+                Matrix2x3.Identity, //how
+                layer2); //who
+
+
+
             // you can change the veiwport via this 
-            viewport.ToScreen = Matrix2x3.FromTransformation(.09f,new Vector2D(40,0));
-            
+            viewport.ToScreen = Matrix2x3.FromTransformation(.09f, new Vector2D(40, 0));
+
             //make it so the veiwport will be resized whn the window is
             window.Resized += delegate(object sender, SizeEventArgs e)
             {
                 viewport.Width = e.Width;
                 viewport.Height = e.Height;
+                viewport2.Width = e.Width;
+                viewport2.Height = e.Height;
             };
             System.Windows.Forms.Application.EnableVisualStyles();
             //create the GUI
@@ -103,7 +119,7 @@ namespace Physics2DDotNet.Demo
 
             //Add some intro text
             DemoHelper.AddText(
-                new DemoOpenInfo(window,viewport,layer),
+                new DemoOpenInfo(window, viewport, layer),
 @"WELCOME TO THE PHYSICS2D.NET DEMO.
 PLEASE ENJOY MESSING WITH IT.
 A LOT OF HARD WORK WENT INTO IT,
@@ -114,10 +130,21 @@ ACTUAL BODY IN THE ENGINE.
 THIS IS TO SHOW OFF THE BITMAP
 TO POLYGON ALGORITHM.
 LOAD THE INTRO TEXT DEMO TO MANIPULATE 
-THIS TEXT.", new Vector2D(20, 20));
+THIS TEXT.", new Vector2D(20, 20),40);
 
 
+            string numberString = "0123456789";
+            numbers = new IShape[10];
+            for (int index = 0; index < numbers.Length; ++index)
+            {
+                numbers[index] = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem(numberString[index] + "|FreeSans.ttf:20", Color.Black), 0, 8, 2);
+                SpriteDrawable s = numbers[index].Tag as SpriteDrawable;
+                s.Color = new ScalarColor4(.1f, .1f, 1, 1);
+            }
 
+            DoCount(window, viewport2, layer, layer2, new Vector2D(100, 2));
+            DoFPS(window, viewport2, layer, layer2, new Vector2D(2,2));
+            DoUPS(window, viewport2, layer, layer2, new Vector2D(2, 30));
             //Show the GUI
             selector.Show();
             //start the physicstimer for Layer.PhysicsEngine
@@ -126,5 +153,106 @@ THIS TEXT.", new Vector2D(20, 20));
             window.Run();
             return;
         }
+        static IShape[] numbers;
+
+        private static void DoUPS(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        {
+            List<Body> fpsBodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "UPS: 000", pos,20);
+            foreach (Body body in fpsBodies)
+            {
+                SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
+                s.Color = new ScalarColor4(.1f, .1f, 1, 1);
+            }
+            fpsBodies.RemoveRange(0, 4);
+
+            DateTime lastfps = DateTime.Now;
+            int frames = 1;
+            Scalar frameSeconds = 0;
+            layer1.Engine.Updated += delegate(object sender, UpdatedEventArgs e)
+            {
+                if (frames >= 10)
+                {
+                    frames /= 2;
+                    frameSeconds /= 2;
+                }
+                frames++;
+                DateTime now = DateTime.Now;
+                frameSeconds += (Scalar)(now.Subtract(lastfps).TotalSeconds);
+                lastfps = now;
+                int ups = (int)(frames / frameSeconds);
+                string val = ups.ToString();
+                int offset = 3 - val.Length;
+                for (int index = 0; index < offset; ++index)
+                {
+                    fpsBodies[index].Shape = numbers[0];
+                }
+                for (int index = 0; index < val.Length; ++index)
+                {
+                    fpsBodies[index + offset].Shape = numbers[int.Parse(val[index] + "")];
+                }
+            };
+        }
+        private static void DoFPS(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        {
+            List<Body> fpsBodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "FPS: 000", pos,20);
+            foreach (Body body in fpsBodies)
+            {
+                SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
+                s.Color = new ScalarColor4(.1f, .1f, 1, 1);
+            }
+            fpsBodies.RemoveRange(0, 4);
+
+            DateTime lastfps = DateTime.Now;
+            int frames = 1;
+            Scalar frameSeconds = 0;
+            viewport2.BeginDrawing += delegate(object sender, DrawEventArgs e)
+            {
+                if (frames >= 10)
+                {
+                    frames /= 2;
+                    frameSeconds /= 2;
+                }
+                frames++;
+                DateTime now = DateTime.Now;
+                frameSeconds += (Scalar)(now.Subtract(lastfps).TotalSeconds);
+                lastfps = now;
+                int ups = (int)(frames / frameSeconds);
+                string val = ups.ToString();
+                int offset = 3 - val.Length;
+                for (int index = 0; index < offset; ++index)
+                {
+                    fpsBodies[index].Shape = numbers[0];
+                }
+                for (int index = 0; index < val.Length; ++index)
+                {
+                    fpsBodies[index + offset].Shape = numbers[int.Parse(val[index] + "")];
+                }
+            };
+        }
+        private static void DoCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        {
+            List<Body> fpsBodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Count: 000000", pos,20);
+            foreach (Body body in fpsBodies)
+            {
+                SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
+                s.Color = new ScalarColor4(.1f, .1f, 1, 1);
+            }
+            fpsBodies.RemoveRange(0, 6);
+
+            layer1.Engine.Updated += delegate(object sender, UpdatedEventArgs e)
+            {
+                string val = layer1.Engine.Bodies.Count.ToString();
+                int offset = 6 - val.Length;
+                for (int index = 0; index < offset; ++index)
+                {
+                    fpsBodies[index].Shape = numbers[0];
+                }
+                for (int index = 0; index < val.Length; ++index)
+                {
+                    fpsBodies[index + offset].Shape = numbers[int.Parse(val[index] + "")];
+                }
+            };
+        }
+
     }
 }

@@ -225,5 +225,32 @@ namespace Graphics2DDotNet
                 }
             }
         }
+
+        static List<DeleteInfo> textures = new List<DeleteInfo>();
+        public static void GlDeleteTextures(int lastRefresh, int[] names)
+        {
+            lock (textures)
+            {
+                textures.Add(new DeleteInfo(lastRefresh, names));
+            }
+        }
+        public static void DoGlDeleteTextures(int lastRefresh)
+        {
+            lock (textures)
+            {
+                if (textures.Count > 0)
+                {
+                    for (int index = 0; index < buffersARB.Count; ++index)
+                    {
+                        DeleteInfo info = buffersARB[index];
+                        if (info.lastRefresh == lastRefresh)
+                        {
+                            Gl.glDeleteTextures(info.names.Length, info.names);
+                        }
+                    }
+                    textures.Clear();
+                }
+            }
+        }
     }
 }

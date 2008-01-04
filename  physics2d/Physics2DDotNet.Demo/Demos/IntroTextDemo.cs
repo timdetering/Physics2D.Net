@@ -62,7 +62,7 @@ EACH CHARACTER HERE IS AN
 ACTUAL BODY IN THE ENGINE.
 THIS IS TO SHOW OFF THE BITMAP
 TO POLYGON ALGORITHM."
-                , new Vector2D(20, 20));
+                , new Vector2D(20, 20),40);
         }
         protected override void Dispose(bool disposing)
         {

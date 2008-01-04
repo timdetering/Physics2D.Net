@@ -54,7 +54,7 @@ A large number of particles being pushed arround by 2 spinning guys
         {
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
-            Shape fighterShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 4, 50, 5);
+            IShape fighterShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 4, 50, 5);
             Body fighter = new Body(new PhysicsState(new ALVector2D(0, 300, 300)), fighterShape, 5000, new Coefficients(0, 1), new Lifespan());
             fighter.State.Velocity.Angular = 9;
             fighter.Mass.MomentOfInertia = Scalar.PositiveInfinity;

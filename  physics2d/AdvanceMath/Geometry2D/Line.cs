@@ -41,6 +41,42 @@ namespace AdvanceMath.Geometry2D
 #endif
     public struct Line : IEquatable<Line>
     {
+        public static Line Transform(Matrix3x3 matrix, Line line)
+        {
+            Line result;
+            Transform(ref  matrix, ref line, out result);
+            return result;
+        }
+        public static void Transform(ref Matrix3x3 matrix, ref Line line, out Line result)
+        {
+            Vector2D point;
+            Vector2D origin = Vector2D.Zero;
+            Vector2D.Multiply(ref line.Normal, ref line.D, out  point);
+            Vector2D.Transform(ref matrix, ref point, out point);
+            Vector2D.Transform(ref matrix, ref origin, out origin);
+            Vector2D.Subtract(ref point, ref origin, out result.Normal);
+            Vector2D.Normalize(ref result.Normal, out result.Normal);
+            Vector2D.Dot(ref point, ref result.Normal, out result.D);
+        }
+        public static Line Transform(Matrix2x3 matrix, Line line)
+        {
+            Line result;
+            Transform(ref  matrix, ref line, out result);
+            return result;
+        }
+        public static void Transform(ref Matrix2x3 matrix, ref Line line, out Line result)
+        {
+            Vector2D point;
+            Vector2D origin = Vector2D.Zero;
+            Vector2D.Multiply(ref line.Normal, ref line.D, out  point);
+            Vector2D.Transform(ref matrix, ref point, out point);
+            Vector2D.Transform(ref matrix, ref origin, out origin);
+            Vector2D.Subtract(ref point, ref origin, out result.Normal);
+            Vector2D.Normalize(ref result.Normal, out result.Normal);
+            Vector2D.Dot(ref point, ref result.Normal, out result.D);
+        }
+
+
         public const int Size = sizeof(Scalar) + Vector2D.Size;
         [AdvBrowsable]
         public Vector2D Normal;

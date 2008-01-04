@@ -48,6 +48,7 @@ namespace Graphics2DDotNet
 {
     public class Viewport
     {
+        static int idCounter = 0;
         class ViewportClipperLogic : Physics2DDotNet.PhysicsLogics.PhysicsLogic
         {
             Viewport viewport;
@@ -60,7 +61,7 @@ namespace Graphics2DDotNet
                 this.viewport = viewport;
 
                 this.vertexes = new Vector2D[4];
-                vertexes = PolygonShape.Subdivide(vertexes,10);
+                vertexes = VertexHelper.Subdivide(vertexes,10);
                 SetVertexes();
                 this.clipper = new Body(new PhysicsState(), shape, 1, new Coefficients(1, 1), this.Lifetime);
                 clipper.IgnoresPhysicsLogics = true;
@@ -126,7 +127,7 @@ namespace Graphics2DDotNet
             protected override void RunLogic(TimeStep step)
             { }
         }
-
+        int id = idCounter++;
         bool registeredMouseDown;
         private event EventHandler<ViewportMouseButtonEventArgs> mouseDown;
         public event EventHandler<ViewportMouseButtonEventArgs> MouseDown
@@ -236,9 +237,11 @@ namespace Graphics2DDotNet
         public event EventHandler Changed;
         public event EventHandler Removed;
 
-        public event EventHandler BeginDrawing;
-        public event EventHandler EndDrawing;
-        
+        public event EventHandler<DrawEventArgs> BeginDrawing;
+        public event EventHandler<DrawEventArgs> EndDrawing;
+
+        public event EventHandler ZOrderChanged;
+
         bool calculated;
         Rectangle rectangle;
         Scalar[] matrixArray;
@@ -248,7 +251,7 @@ namespace Graphics2DDotNet
         Window engine;
         bool isExpired;
         List<ViewportClipperLogic> clippers;
-        
+        int zOrder;
         internal Viewport(
             Window engine,
             Rectangle rectangle,
@@ -264,7 +267,20 @@ namespace Graphics2DDotNet
             Calc();
             AddClippers();
         }
-
+        public int ZOrder
+        {
+            get { return zOrder; }
+            set
+            {
+                if (zOrder != value)
+                {
+                    zOrder = value;
+                    if (ZOrderChanged != null) { ZOrderChanged(this, EventArgs.Empty); }
+                }
+            }
+        }
+        public int ID
+        { get { return id; } }
         void AddClippers()
         {
             Layer layer = this.layer;
@@ -407,7 +423,7 @@ namespace Graphics2DDotNet
         }
         public void Draw(DrawInfo drawInfo)
         {
-            if (BeginDrawing != null) { BeginDrawing(this, EventArgs.Empty); }
+            if (BeginDrawing != null) { BeginDrawing(this, new DrawEventArgs(drawInfo)); }
             Gl.glViewport(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             if (!calculated)
@@ -418,7 +434,7 @@ namespace Graphics2DDotNet
             GlHelper.GlLoadMatrix(matrixArray);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             layer.Draw(drawInfo);
-            if (EndDrawing != null) { EndDrawing(this, EventArgs.Empty); }
+            if (EndDrawing != null) { EndDrawing(this, new DrawEventArgs(drawInfo)); }
         }
     }
 }

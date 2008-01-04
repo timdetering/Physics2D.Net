@@ -65,7 +65,7 @@ namespace Physics2DDotNet.Demo.Demos
 
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 
-            Shape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
 
 
             DemoHelper.AddGrid(
@@ -73,6 +73,65 @@ namespace Physics2DDotNet.Demo.Demos
                 new BoundingRectangle(440, 450, 500, 730),
                 1, 1);
             Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (dispose != null) { dispose(); }
+        }
+    }
+    [PhysicsDemo("Simple", "MultiPolygon Demo", "There is a single Tower of stacking blocks")]
+    public class MultiPolygonDemo : BaseDemo
+    {
+        DisposeCallback dispose;
+        protected override void Open()
+        {
+
+
+
+
+
+
+
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
+            dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
+
+            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+
+
+            DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
+
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
+
+
+            DemoHelper.AddGrid(
+                DemoInfo, shape, 20,
+                new BoundingRectangle(440, 450, 500, 730),
+                1, 1);
+            Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));
+
+            Vector2D[][] polygons1 = new Vector2D[2][];
+            polygons1[0] = VertexHelper.Subdivide(VertexHelper.CreateRectangle(50, 50), 16);
+            polygons1[1] = VertexHelper.CreateCircle(30, 20);
+            Matrix2x3 matrix = Matrix2x3.FromTransformation(1, new Vector2D(30, 50));
+
+            polygons1[0] = VertexHelper.ApplyMatrix(ref matrix, polygons1[0]);
+
+            IShape shape1 = ShapeFactory.CreateColoredMultiPolygon(polygons1, 3);
+            DemoHelper.AddShape(DemoInfo, shape1, 50, new ALVector2D(0, 300, 300));
+
+
+            Vector2D[][] polygons = new Vector2D[3][];
+            polygons[0] = VertexHelper.Subdivide(VertexHelper.CreateRectangle(30, 50), 16);
+            polygons[1] = VertexHelper.Subdivide(VertexHelper.CreateRectangle(50, 70), 16);
+            polygons[2] = VertexHelper.CreateCircle(30, 20);
+             matrix = Matrix2x3.FromTransformation(6, new Vector2D(36, 50));
+
+            polygons[2] = VertexHelper.ApplyMatrix(ref matrix, polygons[2]);
+            matrix = Matrix2x3.FromTransformation(-6, new Vector2D(-36, 50));
+
+            polygons[1] = VertexHelper.ApplyMatrix(ref matrix, polygons[1]);
+            IShape shape2 = ShapeFactory.CreateColoredMultiPolygon(polygons, 3);
+            DemoHelper.AddShape(DemoInfo, shape2, 50, new ALVector2D(0, 400, 300));
         }
         protected override void Dispose(bool disposing)
         {

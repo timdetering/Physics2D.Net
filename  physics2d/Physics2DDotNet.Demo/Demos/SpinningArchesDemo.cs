@@ -76,8 +76,8 @@ namespace Physics2DDotNet.Demo.Demos
                      Vector2D.FromLengthAndAngle(distance+l2,da/2),
                 };
                 //da *= 2;
-                Vector2D[] vertexes2 = PolygonShape.MakeCentroidOrigin(vertexes);
-                vertexes = PolygonShape.Subdivide(vertexes2, 5);
+                Vector2D[] vertexes2 = VertexHelper.CenterVertexes(vertexes);
+                vertexes = VertexHelper.Subdivide(vertexes2, 5);
 
                 PolygonShape shape = ShapeFactory.CreateColoredPolygon(vertexes, 1.5f);
                 for (Scalar angle = 0; angle < MathHelper.TwoPi; angle += da)

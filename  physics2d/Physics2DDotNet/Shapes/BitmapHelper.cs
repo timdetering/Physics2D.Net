@@ -166,12 +166,12 @@ namespace Physics2DDotNet.Shapes
                 return false;
             }
             List<int> scan = scans[scanIndex];
-            for (int index = 0; index < scan.Count; index += 2)
+            for (int index = 1; index < scan.Count; index += 2)
             {
-                if (point.Y >= scan[index] &&
-                    point.Y <= scan[index + 1])
+                if (point.Y >= scan[index - 1] &&
+                    point.Y <= scan[index])
                 {
-                    nextY = scan[index + 1];
+                    nextY = scan[index];
                     return true;
                 }
             }

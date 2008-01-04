@@ -59,6 +59,28 @@ namespace Physics2DDotNet
             get { return new MassInfo(infinite); }
         }
 
+        public static Scalar InertiaOfCylindricalShell(Scalar radius)
+        {
+            return radius * radius;
+        }
+        public static Scalar InertiaOfHollowCylinder(Scalar innerRadius, Scalar outerRadius)
+        {
+            return .5f * (innerRadius * innerRadius + outerRadius * outerRadius);
+        }
+        public static Scalar InertiaOfSolidCylinder(Scalar radius)
+        {
+            return .5f * (radius * radius);
+        }
+        public static Scalar InertiaOfRectangle(Scalar length, Scalar width)
+        {
+            return (1f / 12f) * (length * length + width * width);
+        }
+        public static Scalar InertiaOfSquare(Scalar sideLength)
+        {
+            return (1f / 6f) * (sideLength * sideLength);
+        }
+
+
         public static MassInfo FromCylindricalShell(Scalar mass, Scalar radius)
         {
             return new MassInfo(mass, mass * radius * radius);

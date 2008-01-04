@@ -192,37 +192,37 @@ namespace AdvanceMath.Geometry2D
         /// <summary>
         /// Calculates the Centroid of a polygon.
         /// </summary>
-        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <param name="vertexes">The vertexes of the polygon.</param>
         /// <returns>The Centroid of a polygon.</returns>
         /// <remarks>
         /// This is Also known as Center of Gravity/Mass.
         /// </remarks>
-        public static Vector2D GetCentroid(Vector2D[] vertices)
+        public static Vector2D GetCentroid(Vector2D[] vertexes)
         {
             Vector2D result;
-            GetCentroid(vertices, out result);
+            GetCentroid(vertexes, out result);
             return result;
         }
         /// <summary>
         /// Calculates the Centroid of a polygon.
         /// </summary>
-        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <param name="vertexes">The vertexes of the polygon.</param>
         /// <param name="centroid">The Centroid of a polygon.</param>
         /// <remarks>
         /// This is Also known as Center of Gravity/Mass.
         /// </remarks>
-        public static void GetCentroid(Vector2D[] vertices, out Vector2D centroid)
+        public static void GetCentroid(Vector2D[] vertexes, out Vector2D centroid)
         {
-            if (vertices == null) { throw new ArgumentNullException("vertices"); }
-            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes", "There must be at least 3 vertexes"); }
             centroid = Vector2D.Zero;
             Scalar temp;
             Scalar area = 0;
-            Vector2D v1 = vertices[vertices.Length - 1];
+            Vector2D v1 = vertexes[vertexes.Length - 1];
             Vector2D v2;
-            for (int index = 0; index < vertices.Length; ++index, v1 = v2)
+            for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
             {
-                v2 = vertices[index];
+                v2 = vertexes[index];
                 Vector2D.ZCross(ref v1, ref v2, out temp);
                 area += temp;
                 centroid.X += ((v1.X + v2.X) * temp);
@@ -235,56 +235,91 @@ namespace AdvanceMath.Geometry2D
         /// <summary>
         /// Calculates the area of a polygon.
         /// </summary>
-        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <param name="vertexes">The vertexes of the polygon.</param>
         /// <returns>the area.</returns>
-        public static Scalar GetArea(Vector2D[] vertices)
+        public static Scalar GetArea(Vector2D[] vertexes)
         {
             Scalar result;
-            GetArea(vertices, out result);
+            GetArea(vertexes, out result);
             return result;
         }
         /// <summary>
         /// Calculates the area of a polygon.
         /// </summary>
-        /// <param name="vertices">The vertices of the polygon.</param>
+        /// <param name="vertexes">The vertexes of the polygon.</param>
         /// <param name="result">the area.</param>
-        public static void GetArea(Vector2D[] vertices, out Scalar result)
+        public static void GetArea(Vector2D[] vertexes, out Scalar result)
         {
-            if (vertices == null) { throw new ArgumentNullException("vertices"); }
-            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
-            result = 0;
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes", "There must be at least 3 vertexes"); }
+            Scalar area = 0;
             Scalar temp;
-            Vector2D v1 = vertices[vertices.Length - 1];
+            Vector2D v1 = vertexes[vertexes.Length - 1];
             Vector2D v2;
-            for (int index = 0; index < vertices.Length; ++index, v1 = v2)
+            for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
             {
-                v2 = vertices[index];
+                v2 = vertexes[index];
                 Vector2D.ZCross(ref v1, ref v2, out temp);
-                result += temp;
+                area += temp;
             }
-            result = Math.Abs(result * .5f);
+            result = Math.Abs(area * .5f);
         }
 
-        public static Scalar GetPerimeter(Vector2D[] vertices)
+        public static Scalar GetPerimeter(Vector2D[] vertexes)
         {
             Scalar result;
-            GetPerimeter(vertices, out result);
+            GetPerimeter(vertexes, out result);
             return result;
         }
-        public static void GetPerimeter(Vector2D[] vertices, out Scalar result)
+        public static void GetPerimeter(Vector2D[] vertexes, out Scalar result)
         {
-            if (vertices == null) { throw new ArgumentNullException("vertices"); }
-            if (vertices.Length < 3) { throw new ArgumentOutOfRangeException("vertices", "There must be at least 3 vertices"); }
-            Vector2D v1 = vertices[vertices.Length - 1];
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length < 3) { throw new ArgumentOutOfRangeException("vertexes", "There must be at least 3 vertexes"); }
+            Vector2D v1 = vertexes[vertexes.Length - 1];
             Vector2D v2;
             Scalar dist;
             result = 0;
-            for (int index = 0; index < vertices.Length; ++index, v1 = v2)
+            for (int index = 0; index < vertexes.Length; ++index, v1 = v2)
             {
-                v2 = vertices[index];
+                v2 = vertexes[index];
                 Vector2D.Distance(ref v1, ref v2, out dist);
                 result += dist;
             }
+        }
+
+        public static Scalar GetInertia(Vector2D[] vertexes)
+        {
+            Scalar result;
+            GetInertia(vertexes, out result);
+            return result;
+        }
+        public static void GetInertia(Vector2D[] vertexes, out Scalar result)
+        {
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (vertexes.Length == 0) { throw new ArgumentOutOfRangeException("vertexes"); }
+            if (vertexes.Length == 1)
+            {
+                result = 0;
+                return;
+            }
+
+            Scalar denom = 0;
+            Scalar numer = 0;
+            Scalar a, b, c, d;
+            Vector2D v1, v2;
+            v1 = vertexes[vertexes.Length - 1];
+            for (int index = 0; index < vertexes.Length; index++, v1 = v2)
+            {
+                v2 = vertexes[index];
+                Vector2D.Dot(ref v2, ref v2, out a);
+                Vector2D.Dot(ref v2, ref v1, out b);
+                Vector2D.Dot(ref v1, ref v1, out c);
+                Vector2D.ZCross(ref v1, ref v2, out d);
+                d = Math.Abs(d);
+                numer += d;
+                denom += (a + b + c) * d;
+            }
+            result = denom / (numer * 6);
         }
 
         Vector2D[] vertexes;

@@ -51,10 +51,10 @@ namespace Physics2DDotNet.Demo.Demos
         protected override void Open()
         {
 
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
+            IShape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
             dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
             dispose += DemoHelper.RegisterMousePicking(DemoInfo);
-            Shape shape = ShapeFactory.CreateColoredCircle(8, 15);
+            IShape shape = ShapeFactory.CreateColoredCircle(8, 15);
             DemoHelper.AddGrid(DemoInfo, shape, 40,
                 new BoundingRectangle(200, 200, 1100, 1100),
                 5, 5);
@@ -64,6 +64,7 @@ namespace Physics2DDotNet.Demo.Demos
             Body b = DemoHelper.AddShape(DemoInfo, bombShape, 400, new ALVector2D(0, 0, 0));
             DemoHelper.RegisterBodyTracking(DemoInfo, b, Matrix2x3.FromRotationZ(-MathHelper.PiOver2));
             DemoHelper.RegisterBodyMovement(DemoInfo, b, new ALVector2D(50000,  50000,0));
+            DemoHelper.AddStarField(DemoInfo, 1000, new BoundingRectangle(-1000, -1000, 2300, 2300));
 
         }
         protected override void Dispose(bool disposing)

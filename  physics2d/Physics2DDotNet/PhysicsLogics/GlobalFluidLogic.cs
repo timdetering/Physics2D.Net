@@ -67,7 +67,7 @@ namespace Physics2DDotNet.PhysicsLogics
             }
             void CalculatePart()
             {
-                Shape shape = body.Shape;
+                IShape shape = body.Shape;
                 affectable = shape as IGlobalFluidAffectable;
                 if (affectable != null)
                 {

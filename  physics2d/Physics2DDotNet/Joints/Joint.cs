@@ -35,8 +35,6 @@ using System.Collections.ObjectModel;
 namespace Physics2DDotNet.Joints
 {
 
-
-
     /// <summary>
     /// Describes a Connection between 2 objects. 
     /// </summary>
@@ -153,7 +151,7 @@ namespace Physics2DDotNet.Joints
             foreach (Body b in Bodies)
             {
                 b.Removed += OnBodyRemoved;
-                b.joints.Add(this);
+                b.AddJoint(this);
             }
             OnAdded(EventArgs.Empty);
         }
@@ -164,7 +162,7 @@ namespace Physics2DDotNet.Joints
             {
                 if (!isPending)
                 {
-                    b.joints.Remove(this);
+                    b.RemoveJoint(this);
                 }
                 b.Removed -= OnBodyRemoved;
             }

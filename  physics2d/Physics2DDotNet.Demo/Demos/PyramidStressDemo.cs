@@ -44,8 +44,8 @@ using SdlDotNet.Input;
 using SdlDotNet.Graphics;
 namespace Physics2DDotNet.Demo.Demos
 {
-    [PhysicsDemo("Simple", "One Way Platform", "The platform allows objects to go up but not down.")]
-    public class OneWayPlatformDemo : BaseDemo
+    [PhysicsDemo("Stress", "Pyramid Stress", "There is a Pyramid.\r\nYou always wanted to blow up a Pyramid now you can!")]
+    public class PyramidStressDemo : BaseDemo
     {
         DisposeCallback dispose;
         protected override void Open()
@@ -54,30 +54,18 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
 
             Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
-
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 
-            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 3, 16, 4);
-            for (int i = 128 * 3; i > -128; i -= 128)
-            {
-                Body b = DemoHelper.AddShape(DemoInfo, shape, 40, new ALVector2D(1, new Vector2D(700, 272 + i)));
-                //b.Transformation *= Matrix2x3.FromScale(new Vector2D(1, .5f));
-            }
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
 
-            Body line = DemoHelper.AddLine(DemoInfo, new Vector2D(300, 400), new Vector2D(400, 400), 20, Scalar.PositiveInfinity);
-            line.IgnoresGravity = true;
-            line.CollisionIgnorer = new OneWayPlatformIgnorer(-Vector2D.YAxis, 10);
+
+            DemoHelper.AddPyramid(
+                DemoInfo, shape, 20,
+                new BoundingRectangle(200, -200, 1000, 710),
+                5, 4);
 
             Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));// //AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
-            ball.Transformation *=
-                Matrix2x3.FromRotationZ(1) *
-                Matrix2x3.FromScale(new Vector2D(.9f, .5f)) *
-                Matrix2x3.FromRotationZ(-1);
         }
-
-
-
-
         protected override void Dispose(bool disposing)
         {
             if (dispose != null) { dispose(); }

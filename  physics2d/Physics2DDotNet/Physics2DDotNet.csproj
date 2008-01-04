@@ -94,6 +94,7 @@
     <Compile Include="Shapes\PolygonShape.cs" />
     <Compile Include="Shapes\RaySegmentsShape.cs" />
     <Compile Include="Shapes\ShapeHelper.cs" />
+    <Compile Include="Shapes\VertexHelper.cs" />
     <Compile Include="Solvers\CollisionSolver.cs" />
     <Compile Include="Solvers\ISequentialImpulsesJoint.cs" />
     <Compile Include="Solvers\SequentialImpulses.cs" />

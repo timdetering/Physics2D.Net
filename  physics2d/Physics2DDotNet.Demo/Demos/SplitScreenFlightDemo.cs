@@ -42,6 +42,7 @@ using Physics2DDotNet.PhysicsLogics;
 using SdlDotNet;
 using SdlDotNet.Input;
 using SdlDotNet.Graphics;
+using Tao.OpenGl;
 namespace Physics2DDotNet.Demo.Demos
 {
     [PhysicsDemo("Advance", "Split Screen Flight", "TODO")]
@@ -50,11 +51,8 @@ namespace Physics2DDotNet.Demo.Demos
         DisposeCallback dispose;
         protected override void Open()
         {
-
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
-            //dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
-            //dispose += DemoHelper.RegisterMousePicking(DemoInfo);
-            Shape shape = ShapeFactory.CreateColoredCircle(8, 15);
+            IShape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
+            IShape shape = ShapeFactory.CreateColoredCircle(8, 15);
             DemoHelper.AddGrid(DemoInfo, shape, 40,
                 new BoundingRectangle(200, 200, 800, 500),
                 5, 5);
@@ -63,7 +61,7 @@ namespace Physics2DDotNet.Demo.Demos
 
             Viewport.Rectangle = new Rectangle(0, 0, Window.Size.Width / 2, Window.Size.Height);
 
-            Shape furyShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("starfury.png"), 2, 16, 3);
+            IShape furyShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("starfury.png"), 2, 16, 3);
             Body b1 = DemoHelper.AddShape(DemoInfo, furyShape, 400, new ALVector2D(0, 0, 0));
             Body b2 = DemoHelper.AddShape(DemoInfo, furyShape, 400, new ALVector2D(0, 0, 0));
 
@@ -78,10 +76,8 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.RegisterBodyMovement(
                 DemoInfo, b2, new ALVector2D(500000, 50000, 0));
 
-
-
-            b1.State.Position.Linear = new Vector2D(1, 0);
-            b2.State.Position = new ALVector2D(MathHelper.Pi, 200, 0);
+            b1.State.Position.Linear = new Vector2D(200, 0);
+            b2.State.Position = new ALVector2D(MathHelper.Pi, 1, 0);
             b1.ApplyPosition();
             b2.ApplyPosition();
 
@@ -92,6 +88,8 @@ namespace Physics2DDotNet.Demo.Demos
                 viewport2.IsExpired = true;
                 Viewport.Rectangle = new Rectangle(0, 0, Window.Size.Width, Window.Size.Height);
             };
+
+            DemoHelper.AddStarField(DemoInfo, 1000, new BoundingRectangle(-1000, -1000, 1300, 1300));
         }
         protected override void Dispose(bool disposing)
         {

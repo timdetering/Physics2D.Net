@@ -52,7 +52,7 @@ namespace Physics2DDotNet.Demo.Demos
         {
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
-            Shape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
             DemoHelper.AddGrid(DemoInfo, shape, 400,
                 new BoundingRectangle(-200, -200, 1100, 1100),
                 5, 5);

@@ -47,7 +47,15 @@ namespace Physics2DDotNet.Demo
                 return x.Name.CompareTo(y.Name);
             }
         }
+        sealed class DemoTypeComparer : IComparer<DemoType>
+        {
+            public int Compare(DemoType x, DemoType y)
+            {
+                return x.DemoAttribute.Group.CompareTo(y.DemoAttribute.Group);
+            }
+        }
         static TypeComparer typeComparer = new TypeComparer();
+        static DemoTypeComparer demoTypeComparer = new DemoTypeComparer();
         static bool IsDemoInterface(Type t, object o)
         {
             return t == typeof(IPhysicsDemo);
@@ -93,12 +101,18 @@ namespace Physics2DDotNet.Demo
         {
             this.InitializeComponent();
             Type[] types = GetDemos();
+            DemoType[] demoTypes = new DemoType[types.Length];
+            for (int index = 0; index < types.Length; ++index)
+            {
+                demoTypes[index] = new DemoType(types[index]);
+            }
+            Array.Sort<DemoType>(demoTypes, demoTypeComparer);
             Dictionary<string, ListViewGroup> groups = new Dictionary<string, ListViewGroup>();
             lvDemos.Clear();
             lvDemos.Columns.Add("Demo Names", lvDemos.Width - 24, HorizontalAlignment.Left);
             for (int index = 0; index < types.Length; ++index)
             {
-                DemoType demoType = new DemoType(types[index]);
+                DemoType demoType = demoTypes[index];
                 PhysicsDemoAttribute att = demoType.DemoAttribute;
                 ListViewGroup group;
                 if (!groups.TryGetValue(att.Group, out group))

@@ -37,7 +37,7 @@ using AdvanceMath.Geometry2D;
 
 namespace Physics2DDotNet.Shapes
 {
-    public static class ShapeHelper
+    static class ShapeHelper
     {
         sealed class StubComparer : System.Collections.Generic.IComparer<SAPNode>
         {
@@ -66,10 +66,10 @@ namespace Physics2DDotNet.Shapes
             Scalar area;
             Vector2D dragCenter;
             Scalar dragArea;
-            Vector2D[] vertexes = ShapeHelper.GetIntersection(vertexes2, line);
+            Vector2D[] vertexes = VertexHelper.GetIntersection(vertexes2, line);
             if (vertexes.Length < 3) { return null; }
-            centroid = PolygonShape.GetCentroid(vertexes);
-            area = PolygonShape.GetArea(vertexes);
+            centroid = VertexHelper.GetCentroid(vertexes);
+            area = VertexHelper.GetArea(vertexes);
             Vector2D tangent = callback(centroid);
             Scalar min, max;
             ShapeHelper.GetProjectedBounds(vertexes, tangent, out min, out max);
@@ -129,83 +129,7 @@ namespace Physics2DDotNet.Shapes
             dragArea = result;
         }
 
-        public static Vector2D[] GetIntersection(Vector2D[] vertexes, Scalar radius)
-        {
-            Scalar[] distances = new Scalar[vertexes.Length];
-            for (int index = 0; index < vertexes.Length; ++index)
-            {
-                distances[index] = vertexes[index].Magnitude - radius;
-            }
-            Scalar lastDistance = distances[distances.Length - 1];
-            Vector2D lastVertex = vertexes[vertexes.Length - 1];
-            Vector2D vertex;
-            Scalar distance;
-            List<Vector2D> result = new List<Vector2D>(vertexes.Length + 1);
-            for (int index = 0; index < vertexes.Length; ++index, lastVertex = vertex, lastDistance = distance)
-            {
-                vertex = vertexes[index];
-                distance = distances[index];
-                if (Math.Abs(Math.Sign(distance) - Math.Sign(lastDistance)) == 2)
-                {
-                    Scalar lastABS = Math.Abs(lastDistance);
-                    Scalar total = (lastABS + Math.Abs(distance));
-                    Scalar percent = lastABS / total;
-                    Vector2D intersection;
-                    Vector2D.Lerp(ref lastVertex, ref vertex, ref percent, out intersection);
-                    result.Add(intersection);
-                }
-                if (distance >= 0)
-                {
-                    result.Add(vertex);
-                }
-            }
-            return result.ToArray();
-        }
 
-
-
-        public static void Transform(ref Matrix2x3 matrix, ref Line line, out Line result)
-        {
-            Vector2D point = line.Normal * line.D;
-            Vector2D origin = Vector2D.Zero;
-            Vector2D.Transform(ref matrix, ref point, out point);
-            Vector2D.Transform(ref matrix, ref origin, out origin);
-            Vector2D.Subtract(ref point, ref origin, out result.Normal);
-            Vector2D.Normalize(ref result.Normal, out result.Normal);
-            result.D = point * result.Normal;
-        }
-        public static Vector2D[] GetIntersection(Vector2D[] vertexes, Line line)
-        {
-            Scalar[] distances = new Scalar[vertexes.Length];
-            for (int index = 0; index < vertexes.Length; ++index)
-            {
-                line.GetDistance(ref vertexes[index], out distances[index]);
-            }
-            Scalar lastDistance = distances[distances.Length - 1];
-            Vector2D lastVertex = vertexes[vertexes.Length - 1];
-            Vector2D vertex;
-            Scalar distance;
-            List<Vector2D> result = new List<Vector2D>(vertexes.Length + 1);
-            for (int index = 0; index < vertexes.Length; ++index, lastVertex = vertex, lastDistance = distance)
-            {
-                vertex = vertexes[index];
-                distance = distances[index];
-                if (Math.Abs(Math.Sign(distance) - Math.Sign(lastDistance)) == 2)
-                {
-                    Scalar lastABS = Math.Abs(lastDistance);
-                    Scalar total = (lastABS + Math.Abs(distance));
-                    Scalar percent = lastABS / total;
-                    Vector2D intersection;
-                    Vector2D.Lerp(ref lastVertex, ref vertex, ref percent, out intersection);
-                    result.Add(intersection);
-                }
-                if (distance >= 0)
-                {
-                    result.Add(vertex);
-                }
-            }
-            return result.ToArray();
-        }
         public static void GetProjectedBounds(Vector2D[] vertexes, Vector2D tangent, out Scalar min, out Scalar max)
         {
             Scalar value;
@@ -225,34 +149,6 @@ namespace Physics2DDotNet.Shapes
                 }
             }
         }
-        public static void CalculateNormals(Vector2D[] vertexes, Vector2D[] normals, int offset)
-        {
-            Vector2D[] edges = new Vector2D[vertexes.Length];
-            Vector2D last = vertexes[0];
-            Vector2D current;
-            Vector2D temp;
-            for (int index = vertexes.Length - 1; index > -1; --index, last = current)
-            {
-                current = vertexes[index];
-                Vector2D.Subtract(ref current, ref last, out temp);
-                Vector2D.Normalize(ref temp, out temp);
-                Vector2D.GetLeftHandNormal(ref temp, out edges[index]);
-            }
-            last = edges[vertexes.Length - 1];
-            for (int index = 0; index < vertexes.Length; ++index, last = current)
-            {
-                current = edges[index];
-                Vector2D.Add(ref current, ref last, out temp);
-                Vector2D.Normalize(ref temp, out normals[index + offset]);
-            }
-        }
-        public static Vector2D[] CalculateNormals(Vector2D[] vertexes)
-        {
-            Vector2D[] result = new Vector2D[vertexes.Length];
-            CalculateNormals(vertexes, result, 0);
-            return result;
-        }
-
     }
 
 }

@@ -73,16 +73,19 @@ namespace Physics2DDotNet.Demo
         {
             return (Scalar)Rand.NextDouble();
         }
-
+        public static Scalar NextScalar(Scalar minValue, Scalar maxValue)
+        {
+            return minValue + ((Scalar)Rand.NextDouble()) * (maxValue - minValue);
+        }
         public static DisposeCallback BasicDemoSetup(DemoOpenInfo info)
         {
             DisposeCallback dispose = null;
-            Shape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
+            IShape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
             dispose += DemoHelper.RegisterBombLaunching(info, bombShape, 120);
             dispose += DemoHelper.RegisterMousePicking(info);
 
             dispose += DemoHelper.RegisterBodyStreamSpawning(info,
-                new Body(new PhysicsState(), ParticleShape.Default, 1, Coefficients.Duplicate(), new Lifespan(5)), 2, 120, 1000, Key.B);
+                new Body(new PhysicsState(), ParticleShape.Default, 1, Coefficients.Duplicate(), new Lifespan(.5f)), 2, 120, 1000, Key.B);
             dispose += DemoHelper.RegisterMaintainSpawning(info, SdlDotNet.Input.Key.N,
                 delegate(Vector2D position)
                 {
@@ -90,13 +93,6 @@ namespace Physics2DDotNet.Demo
                     info.Layer.Engine.AddLogic(result);
                     return result;
                 });
-
-
-
-
-
-
-
 
             List<RaySegment> segments = new List<RaySegment>();
 
@@ -108,7 +104,7 @@ namespace Physics2DDotNet.Demo
                 segments.Add(seg);
             }
 
-            Shape rayShape = ShapeFactory.CreateRays(segments.ToArray());
+            IShape rayShape = ShapeFactory.CreateRays(segments.ToArray());
             dispose += DemoHelper.RegisterMaintainSpawning(info, SdlDotNet.Input.Key.M,
                 delegate(Vector2D position)
                 {
@@ -131,7 +127,7 @@ namespace Physics2DDotNet.Demo
             Lifespan avatarLifespan = new Lifespan();
 
 
-            Shape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("tank.png"), 4, 18, 2);
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("tank.png"), 4, 18, 2);
 
             ObjectIgnorer ignorer = new ObjectIgnorer();
             Body tankBody = new Body(new PhysicsState(new ALVector2D(0, 0, 0)),
@@ -238,8 +234,11 @@ namespace Physics2DDotNet.Demo
 
                         weapon.Collided += delegate(object sender2, CollisionEventArgs e2)
                         {
-                            weapon.Lifetime.IsExpired = true;
-                            AddParticles(info, weapon.State.Position.Linear, weapon.State.Velocity.Linear * .5f, 50);
+                            if (!weapon.Lifetime.IsExpired)
+                            {
+                                weapon.Lifetime.IsExpired = true;
+                                AddParticles(info, weapon.State.Position.Linear, weapon.State.Velocity.Linear * .5f, 50);
+                            }
                         };
 
                         //  weapon.Collided += weapon_Collided;
@@ -332,11 +331,11 @@ namespace Physics2DDotNet.Demo
                 info.Viewport.MouseMotion -= mouseMotion;
             };
         }
-        public static DisposeCallback RegisterBombLaunching(DemoOpenInfo info, Shape shape, Scalar mass)
+        public static DisposeCallback RegisterBombLaunching(DemoOpenInfo info, IShape shape, Scalar mass)
         {
             return RegisterBombLaunching(info, shape, mass, MouseButton.SecondaryButton);
         }
-        public static DisposeCallback RegisterBombLaunching(DemoOpenInfo info, Shape shape, Scalar mass, MouseButton button)
+        public static DisposeCallback RegisterBombLaunching(DemoOpenInfo info, IShape shape, Scalar mass, MouseButton button)
         {
             EventHandler<ViewportMouseButtonEventArgs> mouseDown = delegate(object sender, ViewportMouseButtonEventArgs e)
             {
@@ -577,9 +576,9 @@ namespace Physics2DDotNet.Demo
         }
         public static Body AddRectangle(DemoOpenInfo info, Scalar height, Scalar width, Scalar mass, ALVector2D position)
         {
-            Vector2D[] vertices = PolygonShape.CreateRectangle(width, height);
-            vertices = PolygonShape.Subdivide(vertices, (height + width) / 9);
-            Shape boxShape = ShapeFactory.CreateColoredPolygon(vertices, Math.Min(height, width) / 5);
+            Vector2D[] vertexes = VertexHelper.CreateRectangle(width, height);
+            vertexes = VertexHelper.Subdivide(vertexes, (height + width) / 9);
+            IShape boxShape = ShapeFactory.CreateColoredPolygon(vertexes, Math.Min(height, width) / 5);
             Body body = new Body(new PhysicsState(position), boxShape, mass, Coefficients.Duplicate(), new Lifespan());
             info.Layer.AddGraphic(new BodyGraphic(body));
             return body;
@@ -618,7 +617,7 @@ namespace Physics2DDotNet.Demo
             {
                 vertexes.Add(new Vector2D(Wd2, 0) + Vector2D.FromLengthAndAngle(Hd2, angle2));
             }
-            Shape shape = ShapeFactory.CreateColoredPolygon(vertexes.ToArray(), thickness / 4);
+            IShape shape = ShapeFactory.CreateColoredPolygon(vertexes.ToArray(), thickness / 4);
 
             Body body = new Body(
                 new PhysicsState(new ALVector2D(0, avg)),
@@ -631,7 +630,7 @@ namespace Physics2DDotNet.Demo
             info.Layer.AddGraphic(new BodyGraphic(body));
             return body;
         }
-        public static Body AddShape(DemoOpenInfo info, Shape shape, Scalar mass, ALVector2D position)
+        public static Body AddShape(DemoOpenInfo info, IShape shape, Scalar mass, ALVector2D position)
         {
             Body body = new Body(new PhysicsState(position), shape, mass, Coefficients.Duplicate(), new Lifespan());
             info.Layer.AddGraphic(new BodyGraphic(body));
@@ -671,15 +670,15 @@ namespace Physics2DDotNet.Demo
             Scalar height = 60;
             Scalar width = 2000;
 
-            Vector2D[] vertices = PolygonShape.CreateRectangle(width, height);
-            Shape boxShape = ShapeFactory.CreateColoredPolygon(vertices, Math.Min(height, width) / 5);
+            Vector2D[] vertexes = VertexHelper.CreateRectangle(width, height);
+            IShape boxShape = ShapeFactory.CreateColoredPolygon(vertexes, Math.Min(height, width) / 5);
             Body body = new Body(new PhysicsState(position), boxShape, Scalar.PositiveInfinity, Coefficients.Duplicate(), new Lifespan());
             body.IgnoresGravity = true;
             info.Layer.AddGraphic(new BodyGraphic(body));
             return body;
         }
 
-        public static List<Body> AddGrid(DemoOpenInfo info, Shape shape, Scalar mass, BoundingRectangle rect, Scalar xSpacing, Scalar ySpacing)
+        public static List<Body> AddGrid(DemoOpenInfo info, IShape shape, Scalar mass, BoundingRectangle rect, Scalar xSpacing, Scalar ySpacing)
         {
             BoundingRectangle shapeRect;
             Matrix2x3 ident = Matrix2x3.Identity;
@@ -699,7 +698,7 @@ namespace Physics2DDotNet.Demo
             }
             return result;
         }
-        public static List<Body> AddPyramid(DemoOpenInfo info, Shape shape, Scalar mass, BoundingRectangle rect, Scalar xSpacing, Scalar ySpacing)
+        public static List<Body> AddPyramid(DemoOpenInfo info, IShape shape, Scalar mass, BoundingRectangle rect, Scalar xSpacing, Scalar ySpacing)
         {
             BoundingRectangle shapeRect;
             Matrix2x3 ident = Matrix2x3.Identity;
@@ -769,7 +768,7 @@ namespace Physics2DDotNet.Demo
                 new Vector2D(Wd2, 0),
             };
 
-            Shape shape = ShapeFactory.CreateColoredPolygon(vertexes, 5);
+            IShape shape = ShapeFactory.CreateColoredPolygon(vertexes, 5);
 
             Body torso = AddShape(info, shape, mass * 4, new ALVector2D(0, location + new Vector2D(0, 40)));
 
@@ -846,10 +845,10 @@ namespace Physics2DDotNet.Demo
             return orbitvelocity;
         }
 
-        public static List<Body> AddText(DemoOpenInfo info, string text, Vector2D position)
+        public static List<Body> AddText(DemoOpenInfo info, string text, Vector2D position,int fontsize)
         {
             Dictionary<char, object[]> chars = new Dictionary<char, object[]>();
-            Font font = Cache<Font>.GetItem("FreeSans.ttf:40");
+            Font font = Cache<Font>.GetItem("FreeSans.ttf:" + fontsize);
 
             List<Body> result = new List<Body>();
             Scalar initialx = position.X;
@@ -871,19 +870,19 @@ namespace Physics2DDotNet.Demo
                 else
                 {
                     object[] temp;
-                    Shape shape;
+                    IShape shape;
                     SurfacePolygons surfacePolygons;
                     if (chars.TryGetValue(c, out temp))
                     {
-                        shape = (Shape)temp[0];
+                        shape = (IShape)temp[0];
                         surfacePolygons = (SurfacePolygons)temp[1];
                     }
                     else
                     {
-                        surfacePolygons = Cache<SurfacePolygons>.GetItem(c + "|FreeSans.ttf:40", System.Drawing.Color.Black);
+                        surfacePolygons = Cache<SurfacePolygons>.GetItem(c + "|FreeSans.ttf:" + fontsize, System.Drawing.Color.Black);
                         shape = ShapeFactory.CreateSprite(
                            surfacePolygons,
-                           2, 5, 2);
+                           0, 5, 2);
                         temp = new object[] { shape, surfacePolygons };
                         chars.Add(c, temp);
                     }
@@ -896,5 +895,22 @@ namespace Physics2DDotNet.Demo
             }
             return result;
         }
+
+        public static void AddStarField(DemoOpenInfo info, int count, BoundingRectangle rect)
+        {
+            Vector2D[] stars = new Vector2D[count];
+            ScalarColor3[] starColors = new ScalarColor3[stars.Length];
+            for (int index = 0; index < stars.Length; ++index)
+            {
+                stars[index] = new Vector2D(NextScalar(rect.Min.X, rect.Max.X), NextScalar(rect.Min.Y, rect.Max.Y));
+                starColors[index] = new ScalarColor3(DemoHelper.NextScalar(), DemoHelper.NextScalar(), DemoHelper.NextScalar());
+            }
+            Colored3VertexesDrawable stardrawable = new Colored3VertexesDrawable(Gl.GL_POINTS, stars, starColors);
+            SimpleGraphic stargraphic = new SimpleGraphic(stardrawable, Matrix2x3.Identity, new Lifespan());
+            stargraphic.ZOrder = -1;
+            stargraphic.DrawProperties.Add(new PointSizeProperty(1));
+            info.Layer.AddGraphic(stargraphic);
+        }
+
     }
 }

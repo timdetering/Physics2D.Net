@@ -43,68 +43,56 @@ using SdlDotNet.Input;
 using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
-    public sealed class Colored3PolygonDrawable : BufferedDrawable
+    public sealed class MultiVertexesDrawable : BufferedDrawable
     {
-        int vertexName = -1;
-        int colorName = -1;
-        Vector2D[] vertexes;
-        ScalarColor3[] colors;
-        public Colored3PolygonDrawable(Vector2D[] vertexes, ScalarColor3[] colors)
+        int[] vertexNames;
+        Vector2D[][] polygon;
+        int mode;
+        public MultiVertexesDrawable(int mode,Vector2D[][] polygon)
         {
-            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
-            if (colors == null) { throw new ArgumentNullException("colors"); }
-            if (colors.Length != vertexes.Length) { throw new ArgumentException("TODO length !="); }
-            this.vertexes = vertexes;
-            this.colors = colors;
+            if (polygon == null) { throw new ArgumentNullException("vertexes"); }
+            this.polygon = polygon;
+            this.vertexNames = new int[polygon.Length];
+            this.mode = mode;
         }
+
         protected override void BufferData()
         {
-            Gl.glGenBuffersARB(1, out vertexName);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
-            GlHelper.GlBufferDataARB(
-                Gl.GL_ARRAY_BUFFER_ARB,
-                vertexes,
-                vertexes.Length * Vector2D.Size,
-                Gl.GL_STATIC_DRAW_ARB);
-
-            Gl.glGenBuffersARB(1, out colorName);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorName);
-            GlHelper.GlBufferDataARB(
-                Gl.GL_ARRAY_BUFFER_ARB,
-                colors,
-                colors.Length * ScalarColor3.Size,
-                Gl.GL_STATIC_DRAW_ARB);
+            Gl.glGenBuffersARB(vertexNames.Length, vertexNames);
+            for (int index = 0; index < polygon.Length; ++index)
+            {
+                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
+                GlHelper.GlBufferDataARB(
+                    Gl.GL_ARRAY_BUFFER_ARB,
+                    polygon[index],
+                    polygon[index].Length * Vector2D.Size,
+                    Gl.GL_STATIC_DRAW_ARB);
+            }
         }
         protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
         {
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
-            Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorName);
-            Gl.glColorPointer(ScalarColor3.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-
-            Gl.glDrawArrays(Gl.GL_POLYGON, 0, vertexes.Length);
+            for (int index = 0; index < polygon.Length; ++index)
+            {
+                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
+                Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
+                Gl.glDrawArrays(mode, 0, polygon[index].Length);
+            }
         }
-
         protected override void EnableState()
         {
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            Gl.glEnableClientState(Gl.GL_COLOR_ARRAY);
         }
         protected override void DisableState()
         {
-            Gl.glDisableClientState(Gl.GL_COLOR_ARRAY);
             Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
         }
         public override IDrawableState CreateState()
         {
             return null;
         }
-
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName, colorName });
+            GlHelper.GlDeleteBuffersARB(LastRefresh, vertexNames);
         }
     }
-
 }

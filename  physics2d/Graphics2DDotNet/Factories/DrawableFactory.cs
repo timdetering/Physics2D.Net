@@ -51,31 +51,31 @@ namespace Graphics2DDotNet
             for (; (1 << index) >= value && index > -2; --index) { }
             return 1 << index + 1;
         }
-        public static PolygonDrawable CreatePolygon(Vector2D[] vertexes)
+        public static VertexesDrawable CreatePolygon(Vector2D[] vertexes)
         {
-            return new PolygonDrawable(vertexes);
+            return new VertexesDrawable(Gl.GL_POLYGON, vertexes);
         }
-        public static Colored3PolygonDrawable CreatePolygon(Vector2D[] vertexes, ScalarColor3[] colors)
+        public static Colored3VertexesDrawable CreatePolygon(Vector2D[] vertexes, ScalarColor3[] colors)
         {
-            return new Colored3PolygonDrawable(vertexes, colors);
+            return new Colored3VertexesDrawable(Gl.GL_POLYGON, vertexes, colors);
         }
-        public static Colored4PolygonDrawable CreatePolygon(Vector2D[] vertexes, ScalarColor4[] colors)
+        public static Colored4VertexesDrawable CreatePolygon(Vector2D[] vertexes, ScalarColor4[] colors)
         {
-            return new Colored4PolygonDrawable(vertexes, colors);
+            return new Colored4VertexesDrawable(Gl.GL_POLYGON, vertexes, colors);
         }
 
 
-        public static MultiPolygonDrawable CreateMultiPolygon(Vector2D[][] polygons)
+        public static MultiVertexesDrawable CreateMultiPolygon(Vector2D[][] polygons)
         {
-            return new MultiPolygonDrawable(polygons);
+            return new MultiVertexesDrawable(Gl.GL_POLYGON, polygons);
         }
-        public static Colored3MultiPolygonDrawable CreateMultiPolygon(Vector2D[][] polygons, ScalarColor3[][] colors)
+        public static Colored3MultiVertexesDrawable CreateMultiPolygon(Vector2D[][] polygons, ScalarColor3[][] colors)
         {
-            return new Colored3MultiPolygonDrawable(polygons, colors);
+            return new Colored3MultiVertexesDrawable(Gl.GL_POLYGON, polygons, colors);
         }
-        public static Colored4MultiPolygonDrawable CreateMultiPolygon(Vector2D[][] polygons, ScalarColor4[][] colors)
+        public static Colored4MultiVertexesDrawable CreateMultiPolygon(Vector2D[][] polygons, ScalarColor4[][] colors)
         {
-            return new Colored4MultiPolygonDrawable(polygons, colors);
+            return new Colored4MultiVertexesDrawable(Gl.GL_POLYGON, polygons, colors);
         }
         public static SpriteDrawable CreateSprite(Surface surface, Vector2D[] vertexes, Vector2D[] coordinates)
         {

@@ -43,55 +43,49 @@ using SdlDotNet.Input;
 using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
-    public sealed class Colored3MultiPolygonDrawable : BufferedDrawable
+    public sealed class Colored4VertexesDrawable : BufferedDrawable
     {
-        int[] vertexNames;
-        int[] colorNames;
-        Vector2D[][] polygon;
-        ScalarColor3[][] colors;
-
-        public Colored3MultiPolygonDrawable(Vector2D[][] polygon, ScalarColor3[][] colors)
+        int vertexName = -1;
+        int colorName = -1;
+        Vector2D[] vertexes;
+        ScalarColor4[] colors;
+        int mode;
+        public Colored4VertexesDrawable(int mode,Vector2D[] vertexes, ScalarColor4[] colors)
         {
-            if (polygon == null) { throw new ArgumentNullException("vertexes"); }
-            if (colors.Length != polygon.Length) { throw new ArgumentException("TODO length !="); }
-            this.polygon = polygon;
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (colors == null) { throw new ArgumentNullException("colors"); }
+            if (colors.Length != vertexes.Length) { throw new ArgumentException("TODO length !="); }
+            this.vertexes = vertexes;
             this.colors = colors;
-            this.vertexNames = new int[polygon.Length];
-            this.colorNames = new int[colors.Length];
+            this.mode = mode;
         }
         protected override void BufferData()
         {
-            Gl.glGenBuffersARB(vertexNames.Length, vertexNames);
-            Gl.glGenBuffersARB(colorNames.Length, colorNames);
-            for (int index = 0; index < polygon.Length; ++index)
-            {
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
-                GlHelper.GlBufferDataARB(
-                    Gl.GL_ARRAY_BUFFER_ARB,
-                    polygon[index],
-                    polygon[index].Length * Vector2D.Size,
-                    Gl.GL_STATIC_DRAW_ARB);
+            Gl.glGenBuffersARB(1, out vertexName);
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
+            GlHelper.GlBufferDataARB(
+                Gl.GL_ARRAY_BUFFER_ARB,
+                vertexes,
+                vertexes.Length * Vector2D.Size,
+                Gl.GL_STATIC_DRAW_ARB);
 
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorNames[index]);
-                GlHelper.GlBufferDataARB(
-                    Gl.GL_ARRAY_BUFFER_ARB,
-                    colors[index],
-                    colors[index].Length * ScalarColor3.Size,
-                    Gl.GL_STATIC_DRAW_ARB);
-            }
+            Gl.glGenBuffersARB(1, out colorName);
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorName);
+            GlHelper.GlBufferDataARB(
+                Gl.GL_ARRAY_BUFFER_ARB,
+                colors,
+                colors.Length * ScalarColor4.Size,
+                Gl.GL_STATIC_DRAW_ARB);
         }
         protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
         {
-            for (int index = 0; index < polygon.Length; ++index)
-            {
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
-                Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
+            Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
 
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorNames[index]);
-                Gl.glColorPointer(ScalarColor3.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorName);
+            Gl.glColorPointer(ScalarColor4.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
 
-                Gl.glDrawArrays(Gl.GL_POLYGON, 0, polygon[index].Length);
-            }
+            Gl.glDrawArrays(mode, 0, vertexes.Length);
         }
         protected override void EnableState()
         {
@@ -109,8 +103,7 @@ namespace Graphics2DDotNet
         }
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteBuffersARB(LastRefresh, vertexNames);
-            GlHelper.GlDeleteBuffersARB(LastRefresh, colorNames);
+            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName, colorName });
         }
     }
 

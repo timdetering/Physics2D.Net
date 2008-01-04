@@ -50,8 +50,6 @@ namespace Physics2DDemo
         static void Main(string[] args)
         {
 
-            Physics2DDotNet.Demo.DemoStart.Run();
-           /* return;
             Console.WriteLine("Welcome to the Physics2D.Net Demo");
 
             Console.WriteLine("In the demo pressing the number keys or W-O will load different demos.");
@@ -72,7 +70,7 @@ namespace Physics2DDemo
             Demo demo = new Demo();
             g.Draw  += demo.Draw;
             g.ReShape += demo.Reshape;
-            g.Run();*/
+            g.Run();
         }
 
     }

@@ -42,11 +42,14 @@ namespace Physics2DDotNet.Shapes
     /// A Circle
     /// </summary>
     [Serializable]
-    public sealed class CircleShape : Shape, IRaySegmentsCollidable, ILineFluidAffectable, IExplosionAffectable
+    public sealed class CircleShape : IShape, IRaySegmentsCollidable, ILineFluidAffectable, IExplosionAffectable
     {
         #region fields
         private Scalar radius;
-        // private Vector2D position;
+        private object tag;
+        private Scalar inertia;
+        private Vector2D[] vertexNormals;
+        private Vector2D[] vertexes;
         #endregion
         #region constructors
 
@@ -59,7 +62,7 @@ namespace Physics2DDotNet.Shapes
         /// This is for collision detection.
         /// </param>
         public CircleShape(Scalar radius, int vertexCount)
-            : this(radius, vertexCount, InertiaOfSolidCylinder(radius))
+            : this(radius, vertexCount, MassInfo.InertiaOfSolidCylinder(radius))
         { }
         /// <summary>
         /// Creates a new Circle Instance.
@@ -69,19 +72,32 @@ namespace Physics2DDotNet.Shapes
         /// The number or vertex that will be generated along the perimeter of the circle. 
         /// This is for collision detection.
         /// </param>
-        /// <param name="momentOfInertiaMultiplier">
+        /// <param name="inertia">
         /// How hard it is to turn the shape. Depending on the construtor in the 
         /// Body this will be multiplied with the mass to determine the moment of inertia.
         /// </param>
-        public CircleShape(Scalar radius, int vertexCount, Scalar momentOfInertiaMultiplier)
-            : base(CreateCircle(radius, vertexCount), momentOfInertiaMultiplier)
+        public CircleShape(Scalar radius, int vertexCount, Scalar inertia)
         {
             if (radius <= 0) { throw new ArgumentOutOfRangeException("radius", "must be larger then zero"); }
+            if (vertexCount < 3) { throw new ArgumentOutOfRangeException("vertexCount", "Must be equal or greater then 3"); }
+            this.vertexes = VertexHelper.CreateCircle(radius, vertexCount);
+            this.vertexNormals = VertexHelper.CreateCircle(1, vertexCount);
+            this.inertia = inertia;
             this.radius = radius;
-            this.Normals = ShapeHelper.CalculateNormals(this.Vertexes);
         }
         #endregion
         #region properties
+        public object Tag
+        {
+            get { return tag; }
+            set { tag = value; }
+        }
+        public Vector2D[] Vertexes { get { return vertexes; } }
+        public Vector2D[] VertexNormals { get { return vertexNormals; } }
+        public Scalar Inertia
+        {
+            get { return inertia; }
+        }
         public Vector2D Centroid
         {
             get { return Vector2D.Zero; }
@@ -97,37 +113,33 @@ namespace Physics2DDotNet.Shapes
         {
             get { return radius; }
         }
-        public override bool CanGetIntersection
+        public bool CanGetIntersection
         {
             get { return true; }
         }
-        public override bool CanGetDistance
-        {
-            get { return true; }
-        }
-        public override bool CanGetCustomIntersection
+        public bool CanGetCustomIntersection
         {
             get { return false; }
         }
         #endregion
         #region methods
-        public override void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
+        public void CalcBoundingRectangle(ref Matrix2x3 matrix, out BoundingRectangle rectangle)
         {
             BoundingRectangle.FromCircle(ref matrix, ref radius, out rectangle);
         }
-        public override void GetDistance(ref Vector2D point, out Scalar result)
+        public void GetDistance(ref Vector2D point, out Scalar result)
         {
             Vector2D.GetMagnitude(ref point, out result);
             result -= radius;
         }
-        public override bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
+        public bool TryGetIntersection(Vector2D point, out IntersectionInfo info)
         {
             info.Position = point;
             Vector2D.Normalize(ref point, out info.Distance, out info.Normal);
             info.Distance -= radius;
             return info.Distance <= 0;
         }
-        public override bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
+        public bool TryGetCustomIntersection(Body self, Body other, out object customIntersectionInfo)
         {
             throw new NotSupportedException();
         }
@@ -176,18 +188,19 @@ namespace Physics2DDotNet.Shapes
         }
         FluidInfo ILineFluidAffectable.GetFluidInfo(GetTangentCallback callback, Line line)
         {
-            return ShapeHelper.GetFluidInfo(Vertexes,callback, line);
+            return ShapeHelper.GetFluidInfo(Vertexes, callback, line);
         }
         DragInfo IExplosionAffectable.GetExplosionInfo(Matrix2x3 matrix, Scalar radius, GetTangentCallback callback)
         {
+            //TODO: do this right!
             Vector2D[] vertexes2 = new Vector2D[Vertexes.Length];
             for (int index = 0; index < vertexes2.Length; ++index)
             {
                 vertexes2[index] = matrix * Vertexes[index];
             }
-            Vector2D[] inter = ShapeHelper.GetIntersection(vertexes2, radius);
+            Vector2D[] inter = VertexHelper.GetIntersection(vertexes2, radius);
             if (inter.Length < 3) { return null; }
-            Vector2D centroid = PolygonShape.GetCentroid(inter);
+            Vector2D centroid = VertexHelper.GetCentroid(inter);
             Vector2D tangent = callback(centroid);
             Scalar min, max;
             ShapeHelper.GetProjectedBounds(inter, tangent, out min, out max);
