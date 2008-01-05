@@ -132,7 +132,6 @@ LOAD THE INTRO TEXT DEMO TO MANIPULATE
 THIS TEXT.", new Vector2D(20, 20),40);
 
 
-            string numberString = "0123456789";
             numbers = new IShape[10];
             numbers2 = new SurfacePolygons[10];
             for (int index = 0; index < numbers.Length; ++index)
@@ -154,6 +153,7 @@ THIS TEXT.", new Vector2D(20, 20),40);
             window.Run();
             return;
         }
+        static string numberString = "0123456789";
         static SurfacePolygons[] numbers2;
         static IShape[] numbers;
 
@@ -194,7 +194,7 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 }
                 for (int index = 0; index < val.Length; ++index)
                 {
-                    int number = int.Parse(val[index] + "");
+                    int number = numberString.IndexOf(val[index]);
                     bodies[index + offset].Shape = numbers[number];
                     bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
                     bodies[index + offset].ApplyPosition();
@@ -238,7 +238,7 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 }
                 for (int index = 0; index < val.Length; ++index)
                 {
-                    int number = int.Parse(val[index] + "");
+                    int number = numberString.IndexOf(val[index]);
                     bodies[index + offset].Shape = numbers[number];
                     bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
                     bodies[index + offset].ApplyPosition();
@@ -271,7 +271,7 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 }
                 for (int index = 0; index < val.Length; ++index)
                 {
-                    int number = int.Parse(val[index] + "");
+                    int number = numberString.IndexOf(val[index]);
                     bodies[index + offset].Shape = numbers[number];
                     bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
                     bodies[index + offset].ApplyPosition();
