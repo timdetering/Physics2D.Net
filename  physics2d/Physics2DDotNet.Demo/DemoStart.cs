@@ -142,7 +142,9 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 s.Color = new ScalarColor4(.1f, .1f, 1, 1);
             }
 
-            DoCount(window, viewport2, layer, layer2, new Vector2D(100, 2));
+            DoBodyCount(window, viewport2, layer, layer2, new Vector2D(100, 2));
+            DoJointCount(window, viewport2, layer, layer2, new Vector2D(100, 30));
+            DoLogicsCount(window, viewport2, layer, layer2, new Vector2D(270, 2));
             DoFPS(window, viewport2, layer, layer2, new Vector2D(2,2));
             DoUPS(window, viewport2, layer, layer2, new Vector2D(2, 30));
             //Show the GUI
@@ -185,20 +187,7 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 int ups = (int)(frames / frameSeconds);
                 if (ups < 0) { ups = 0; }
                 string val = ups.ToString();
-                int offset = 3 - val.Length;
-                for (int index = 0; index < offset; ++index)
-                {
-                    bodies[index].Shape = numbers[0];
-                    bodies[index].State.Position.Linear = positions[index] + numbers2[0].Offset;
-                    bodies[index].ApplyPosition();
-                }
-                for (int index = 0; index < val.Length; ++index)
-                {
-                    int number = numberString.IndexOf(val[index]);
-                    bodies[index + offset].Shape = numbers[number];
-                    bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
-                    bodies[index + offset].ApplyPosition();
-                }
+                SetBodiesText(bodies, positions, val);
             };
         }
         private static void DoFPS(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
@@ -229,55 +218,91 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 int ups = (int)(frames / frameSeconds);
                 if (ups < 0) { ups = 0; }
                 string val = ups.ToString();
-                int offset = 3 - val.Length;
-                for (int index = 0; index < offset; ++index)
-                {
-                    bodies[index].Shape = numbers[0];
-                    bodies[index].State.Position.Linear = positions[index] + numbers2[0].Offset;
-                    bodies[index].ApplyPosition();
-                }
-                for (int index = 0; index < val.Length; ++index)
-                {
-                    int number = numberString.IndexOf(val[index]);
-                    bodies[index + offset].Shape = numbers[number];
-                    bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
-                    bodies[index + offset].ApplyPosition();
-                }
+                SetBodiesText(bodies, positions, val);
             };
         }
-        private static void DoCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        private static void DoLogicsCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
         {
-            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Count: 000000", pos,20);
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Logics: 000000", pos, 20);
             foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
                 s.Color = new ScalarColor4(.1f, .1f, 1, 1);
             }
-            bodies.RemoveRange(0, 6);
+            bodies.RemoveRange(0, 7);
             Vector2D[] positions = new Vector2D[bodies.Count];
             for (int index = 0; index < positions.Length; index++)
             {
                 positions[index] = bodies[index].State.Position.Linear - numbers2[0].Offset;
             }
-            layer1.Engine.Updated += delegate(object sender, UpdatedEventArgs e)
+            EventHandler<CollectionEventArgs<PhysicsLogic>> handler = delegate(object sender, CollectionEventArgs<PhysicsLogic> e)
+            {
+                string val = layer1.Engine.Logics.Count.ToString();
+                SetBodiesText(bodies, positions, val);
+            };
+            layer1.Engine.LogicsAdded += handler;
+            layer1.Engine.LogicsRemoved += handler;
+        }
+        private static void DoJointCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        {
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Joints: 000000", pos, 20);
+            foreach (Body body in bodies)
+            {
+                SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
+                s.Color = new ScalarColor4(.1f, .1f, 1, 1);
+            }
+            bodies.RemoveRange(0, 7);
+            Vector2D[] positions = new Vector2D[bodies.Count];
+            for (int index = 0; index < positions.Length; index++)
+            {
+                positions[index] = bodies[index].State.Position.Linear - numbers2[0].Offset;
+            }
+            EventHandler<CollectionEventArgs<Joint>> handler = delegate(object sender, CollectionEventArgs<Joint> e)
+            {
+                string val = layer1.Engine.Joints.Count.ToString();
+                SetBodiesText(bodies, positions, val);
+            };
+            layer1.Engine.JointsAdded += handler;
+            layer1.Engine.JointsRemoved += handler;
+        }
+        private static void DoBodyCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        {
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Bodies: 000000", pos,20);
+            foreach (Body body in bodies)
+            {
+                SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
+                s.Color = new ScalarColor4(.1f, .1f, 1, 1);
+            }
+            bodies.RemoveRange(0, 7);
+            Vector2D[] positions = new Vector2D[bodies.Count];
+            for (int index = 0; index < positions.Length; index++)
+            {
+                positions[index] = bodies[index].State.Position.Linear - numbers2[0].Offset;
+            }
+            EventHandler<CollectionEventArgs<Body>> handler = delegate(object sender, CollectionEventArgs<Body> e)
             {
                 string val = layer1.Engine.Bodies.Count.ToString();
-                int offset = 6 - val.Length;
-                for (int index = 0; index < offset; ++index)
-                {
-                    bodies[index].Shape = numbers[0];
-                    bodies[index].State.Position.Linear = positions[index] + numbers2[0].Offset;
-                    bodies[index].ApplyPosition();
-                }
-                for (int index = 0; index < val.Length; ++index)
-                {
-                    int number = numberString.IndexOf(val[index]);
-                    bodies[index + offset].Shape = numbers[number];
-                    bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
-                    bodies[index + offset].ApplyPosition();
-                }
+                SetBodiesText(bodies, positions, val);
             };
+            layer1.Engine.BodiesAdded += handler;
+            layer1.Engine.BodiesRemoved += handler;
         }
-
+        private static void SetBodiesText(List<Body> bodies, Vector2D[] positions, string val)
+        {
+            int offset = bodies.Count - val.Length;
+            for (int index = 0; index < offset; ++index)
+            {
+                bodies[index].Shape = numbers[0];
+                bodies[index].State.Position.Linear = positions[index] + numbers2[0].Offset;
+                bodies[index].ApplyPosition();
+            }
+            for (int index = 0; index < val.Length; ++index)
+            {
+                int number = numberString.IndexOf(val[index]);
+                bodies[index + offset].Shape = numbers[number];
+                bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
+                bodies[index + offset].ApplyPosition();
+            }
+        }
     }
 }

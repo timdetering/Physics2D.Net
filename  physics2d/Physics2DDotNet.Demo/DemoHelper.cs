@@ -89,7 +89,7 @@ namespace Physics2DDotNet.Demo
             dispose += DemoHelper.RegisterMaintainSpawning(info, SdlDotNet.Input.Key.N,
                 delegate(Vector2D position)
                 {
-                    ExplosionLogic result = new ExplosionLogic(position, Vector2D.Zero, 9000, .4f, 600, new Lifespan(1));
+                    ExplosionLogic result = new ExplosionLogic(position, Vector2D.Zero, 9000, .4f, 600, new Lifespan(.5f));
                     info.Layer.Engine.AddLogic(result);
                     return result;
                 });
