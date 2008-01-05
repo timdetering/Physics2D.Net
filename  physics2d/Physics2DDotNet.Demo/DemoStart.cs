@@ -134,9 +134,11 @@ THIS TEXT.", new Vector2D(20, 20),40);
 
             string numberString = "0123456789";
             numbers = new IShape[10];
+            numbers2 = new SurfacePolygons[10];
             for (int index = 0; index < numbers.Length; ++index)
             {
-                numbers[index] = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem(numberString[index] + "|FreeSans.ttf:20", Color.Black), 0, 8, 2);
+                numbers2[index] = Cache<SurfacePolygons>.GetItem(numberString[index] + "|FreeSans.ttf:20", Color.Black);
+                numbers[index] = ShapeFactory.CreateSprite(numbers2[index], 0, 8, 2);
                 SpriteDrawable s = numbers[index].Tag as SpriteDrawable;
                 s.Color = new ScalarColor4(.1f, .1f, 1, 1);
             }
@@ -152,21 +154,25 @@ THIS TEXT.", new Vector2D(20, 20),40);
             window.Run();
             return;
         }
+        static SurfacePolygons[] numbers2;
         static IShape[] numbers;
 
         private static void DoUPS(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
         {
-            List<Body> fpsBodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "UPS: 000", pos,20);
-            foreach (Body body in fpsBodies)
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "UPS: 000", pos,20);
+            foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
                 s.Color = new ScalarColor4(.1f, .1f, 1, 1);
             }
-            fpsBodies.RemoveRange(0, 4);
-
-            DateTime lastfps = DateTime.Now;
-            int frames = 1;
-            Scalar frameSeconds = 0;
+            bodies.RemoveRange(0, 4);
+            Vector2D[] positions = new Vector2D[bodies.Count];
+            for (int index = 0; index < positions.Length; index++)
+            {
+                positions[index] = bodies[index].State.Position.Linear - numbers2[0].Offset;
+            }
+            int frames = 50;
+            Scalar frameSeconds = 1;
             layer1.Engine.Updated += delegate(object sender, UpdatedEventArgs e)
             {
                 if (frames >= 10)
@@ -175,9 +181,6 @@ THIS TEXT.", new Vector2D(20, 20),40);
                     frameSeconds /= 2;
                 }
                 frames++;
-               /* DateTime now = DateTime.Now;
-                frameSeconds += (Scalar)(now.Subtract(lastfps).TotalSeconds);
-                lastfps = now;*/
                 frameSeconds += e.Step.TrueDt;
                 int ups = (int)(frames / frameSeconds);
                 if (ups < 0) { ups = 0; }
@@ -185,27 +188,35 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 int offset = 3 - val.Length;
                 for (int index = 0; index < offset; ++index)
                 {
-                    fpsBodies[index].Shape = numbers[0];
+                    bodies[index].Shape = numbers[0];
+                    bodies[index].State.Position.Linear = positions[index] + numbers2[0].Offset;
+                    bodies[index].ApplyPosition();
                 }
                 for (int index = 0; index < val.Length; ++index)
                 {
-                    fpsBodies[index + offset].Shape = numbers[int.Parse(val[index] + "")];
+                    int number = int.Parse(val[index] + "");
+                    bodies[index + offset].Shape = numbers[number];
+                    bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
+                    bodies[index + offset].ApplyPosition();
                 }
             };
         }
         private static void DoFPS(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
         {
-            List<Body> fpsBodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "FPS: 000", pos,20);
-            foreach (Body body in fpsBodies)
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "FPS: 000", pos,20);
+            foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
                 s.Color = new ScalarColor4(.1f, .1f, 1, 1);
             }
-            fpsBodies.RemoveRange(0, 4);
-
-            DateTime lastfps = DateTime.Now;
-            int frames = 1;
-            Scalar frameSeconds = 0;
+            bodies.RemoveRange(0, 4);
+            Vector2D[] positions = new Vector2D[bodies.Count];
+            for (int index = 0; index < positions.Length; index++)
+            {
+                positions[index] = bodies[index].State.Position.Linear - numbers2[0].Offset;
+            }
+            int frames = 100;
+            Scalar frameSeconds = 1;
             viewport2.BeginDrawing += delegate(object sender, DrawEventArgs e)
             {
                 if (frames >= 10)
@@ -214,9 +225,6 @@ THIS TEXT.", new Vector2D(20, 20),40);
                     frameSeconds /= 2;
                 }
                 frames++;
-               // DateTime now = DateTime.Now;
-               // frameSeconds += (Scalar)(now.Subtract(lastfps).TotalSeconds);
-               // lastfps = now;
                 frameSeconds += e.DrawInfo.TrueDt;
                 int ups = (int)(frames / frameSeconds);
                 if (ups < 0) { ups = 0; }
@@ -224,35 +232,49 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 int offset = 3 - val.Length;
                 for (int index = 0; index < offset; ++index)
                 {
-                    fpsBodies[index].Shape = numbers[0];
+                    bodies[index].Shape = numbers[0];
+                    bodies[index].State.Position.Linear = positions[index] + numbers2[0].Offset;
+                    bodies[index].ApplyPosition();
                 }
                 for (int index = 0; index < val.Length; ++index)
                 {
-                    fpsBodies[index + offset].Shape = numbers[int.Parse(val[index] + "")];
+                    int number = int.Parse(val[index] + "");
+                    bodies[index + offset].Shape = numbers[number];
+                    bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
+                    bodies[index + offset].ApplyPosition();
                 }
             };
         }
         private static void DoCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
         {
-            List<Body> fpsBodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Count: 000000", pos,20);
-            foreach (Body body in fpsBodies)
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Count: 000000", pos,20);
+            foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
                 s.Color = new ScalarColor4(.1f, .1f, 1, 1);
             }
-            fpsBodies.RemoveRange(0, 6);
-
+            bodies.RemoveRange(0, 6);
+            Vector2D[] positions = new Vector2D[bodies.Count];
+            for (int index = 0; index < positions.Length; index++)
+            {
+                positions[index] = bodies[index].State.Position.Linear - numbers2[0].Offset;
+            }
             layer1.Engine.Updated += delegate(object sender, UpdatedEventArgs e)
             {
                 string val = layer1.Engine.Bodies.Count.ToString();
                 int offset = 6 - val.Length;
                 for (int index = 0; index < offset; ++index)
                 {
-                    fpsBodies[index].Shape = numbers[0];
+                    bodies[index].Shape = numbers[0];
+                    bodies[index].State.Position.Linear = positions[index] + numbers2[0].Offset;
+                    bodies[index].ApplyPosition();
                 }
                 for (int index = 0; index < val.Length; ++index)
                 {
-                    fpsBodies[index + offset].Shape = numbers[int.Parse(val[index] + "")];
+                    int number = int.Parse(val[index] + "");
+                    bodies[index + offset].Shape = numbers[number];
+                    bodies[index + offset].State.Position.Linear = positions[index + offset] + numbers2[number].Offset;
+                    bodies[index + offset].ApplyPosition();
                 }
             };
         }

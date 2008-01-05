@@ -67,14 +67,14 @@ namespace Physics2DDotNet.Demo.Demos
 
 
             dispose += DemoHelper.RegisterBodyTracking(DemoInfo, b1, Matrix2x3.FromRotationZ(-MathHelper.PiOver2));
-            dispose += DemoHelper.RegisterBodyMovement(DemoInfo, b1, new ALVector2D(500000, 50000, 0), Key.W, Key.S, Key.A, Key.D);
+            dispose += DemoHelper.RegisterBodyMovement(DemoInfo, b1, new ALVector2D(1000000, 100000, 0), Key.W, Key.S, Key.A, Key.D);
 
 
             dispose += DemoHelper.RegisterBodyTracking(
                 new DemoOpenInfo(Window, viewport2, Layer)
                 , b2, Matrix2x3.FromRotationZ(-MathHelper.PiOver2));
             dispose += DemoHelper.RegisterBodyMovement(
-                DemoInfo, b2, new ALVector2D(500000, 50000, 0));
+                DemoInfo, b2, new ALVector2D(1000000, 100000, 0));
 
             b1.State.Position.Linear = new Vector2D(200, 0);
             b2.State.Position = new ALVector2D(MathHelper.Pi, 1, 0);
