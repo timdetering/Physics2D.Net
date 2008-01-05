@@ -257,26 +257,23 @@ namespace AdvanceMath.Geometry2D
             result.Min.Y = circle.Position.Y - circle.Radius;
         }
 
-        public static BoundingRectangle FromCircle( Matrix2x3 toWorld, Scalar radius)
+        public static BoundingRectangle FromCircle( Matrix2x3 matrix, Scalar radius)
         {
             BoundingRectangle result;
-            FromCircle(ref toWorld, ref radius, out result);
+            FromCircle(ref matrix, ref radius, out result);
             return result;
         }
-        public static void FromCircle(ref Matrix2x3 toWorld, ref Scalar radius, out BoundingRectangle result)
+        public static void FromCircle(ref Matrix2x3 matrix, ref Scalar radius, out BoundingRectangle result)
         {
-            Vector2D position = Vector2D.Zero;
-            Vector2D.Transform(ref toWorld, ref position, out position);
-
-            Scalar xRadius = toWorld.m01 * toWorld.m01 + toWorld.m00 * toWorld.m00;
+            Scalar xRadius = matrix.m01 * matrix.m01 + matrix.m00 * matrix.m00;
             xRadius = ((xRadius == 1) ? (radius) : (radius * MathHelper.Sqrt(xRadius)));
-            Scalar yRadius = toWorld.m10 * toWorld.m10 + toWorld.m11 * toWorld.m11;
+            Scalar yRadius = matrix.m10 * matrix.m10 + matrix.m11 * matrix.m11;
             yRadius = ((yRadius == 1) ? (radius) : (radius * MathHelper.Sqrt(yRadius)));
 
-            result.Max.X = position.X + xRadius;
-            result.Max.Y = position.Y + yRadius;
-            result.Min.X = position.X - xRadius;
-            result.Min.Y = position.Y - yRadius;
+            result.Max.X = matrix.m02 + xRadius;
+            result.Min.X = matrix.m02 - xRadius;
+            result.Max.Y = matrix.m12 + yRadius;
+            result.Min.Y = matrix.m12 - yRadius;
         }
         
         
