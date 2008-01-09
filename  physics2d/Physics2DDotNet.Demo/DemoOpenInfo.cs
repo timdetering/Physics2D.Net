@@ -59,12 +59,12 @@ namespace Physics2DDotNet.Demo
     {
         Window window;
         Viewport viewport;
-        Layer layer;
-        public DemoOpenInfo(Window window, Viewport viewport, Layer layer)
+        Scene scene;
+        public DemoOpenInfo(Window window, Viewport viewport, Scene scene)
         {
             this.window = window;
             this.viewport = viewport;
-            this.layer = layer;
+            this.scene = scene;
         }
         public Window Window
         {
@@ -74,9 +74,9 @@ namespace Physics2DDotNet.Demo
         {
             get { return viewport; }
         }
-        public Layer Layer
+        public Scene Scene
         {
-            get { return layer; }
+            get { return scene; }
         }
     }
 

@@ -41,36 +41,23 @@ using Tao.OpenGl;
 
 namespace Graphics2DDotNet
 {
-    public interface IGraphic : IDuplicateable<IGraphic>
+    /*public interface IGraphic : IDuplicateable<Graphic>
     {
         event EventHandler ZOrderChanged;
         object Tag { get;set;}
         int ID { get;}
         int ZOrder { get;set;}
         Lifespan Lifetime { get;set;}
-        Layer Parent { get;}
+        Scene Parent { get;}
         IDrawable Drawable { get;set;}
         IAnimation Animation { get;set;}
         List<IDrawProperty> DrawProperties { get;}
         IDrawableState DrawableState { get;set;}
-        bool ShouldDraw { get;set;}
+        bool IsVisible { get;set;}
         Scalar[] MatrixArray { get;}
         Matrix2x3 Matrix { get;set;}
-        void OnPending(Layer parent);
-        void OnPendingRange(Layer parent, RangeInfo rangeInfo);
         void Draw(DrawInfo drawInfo);
-    }
-    public class RangeInfo
-    {
-        List<Body> bodies;
-        public RangeInfo(List<Body> bodies)
-        {
-            this.bodies = bodies;
-        }
-        public void AddBody(Body item)
-        {
-            bodies.Add(item);
-        }
-    }
+    }*/
+
 
 }

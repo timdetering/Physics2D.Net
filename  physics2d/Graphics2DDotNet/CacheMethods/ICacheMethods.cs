@@ -27,26 +27,12 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Reflection;
-using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
-using Tao.OpenGl;
-using SdlDotNet;
-using SdlDotNet.Graphics;
-using Color = System.Drawing.Color;
 namespace Graphics2DDotNet
 {
-
     public interface ICacheMethods<T>
     {
         T LoadItem(string name, object[] loadArgs);
+        bool Validate(T item);
         void DisposeItem(T item);
     }
 }

@@ -36,12 +36,43 @@ namespace Graphics2DDotNet
 {
     public static class GlHelper
     {
+        class DeleteInfo
+        {
+            public int refresh;
+            public int[] names;
+            public DeleteInfo(int refresh, int[] names)
+            {
+                this.refresh = refresh;
+                this.names = names;
+            }
+        }
 #if UseDouble
         public const int GlScalar = Gl.GL_DOUBLE;
 #else
         public const int GlScalar = Gl.GL_FLOAT;
 #endif
+        static List<DeleteInfo> buffersARB = new List<DeleteInfo>();
+        static List<DeleteInfo> textures = new List<DeleteInfo>();
 
+
+        public static void GlScale(Scalar x, Scalar y, Scalar z)
+        {
+#if UseDouble
+            Gl.glScaled(x, y, z);
+#else
+            Gl.glScalef(x, y, z);
+#endif
+
+        }
+        public static void GlTranslate(Scalar x,Scalar y,Scalar z)
+        {
+#if UseDouble
+            Gl.glTranslated(x, y, z);
+#else
+            Gl.glTranslatef(x, y, z);
+#endif
+
+        }
         public static void GlVertex(Vector2D vertex)
         {
 #if UseDouble
@@ -121,6 +152,15 @@ namespace Graphics2DDotNet
 #endif
         }
 
+        public static void GlGetModelViewMatrix(Scalar[] array)
+        {
+#if UseDouble
+            Gl.glGetDoublev(Gl.GL_MODELVIEW_MATRIX, array);
+#else
+            Gl.glGetFloatv(Gl.GL_MODELVIEW_MATRIX, array);
+#endif
+        }
+
         public static void GlBufferData(int target, Array array, int size, int usage)
         {
             GCHandle handle = GCHandle.Alloc(array, GCHandleType.Pinned);
@@ -187,36 +227,27 @@ namespace Graphics2DDotNet
 #endif
         }
 
-
-
-        class DeleteInfo
-        {
-            public int lastRefresh;
-            public int[] names;
-            public DeleteInfo(int lastRefresh, int[] names)
-            {
-                this.lastRefresh = lastRefresh;
-                this.names = names;
-            }
-        }
-        static List<DeleteInfo> buffersARB = new List<DeleteInfo>();
-        public static void GlDeleteBuffersARB(int lastRefresh, int[] names)
+        public static void GlDeleteBuffersARB(int refresh, int[] names)
         {
             lock (buffersARB)
             {
-                buffersARB.Add(new DeleteInfo(lastRefresh, names));
+                if (refresh >= lastRefresh)
+                {
+                    buffersARB.Add(new DeleteInfo(refresh, names));
+                }
             }
         }
-        public static void DoGlDeleteBuffersARB(int lastRefresh)
+        public static void DoGlDeleteBuffersARB(int refresh)
         {
             lock (buffersARB)
             {
-                if(buffersARB.Count > 0)
+                lastRefresh = refresh;
+                if (buffersARB.Count > 0)
                 {
                     for (int index = 0; index < buffersARB.Count; ++index)
                     {
                         DeleteInfo info = buffersARB[index];
-                        if (info.lastRefresh == lastRefresh)
+                        if (info.refresh == refresh)
                         {
                             Gl.glDeleteBuffersARB(info.names.Length, info.names);
                         }
@@ -225,25 +256,28 @@ namespace Graphics2DDotNet
                 }
             }
         }
-
-        static List<DeleteInfo> textures = new List<DeleteInfo>();
-        public static void GlDeleteTextures(int lastRefresh, int[] names)
+        static int lastRefresh = -2;
+        public static void GlDeleteTextures(int refresh, int[] names)
         {
             lock (textures)
             {
-                textures.Add(new DeleteInfo(lastRefresh, names));
+                if (refresh >= lastRefresh)
+                {
+                    textures.Add(new DeleteInfo(refresh, names));
+                }
             }
         }
-        public static void DoGlDeleteTextures(int lastRefresh)
+        public static void DoGlDeleteTextures(int refresh)
         {
             lock (textures)
             {
+                lastRefresh = refresh;
                 if (textures.Count > 0)
                 {
                     for (int index = 0; index < buffersARB.Count; ++index)
                     {
                         DeleteInfo info = buffersARB[index];
-                        if (info.lastRefresh == lastRefresh)
+                        if (info.refresh == refresh)
                         {
                             Gl.glDeleteTextures(info.names.Length, info.names);
                         }

@@ -724,7 +724,7 @@ namespace Physics2DDotNet
             for (int index = 0; index < pendingJoints.Count; ++index)
             {
                 Joint item = pendingJoints[index];
-                item.OnAddedInternal(this);
+                item.OnAddedInternal();
             }
             if (JointsAdded != null) { JointsAdded(this, new CollectionEventArgs<Joint>(pendingJoints.AsReadOnly())); }
             pendingJoints.Clear();

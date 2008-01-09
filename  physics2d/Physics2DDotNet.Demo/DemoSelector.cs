@@ -94,7 +94,7 @@ namespace Physics2DDotNet.Demo
 
         Window window;
         Viewport viewport;
-        Layer layer;
+        Scene scene;
         DemoType selected;
         IPhysicsDemo demo;
         public DemoSelector()
@@ -126,29 +126,29 @@ namespace Physics2DDotNet.Demo
                 lvDemos.Items.Add(item);
             }
         }
-        public void Initialize(Window window, Viewport viewport, Layer layer)
+        public void Initialize(Window window, Viewport viewport, Scene scene)
         {
             this.window = window;
             this.viewport = viewport;
-            this.layer = layer;
+            this.scene = scene;
         }
 
         void Start()
         {
-            layer.End();
+            scene.Timer.IsRunning = false;
             if (demo != null)
             {
                 demo.Dispose();
                 demo = null;
             }
             viewport.ToScreen = AdvanceMath.Matrix2x3.Identity;
-            layer.Clear();
+            scene.Clear();
             if (selected != null)
             {
                 demo = (IPhysicsDemo)selected.Constructor.Invoke(null);
-                demo.Open(new DemoOpenInfo(window, viewport, layer));
+                demo.Open(new DemoOpenInfo(window, viewport, scene));
             }
-            layer.Begin();
+            scene.Timer.IsRunning = true;
         }
         void SelectionChanged()
         {

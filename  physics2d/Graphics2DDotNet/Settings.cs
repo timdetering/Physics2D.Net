@@ -58,7 +58,6 @@ namespace Graphics2DDotNet
         static Settings()
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(SettingsXML));
-
             SettingsXML settings;
             if (File.Exists(SettingsFile))
             {
@@ -70,7 +69,6 @@ namespace Graphics2DDotNet
                 {
                     settings = SaveDefault(xmlSerializer);
                 }
-
             }
             else
             {

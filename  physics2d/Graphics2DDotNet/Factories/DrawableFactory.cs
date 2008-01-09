@@ -45,12 +45,6 @@ namespace Graphics2DDotNet
 {
     public static class DrawableFactory
     {
-        private static int GetPower(int value)
-        {
-            int index = 30;
-            for (; (1 << index) >= value && index > -2; --index) { }
-            return 1 << index + 1;
-        }
         public static VertexesDrawable CreatePolygon(Vector2D[] vertexes)
         {
             return new VertexesDrawable(Gl.GL_POLYGON, vertexes);
@@ -64,7 +58,6 @@ namespace Graphics2DDotNet
             return new Colored4VertexesDrawable(Gl.GL_POLYGON, vertexes, colors);
         }
 
-
         public static MultiVertexesDrawable CreateMultiPolygon(Vector2D[][] polygons)
         {
             return new MultiVertexesDrawable(Gl.GL_POLYGON, polygons);
@@ -77,6 +70,7 @@ namespace Graphics2DDotNet
         {
             return new Colored4MultiVertexesDrawable(Gl.GL_POLYGON, polygons, colors);
         }
+
         public static SpriteDrawable CreateSprite(Surface surface, Vector2D[] vertexes, Vector2D[] coordinates)
         {
             return new SpriteDrawable(surface, vertexes, coordinates);
@@ -89,8 +83,8 @@ namespace Graphics2DDotNet
             vertexes[2] = new Vector2D(surface.Width - offset.X, surface.Height - offset.Y);
             vertexes[3] = new Vector2D(surface.Width - offset.X, -offset.Y);
 
-            Scalar xScale = surface.Width / (Scalar)GetPower(surface.Width);
-            Scalar yScale = surface.Height / (Scalar)GetPower(surface.Height);
+            Scalar xScale = surface.Width / (Scalar)TextureHelper.GetPower(surface.Width);
+            Scalar yScale = surface.Height / (Scalar)TextureHelper.GetPower(surface.Height);
             Vector2D[] coordinates = new Vector2D[4];
             coordinates[1] = new Vector2D(0, 0);
             coordinates[0] = new Vector2D(0, yScale);
@@ -98,8 +92,24 @@ namespace Graphics2DDotNet
             coordinates[2] = new Vector2D(xScale, 0);
             return new SpriteDrawable(surface, vertexes, coordinates);
         }
+        public static BumpmapSpriteDrawable CreateSprite(
+            Surface surface, Surface bumpmap, bool xInverted, bool yInverted,
+            Vector2D offset, Light light)
+        {
+            Vector2D[] vertexes = new Vector2D[4];
+            vertexes[0] = -offset;
+            vertexes[1] = new Vector2D(-offset.X, surface.Height - offset.Y);
+            vertexes[2] = new Vector2D(surface.Width - offset.X, surface.Height - offset.Y);
+            vertexes[3] = new Vector2D(surface.Width - offset.X, -offset.Y);
 
-
+            Scalar xScale = surface.Width / (Scalar)TextureHelper.GetPower(surface.Width);
+            Scalar yScale = surface.Height / (Scalar)TextureHelper.GetPower(surface.Height);
+            Vector2D[] coordinates = new Vector2D[4];
+            coordinates[1] = new Vector2D(0, 0);
+            coordinates[0] = new Vector2D(0, yScale);
+            coordinates[3] = new Vector2D(xScale, yScale);
+            coordinates[2] = new Vector2D(xScale, 0);
+            return new BumpmapSpriteDrawable(surface, bumpmap, vertexes, coordinates, true, xInverted, yInverted, light);
+        }
     }
-
 }

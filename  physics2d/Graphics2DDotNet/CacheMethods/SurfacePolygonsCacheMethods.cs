@@ -81,6 +81,14 @@ namespace Graphics2DDotNet
         }
         public void DisposeItem(SurfacePolygons item)
         { }
+
+
+
+        public bool Validate(SurfacePolygons item)
+        {
+            return true;
+        }
+
     }
 
 }

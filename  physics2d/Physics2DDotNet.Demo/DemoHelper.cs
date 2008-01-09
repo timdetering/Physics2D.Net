@@ -90,7 +90,7 @@ namespace Physics2DDotNet.Demo
                 delegate(Vector2D position)
                 {
                     ExplosionLogic result = new ExplosionLogic(position, Vector2D.Zero, 9000, .4f, 600, new Lifespan(.5f));
-                    info.Layer.Engine.AddLogic(result);
+                    info.Scene.Engine.AddLogic(result);
                     return result;
                 });
 
@@ -113,7 +113,7 @@ namespace Physics2DDotNet.Demo
                     lazer.State.Velocity.Angular = .91f;
                     lazer.IgnoresGravity = true;
                     lazer.ApplyPosition();
-                    info.Layer.AddGraphic(new BodyGraphic(lazer));
+                    info.Scene.AddGraphic(new BodyGraphic(lazer));
                     return lazer;
                 });
 
@@ -145,7 +145,7 @@ namespace Physics2DDotNet.Demo
             tankBody.CollisionIgnorer = ignorer;
             BodyGraphic graphic = new BodyGraphic(tankBody);
             graphic.ZOrder = 2;
-            info.Layer.AddGraphic(graphic);
+            info.Scene.AddGraphic(graphic);
 
             Scalar wheelSize = 18;
             Scalar wheelSpacing = -9;
@@ -188,16 +188,16 @@ namespace Physics2DDotNet.Demo
                 {
                     wheel.State.ForceAccumulator.Angular += force;
                 };
-                info.Layer.AddGraphic(new BodyGraphic(wheel));
+                info.Scene.AddGraphic(new BodyGraphic(wheel));
 
                 HingeJoint joint = new HingeJoint(tankBody, wheel, offset + position, avatarLifespan);
                 joint.Softness = .1f;
-                info.Layer.Engine.AddJoint(joint);
+                info.Scene.Engine.AddJoint(joint);
 
                 if (lastWheel != null)
                 {
                     AngleJoint joint2 = new AngleJoint(lastWheel, wheel, avatarLifespan);
-                    info.Layer.Engine.AddJoint(joint2);
+                    info.Scene.Engine.AddJoint(joint2);
                 }
                 lastWheel = wheel;
             }
@@ -248,7 +248,7 @@ namespace Physics2DDotNet.Demo
 
                         //  weapon.Collided += weapon_Collided;
                         tankBody.State.Velocity.Linear -= (velocity * weapon.Mass.Mass * tankBody.Mass.MassInv) * direction;
-                        info.Layer.AddGraphic(new BodyGraphic(weapon));
+                        info.Scene.AddGraphic(new BodyGraphic(weapon));
                         break;
                 }
             };
@@ -288,7 +288,7 @@ namespace Physics2DDotNet.Demo
                 {
                     IntersectionInfo temp;
                     Body body = null;
-                    foreach (Body b in info.Layer.Engine.Bodies)
+                    foreach (Body b in info.Scene.Engine.Bodies)
                     {
                         Vector2D bodyVertex = b.Matrices.ToBody * e.Position;
                         if (b.Shape.CanGetIntersection &&
@@ -303,7 +303,7 @@ namespace Physics2DDotNet.Demo
                     if (body != null)
                     {
                         joint = new FixedHingeJoint(body, e.Position, new Lifespan());
-                        info.Layer.Engine.AddJoint(joint);
+                        info.Scene.Engine.AddJoint(joint);
                     }
                 }
             };
@@ -356,7 +356,7 @@ namespace Physics2DDotNet.Demo
                             shape, mass,
                             Coefficients.Duplicate(),
                             new Lifespan());
-                    info.Layer.AddGraphic(new BodyGraphic(newbomb));
+                    info.Scene.AddGraphic(new BodyGraphic(newbomb));
                 }
             };
             info.Viewport.MouseDown += mouseDown;
@@ -480,11 +480,11 @@ namespace Physics2DDotNet.Demo
                     dub.State.Position.Linear = position + velocityDirection;
                     dub.ApplyPosition();
                     dub.State.Velocity.Linear = velocityDirection * (minVelocity + NextScalar() * range);
-                    info.Layer.AddGraphic(new BodyGraphic(dub));
+                    info.Scene.AddGraphic(new BodyGraphic(dub));
                 }
                 else
                 {
-                    IGraphic[] graphics = new IGraphic[count];
+                    Graphic[] graphics = new Graphic[count];
                     for (int index = 0; index < count; ++index)
                     {
                         Body dub = body.Duplicate();
@@ -494,15 +494,15 @@ namespace Physics2DDotNet.Demo
                         dub.State.Velocity.Linear = velocityDirection * (minVelocity + NextScalar() * range);
                         graphics[index] = new BodyGraphic(dub);
                     }
-                    info.Layer.AddGraphicRange(graphics);
+                    info.Scene.AddGraphicRange(graphics);
                 }
             };
-            info.Layer.Engine.Updated += updatedHandler;
+            info.Scene.Engine.Updated += updatedHandler;
             Events.KeyboardDown += downHandler;
             Events.KeyboardUp += upHandler;
             return delegate()
             {
-                info.Layer.Engine.Updated -= updatedHandler;
+                info.Scene.Engine.Updated -= updatedHandler;
                 Events.KeyboardDown -= downHandler;
                 Events.KeyboardUp -= upHandler;
             };
@@ -517,7 +517,7 @@ namespace Physics2DDotNet.Demo
                     Body dub = body.Duplicate();
                     dub.State.Position.Linear = position;
                     dub.ApplyPosition();
-                    info.Layer.AddGraphic(new BodyGraphic(dub));
+                    info.Scene.AddGraphic(new BodyGraphic(dub));
                     return dub;
                 });
         }
@@ -553,7 +553,7 @@ namespace Physics2DDotNet.Demo
 
         public static void AddParticles(DemoOpenInfo info, Vector2D position, Vector2D velocity, int count)
         {
-            IGraphic[] graphics = new IGraphic[count];
+            Graphic[] graphics = new Graphic[count];
             Scalar angle = MathHelper.TwoPi / count;
             for (int index = 0; index < count; ++index)
             {
@@ -570,13 +570,13 @@ namespace Physics2DDotNet.Demo
                 BodyGraphic graphic = new BodyGraphic(particle);
                 graphics[index] = graphic;
             }
-            info.Layer.AddGraphicRange(graphics);
+            info.Scene.AddGraphicRange(graphics);
         }
         public static Body AddCircle(DemoOpenInfo info, Scalar radius, int vertexCount, Scalar mass, ALVector2D position)
         {
             CircleShape shape = ShapeFactory.CreateColoredCircle(radius, vertexCount);
             Body result = new Body(new PhysicsState(position), shape, mass, Coefficients.Duplicate(), new Lifespan());
-            info.Layer.AddGraphic(new BodyGraphic(result));
+            info.Scene.AddGraphic(new BodyGraphic(result));
             return result;
         }
         public static Body AddRectangle(DemoOpenInfo info, Scalar height, Scalar width, Scalar mass, ALVector2D position)
@@ -585,7 +585,7 @@ namespace Physics2DDotNet.Demo
             vertexes = VertexHelper.Subdivide(vertexes, (height + width) / 9);
             IShape boxShape = ShapeFactory.CreateColoredPolygon(vertexes, Math.Min(height, width) / 5);
             Body body = new Body(new PhysicsState(position), boxShape, mass, Coefficients.Duplicate(), new Lifespan());
-            info.Layer.AddGraphic(new BodyGraphic(body));
+            info.Scene.AddGraphic(new BodyGraphic(body));
             return body;
         }
         public static Body AddRectangle(DemoOpenInfo info, BoundingRectangle rect, Scalar mass)
@@ -632,13 +632,13 @@ namespace Physics2DDotNet.Demo
                 new Lifespan());
             body.Transformation = Matrix2x3.FromRotationZ(angle);
             body.ApplyPosition();
-            info.Layer.AddGraphic(new BodyGraphic(body));
+            info.Scene.AddGraphic(new BodyGraphic(body));
             return body;
         }
         public static Body AddShape(DemoOpenInfo info, IShape shape, Scalar mass, ALVector2D position)
         {
             Body body = new Body(new PhysicsState(position), shape, mass, Coefficients.Duplicate(), new Lifespan());
-            info.Layer.AddGraphic(new BodyGraphic(body));
+            info.Scene.AddGraphic(new BodyGraphic(body));
             return body;
         }
         public static List<Body> AddShell(DemoOpenInfo info, BoundingRectangle rect, Scalar thickness, Scalar mass)
@@ -679,7 +679,7 @@ namespace Physics2DDotNet.Demo
             IShape boxShape = ShapeFactory.CreateColoredPolygon(vertexes, Math.Min(height, width) / 5);
             Body body = new Body(new PhysicsState(position), boxShape, Scalar.PositiveInfinity, Coefficients.Duplicate(), new Lifespan());
             body.IgnoresGravity = true;
-            info.Layer.AddGraphic(new BodyGraphic(body));
+            info.Scene.AddGraphic(new BodyGraphic(body));
             return body;
         }
 
@@ -743,7 +743,7 @@ namespace Physics2DDotNet.Demo
                     Vector2D anchor = (current.State.Position.Linear + last.State.Position.Linear) * .5f;
                     HingeJoint joint = new HingeJoint(last, current, anchor, new Lifespan());
                     joint.DistanceTolerance = 10;
-                    info.Layer.Engine.AddJoint(joint);
+                    info.Scene.Engine.AddJoint(joint);
                 }
                 last = current;
             }
@@ -832,7 +832,7 @@ namespace Physics2DDotNet.Demo
             {
                 joint.DistanceTolerance = 10;
             }
-            info.Layer.Engine.AddJointRange(joints);
+            info.Scene.Engine.AddJointRange(joints);
 
             return result;
         }
@@ -911,10 +911,10 @@ namespace Physics2DDotNet.Demo
                 starColors[index] = new ScalarColor3(DemoHelper.NextScalar(), DemoHelper.NextScalar(), DemoHelper.NextScalar());
             }
             Colored3VertexesDrawable stardrawable = new Colored3VertexesDrawable(Gl.GL_POINTS, stars, starColors);
-            SimpleGraphic stargraphic = new SimpleGraphic(stardrawable, Matrix2x3.Identity, new Lifespan());
+            Graphic stargraphic = new Graphic(stardrawable, Matrix2x3.Identity, new Lifespan());
             stargraphic.ZOrder = -1;
             stargraphic.DrawProperties.Add(new PointSizeProperty(1));
-            info.Layer.AddGraphic(stargraphic);
+            info.Scene.AddGraphic(stargraphic);
         }
     }
 }

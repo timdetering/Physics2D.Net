@@ -44,6 +44,7 @@ namespace Graphics2DDotNet
     public interface IAnimation
     {
         Lifespan LifeTime { get;set;}
-        void Apply(IGraphic parent, DrawInfo drawInfo);
+        void Apply(Graphic parent, DrawInfo drawInfo);
+        void Remove(Graphic parent, DrawInfo drawInfo);
     }
 }

@@ -55,7 +55,7 @@ namespace Physics2DDotNet.Demo.Demos
             List<Body> bodies = new List<Body>();
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(250, 0), bodies);
 
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 

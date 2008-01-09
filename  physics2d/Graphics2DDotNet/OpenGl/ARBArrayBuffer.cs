@@ -21,62 +21,61 @@
  */
 #endregion
 
-
-
 #if UseDouble
 using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Text;
-using System.Drawing;
+using System.Runtime.InteropServices;
 using AdvanceMath;
-using Graphics2DDotNet;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.PhysicsLogics;
-using SdlDotNet;
+using Tao.OpenGl;
 using SdlDotNet.Graphics;
-namespace Physics2DDotNet.Demo.Demos
+namespace Graphics2DDotNet
 {
-    public abstract class BaseDemo : IPhysicsDemo
+    public sealed class ARBArrayBuffer<T> : IDisposable
     {
-        Window window;
-        Viewport viewport;
-        Scene scene;
-        DemoOpenInfo demoInfo;
-        public void Open(DemoOpenInfo demoInfo)
+        T[] array;
+        int bufferName;
+        int refresh;
+        int elementSize;
+        public ARBArrayBuffer(T[] array, int elementSize)
         {
-            this.window = demoInfo.Window;
-            this.viewport = demoInfo.Viewport;
-            this.scene = demoInfo.Scene;
-            this.demoInfo = demoInfo;
-            Open();
+            if (array == null) { throw new ArgumentNullException("array"); }
+            this.array = array;
+            this.elementSize = elementSize;
+            this.refresh = -1;
+            this.bufferName = -1;
         }
-        public Window Window
+        ~ARBArrayBuffer()
         {
-            get { return window; }
+            Dispose(false);
         }
-        public Viewport Viewport
+        public int Length { get { return array.Length; } }
+        public void Buffer(int refresh)
         {
-            get { return viewport; }
+            this.refresh = refresh;
+            Gl.glGenBuffersARB(1, out bufferName);
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, bufferName);
+            GlHelper.GlBufferDataARB(
+                Gl.GL_ARRAY_BUFFER_ARB,
+                array,
+                array.Length * elementSize,
+                Gl.GL_STATIC_DRAW_ARB);
         }
-        public Scene Scene
+        public void Bind()
         {
-            get { return scene; }
+            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, bufferName);
         }
-        public DemoOpenInfo DemoInfo
+        private void Dispose(bool disposing)
         {
-            get { return demoInfo; }
+            GlHelper.GlDeleteBuffersARB(refresh, new int[] { bufferName });
         }
-        protected abstract void Open();
-        protected abstract void Dispose(bool disposing);
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
+
 }

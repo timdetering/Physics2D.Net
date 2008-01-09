@@ -46,29 +46,15 @@ namespace Graphics2DDotNet
 {
     public class Window
     {
-        class ZOrderComparer : IComparer<Viewport>
+        public event EventHandler<CollectionEventArgs<Viewport>> ViewportsAdded
         {
-            public int Compare(Viewport x, Viewport y)
-            {
-                int result = x.ZOrder.CompareTo(y.ZOrder);
-                if (result == 0)
-                {
-                    result = x.ID.CompareTo(y.ID);
-                }
-                return result;
-            }
+            add { viewports.ItemsAdded += value; }
+            remove { viewports.ItemsAdded -= value; }
         }
-        static ZOrderComparer zOrderComparer = new ZOrderComparer();
-
-        bool IsViewportExpired(Viewport item)
+        public event EventHandler<CollectionEventArgs<Viewport>> ViewportsRemoved
         {
-            if (item.IsExpired)
-            {
-                item.ZOrderChanged -= OnZOrderChanged;
-                item.OnRemoved();
-                return true;
-            }
-            return false;
+            add { viewports.ItemsRemoved += value; }
+            remove { viewports.ItemsRemoved -= value; }
         }
 
         public event EventHandler<SizeEventArgs> Resized;
@@ -76,22 +62,20 @@ namespace Graphics2DDotNet
         Surface screen;
         Size size;
         bool isResized;
-
-        List<Viewport> pendingViewports;
-        List<Viewport> viewports;
-
+        PendableCollection<Window, Viewport> viewports;
         int drawCount;
         int refreshCount;
         PhysicsTimer drawTimer;
         bool isRunning;
-        bool zOrderChanged;
+        [NonSerialized]
+        AdvReaderWriterLock rwLock;
         public Window(Size size)
         {
             this.size = size;
             this.drawTimer = new PhysicsTimer(GraphicsProcess, .01f);
-            this.pendingViewports = new List<Viewport>();
-            this.viewports = new List<Viewport>();
+            this.viewports = new PendableCollection<Window, Viewport>(this);
             this.syncRoot = new object();
+            this.rwLock = new AdvReaderWriterLock();
         }
         public string Title
         {
@@ -108,7 +92,14 @@ namespace Graphics2DDotNet
         {
             get { return isRunning; }
         }
-        private void GraphicsProcess(Scalar dt,Scalar trueDt)
+        public ReadOnlyThreadSafeCollection<Viewport> Viewports
+        {
+            get
+            {
+                return new ReadOnlyThreadSafeCollection<Viewport>(rwLock, viewports.Items);
+            }
+        }
+        private void GraphicsProcess(Scalar dt, Scalar trueDt)
         {
             while (Events.Poll()) { }
             if (isResized)
@@ -119,23 +110,30 @@ namespace Graphics2DDotNet
             }
             GlHelper.DoGlDeleteBuffersARB(refreshCount);
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
-            RemoveExpired();
-            AddPending();
             Draw(dt, trueDt);
             Video.GLSwapBuffers();
         }
         void Draw(Scalar dt, Scalar trueDt)
         {
-            drawCount++;
-            DrawInfo drawInfo = new DrawInfo(dt,trueDt, drawCount, refreshCount);
-            if (zOrderChanged)
+            rwLock.EnterWrite();
+            try
             {
-                zOrderChanged = false;
-                viewports.Sort(zOrderComparer);
+                viewports.RemoveExpired();
+                lock (syncRoot)
+                {
+                    viewports.AddPending();
+                }
+                viewports.CheckZOrder();
+                drawCount++;
+                DrawInfo drawInfo = new DrawInfo(dt, trueDt, drawCount, refreshCount);
+                foreach (Viewport viewport in viewports.Items)
+                {
+                    viewport.Draw(drawInfo);
+                }
             }
-            foreach (Viewport viewport in viewports)
+            finally
             {
-                viewport.Draw(drawInfo);
+                rwLock.ExitWrite();
             }
         }
         void Init()
@@ -195,40 +193,19 @@ namespace Graphics2DDotNet
         {
             this.drawTimer.Dispose();
         }
-
-        void RemoveExpired()
-        {
-            viewports.RemoveAll(IsViewportExpired);
-        }
-        void AddPending()
+        public void AddViewport(Viewport item)
         {
             lock (syncRoot)
             {
-                if (pendingViewports.Count > 0)
-                {
-                    viewports.AddRange(pendingViewports);
-                    foreach (Viewport item in pendingViewports)
-                    {
-                        item.ZOrderChanged += OnZOrderChanged;
-
-                    }
-                    pendingViewports.Clear();
-                    zOrderChanged = true;
-                }
+                viewports.Add(item);
             }
         }
-        void OnZOrderChanged(object sender, EventArgs e)
+        public void AddViewportRange(ICollection<Viewport> collection)
         {
-            this.zOrderChanged = true;
-        }
-        public Viewport CreateViewport(Rectangle rectangle, Matrix2x3 projection, Layer layer)
-        {
-            Viewport viewport = new Viewport(this, rectangle, projection, layer);
             lock (syncRoot)
             {
-                pendingViewports.Add(viewport);
+                viewports.AddRange(collection);
             }
-            return viewport;
         }
     }
 }

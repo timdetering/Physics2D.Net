@@ -27,62 +27,34 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
 using Tao.OpenGl;
-
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
     public sealed class Colored4VertexesDrawable : BufferedDrawable
     {
-        int vertexName = -1;
-        int colorName = -1;
-        Vector2D[] vertexes;
-        ScalarColor4[] colors;
+        ARBArrayBuffer<ScalarColor4> colors;
+        ARBArrayBuffer<Vector2D> vertexes;
         int mode;
         public Colored4VertexesDrawable(int mode,Vector2D[] vertexes, ScalarColor4[] colors)
         {
             if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
             if (colors == null) { throw new ArgumentNullException("colors"); }
             if (colors.Length != vertexes.Length) { throw new ArgumentException("TODO length !="); }
-            this.vertexes = vertexes;
-            this.colors = colors;
+            this.vertexes = new ARBArrayBuffer<Vector2D>(vertexes, Vector2D.Size);
+            this.colors = new ARBArrayBuffer<ScalarColor4>(colors, ScalarColor4.Size);
             this.mode = mode;
         }
-        protected override void BufferData()
+        protected override void BufferData(int refresh)
         {
-            Gl.glGenBuffersARB(1, out vertexName);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
-            GlHelper.GlBufferDataARB(
-                Gl.GL_ARRAY_BUFFER_ARB,
-                vertexes,
-                vertexes.Length * Vector2D.Size,
-                Gl.GL_STATIC_DRAW_ARB);
-
-            Gl.glGenBuffersARB(1, out colorName);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorName);
-            GlHelper.GlBufferDataARB(
-                Gl.GL_ARRAY_BUFFER_ARB,
-                colors,
-                colors.Length * ScalarColor4.Size,
-                Gl.GL_STATIC_DRAW_ARB);
+            vertexes.Buffer(refresh);
+            colors.Buffer(refresh);
         }
         protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
         {
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
+            vertexes.Bind();
             Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorName);
+            colors.Bind();
             Gl.glColorPointer(ScalarColor4.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
 
             Gl.glDrawArrays(mode, 0, vertexes.Length);
@@ -103,7 +75,11 @@ namespace Graphics2DDotNet
         }
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName, colorName });
+            if (disposing)
+            {
+                vertexes.Dispose();
+                colors.Dispose();
+            }
         }
     }
 

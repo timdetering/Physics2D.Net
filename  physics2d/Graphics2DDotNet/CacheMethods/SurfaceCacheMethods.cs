@@ -84,6 +84,10 @@ namespace Graphics2DDotNet
         {
             item.Dispose();
         }
+        public bool Validate(Surface item)
+        {
+            return true;
+        }
     }
 
 }

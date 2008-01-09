@@ -52,7 +52,7 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 
             IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);

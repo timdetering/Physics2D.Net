@@ -77,6 +77,9 @@ namespace Physics2DDotNet
         #region static
         static int threadCount;
         #endregion
+        #region events
+        public event EventHandler IsRunningChanged; 
+        #endregion
         #region fields
         bool isBackground;
         bool isDisposed;
@@ -154,6 +157,7 @@ namespace Physics2DDotNet
                             waitHandle.Set();
                         }
                     }
+                    if (IsRunningChanged != null) { IsRunningChanged(this, EventArgs.Empty); }
                 }
             }
         }

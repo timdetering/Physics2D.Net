@@ -68,14 +68,10 @@ namespace Physics2DDotNet.Demo
             string dir = Settings.DataDir;
 
             //Create a new Layer 
-            Layer layer = new Layer();
-            Layer layer2 = new Layer();
-            PhysicsEngine physicsEngine2 = layer2.Engine;
-            physicsEngine2.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
-            //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
-            physicsEngine2.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
-            //Get the layers physics engine
-            PhysicsEngine physicsEngine = layer.Engine;
+            Scene scene = new Scene();
+
+            //Get the scenes physics engine
+            PhysicsEngine physicsEngine = scene.Engine;
             //initialize the engine 
             physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
@@ -85,17 +81,12 @@ namespace Physics2DDotNet.Demo
             Window window = new Window(new System.Drawing.Size(1000, 750));
             window.Title = "Physics2D.Net Demo";
 
-            Viewport viewport = window.CreateViewport(
+            Viewport viewport = new Viewport(
                 new Rectangle(0, 0, window.Size.Width, window.Size.Height), //where
                 Matrix2x3.Identity, //how
-                layer); //who
-
-            Viewport viewport2 = window.CreateViewport(
-                new Rectangle(0, 0, window.Size.Width, window.Size.Height), //where
-                Matrix2x3.Identity, //how
-                layer2); //who
-
-
+                scene, //who
+                new Lifespan()); // how long 
+            window.AddViewport(viewport);
 
             // you can change the veiwport via this 
             viewport.ToScreen = Matrix2x3.FromTransformation(.09f, new Vector2D(40, 0));
@@ -105,20 +96,41 @@ namespace Physics2DDotNet.Demo
             {
                 viewport.Width = e.Width;
                 viewport.Height = e.Height;
-                viewport2.Width = e.Width;
-                viewport2.Height = e.Height;
             };
             System.Windows.Forms.Application.EnableVisualStyles();
             //create the GUI
             DemoSelector selector = new DemoSelector();
             //initialize the GUI
-            selector.Initialize(window, viewport, layer);
+            selector.Initialize(window, viewport, scene);
             //Create the window
             window.Intialize();
             window.DrawingInterval = .02f;
             //Add some intro text
+
+
+            AddIntoText(window, viewport, scene);
+            SetupStatus(window, scene);
+
+
+            //Show the GUI
+            selector.Show();
+            //start the physicstimer for Layer.PhysicsEngine
+            scene.Timer.IsRunning = true;
+            //Begin the rendering loop. 
+            window.Run();
+            return;
+        }
+
+
+
+        static string numberString = "0123456789";
+        static SurfacePolygons[] numbers2;
+        static IShape[] numbers;
+
+        private static void AddIntoText(Window window, Viewport viewport, Scene scene)
+        {
             DemoHelper.AddText(
-                new DemoOpenInfo(window, viewport, layer),
+    new DemoOpenInfo(window, viewport, scene),
 @"WELCOME TO THE PHYSICS2D.NET DEMO.
 PLEASE ENJOY MESSING WITH IT.
 A LOT OF HARD WORK WENT INTO IT,
@@ -129,8 +141,30 @@ ACTUAL BODY IN THE ENGINE.
 THIS IS TO SHOW OFF THE BITMAP
 TO POLYGON ALGORITHM.
 LOAD THE INTRO TEXT DEMO TO MANIPULATE 
-THIS TEXT.", new Vector2D(20, 20),40);
+THIS TEXT.", new Vector2D(20, 20), 40);
+        }
+        private static void SetupStatus(Window window, Scene scene)
+        {
 
+            Scene scene2 = new Scene();
+            PhysicsEngine physicsEngine2 = scene2.Engine;
+            physicsEngine2.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
+            physicsEngine2.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+
+            Viewport viewport2 = new Viewport(
+                    new Rectangle(0, 0, window.Size.Width, window.Size.Height), //where
+                    Matrix2x3.Identity, //how
+                    scene2, //who
+                    new Lifespan()); // how long
+            window.AddViewport(viewport2);
+
+
+            window.Resized += delegate(object sender, SizeEventArgs e)
+            {
+                viewport2.Width = e.Width;
+                viewport2.Height = e.Height;
+            };
 
             numbers = new IShape[10];
             numbers2 = new SurfacePolygons[10];
@@ -142,26 +176,16 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 s.Color = new ScalarColor4(.1f, .1f, 1, 1);
             }
 
-            DoBodyCount(window, viewport2, layer, layer2, new Vector2D(100, 2));
-            DoJointCount(window, viewport2, layer, layer2, new Vector2D(100, 30));
-            DoLogicsCount(window, viewport2, layer, layer2, new Vector2D(270, 2));
-            DoFPS(window, viewport2, layer, layer2, new Vector2D(2,2));
-            DoUPS(window, viewport2, layer, layer2, new Vector2D(2, 30));
-            //Show the GUI
-            selector.Show();
-            //start the physicstimer for Layer.PhysicsEngine
-            layer.Begin();
-            //Begin the rendering loop. 
-            window.Run();
-            return;
+            DoBodyCount(window, viewport2, scene, scene2, new Vector2D(100, 2));
+            DoJointCount(window, viewport2, scene, scene2, new Vector2D(100, 30));
+            DoLogicsCount(window, viewport2, scene, scene2, new Vector2D(270, 2));
+            DoFPS(window, viewport2, scene, scene2, new Vector2D(2, 2));
+            DoUPS(window, viewport2, scene, scene2, new Vector2D(2, 30));
         }
-        static string numberString = "0123456789";
-        static SurfacePolygons[] numbers2;
-        static IShape[] numbers;
 
-        private static void DoUPS(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        private static void DoUPS(Window window, Viewport viewport2, Scene scene1, Scene scene2, Vector2D pos)
         {
-            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "UPS: 000", pos,20);
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, scene2), "UPS: 000", pos,20);
             foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
@@ -175,7 +199,7 @@ THIS TEXT.", new Vector2D(20, 20),40);
             }
             int frames = 50;
             Scalar frameSeconds = 1;
-            layer1.Engine.Updated += delegate(object sender, UpdatedEventArgs e)
+            scene1.Engine.Updated += delegate(object sender, UpdatedEventArgs e)
             {
                 if (frames >= 10)
                 {
@@ -190,9 +214,9 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 SetBodiesText(bodies, positions, val);
             };
         }
-        private static void DoFPS(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        private static void DoFPS(Window window, Viewport viewport2, Scene scene1, Scene scene2, Vector2D pos)
         {
-            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "FPS: 000", pos,20);
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, scene2), "FPS: 000", pos,20);
             foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
@@ -221,9 +245,9 @@ THIS TEXT.", new Vector2D(20, 20),40);
                 SetBodiesText(bodies, positions, val);
             };
         }
-        private static void DoLogicsCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        private static void DoLogicsCount(Window window, Viewport viewport2, Scene scene1, Scene scene2, Vector2D pos)
         {
-            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Logics: 000000", pos, 20);
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, scene2), "Logics: 000000", pos, 20);
             foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
@@ -237,15 +261,15 @@ THIS TEXT.", new Vector2D(20, 20),40);
             }
             EventHandler<CollectionEventArgs<PhysicsLogic>> handler = delegate(object sender, CollectionEventArgs<PhysicsLogic> e)
             {
-                string val = layer1.Engine.Logics.Count.ToString();
+                string val = scene1.Engine.Logics.Count.ToString();
                 SetBodiesText(bodies, positions, val);
             };
-            layer1.Engine.LogicsAdded += handler;
-            layer1.Engine.LogicsRemoved += handler;
+            scene1.Engine.LogicsAdded += handler;
+            scene1.Engine.LogicsRemoved += handler;
         }
-        private static void DoJointCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        private static void DoJointCount(Window window, Viewport viewport2, Scene scene1, Scene scene2, Vector2D pos)
         {
-            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Joints: 000000", pos, 20);
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, scene2), "Joints: 000000", pos, 20);
             foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
@@ -259,15 +283,15 @@ THIS TEXT.", new Vector2D(20, 20),40);
             }
             EventHandler<CollectionEventArgs<Joint>> handler = delegate(object sender, CollectionEventArgs<Joint> e)
             {
-                string val = layer1.Engine.Joints.Count.ToString();
+                string val = scene1.Engine.Joints.Count.ToString();
                 SetBodiesText(bodies, positions, val);
             };
-            layer1.Engine.JointsAdded += handler;
-            layer1.Engine.JointsRemoved += handler;
+            scene1.Engine.JointsAdded += handler;
+            scene1.Engine.JointsRemoved += handler;
         }
-        private static void DoBodyCount(Window window, Viewport viewport2, Layer layer1, Layer layer2, Vector2D pos)
+        private static void DoBodyCount(Window window, Viewport viewport2, Scene scene1, Scene scene2, Vector2D pos)
         {
-            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, layer2), "Bodies: 000000", pos,20);
+            List<Body> bodies = DemoHelper.AddText(new DemoOpenInfo(window, viewport2, scene2), "Bodies: 000000", pos,20);
             foreach (Body body in bodies)
             {
                 SpriteDrawable s = body.Shape.Tag as SpriteDrawable;
@@ -281,11 +305,11 @@ THIS TEXT.", new Vector2D(20, 20),40);
             }
             EventHandler<CollectionEventArgs<Body>> handler = delegate(object sender, CollectionEventArgs<Body> e)
             {
-                string val = layer1.Engine.Bodies.Count.ToString();
+                string val = scene1.Engine.Bodies.Count.ToString();
                 SetBodiesText(bodies, positions, val);
             };
-            layer1.Engine.BodiesAdded += handler;
-            layer1.Engine.BodiesRemoved += handler;
+            scene1.Engine.BodiesAdded += handler;
+            scene1.Engine.BodiesRemoved += handler;
         }
         private static void SetBodiesText(List<Body> bodies, Vector2D[] positions, string val)
         {

@@ -56,7 +56,7 @@ namespace Physics2DDotNet.Demo.Demos
 
             Vector2D gravityCenter = new Vector2D(500, 500);
             Scalar gravityPower = 200;
-            Layer.Engine.AddLogic(new GravityPointField(gravityCenter, gravityPower, new Lifespan()));
+            Scene.Engine.AddLogic(new GravityPointField(gravityCenter, gravityPower, new Lifespan()));
             DemoHelper.AddRagDoll(DemoInfo, gravityCenter + new Vector2D(0, -20));
             Scalar length = 41;
             Scalar size = 8

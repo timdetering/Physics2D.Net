@@ -60,12 +60,12 @@ A large number of particles being pushed arround by 2 spinning guys
             fighter.Mass.MomentOfInertia = Scalar.PositiveInfinity;
             
             BodyGraphic fighterGraphic = new BodyGraphic(fighter);
-            Layer.AddGraphic(fighterGraphic);
+            Scene.AddGraphic(fighterGraphic);
 
             BodyGraphic fighterGraphic2 = (BodyGraphic)fighterGraphic.Duplicate();
             fighterGraphic2.Body.State.Position.Linear.Y = 500;
             fighterGraphic2.Body.State.Velocity.Angular = -8.5f;
-            Layer.AddGraphic(fighterGraphic2);
+            Scene.AddGraphic(fighterGraphic2);
 
             ParticleShape particleShape = new ParticleShape();
             particleShape.Tag = DrawableFactory.CreateSprite(Cache<Surface>.GetItem("particle.png"), new Vector2D(8, 8));
@@ -86,10 +86,10 @@ A large number of particles being pushed arround by 2 spinning guys
                     body.State.Velocity.Linear = m * body.State.Velocity.Linear;
                     body.LinearDamping = .9999f;
                     BodyGraphic g1 = new BodyGraphic(body);
-                    Layer.AddGraphic(g1);
+                    Scene.AddGraphic(g1);
                 }
             }
-            Layer.Engine.AddLogic(new GravityPointField(new Vector2D(400, 400), 500, new Lifespan()));
+            Scene.Engine.AddLogic(new GravityPointField(new Vector2D(400, 400), 500, new Lifespan()));
 
         }
 

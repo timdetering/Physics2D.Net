@@ -52,7 +52,7 @@ namespace Physics2DDotNet.Demo.Demos
         {
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(300, 0));
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
             DemoHelper.AddLine(DemoInfo, new Vector2D(0, 700), new Vector2D(300, 700), 30, Scalar.PositiveInfinity).IgnoresGravity = true;
             DemoHelper.AddLine(DemoInfo, new Vector2D(300, 700), new Vector2D(400, 650), 30, Scalar.PositiveInfinity).IgnoresGravity = true;
             DemoHelper.AddLine(DemoInfo, new Vector2D(400, 650), new Vector2D(500, 650), 30, Scalar.PositiveInfinity).IgnoresGravity = true;

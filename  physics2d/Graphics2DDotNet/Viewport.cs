@@ -46,7 +46,7 @@ using SdlDotNet.Input;
 
 namespace Graphics2DDotNet
 {
-    public class Viewport
+    public class Viewport : Pendable<Window>
     {
         static int idCounter = 0;
         class ViewportClipperLogic : Physics2DDotNet.PhysicsLogics.PhysicsLogic
@@ -235,78 +235,50 @@ namespace Graphics2DDotNet
         }
 
         public event EventHandler Changed;
-        public event EventHandler Removed;
-
         public event EventHandler<DrawEventArgs> BeginDrawing;
         public event EventHandler<DrawEventArgs> EndDrawing;
 
-        public event EventHandler ZOrderChanged;
-
+        object syncRoot;
         bool calculated;
         Rectangle rectangle;
         Scalar[] matrixArray;
         Matrix2x3 toWorld;
         Matrix2x3 toScreen;
-        Layer layer;
-        Window engine;
-        bool isExpired;
-        List<ViewportClipperLogic> clippers;
-        int zOrder;
-        internal Viewport(
-            Window engine,
-            Rectangle rectangle,
+        Scene scene;
+        ViewportClipperLogic clipper;
+        public Viewport( Rectangle rectangle,
             Matrix2x3 projection,
-            Layer layer)
+            Scene scene,Lifespan lifetime):base(lifetime)
         {
+            this.syncRoot = new object();
             this.matrixArray = new Scalar[16];
             this.rectangle = rectangle;
-            this.layer = layer;
+            this.scene = scene;
             this.toScreen = projection;
-            this.engine = engine;
-            this.clippers = new List<ViewportClipperLogic>();
             Calc();
-            AddClippers();
+            this.scene.AddViewport(this);
+            AddClipper();
         }
-        public int ZOrder
+        void AddClipper()
         {
-            get { return zOrder; }
-            set
-            {
-                if (zOrder != value)
-                {
-                    zOrder = value;
-                    if (ZOrderChanged != null) { ZOrderChanged(this, EventArgs.Empty); }
-                }
-            }
-        }
-        public int ID
-        { get { return id; } }
-        void AddClippers()
-        {
-            Layer layer = this.layer;
-            while (layer != null)
-            {
-                ViewportClipperLogic clipper = new ViewportClipperLogic(this);
-                clipper.Removed += new EventHandler<RemovedEventArgs>(OnClipperRemoved);
-                clippers.Add(clipper);
-                layer.Engine.AddLogic(clipper);
-                layer = layer.Overlay;
-            }
+            clipper = new ViewportClipperLogic(this);
+            clipper.Removed += new EventHandler<RemovedEventArgs>(OnClipperRemoved);
+            scene.Engine.AddLogic(clipper);
         }
         void OnClipperRemoved(object sender, RemovedEventArgs e)
         {
-            ViewportClipperLogic clipper = (ViewportClipperLogic)sender;
             clipper.Lifetime.IsExpired = false;
             e.Engine.AddLogic(clipper);
         }
-        void RemoveClippers()
+        void RemoveClipper()
         {
-            foreach (ViewportClipperLogic clipper in clippers)
-            {
-                clipper.Removed -= OnClipperRemoved;
-                clipper.Lifetime.IsExpired = true;
-            }
-            clippers.Clear();
+            clipper.Removed -= OnClipperRemoved;
+            clipper.Lifetime.IsExpired = true;
+        }
+        protected override void OnRemoved(RemovedEventArgs<Window> e)
+        {
+            RemoveClipper();
+            base.OnRemoved(e);
         }
 
         public Vector2D MousePosition
@@ -320,11 +292,6 @@ namespace Graphics2DDotNet
             }
         }
 
-        public bool IsExpired
-        {
-            get { return isExpired; }
-            set { isExpired = value; }
-        }
         public Rectangle Rectangle
         {
             get
@@ -351,20 +318,20 @@ namespace Graphics2DDotNet
                 calculated = false;
             }
         }
-        public Window Engine
+        public Scene Scene
         {
-            get { return engine; }
-            internal set { engine = value; }
-        }
-        public Layer LayerInstance
-        {
-            get { return layer; }
+            get { return scene; }
             set
             {
                 if (value == null) { throw new ArgumentOutOfRangeException("value"); }
-                RemoveClippers();
-                layer = value;
-                AddClippers();
+                lock (syncRoot)
+                {
+                    RemoveClipper();
+                    scene.RemoveViewport(this);
+                    scene = value;
+                    value.AddViewport(this);
+                    AddClipper();
+                }
             }
         }
         public int X
@@ -416,11 +383,6 @@ namespace Graphics2DDotNet
             Matrix4x4.CopyTranspose(ref result, matrixArray);
             if (Changed != null) { Changed(this, EventArgs.Empty); }
         }
-        internal void OnRemoved()
-        {
-            this.engine = null;
-            if (Removed != null) { Removed(this, EventArgs.Empty); }
-        }
         public void Draw(DrawInfo drawInfo)
         {
             if (BeginDrawing != null) { BeginDrawing(this, new DrawEventArgs(drawInfo)); }
@@ -433,7 +395,7 @@ namespace Graphics2DDotNet
             }
             GlHelper.GlLoadMatrix(matrixArray);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
-            layer.Draw(drawInfo);
+            scene.Draw(drawInfo);
             if (EndDrawing != null) { EndDrawing(this, new DrawEventArgs(drawInfo)); }
         }
     }

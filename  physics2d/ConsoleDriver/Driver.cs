@@ -61,8 +61,26 @@ namespace ConsoleDriver
     public sealed class OperationFactoryAttribute : Attribute
     {
         readonly Type operation;
+
+        public Type Operation
+        {
+            get { return operation; }
+        }
+
         readonly Type left;
+
+        public Type Left
+        {
+            get { return left; }
+        }
+
         readonly Type right;
+
+        public Type Right
+        {
+            get { return right; }
+        } 
+
         public OperationFactoryAttribute(Type operation, Type left, Type right)
         {
             this.operation = operation;
@@ -175,7 +193,6 @@ namespace ConsoleDriver
         }
     }
 
-
     public class TimeTester
     {
         Stopwatch stopwatch = new Stopwatch();
@@ -265,8 +282,6 @@ namespace ConsoleDriver
             return stopwatch.Elapsed;
         }
     }
-
-
 
     static class Driver
     {

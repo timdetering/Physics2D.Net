@@ -52,18 +52,10 @@ namespace Physics2DDotNet.Demo.Demos
         {
 
 
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
             IShape bombShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("rocket.png"), 2, 16, 3);
-            dispose += DemoHelper.RegisterBombLaunching(DemoInfo, bombShape, 120);
-            dispose += DemoHelper.RegisterMousePicking(DemoInfo);
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
-            dispose += DemoHelper.RegisterMaintainSpawning(DemoInfo, SdlDotNet.Input.Key.N,
-                delegate(Vector2D position)
-                {
-                    ExplosionLogic result = new ExplosionLogic(position, Vector2D.Zero, 9000, .4f, 800, new Lifespan(1));
-                    DemoInfo.Layer.Engine.AddLogic(result);
-                    return result;
-                });
 
 
             Coefficients o = DemoHelper.Coefficients;

@@ -207,6 +207,29 @@ namespace Graphics2DDotNet
             return shape;
         }
 
+        public static IShape CreateSprite(SurfacePolygons surfacePolygons, Surface bumpmap, bool xInverted, bool yInverted, int reduce, Scalar subdivide, Scalar gridSpacing, Light light)
+        {
+            Vector2D[][] polygons = surfacePolygons.Polygons;
+            for (int index = 1; index < reduce; index++)
+            {
+                polygons = VertexHelper.ReduceRange(polygons, index);
+            }
+            polygons = VertexHelper.SubdivideRange(polygons, subdivide);
+            Vector2D centroid = surfacePolygons.Offset;
+            IShape shape;
+            if (polygons.Length == 1)
+            {
+                shape = new PolygonShape(polygons[0], gridSpacing);
+            }
+            else
+            {
+                shape = new MultiPolygonShape(polygons, gridSpacing);
+            }
+            shape.Tag = DrawableFactory.CreateSprite(surfacePolygons.Surface, bumpmap,xInverted,yInverted, centroid,light);
+            return shape;
+        }
+
+
         public static RaySegmentsShape CreateRays(RaySegment[] raySegments)
         {
             RaySegmentsShape rayShape = new RaySegmentsShape(raySegments);

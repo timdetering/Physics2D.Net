@@ -21,62 +21,59 @@
  */
 #endregion
 
-
-
 #if UseDouble
 using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Text;
-using System.Drawing;
+using System.Runtime.InteropServices;
 using AdvanceMath;
-using Graphics2DDotNet;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.PhysicsLogics;
-using SdlDotNet;
+using Tao.OpenGl;
 using SdlDotNet.Graphics;
-namespace Physics2DDotNet.Demo.Demos
+namespace Graphics2DDotNet
 {
-    public abstract class BaseDemo : IPhysicsDemo
+    public sealed class Texture2D : IDisposable
     {
-        Window window;
-        Viewport viewport;
-        Scene scene;
-        DemoOpenInfo demoInfo;
-        public void Open(DemoOpenInfo demoInfo)
+        Surface surface;
+        bool flip;
+        TextureOptions options;
+        int refresh;
+        int textureID;
+
+        public Texture2D(Surface surface, bool flip, TextureOptions options)
         {
-            this.window = demoInfo.Window;
-            this.viewport = demoInfo.Viewport;
-            this.scene = demoInfo.Scene;
-            this.demoInfo = demoInfo;
-            Open();
+            if (surface == null) { throw new ArgumentNullException("surface"); }
+            if (options == null) { throw new ArgumentNullException("options"); }
+            this.surface = surface;
+            this.flip = flip;
+            this.options = options;
+            this.refresh = -1;
+            this.textureID = -1;
         }
-        public Window Window
+        ~Texture2D()
         {
-            get { return window; }
+            Dispose(false);
         }
-        public Viewport Viewport
+
+        public void Buffer(int refresh)
         {
-            get { return viewport; }
+            this.refresh = refresh;
+            this.textureID = TextureHelper.LoadTexture2D(surface, flip, options);
         }
-        public Scene Scene
+
+        public void Bind()
         {
-            get { return scene; }
+            Gl.glBindTexture(Gl.GL_TEXTURE_2D, textureID);
         }
-        public DemoOpenInfo DemoInfo
+        private void Dispose(bool disposing)
         {
-            get { return demoInfo; }
+            GlHelper.GlDeleteTextures(refresh, new int[] { textureID });
         }
-        protected abstract void Open();
-        protected abstract void Dispose(bool disposing);
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

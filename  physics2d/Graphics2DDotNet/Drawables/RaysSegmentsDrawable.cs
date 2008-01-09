@@ -27,22 +27,12 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Runtime.InteropServices;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
 using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
 using Physics2DDotNet.PhysicsLogics;
 using Tao.OpenGl;
-
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
     public class RaysSegmentsDrawable : IDrawable
@@ -55,13 +45,17 @@ namespace Graphics2DDotNet
             public RaysSegmentsState(int count)
             {
                 lenghts = new Scalar[count];
+                for (int index = 0; index < count; ++index)
+                {
+                    lenghts[index] = -1;
+                }
             }
-            public void OnPending(IGraphic parent)
+            public void OnPending(Graphic parent)
             {
                 this.parent = parent as BodyGraphic;
                 logic = new RaySegmentsCollisionLogic(this.parent.Body);
-                parent.Parent.Engine.AddLogic(logic);
-                logic.NewInfo += new EventHandler(logic_NewInfo);
+                parent.Parent.physicsLogics.Add(logic);
+                logic.NewInfo += logic_NewInfo;
             }
             void logic_NewInfo(object sender, EventArgs e)
             {
@@ -70,9 +64,7 @@ namespace Graphics2DDotNet
                     lenghts[index] = logic.Collisions[index].Distance;
                 }
             }
-
         }
-
         object tag;
         RaySegmentsShape shape;
         Vector2D[] array;
@@ -82,8 +74,10 @@ namespace Graphics2DDotNet
             this.array = new Vector2D[shape.Segments.Length * 2];
             for (int index = 0; index < shape.Segments.Length; ++index)
             {
-                array[index * 2] = shape.Segments[index].RayInstance.Origin;
-                array[index * 2 + 1] = shape.Segments[index].RayInstance.Origin + shape.Segments[index].RayInstance.Direction * shape.Segments[index].Length;
+                RaySegment segment = shape.Segments[index];
+                Ray ray = segment.RayInstance;
+                array[index * 2] = ray.Origin;
+                array[index * 2 + 1] = ray.Origin + ray.Direction * segment.Length;
             }
         }
         public object Tag
@@ -91,12 +85,10 @@ namespace Graphics2DDotNet
             get { return tag; }
             set { tag = value; }
         }
-
         public IDrawableState CreateState()
         {
             return new RaysSegmentsState(shape.Segments.Length);
         }
-
         public void Draw(DrawInfo drawInfo, IDrawableState state)
         {
             RaysSegmentsState st = state as RaysSegmentsState;

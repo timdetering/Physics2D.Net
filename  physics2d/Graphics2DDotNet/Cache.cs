@@ -45,32 +45,19 @@ namespace Graphics2DDotNet
 {
     public static class Cache<TValue>
     {
-        sealed class TypeComparer : IComparer<Type>
+        private sealed class TypeComparer : IComparer<Type>
         {
             public int Compare(Type x, Type y)
             {
                 return x.Name.CompareTo(y.Name);
             }
         }
-        static TypeComparer typeComparer = new TypeComparer();
 
-
-        static object syncRoot;
-        static ICacheMethods<TValue> methods;
-
-        static bool IsCacheLoaderInterface(Type type, object filterCriteria)
-        {
-            return type == typeof(ICacheMethods<TValue>);
-        }
-        static bool IsCacheLoader(Type type, object filterCriteria)
-        {
-            return type.FindInterfaces(IsCacheLoaderInterface, null).Length > 0;
-        }
+        private static object syncRoot;
+        private static ICacheMethods<TValue> methods;
         private static Dictionary<string, WeakReference> cache;
         static Cache()
         {
-
-
             List<Type> types = new List<Type>();
             foreach (Module module in Assembly.GetCallingAssembly().GetLoadedModules(true))
             {
@@ -84,7 +71,7 @@ namespace Graphics2DDotNet
             {
                 types.AddRange(module.FindTypes(IsCacheLoader, null));
             }
-            types.Sort(typeComparer);
+            types.Sort(new TypeComparer());
             Type last = null;
             types.RemoveAll(delegate(Type t)
             {
@@ -100,22 +87,49 @@ namespace Graphics2DDotNet
             cache = new Dictionary<string, WeakReference>();
             syncRoot = new object();
         }
+        private static bool IsCacheLoaderInterface(Type type, object filterCriteria)
+        {
+            return type == typeof(ICacheMethods<TValue>);
+        }
+        private static bool IsCacheLoader(Type type, object filterCriteria)
+        {
+            return type.FindInterfaces(IsCacheLoaderInterface, null).Length > 0;
+        }
+        private static bool TryGetValue(string name, out TValue result)
+        {
 
-        public static TValue GetItem(string name,params object[] loadArgs)
+            WeakReference weakReference;
+            if (cache.TryGetValue(name, out weakReference) &&
+                weakReference.IsAlive)
+            {
+                result = (TValue)weakReference.Target;
+                if (methods.Validate(result))
+                {
+                    return true;
+                }
+                else
+                {
+                    cache.Remove(name);
+                }
+            }
+            else
+            {
+                result = default(TValue);
+            }
+            return false;
+        }
+
+        public static TValue GetItem(string name, params object[] loadArgs)
         {
             if (name == null) { throw new ArgumentNullException("name"); }
             lock (syncRoot)
             {
-                WeakReference weakReference;
-                if (cache.TryGetValue(name, out weakReference))
+                TValue result;
+                if (!TryGetValue(name, out result))
                 {
-                    if (weakReference.IsAlive)
-                    {
-                        return (TValue)weakReference.Target;
-                    }
+                    result = methods.LoadItem(name, loadArgs);
+                    cache[name] = new WeakReference(result);
                 }
-                TValue result = methods.LoadItem(name, loadArgs);
-                cache[name] = new WeakReference(result);
                 return result;
             }
         }
@@ -124,19 +138,14 @@ namespace Graphics2DDotNet
             if (name == null) { throw new ArgumentNullException("name"); }
             lock (syncRoot)
             {
-                bool result = false;
-                WeakReference weakReference;
-                if (cache.TryGetValue(name, out weakReference))
+                TValue value;
+                if (TryGetValue(name, out value))
                 {
-                    if (weakReference.IsAlive)
-                    {
-                        methods.DisposeItem((TValue)weakReference.Target);
-                        weakReference.Target = null;
-                        result = true;
-                    }
+                    methods.DisposeItem(value);
                     cache.Remove(name);
+                    return true;
                 }
-                return result;
+                return false;
             }
         }
         public static void Clear()
@@ -147,8 +156,11 @@ namespace Graphics2DDotNet
                 {
                     if (weakReference.IsAlive)
                     {
-                        methods.DisposeItem((TValue)weakReference.Target);
-                        weakReference.Target = null;
+                        TValue value = (TValue)weakReference.Target;
+                        if (methods.Validate(value))
+                        {
+                            methods.DisposeItem(value);
+                        }
                     }
                 }
                 cache.Clear();

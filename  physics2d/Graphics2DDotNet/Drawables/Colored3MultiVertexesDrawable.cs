@@ -27,71 +27,38 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
 using Tao.OpenGl;
-
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
     public sealed class Colored3MultiVertexesDrawable : BufferedDrawable
     {
-        int[] vertexNames;
-        int[] colorNames;
-        Vector2D[][] polygon;
-        ScalarColor3[][] colors;
+        MultiARBArrayBuffer<ScalarColor3> colors;
+        MultiARBArrayBuffer<Vector2D> vertexes;
         int mode;
-        public Colored3MultiVertexesDrawable(int mode,Vector2D[][] polygon, ScalarColor3[][] colors)
+        public Colored3MultiVertexesDrawable(int mode, Vector2D[][] vertexes, ScalarColor3[][] colors)
         {
-            if (polygon == null) { throw new ArgumentNullException("vertexes"); }
-            if (colors.Length != polygon.Length) { throw new ArgumentException("TODO length !="); }
-            this.polygon = polygon;
-            this.colors = colors;
-            this.vertexNames = new int[polygon.Length];
-            this.colorNames = new int[colors.Length];
+            if (vertexes == null) { throw new ArgumentNullException("vertexes"); }
+            if (colors == null) { throw new ArgumentNullException("colors"); }
+            if (colors.Length != vertexes.Length) { throw new ArgumentException("TODO length !="); }
+            this.vertexes = new MultiARBArrayBuffer<Vector2D>(vertexes, Vector2D.Size);
+            this.colors = new MultiARBArrayBuffer<ScalarColor3>(colors, ScalarColor3.Size);
             this.mode = mode;
         }
-        protected override void BufferData()
+        protected override void BufferData(int refresh)
         {
-            Gl.glGenBuffersARB(vertexNames.Length, vertexNames);
-            Gl.glGenBuffersARB(colorNames.Length, colorNames);
-            for (int index = 0; index < polygon.Length; ++index)
-            {
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
-                GlHelper.GlBufferDataARB(
-                    Gl.GL_ARRAY_BUFFER_ARB,
-                    polygon[index],
-                    polygon[index].Length * Vector2D.Size,
-                    Gl.GL_STATIC_DRAW_ARB);
-
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorNames[index]);
-                GlHelper.GlBufferDataARB(
-                    Gl.GL_ARRAY_BUFFER_ARB,
-                    colors[index],
-                    colors[index].Length * ScalarColor3.Size,
-                    Gl.GL_STATIC_DRAW_ARB);
-            }
+            vertexes.Buffer(refresh);
+            colors.Buffer(refresh);
         }
         protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
         {
-            for (int index = 0; index < polygon.Length; ++index)
+            for (int index = 0; index < vertexes.Count; ++index)
             {
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
+                vertexes.Bind(index);
                 Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, colorNames[index]);
+                colors.Bind(index);
                 Gl.glColorPointer(ScalarColor3.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-
-                Gl.glDrawArrays(mode, 0, polygon[index].Length);
+                Gl.glDrawArrays(mode, 0, vertexes.GetLength(index));
             }
         }
         protected override void EnableState()
@@ -110,9 +77,14 @@ namespace Graphics2DDotNet
         }
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteBuffersARB(LastRefresh, vertexNames);
-            GlHelper.GlDeleteBuffersARB(LastRefresh, colorNames);
+            if (disposing)
+            {
+                vertexes.Dispose();
+                colors.Dispose();
+            }
         }
     }
+
+
 
 }

@@ -27,38 +27,22 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
-using Tao.OpenGl;
 
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
     public abstract class BufferedDrawable : IDrawable, IDisposable
     {
         object tag;
-        int lastRefresh;
+        int refresh;
         public int LastRefresh
         {
-            get { return lastRefresh; }
+            get { return refresh; }
+            protected set { refresh = value; }
         }
         bool isDisposed;
         protected BufferedDrawable()
         {
-            this.lastRefresh = -1;
-        }
-        ~BufferedDrawable()
-        {
-            Dispose(false);
+            this.refresh = -1;
         }
         public object Tag
         {
@@ -67,16 +51,16 @@ namespace Graphics2DDotNet
         }
         protected abstract void EnableState();
         protected abstract void DisableState();
-        protected abstract void BufferData();
+        protected abstract void BufferData(int refresh);
         protected abstract void DrawData(DrawInfo drawInfo, IDrawableState state);
         public void Draw(DrawInfo drawInfo, IDrawableState state)
         {
             if (isDisposed) { throw new ObjectDisposedException(this.ToString()); }
             EnableState();
-            if (lastRefresh != drawInfo.RefreshCount)
+            if (refresh != drawInfo.RefreshCount)
             {
-                lastRefresh = drawInfo.RefreshCount;
-                BufferData();
+                refresh = drawInfo.RefreshCount;
+                BufferData(drawInfo.RefreshCount);
             }
             DrawData(drawInfo, state);
             DisableState();

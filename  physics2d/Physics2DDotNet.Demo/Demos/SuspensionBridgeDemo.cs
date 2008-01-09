@@ -54,7 +54,7 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
 
 
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
             IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
             DemoHelper.AddGrid(
@@ -74,14 +74,14 @@ namespace Physics2DDotNet.Demo.Demos
             end2.IgnoresGravity = true;
             HingeJoint joint2 = new HingeJoint(chain[chain.Count - 1], end2, point2, new Lifespan());
             joint2.DistanceTolerance = 10;
-            Layer.Engine.AddJoint(joint2);
+            Scene.Engine.AddJoint(joint2);
 
             Vector2D point1 = new Vector2D(chain[0].State.Position.Linear.X - anchorGap, 500);
             Body end1 = DemoHelper.AddCircle(DemoInfo, anchorLenght / 2, 14, Scalar.PositiveInfinity, new ALVector2D(0, point1));
             end1.IgnoresGravity = true;
             HingeJoint joint1 = new HingeJoint(chain[0], end1, point1, new Lifespan());
             joint1.DistanceTolerance = 10;
-            Layer.Engine.AddJoint(joint1);
+            Scene.Engine.AddJoint(joint1);
             end2.State.Position.Linear.X -= 10;
             end1.State.Position.Linear.X += 10;
             end2.ApplyPosition();

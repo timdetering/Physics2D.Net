@@ -27,23 +27,15 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+using System.Runtime.InteropServices;
 using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
 using Tao.OpenGl;
-
-using SdlDotNet.Core;
 using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
-    
+
+
+
     /// <summary>
     /// The texture minifying function is used whenever
     /// the	pixel being textured maps to an	area greater
@@ -77,60 +69,60 @@ namespace Graphics2DDotNet
         None = 0,
         /// <summary>
         /// Returns the value	of the texture element
-		///	that is nearest (in Manhattan distance)
-		///	to the center of the pixel being
-		///	textured.
+        ///	that is nearest (in Manhattan distance)
+        ///	to the center of the pixel being
+        ///	textured.
         /// </summary>
         Nearest = Gl.GL_NEAREST,
         /// <summary>
         /// Returns the weighted average of the four
-		/// texture elements that are closest	to the
-		/// center of the pixel being textured.
-		/// These can include border texture
-		/// elements, depending on the values	of
-		/// GL_TEXTURE_WRAP_S and GL_TEXTURE_WRAP_T,
+        /// texture elements that are closest	to the
+        /// center of the pixel being textured.
+        /// These can include border texture
+        /// elements, depending on the values	of
+        /// GL_TEXTURE_WRAP_S and GL_TEXTURE_WRAP_T,
         /// and on the exact mapping.
         /// </summary>
         Linear = Gl.GL_LINEAR,
         /// <summary>
         /// Chooses the mipmap that most closely
-		/// matches the size of the pixel being
-		/// textured and uses the GL_NEAREST
-		/// criterion (the texture element nearest
-		/// to the center of the pixel) to produce a
+        /// matches the size of the pixel being
+        /// textured and uses the GL_NEAREST
+        /// criterion (the texture element nearest
+        /// to the center of the pixel) to produce a
         /// texture value.
         /// </summary>
         NearestMipMapNearest = Gl.GL_NEAREST_MIPMAP_NEAREST,
         /// <summary>
         /// Chooses the mipmap that most closely
-		/// matches the size of the pixel being
-		/// textured and uses the GL_LINEAR
-		/// criterion (a weighted average of the
-		/// four texture elements that are closest
-		/// to the center of the pixel) to produce a
+        /// matches the size of the pixel being
+        /// textured and uses the GL_LINEAR
+        /// criterion (a weighted average of the
+        /// four texture elements that are closest
+        /// to the center of the pixel) to produce a
         /// texture value.
         /// </summary>
         LinearMipMapNearest = Gl.GL_LINEAR_MIPMAP_NEAREST,
         /// <summary>
         /// Chooses the two mipmaps that most
-		/// closely match the	size of	the pixel
-		/// being textured and uses the GL_NEAREST
-		/// criterion	(the texture element nearest
-		/// to the center of the pixel) to produce a
-		/// texture value from each mipmap. The
-		/// final texture value is a weighted
+        /// closely match the	size of	the pixel
+        /// being textured and uses the GL_NEAREST
+        /// criterion	(the texture element nearest
+        /// to the center of the pixel) to produce a
+        /// texture value from each mipmap. The
+        /// final texture value is a weighted
         /// average of those two values.
         /// </summary>
         NearestMipMapLinear = Gl.GL_NEAREST_MIPMAP_LINEAR,
         /// <summary>
         /// Chooses the two mipmaps that most
-		/// closely match the size of the pixel
-		/// being textured and uses the GL_LINEAR
-		/// criterion (a weighted average of the
-		/// four texture elements that are closest
-		/// to the center of the pixel) to produce a
-		/// texture value from each mipmap. The
-		/// final texture value is a weighted
+        /// closely match the size of the pixel
+        /// being textured and uses the GL_LINEAR
+        /// criterion (a weighted average of the
+        /// four texture elements that are closest
+        /// to the center of the pixel) to produce a
+        /// texture value from each mipmap. The
+        /// final texture value is a weighted
         /// average of those two values.
         /// </summary>
         LinearMipMapLinear = Gl.GL_LINEAR_MIPMAP_LINEAR
@@ -182,7 +174,7 @@ namespace Graphics2DDotNet
         None = 0,
         /// <summary>
         /// Causes texture coordinates to be clamped to the range [0,1] and
-		/// is useful for preventing wrapping artifacts	when
+        /// is useful for preventing wrapping artifacts	when
         /// mapping a single image onto	an object.
         /// </summary>
         Clamp = Gl.GL_CLAMP,
@@ -194,119 +186,17 @@ namespace Graphics2DDotNet
         Repeat = Gl.GL_REPEAT
     }
 
-
-    public sealed class SpriteDrawable : BufferedDrawable
+    public class TextureHelper
     {
-
-
-        public int Refresh()
+        public static int GetPower(int value)
         {
-            int textureId;
-            using (Surface textureSurface = surface.CreateResizedSurface())
-            {
-                Gl.glGenTextures(1,out textureId);
-                Gl.glBindTexture(Gl.GL_TEXTURE_2D, textureId);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, (int)minifyingFilter);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, (int)magnificationFilter);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, (int)wrapS);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, (int)wrapT);
-
-                if (minifyingFilter == MinifyingOption.Linear || minifyingFilter == MinifyingOption.Nearest)
-                {
-                    Gl.glTexImage2D(Gl.GL_TEXTURE_2D, 0, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, 0, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
-                }
-                else
-                {
-                    Glu.gluBuild2DMipmaps(Gl.GL_TEXTURE_2D, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
-                }
-            }
-            return textureId;
+            int index = 30;
+            for (; (1 << index) >= value && index > -2; --index) { }
+            return 1 << index + 1;
         }
 
-        MinifyingOption minifyingFilter = MinifyingOption.Linear; 
-        MagnificationOption magnificationFilter; 
-        WrapOption wrapS = WrapOption.Clamp;
-        WrapOption wrapT = WrapOption.Clamp;
-        ScalarColor4 color;
-        Surface surface;
-        int textureID;
-        Vector2D[] vertexes;
-        Vector2D[] coordinates;
-        int vertexName;
-        int coordName;
-        public SpriteDrawable(Surface surface, Vector2D[] vertexes, Vector2D[] coordinates)
-        {
-            this.surface = surface;
-            this.vertexes = vertexes;
-            this.coordinates = coordinates;
-            this.color = new ScalarColor4(1, 1, 1, 1);
-            this.minifyingFilter = MinifyingOption.Linear;
-            this.magnificationFilter = MagnificationOption.Linear;
-            this.wrapS = WrapOption.Repeat;
-            this.wrapT = WrapOption.Repeat;
-        }
-        public ScalarColor4 Color
-        {
-            get { return color; }
-            set { color = value; }
-        }
 
-        protected override void EnableState()
-        {
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            Gl.glEnableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
-            Gl.glEnable(Gl.GL_TEXTURE_2D);
-            Gl.glEnable(Gl.GL_BLEND);
-            Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
-        }
-
-        protected override void DisableState()
-        {
-            Gl.glDisable(Gl.GL_BLEND);
-            Gl.glDisable(Gl.GL_TEXTURE_2D);
-            Gl.glEnableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-        }
-
-        protected override void BufferData()
-        {
-            Gl.glGenBuffersARB(1, out vertexName);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
-            GlHelper.GlBufferDataARB(
-                Gl.GL_ARRAY_BUFFER_ARB,
-                vertexes,
-                vertexes.Length * Vector2D.Size,
-                Gl.GL_STATIC_DRAW_ARB);
-
-            Gl.glGenBuffersARB(1, out coordName);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, coordName);
-            GlHelper.GlBufferDataARB(
-                Gl.GL_ARRAY_BUFFER_ARB,
-                coordinates,
-                coordinates.Length * Vector2D.Size,
-                Gl.GL_STATIC_DRAW_ARB);
-
-
-            using (Surface textureSurface =  TransformSurface(true))
-            {
-                Gl.glGenTextures(1, out textureID);
-                Gl.glBindTexture(Gl.GL_TEXTURE_2D, textureID);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, (int)minifyingFilter);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, (int)magnificationFilter);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, (int)wrapS);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, (int)wrapT);
-
-                if (minifyingFilter == MinifyingOption.Linear || minifyingFilter == MinifyingOption.Nearest)
-                {
-                    Gl.glTexImage2D(Gl.GL_TEXTURE_2D, 0, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, 0, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
-                }
-                else
-                {
-                    Glu.gluBuild2DMipmaps(Gl.GL_TEXTURE_2D, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
-                }
-            }
-        }
-        private Surface TransformSurface(bool isFlipped)
+        private static Surface TransformSurface(Surface surface, bool isFlipped)
         {
             byte alpha = surface.Alpha;
             Surface textureSurface2 = null;
@@ -332,61 +222,322 @@ namespace Graphics2DDotNet
             }
         }
 
-        protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
+        public static int LoadTexture2D(
+            Surface surface,
+            bool flip,
+            TextureOptions options)
         {
-            Gl.glBindTexture(Gl.GL_TEXTURE_2D, textureID);
-            
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexName);
-            Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, coordName);
-            Gl.glTexCoordPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-            
-            GlHelper.GlColor4(color.Red, color.Green, color.Blue, color.Alpha);
-            
-            Gl.glDrawArrays(Gl.GL_POLYGON, 0, vertexes.Length);
+            if (surface == null) { throw new ArgumentNullException("surface"); }
+            if (options == null) { throw new ArgumentNullException("options"); }
+            int textureID;
+            using (Surface textureSurface = TransformSurface(surface, flip))
+            {
+                Gl.glGenTextures(1, out textureID);
+                Gl.glBindTexture(Gl.GL_TEXTURE_2D, textureID);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, (int)options.MinifyingFilter);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, (int)options.MagnificationFilter);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, (int)options.WrapS);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, (int)options.WrapT);
+                if (options.MinifyingFilter == MinifyingOption.Linear ||
+                    options.MinifyingFilter == MinifyingOption.Nearest)
+                {
+                    Gl.glTexImage2D(Gl.GL_TEXTURE_2D, 0, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, 0, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
+                }
+                else
+                {
+                    Glu.gluBuild2DMipmaps(Gl.GL_TEXTURE_2D, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
+                }
+            }
+            return textureID;
+        }
+        public static int[] LoadTexture2DRange(
+             Surface surface,
+             bool flip,
+             TextureOptions[] options)
+        {
+            if (surface == null) { throw new ArgumentNullException("surface"); }
+            if (options == null) { throw new ArgumentNullException("options"); }
+            for (int index = 0; index < options.Length; ++index)
+            {
+                if (options[index] == null) { throw new ArgumentNullException("options"); }
+            }
+            int[] textureIDs = new int[options.Length];
+            using (Surface textureSurface = TransformSurface(surface, flip))
+            {
+                Gl.glGenTextures(options.Length, textureIDs);
+                for (int index = 0; index < options.Length; ++index)
+                {
+                    Gl.glBindTexture(Gl.GL_TEXTURE_2D, textureIDs[index]);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, (int)options[index].MinifyingFilter);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, (int)options[index].MagnificationFilter);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, (int)options[index].WrapS);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, (int)options[index].WrapT);
+                    if (options[index].MinifyingFilter == MinifyingOption.Linear ||
+                        options[index].MinifyingFilter == MinifyingOption.Nearest)
+                    {
+                        Gl.glTexImage2D(Gl.GL_TEXTURE_2D, 0, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, 0, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
+                    }
+                    else
+                    {
+                        Glu.gluBuild2DMipmaps(Gl.GL_TEXTURE_2D, textureSurface.BytesPerPixel, textureSurface.Width, textureSurface.Height, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, textureSurface.Pixels);
+                    }
+                }
+            }
+            return textureIDs;
         }
 
+        private static void ScaleTo1(ref Vector3D vector)
+        {
+            vector = vector.Normalized * .5f + new Vector3D(.5f, .5f, .5f);
+        }
+        public static int GenNormalizationCubeMap(int size)
+        {
+            int texid;
+            Gl.glGenTextures(1, out texid);
+            Gl.glBindTexture(Gl.GL_TEXTURE_CUBE_MAP, texid);
+
+            byte[] data = new byte[size * size * 3];
+
+            GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            try
+            {
+                IntPtr ptr = handle.AddrOfPinnedObject();
+
+                Scalar offset = 0.5f;
+                Scalar halfSize = size * 0.5f;
+                int bytePtr = 0;
+                Vector3D vector;
+                for (int j = 0; j < size; j++)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        vector.X = halfSize;
+                        vector.Y = (j + offset - halfSize);
+                        vector.Z = -(i + offset - halfSize);
+                        ScaleTo1(ref vector);
+                        data[bytePtr] = (byte)(vector.X * 255.0f);
+                        data[bytePtr + 1] = (byte)(vector.Y * 255.0f);
+                        data[bytePtr + 2] = (byte)(vector.Z * 255.0f);
+
+                        bytePtr += 3;
+                    }
+                }
+                Gl.glTexImage2D(Gl.GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+                        0, Gl.GL_RGB8, size, size, 0, Gl.GL_RGB, Gl.GL_UNSIGNED_BYTE, ptr);
+
+                bytePtr = 0;
+                for (int j = 0; j < size; j++)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        vector.X = -halfSize;
+                        vector.Y = (j + offset - halfSize);
+                        vector.Z = (i + offset - halfSize);
+                        ScaleTo1(ref vector);
+
+                        data[bytePtr] = (byte)(vector.X * 255.0f);
+                        data[bytePtr + 1] = (byte)(vector.Y * 255.0f);
+                        data[bytePtr + 2] = (byte)(vector.Z * 255.0f);
+
+                        bytePtr += 3;
+                    }
+                }
+                Gl.glTexImage2D(Gl.GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+                        0, Gl.GL_RGB8, size, size, 0, Gl.GL_RGB, Gl.GL_UNSIGNED_BYTE, ptr);
+
+                bytePtr = 0;
+                for (int j = 0; j < size; j++)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        vector.X = i + offset - halfSize;
+                        vector.Y = -halfSize;
+                        vector.Z = j + offset - halfSize;
+                        ScaleTo1(ref vector);
+
+                        data[bytePtr] = (byte)(vector.X * 255.0f);
+                        data[bytePtr + 1] = (byte)(vector.Y * 255.0f);
+                        data[bytePtr + 2] = (byte)(vector.Z * 255.0f);
+
+                        bytePtr += 3;
+                    }
+                }
+                Gl.glTexImage2D(Gl.GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+                        0, Gl.GL_RGB8, size, size, 0, Gl.GL_RGB, Gl.GL_UNSIGNED_BYTE, ptr);
+
+                bytePtr = 0;
+                for (int j = 0; j < size; j++)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        vector.X = i + offset - halfSize;
+                        vector.Y = halfSize;
+                        vector.Z = -(j + offset - halfSize);
+                        ScaleTo1(ref vector);
+
+                        data[bytePtr] = (byte)(vector.X * 255.0f);
+                        data[bytePtr + 1] = (byte)(vector.Y * 255.0f);
+                        data[bytePtr + 2] = (byte)(vector.Z * 255.0f);
+
+                        bytePtr += 3;
+                    }
+                }
+                Gl.glTexImage2D(Gl.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+                        0, Gl.GL_RGB8, size, size, 0, Gl.GL_RGB, Gl.GL_UNSIGNED_BYTE, ptr);
+
+                bytePtr = 0;
+                for (int j = 0; j < size; j++)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        vector.X = i + offset - halfSize;
+                        vector.Y = (j + offset - halfSize);
+                        vector.Z = halfSize;
+                        ScaleTo1(ref vector);
+
+                        data[bytePtr] = (byte)(vector.X * 255.0f);
+                        data[bytePtr + 1] = (byte)(vector.Y * 255.0f);
+                        data[bytePtr + 2] = (byte)(vector.Z * 255.0f);
+
+                        bytePtr += 3;
+                    }
+                }
+                Gl.glTexImage2D(Gl.GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+                        0, Gl.GL_RGB8, size, size, 0, Gl.GL_RGB, Gl.GL_UNSIGNED_BYTE, ptr);
+
+                bytePtr = 0;
+                for (int j = 0; j < size; j++)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        vector.X = -(i + offset - halfSize);
+                        vector.Y = (j + offset - halfSize);
+                        vector.Z = -halfSize;
+                        ScaleTo1(ref vector);
+
+                        data[bytePtr] = (byte)(vector.X * 255.0f);
+                        data[bytePtr + 1] = (byte)(vector.Y * 255.0f);
+                        data[bytePtr + 2] = (byte)(vector.Z * 255.0f);
+
+                        bytePtr += 3;
+                    }
+                }
+                Gl.glTexImage2D(Gl.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+                        0, Gl.GL_RGB8, size, size, 0, Gl.GL_RGB, Gl.GL_UNSIGNED_BYTE, ptr);
+
+
+
+                Gl.glTexParameteri(Gl.GL_TEXTURE_CUBE_MAP, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_CUBE_MAP, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_CUBE_MAP, Gl.GL_TEXTURE_WRAP_S, Gl.GL_CLAMP_TO_EDGE);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_CUBE_MAP, Gl.GL_TEXTURE_WRAP_T, Gl.GL_CLAMP_TO_EDGE);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_CUBE_MAP, Gl.GL_TEXTURE_WRAP_R, Gl.GL_CLAMP_TO_EDGE);
+                return texid;
+            }
+            finally
+            {
+                handle.Free();
+            }
+        }
+    }
+    public class TextureOptions
+    {
+        MinifyingOption minifyingFilter = MinifyingOption.Linear;
+        MagnificationOption magnificationFilter = MagnificationOption.Linear;
+        WrapOption wrapS = WrapOption.Clamp;
+        WrapOption wrapT = WrapOption.Clamp;
+        public MinifyingOption MinifyingFilter
+        {
+            get { return minifyingFilter; }
+            set { minifyingFilter = value; }
+        }
+        public MagnificationOption MagnificationFilter
+        {
+            get { return magnificationFilter; }
+            set { magnificationFilter = value; }
+        }
+        public WrapOption WrapS
+        {
+            get { return wrapS; }
+            set { wrapS = value; }
+        }
+        public WrapOption WrapT
+        {
+            get { return wrapT; }
+            set { wrapT = value; }
+        }
+    }
+    public sealed class SpriteDrawable : BufferedDrawable
+    {
+        ARBArrayBuffer<Vector2D> vertexes;
+        ARBArrayBuffer<Vector2D> coordinates;
+        Texture2D texture;
+        ScalarColor4 color;
+
+        public SpriteDrawable(Surface surface, Vector2D[] vertexes, Vector2D[] coordinates)
+            :this(surface,vertexes,coordinates,true,new TextureOptions())
+        {
+        }
+        public SpriteDrawable(Surface surface, Vector2D[] vertexes, Vector2D[] coordinates, bool flip, TextureOptions options)
+        {
+            this.vertexes = new ARBArrayBuffer<Vector2D>(vertexes, Vector2D.Size);
+            this.coordinates = new ARBArrayBuffer<Vector2D>(coordinates, Vector2D.Size);
+            this.texture = new Texture2D(surface, flip, options);
+            this.color = new ScalarColor4(1, 1, 1, 1);
+        }
+        public ScalarColor4 Color
+        {
+            get { return color; }
+            set { color = value; }
+        }
+        protected override void EnableState()
+        {
+            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
+            Gl.glEnableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
+            Gl.glEnable(Gl.GL_BLEND);
+            Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
+        }
+        protected override void DisableState()
+        {
+            Gl.glDisable(Gl.GL_BLEND);
+            Gl.glDisable(Gl.GL_TEXTURE_2D);
+            Gl.glDisableClientState(Gl.GL_TEXTURE_COORD_ARRAY);
+            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
+        }
+        protected override void BufferData(int refresh)
+        {
+            vertexes.Buffer(refresh);
+            coordinates.Buffer(refresh);
+            texture.Buffer(refresh);
+        }
+        protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
+        {
+            texture.Bind();
+            vertexes.Bind();
+            Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
+
+            coordinates.Bind();
+            Gl.glTexCoordPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
+
+            GlHelper.GlColor4(color.Red, color.Green, color.Blue, color.Alpha);
+
+            Gl.glDrawArrays(Gl.GL_QUADS, 0, vertexes.Length);
+        }
         public override IDrawableState CreateState()
         {
             return null;
         }
-
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteTextures(LastRefresh, new int[] { textureID });
-            GlHelper.GlDeleteBuffersARB(LastRefresh, new int[] { vertexName, coordName });
-        }
-    }
-    
-    /*
-    public sealed class DrawableCollection<T>: List<T>, IDrawable
-        where T : IDrawable
-    {
-        class DrawableStateCollection : List<IDrawableState>, IDrawableState
-        {
-            public void OnPending(IGraphic parent)
+            if (disposing)
             {
-                throw new Exception("The method or operation is not implemented.");
+                texture.Dispose();
+                vertexes.Dispose();
+                coordinates.Dispose();
             }
         }
+    }
 
-        object tag;
-        public object Tag
-        {
-            get { return tag; }
-            set { tag = value; }
-        }
 
-        public IDrawableState CreateState()
-        {
-           
-        }
-
-        public void Draw(DrawInfo drawInfo, IDrawableState state)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-    }*/
 }

@@ -30,53 +30,39 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Drawing;
 using AdvanceMath;
-using Graphics2DDotNet;
+using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
 using Physics2DDotNet.Shapes;
-using Physics2DDotNet.PhysicsLogics;
-using SdlDotNet;
+using Physics2DDotNet.Collections;
+using Tao.OpenGl;
 using SdlDotNet.Graphics;
-namespace Physics2DDotNet.Demo.Demos
+using SdlDotNet.Core;
+using SdlDotNet.Input;
+
+namespace Graphics2DDotNet
 {
-    public abstract class BaseDemo : IPhysicsDemo
+    [Serializable]
+    public class RemovedEventArgs<TParent> : EventArgs
     {
-        Window window;
-        Viewport viewport;
-        Scene scene;
-        DemoOpenInfo demoInfo;
-        public void Open(DemoOpenInfo demoInfo)
+        bool wasPending;
+        TParent parent;
+        public RemovedEventArgs(TParent parent, bool wasPending)
         {
-            this.window = demoInfo.Window;
-            this.viewport = demoInfo.Viewport;
-            this.scene = demoInfo.Scene;
-            this.demoInfo = demoInfo;
-            Open();
+            this.wasPending = wasPending;
+            this.parent = parent;
         }
-        public Window Window
+        public bool WasPending
         {
-            get { return window; }
+            get { return wasPending; }
         }
-        public Viewport Viewport
+        public TParent Parent
         {
-            get { return viewport; }
-        }
-        public Scene Scene
-        {
-            get { return scene; }
-        }
-        public DemoOpenInfo DemoInfo
-        {
-            get { return demoInfo; }
-        }
-        protected abstract void Open();
-        protected abstract void Dispose(bool disposing);
-        public void Dispose()
-        {
-            Dispose(true);
+            get { return parent; }
         }
     }
+
 }

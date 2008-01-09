@@ -29,54 +29,21 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Text;
-using System.Drawing;
-using AdvanceMath;
-using Graphics2DDotNet;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.PhysicsLogics;
-using SdlDotNet;
-using SdlDotNet.Graphics;
-namespace Physics2DDotNet.Demo.Demos
+
+
+namespace Graphics2DDotNet
 {
-    public abstract class BaseDemo : IPhysicsDemo
+    [Serializable]
+    public class ItemEventArgs<T> : EventArgs
     {
-        Window window;
-        Viewport viewport;
-        Scene scene;
-        DemoOpenInfo demoInfo;
-        public void Open(DemoOpenInfo demoInfo)
+        T item;
+        public ItemEventArgs(T item)
         {
-            this.window = demoInfo.Window;
-            this.viewport = demoInfo.Viewport;
-            this.scene = demoInfo.Scene;
-            this.demoInfo = demoInfo;
-            Open();
+            this.item = item;
         }
-        public Window Window
+        public T Item
         {
-            get { return window; }
-        }
-        public Viewport Viewport
-        {
-            get { return viewport; }
-        }
-        public Scene Scene
-        {
-            get { return scene; }
-        }
-        public DemoOpenInfo DemoInfo
-        {
-            get { return demoInfo; }
-        }
-        protected abstract void Open();
-        protected abstract void Dispose(bool disposing);
-        public void Dispose()
-        {
-            Dispose(true);
+            get { return item; }
         }
     }
 }

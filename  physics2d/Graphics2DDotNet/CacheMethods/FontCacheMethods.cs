@@ -60,6 +60,10 @@ namespace Graphics2DDotNet
         {
             item.Dispose();
         }
+        public bool Validate(Font item)
+        {
+            return true;
+        }
     }
 
 }

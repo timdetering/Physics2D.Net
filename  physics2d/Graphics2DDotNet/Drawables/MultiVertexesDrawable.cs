@@ -27,55 +27,32 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
 using Tao.OpenGl;
-
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
     public sealed class MultiVertexesDrawable : BufferedDrawable
     {
-        int[] vertexNames;
-        Vector2D[][] polygon;
+        MultiARBArrayBuffer<Vector2D> buffer;
         int mode;
         public MultiVertexesDrawable(int mode,Vector2D[][] polygon)
         {
             if (polygon == null) { throw new ArgumentNullException("vertexes"); }
-            this.polygon = polygon;
-            this.vertexNames = new int[polygon.Length];
+            this.buffer = new MultiARBArrayBuffer<Vector2D>(polygon, Vector2D.Size);
             this.mode = mode;
         }
 
-        protected override void BufferData()
+        protected override void BufferData(int refresh)
         {
-            Gl.glGenBuffersARB(vertexNames.Length, vertexNames);
-            for (int index = 0; index < polygon.Length; ++index)
-            {
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
-                GlHelper.GlBufferDataARB(
-                    Gl.GL_ARRAY_BUFFER_ARB,
-                    polygon[index],
-                    polygon[index].Length * Vector2D.Size,
-                    Gl.GL_STATIC_DRAW_ARB);
-            }
+            buffer.Buffer(refresh);
         }
         protected override void DrawData(DrawInfo drawInfo, IDrawableState state)
         {
-            for (int index = 0; index < polygon.Length; ++index)
+            for (int index = 0; index < buffer.Count; ++index)
             {
-                Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER_ARB, vertexNames[index]);
+                buffer.Bind(index);
                 Gl.glVertexPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
-                Gl.glDrawArrays(mode, 0, polygon[index].Length);
+                Gl.glDrawArrays(mode, 0, buffer.GetLength(index));
             }
         }
         protected override void EnableState()
@@ -92,7 +69,10 @@ namespace Graphics2DDotNet
         }
         protected override void Dispose(bool disposing)
         {
-            GlHelper.GlDeleteBuffersARB(LastRefresh, vertexNames);
+            if (disposing)
+            {
+                buffer.Dispose();
+            }
         }
     }
 }

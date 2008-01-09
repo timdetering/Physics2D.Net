@@ -54,8 +54,8 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
 
-            Layer.Engine.AddLogic(new LineFluidLogic(new Line(0, -1, -400), 1.95f, .02f, new Vector2D(0, 0), new Lifespan()));
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new LineFluidLogic(new Line(0, -1, -400), 1.95f, .02f, new Vector2D(0, 0), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
             Rectangle rect1 = Viewport.Rectangle;
 
@@ -92,9 +92,9 @@ namespace Physics2DDotNet.Demo.Demos
             };
             Colored3VertexesDrawable drawable = new Colored3VertexesDrawable(Gl.GL_QUADS, waterVertexes, waterColor);
 
-            SimpleGraphic graphic = new SimpleGraphic(drawable, Matrix2x3.Identity, new Lifespan());
+            Graphic graphic = new Graphic(drawable, Matrix2x3.Identity, new Lifespan());
             graphic.ZOrder = -1;
-            Layer.AddGraphic(graphic);
+            Scene.AddGraphic(graphic);
         }
         protected override void Dispose(bool disposing)
         {

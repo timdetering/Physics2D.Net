@@ -60,6 +60,7 @@
     <Compile Include="Demos\BallRoomDemo.cs" />
     <Compile Include="Demos\BaseDemo.cs" />
     <Compile Include="Demos\BoxesStressDemo.cs" />
+    <Compile Include="Demos\BumpMappingDemo.cs" />
     <Compile Include="Demos\CirclesContainedStressDemo.cs" />
     <Compile Include="Demos\CirclesStressDemo.cs" />
     <Compile Include="Demos\PyramidStressDemo.cs" />

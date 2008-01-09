@@ -53,7 +53,7 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
             
             
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
             for (int x = 0; x < 400; x += 45)
             {
@@ -79,7 +79,7 @@ namespace Physics2DDotNet.Demo.Demos
             for (int x = 160; x < 500; x += 42)
             {
                 Body b = DemoHelper.AddCircle(DemoInfo, 20, 20, 300, new ALVector2D(0, x, 450));
-                Layer.Engine.AddJoint(new FixedHingeJoint(b, b.State.Position.Linear - new Vector2D(0, 500), new Lifespan()));
+                Scene.Engine.AddJoint(new FixedHingeJoint(b, b.State.Position.Linear - new Vector2D(0, 500), new Lifespan()));
             }
             DemoHelper.Coefficients.Restitution = rest;
 

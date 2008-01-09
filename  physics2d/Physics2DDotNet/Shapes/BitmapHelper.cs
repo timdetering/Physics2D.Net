@@ -71,116 +71,116 @@ namespace Physics2DDotNet.Shapes
             }
         }
     }
-    class BitMapSkipper
+    static class BitmapHelper
     {
-        int xMin;
-        int xMax;
-        List<int>[] scans;
-
-
-        public BitMapSkipper(IBitmap bitmap, List<Point2D> points)
+        class BitMapSkipper
         {
-            FromVectors(points);
-            CreateScans();
-            FillScans(points);
-            FormatScans(bitmap);
-        }
+            int xMin;
+            int xMax;
+            List<int>[] scans;
 
-        void FromVectors(List<Point2D> points)
-        {
-            if (points == null) { throw new ArgumentNullException("vectors"); }
-            if (points.Count == 0) { throw new ArgumentOutOfRangeException("points"); }
-            xMin = points[0].X;
-            xMax = xMin;
-            for (int index = 1; index < points.Count; ++index)
+
+            public BitMapSkipper(IBitmap bitmap, List<Point2D> points)
             {
-                Point2D current = points[index];
-                if (current.X > xMax)
+                FromVectors(points);
+                CreateScans();
+                FillScans(points);
+                FormatScans(bitmap);
+            }
+
+            void FromVectors(List<Point2D> points)
+            {
+                if (points == null) { throw new ArgumentNullException("vectors"); }
+                if (points.Count == 0) { throw new ArgumentOutOfRangeException("points"); }
+                xMin = points[0].X;
+                xMax = xMin;
+                for (int index = 1; index < points.Count; ++index)
                 {
-                    xMax = current.X;
-                }
-                else if (current.X < xMin)
-                {
-                    xMin = current.X;
+                    Point2D current = points[index];
+                    if (current.X > xMax)
+                    {
+                        xMax = current.X;
+                    }
+                    else if (current.X < xMin)
+                    {
+                        xMin = current.X;
+                    }
                 }
             }
-        }
-        void CreateScans()
-        {
-            scans = new List<int>[(xMax - xMin) + 1];
-            for (int index = 0; index < scans.Length; ++index)
+            void CreateScans()
             {
-                scans[index] = new List<int>();
+                scans = new List<int>[(xMax - xMin) + 1];
+                for (int index = 0; index < scans.Length; ++index)
+                {
+                    scans[index] = new List<int>();
+                }
             }
-        }
-        void FillScans(List<Point2D> points)
-        {
-            for (int index = 0; index < points.Count; ++index)
+            void FillScans(List<Point2D> points)
             {
-                Point2D point = points[index];
+                for (int index = 0; index < points.Count; ++index)
+                {
+                    Point2D point = points[index];
+                    int scanIndex = point.X - xMin;
+                    scans[scanIndex].Add(point.Y);
+                }
+            }
+
+            void FormatScans(IBitmap bitmap)
+            {
+                for (int index = 0; index < scans.Length; ++index)
+                {
+                    scans[index].Sort();
+                    FormatScan(bitmap, index);
+                }
+            }
+            void FormatScan(IBitmap bitmap, int x)
+            {
+                List<int> scan = scans[x];
+                List<int> newScan = new List<int>();
+                bool inPoly = false;
+                for (int index = 0; index < scan.Count; ++index)
+                {
+                    int y = scan[index];
+                    if (!inPoly)
+                    {
+                        newScan.Add(y);
+                    }
+                    bool value = bitmap[x + xMin, y + 1];
+                    if (value)
+                    {
+                        inPoly = true;
+                    }
+                    else
+                    {
+                        newScan.Add(y);
+                        inPoly = false;
+                    }
+                }
+                //if (newScan.Count % 2 != 0) { throw new Exception(); }
+                scans[x] = newScan;
+            }
+            public bool TryGetSkip(Point2D point, out int nextY)
+            {
                 int scanIndex = point.X - xMin;
-                scans[scanIndex].Add(point.Y);
-            }
-        }
-
-        void FormatScans(IBitmap bitmap)
-        {
-            for (int index = 0; index < scans.Length; ++index)
-            {
-                scans[index].Sort();
-                FormatScan(bitmap, index);
-            }
-        }
-        void FormatScan(IBitmap bitmap, int x)
-        {
-            List<int> scan = scans[x];
-            List<int> newScan = new List<int>();
-            bool inPoly = false;
-            for (int index = 0; index < scan.Count; ++index)
-            {
-                int y = scan[index];
-                if (!inPoly)
+                if (scanIndex < 0 || scanIndex >= scans.Length)
                 {
-                    newScan.Add(y);
+                    nextY = 0;
+                    return false;
                 }
-                bool value = bitmap[x + xMin, y + 1];
-                if (value)
+                List<int> scan = scans[scanIndex];
+                for (int index = 1; index < scan.Count; index += 2)
                 {
-                    inPoly = true;
+                    if (point.Y >= scan[index - 1] &&
+                        point.Y <= scan[index])
+                    {
+                        nextY = scan[index];
+                        return true;
+                    }
                 }
-                else
-                {
-                    newScan.Add(y);
-                    inPoly = false;
-                }
-            }
-            //if (newScan.Count % 2 != 0) { throw new Exception(); }
-            scans[x] = newScan;
-        }
-        public bool TryGetSkip(Point2D point, out int nextY)
-        {
-            int scanIndex = point.X - xMin;
-            if (scanIndex < 0 || scanIndex >= scans.Length)
-            {
                 nextY = 0;
                 return false;
             }
-            List<int> scan = scans[scanIndex];
-            for (int index = 1; index < scan.Count; index += 2)
-            {
-                if (point.Y >= scan[index - 1] &&
-                    point.Y <= scan[index])
-                {
-                    nextY = scan[index];
-                    return true;
-                }
-            }
-            nextY = 0;
-            return false;
         }
-    }
-    static class BitmapHelper
-    {
         static readonly Point2D[] bitmapPoints = new Point2D[]{
             new Point2D (1,1),
             new Point2D (0,1),
@@ -220,7 +220,7 @@ namespace Physics2DDotNet.Shapes
                 current = GetNextVertex(bitmap, current, last);
                 last = result[result.Count - 1];
             } while (current != first);
-            if (result.Count < 3) { throw new ArgumentException("TODO", "bitmap"); }
+            if (result.Count < 3) { throw new ArgumentException("The image has an area with less then 3 pixels (possibly an artifact).", "bitmap"); }
             return result;
         }
         private static Point2D GetFirst(IBitmap bitmap)
@@ -291,7 +291,7 @@ namespace Physics2DDotNet.Shapes
                     return point;
                 }
             }
-            throw new ArgumentException("TODO", "bitmap");
+            throw new ArgumentException("The image has an area with less then 3 pixels (possibly an artifact).", "bitmap");
         }
         private static Vector2D[] Reduce(List<Point2D> list)
         {

@@ -60,7 +60,7 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
 
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
 
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
@@ -95,7 +95,7 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
 
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
 
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));

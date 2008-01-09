@@ -57,8 +57,8 @@ namespace Physics2DDotNet.Demo.Demos
                 new BoundingRectangle(200, 200, 800, 500),
                 5, 5);
 
-            Viewport viewport2 = Window.CreateViewport(new Rectangle(Window.Size.Width / 2, 0, Window.Size.Width / 2, Window.Size.Height), Matrix2x3.Identity, Layer);
-
+            Viewport viewport2 = new Viewport(new Rectangle(Window.Size.Width / 2, 0, Window.Size.Width / 2, Window.Size.Height), Matrix2x3.Identity, Scene,new Lifespan());
+            Window.AddViewport(viewport2);
             Viewport.Rectangle = new Rectangle(0, 0, Window.Size.Width / 2, Window.Size.Height);
 
             IShape furyShape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("starfury.png"), 2, 16, 3);
@@ -66,13 +66,13 @@ namespace Physics2DDotNet.Demo.Demos
             Body b2 = DemoHelper.AddShape(DemoInfo, furyShape, 400, new ALVector2D(0, 0, 0));
 
 
-            dispose += DemoHelper.RegisterBodyTracking(DemoInfo, b1, Matrix2x3.FromRotationZ(-MathHelper.PiOver2));
+            dispose += DemoHelper.RegisterBodyTracking(DemoInfo, b1, Matrix2x3.FromRotationZ(-MathHelper.PiOver2) * Matrix2x3.FromScale(new Vector2D(.5f, .5f)));
             dispose += DemoHelper.RegisterBodyMovement(DemoInfo, b1, new ALVector2D(1000000, 100000, 0), Key.W, Key.S, Key.A, Key.D);
 
 
             dispose += DemoHelper.RegisterBodyTracking(
-                new DemoOpenInfo(Window, viewport2, Layer)
-                , b2, Matrix2x3.FromRotationZ(-MathHelper.PiOver2));
+                new DemoOpenInfo(Window, viewport2, Scene)
+                , b2, Matrix2x3.FromRotationZ(-MathHelper.PiOver2) * Matrix2x3.FromScale(new Vector2D(.5f,.5f)));
             dispose += DemoHelper.RegisterBodyMovement(
                 DemoInfo, b2, new ALVector2D(1000000, 100000, 0));
 
@@ -85,7 +85,7 @@ namespace Physics2DDotNet.Demo.Demos
 
             dispose += delegate()
             {
-                viewport2.IsExpired = true;
+                viewport2.Lifetime.IsExpired = true;
                 Viewport.Rectangle = new Rectangle(0, 0, Window.Size.Width, Window.Size.Height);
             };
 

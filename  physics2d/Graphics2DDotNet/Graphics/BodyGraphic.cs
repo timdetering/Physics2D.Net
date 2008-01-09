@@ -41,7 +41,7 @@ using Tao.OpenGl;
 
 namespace Graphics2DDotNet
 {
-    public sealed class BodyGraphic : SimpleGraphic
+    public sealed class BodyGraphic : Graphic
     {
         private static IDrawable GetIDrawable(Body body)
         {
@@ -54,6 +54,7 @@ namespace Graphics2DDotNet
             : base(GetIDrawable(body), body.Matrices.ToWorld, body.Lifetime)
         {
             SetBody(body);
+            this.IsLifetimeOwner = false;
         }
         private BodyGraphic(BodyGraphic copy)
             : base(copy)
@@ -91,7 +92,6 @@ namespace Graphics2DDotNet
         {
             Matrix2x3.Copy2DToOpenGlMatrix(ref body.Matrices.ToWorld, MatrixArray);
         }
-        protected override void UpdateTime(DrawInfo drawInfo) { }
         public override void Draw(DrawInfo drawInfo)
         {
             if (collidedStep >= body.Lifetime.LastUpdate - 1)
@@ -99,20 +99,14 @@ namespace Graphics2DDotNet
                 base.Draw(drawInfo);
             }
         }
-        public override void OnPending(Layer parent)
+        protected override void OnPending(EventArgs e)
         {
-            parent.Engine.AddBody(body);
-            base.OnPending(parent);
+            Parent.bodies.Add(body);
+            base.OnPending(e);
         }
-        public override void OnPendingRange(Layer parent, RangeInfo rangeInfo)
-        {
-            rangeInfo.AddBody(body);
-            base.OnPendingRange(parent, rangeInfo);
-        }
-        public override IGraphic Duplicate()
+        public override Graphic Duplicate()
         {
             return new BodyGraphic(this);
         }
     }
-
 }

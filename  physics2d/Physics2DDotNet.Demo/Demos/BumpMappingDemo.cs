@@ -21,8 +21,6 @@
  */
 #endregion
 
-
-
 #if UseDouble
 using Scalar = System.Double;
 #else
@@ -34,49 +32,58 @@ using System.Threading;
 using System.Text;
 using System.Drawing;
 using AdvanceMath;
+using AdvanceMath.Geometry2D;
 using Graphics2DDotNet;
 using Physics2DDotNet;
+using Physics2DDotNet.Ignorers;
+using Physics2DDotNet.Joints;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.PhysicsLogics;
 using SdlDotNet;
+using SdlDotNet.Input;
 using SdlDotNet.Graphics;
 namespace Physics2DDotNet.Demo.Demos
 {
-    public abstract class BaseDemo : IPhysicsDemo
+    [PhysicsDemo("Graphical", "Bump Mapping", "This shows off a new feature in Graphics2D.Net")]
+    public class BumpMappingDemo : BaseDemo
     {
-        Window window;
-        Viewport viewport;
-        Scene scene;
-        DemoOpenInfo demoInfo;
-        public void Open(DemoOpenInfo demoInfo)
+        DisposeCallback dispose;
+        protected override void Open()
         {
-            this.window = demoInfo.Window;
-            this.viewport = demoInfo.Viewport;
-            this.scene = demoInfo.Scene;
-            this.demoInfo = demoInfo;
-            Open();
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
+
+
+            Scene.Engine.AddLogic(new GravityPointField(new Vector2D(500, 500), 1000, new Lifespan()));
+
+
+            Light light = new Light();
+            light.Position.X = 000;
+            light.Position.Y = 000;
+            light.Position.Z = 0100;
+
+            Body lightBody = new Body(new PhysicsState(), ShapeFactory.CreateCircle(15, 20), 40, new Coefficients(0, 1), new Lifespan());
+            BodyGraphic lightGraphic = new BodyGraphic(lightBody);
+
+            lightGraphic.DrawProperties.Add(new Color3Property(1, 1, 1));
+
+            Scene.AddGraphic(lightGraphic);
+
+            lightBody.PositionChanged += delegate(object sender, EventArgs e)
+            {
+                light.Position = lightBody.State.Position.Linear.ToVector3D(100);
+            };
+
+            IShape shape = ShapeFactory.CreateSprite(
+                Cache<SurfacePolygons>.GetItem("Monkey.png"),
+                Cache<Surface>.GetItem("MonkeyNormal.bmp"),
+                false, true,
+                3, 8, 16,
+                light);
         }
-        public Window Window
+
+        protected override void Dispose(bool disposing)
         {
-            get { return window; }
-        }
-        public Viewport Viewport
-        {
-            get { return viewport; }
-        }
-        public Scene Scene
-        {
-            get { return scene; }
-        }
-        public DemoOpenInfo DemoInfo
-        {
-            get { return demoInfo; }
-        }
-        protected abstract void Open();
-        protected abstract void Dispose(bool disposing);
-        public void Dispose()
-        {
-            Dispose(true);
+            if (dispose != null) { dispose(); }
         }
     }
 }

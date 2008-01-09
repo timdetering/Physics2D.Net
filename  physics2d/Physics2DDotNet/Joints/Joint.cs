@@ -144,10 +144,9 @@ namespace Physics2DDotNet.Joints
             this.engine = engine;
             OnPending(EventArgs.Empty);
         }
-        internal void OnAddedInternal(PhysicsEngine engine)
+        internal void OnAddedInternal()
         {
             this.isAdded = true;
-            this.engine = engine;
             foreach (Body b in Bodies)
             {
                 b.Removed += OnBodyRemoved;

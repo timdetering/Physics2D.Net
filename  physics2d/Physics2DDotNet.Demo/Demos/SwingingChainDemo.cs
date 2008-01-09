@@ -53,7 +53,7 @@ namespace Physics2DDotNet.Demo.Demos
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
 
 
-            Layer.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
 
             List<Body> chain = DemoHelper.AddChain(DemoInfo, new Vector2D(400, 50), 100, 30, 200, 20, 800);
             Vector2D point = new Vector2D(300, 50);
@@ -62,7 +62,7 @@ namespace Physics2DDotNet.Demo.Demos
             Anchor.IgnoresGravity = true;
             HingeJoint joint = new HingeJoint(chain[0], Anchor, point, new Lifespan());
             joint.DistanceTolerance = 10;
-            Layer.Engine.AddJoint(joint);
+            Scene.Engine.AddJoint(joint);
         }
         protected override void Dispose(bool disposing)
         {

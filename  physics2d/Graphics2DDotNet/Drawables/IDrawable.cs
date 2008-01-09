@@ -27,27 +27,12 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Runtime.InteropServices;
-using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
-using Physics2DDotNet.PhysicsLogics;
-using Tao.OpenGl;
 
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
     public interface IDrawableState
     {
-        void OnPending(IGraphic parent);
+        void OnPending(Graphic parent);
     }
     public interface IDrawable
     {
