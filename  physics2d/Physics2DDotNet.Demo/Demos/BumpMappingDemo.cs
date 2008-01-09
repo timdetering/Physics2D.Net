@@ -79,6 +79,8 @@ namespace Physics2DDotNet.Demo.Demos
                 false, true,
                 3, 8, 16,
                 light);
+            DemoHelper.AddGrid(DemoInfo, shape, 40, new BoundingRectangle(40, 40, 900, 900), 100, 100);
+
         }
 
         protected override void Dispose(bool disposing)
