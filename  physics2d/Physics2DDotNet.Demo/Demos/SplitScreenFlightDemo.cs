@@ -68,7 +68,7 @@ Turn: Left, Right
 Move Up, Down
 "; 
         #endregion
-        private void DoGuns(Body body, Body other, Key fire)
+        private void DoGuns(Body body, Body enemy, Key fire)
         {
             //this method requires a deep understanding of delegates and events. ENJOY :P
             Scalar projectileSpeed = 500;
@@ -105,7 +105,7 @@ Move Up, Down
                     {
                         Body projectile = (Body)sender1;
                         projectile.Lifetime.IsExpired = true;
-                        bool isHit = e1.Other == other || e1.Other == body;
+                        bool isHit = e1.Other == enemy || e1.Other == body;
 
                         List<Body> particles = DemoHelper.AddParticles(
                             DemoInfo,
@@ -129,6 +129,10 @@ Move Up, Down
                                     Scene.AddGraphic(new BodyGraphic(e1.Other));
                                 }
                             };
+                        }
+                        else if(e1.Other.Shape is CircleShape)
+                        {
+                            e1.Other.Lifetime.IsExpired = true;
                         }
                     };
                     projectile1.Collided += collided;
