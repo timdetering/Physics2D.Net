@@ -122,6 +122,7 @@ Move Up, Down
                             {
                                 if (particles[0].Lifetime.IsExpired)
                                 {
+                                    e1.Other.State.Velocity = ALVector2D.Zero;
                                     e1.Other.State.Position = new ALVector2D(DemoHelper.NextScalar(-600, 900), DemoHelper.NextScalar(-600, 900), DemoHelper.NextScalar(-600, 900));
                                     e1.Other.ApplyPosition();
                                     e1.Other.Lifetime.IsExpired = false;
@@ -150,8 +151,8 @@ Move Up, Down
         {
             IShape shape = ShapeFactory.CreateColoredCircle(8, 15);
             DemoHelper.AddGrid(DemoInfo, shape, 40,
-                new BoundingRectangle(200, 200, 800, 500),
-                5, 5);
+                new BoundingRectangle(-500, 200, 800, 800),
+                50, 50);
 
             Viewport viewport2 = new Viewport(new Rectangle(Window.Size.Width / 2, 0, Window.Size.Width / 2, Window.Size.Height), Matrix2x3.Identity, Scene,new Lifespan());
             Window.AddViewport(viewport2);
