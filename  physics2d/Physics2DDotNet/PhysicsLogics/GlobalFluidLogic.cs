@@ -43,8 +43,6 @@ namespace Physics2DDotNet.PhysicsLogics
     {
         sealed class Wrapper : IDisposable
         {
-            public Vector2D centroid;
-            public Scalar area;
             public Body body;
             public IGlobalFluidAffectable affectable;
             public Wrapper(Body body)
@@ -55,25 +53,7 @@ namespace Physics2DDotNet.PhysicsLogics
             }
             void Calculate()
             {
-                CalculatePart();
-                if (Math.Abs(this.centroid.X) < .00001f)
-                {
-                    this.centroid.X = 0;
-                }
-                if (Math.Abs(this.centroid.Y) < .00001f)
-                {
-                    this.centroid.Y = 0;
-                }
-            }
-            void CalculatePart()
-            {
-                IShape shape = body.Shape;
-                affectable = shape as IGlobalFluidAffectable;
-                if (affectable != null)
-                {
-                    area = affectable.Area;
-                    centroid = affectable.Centroid;
-                }
+                affectable = body.Shape as IGlobalFluidAffectable;
             }
             void OnShapeChanged(object sender, EventArgs e)
             {
@@ -144,8 +124,8 @@ namespace Physics2DDotNet.PhysicsLogics
                     continue;
                 }
 
-                Vector2D centroid = wrapper.body.Matrices.ToWorldNormal * wrapper.centroid;
-                Vector2D buoyancyForce = body.State.Acceleration.Linear * wrapper.area * -Density;
+                Vector2D centroid = wrapper.body.Matrices.ToWorldNormal * wrapper.affectable.Centroid;
+                Vector2D buoyancyForce = body.State.Acceleration.Linear * wrapper.affectable.Area * -Density;
                 wrapper.body.ApplyForce(buoyancyForce, centroid);
 
                 Vector2D relativeVelocity = body.State.Velocity.Linear - FluidVelocity;

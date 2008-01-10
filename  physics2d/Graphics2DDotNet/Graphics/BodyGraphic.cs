@@ -50,18 +50,30 @@ namespace Graphics2DDotNet
         }
         Body body;
         int collidedStep = -1;
+        bool isBodyOwner;
+
+
         public BodyGraphic(Body body)
             : base(GetIDrawable(body), body.Matrices.ToWorld, body.Lifetime)
         {
             SetBody(body);
             this.IsLifetimeOwner = false;
+            this.isBodyOwner = true;
         }
         private BodyGraphic(BodyGraphic copy)
             : base(copy)
         {
             SetBody(copy.body.Duplicate());
             this.Lifetime = body.Lifetime;
+            this.isBodyOwner = copy.isBodyOwner;
         }
+        public bool IsBodyOwner
+        {
+            get { return isBodyOwner; }
+            set { isBodyOwner = value; }
+        }
+        public Body Body { get { return body; } }
+        public PhysicsState State { get { return body.State; } }
         private void SetBody(Body body)
         {
             this.body = body;
@@ -69,8 +81,6 @@ namespace Graphics2DDotNet
             this.body.PositionChanged += OnPositionChanged;
             this.body.ShapeChanged += OnShapeChanged;
         }
-        public Body Body { get { return body; } }
-        public PhysicsState State { get { return body.State; } }
         internal void SetCollidedStep(int step)
         {
             collidedStep = step;
@@ -101,7 +111,10 @@ namespace Graphics2DDotNet
         }
         protected override void OnPending(EventArgs e)
         {
-            Parent.bodies.Add(body);
+            if (isBodyOwner)
+            {
+                Parent.bodies.Add(body);
+            }
             base.OnPending(e);
         }
         public override Graphic Duplicate()

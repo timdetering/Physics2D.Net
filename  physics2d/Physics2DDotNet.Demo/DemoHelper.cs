@@ -551,9 +551,10 @@ namespace Physics2DDotNet.Demo
             };
         }
 
-        public static void AddParticles(DemoOpenInfo info, Vector2D position, Vector2D velocity, int count)
+        public static List<Body> AddParticles(DemoOpenInfo info, Vector2D position, Vector2D velocity, int count)
         {
             Graphic[] graphics = new Graphic[count];
+            List<Body> result = new List<Body>(count);
             Scalar angle = MathHelper.TwoPi / count;
             for (int index = 0; index < count; ++index)
             {
@@ -563,6 +564,7 @@ namespace Physics2DDotNet.Demo
                     1f,
                    new Coefficients(1, .5f),// coefficients.Duplicate(),
                     new Lifespan(.9f));
+                result.Add(particle);
                 Vector2D direction = Vector2D.FromLengthAndAngle(1, index * angle + ((Scalar)Rand.NextDouble() - .5f) * angle);
                 particle.State.Position.Linear += direction;
                 particle.State.Velocity.Linear = direction * Rand.Next(200, 1001) + velocity;
@@ -571,6 +573,7 @@ namespace Physics2DDotNet.Demo
                 graphics[index] = graphic;
             }
             info.Scene.AddGraphicRange(graphics);
+            return result;
         }
         public static Body AddCircle(DemoOpenInfo info, Scalar radius, int vertexCount, Scalar mass, ALVector2D position)
         {

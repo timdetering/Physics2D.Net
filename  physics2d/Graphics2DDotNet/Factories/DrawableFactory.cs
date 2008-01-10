@@ -40,7 +40,6 @@ using Tao.OpenGl;
 using SdlDotNet.Core;
 using SdlDotNet.Graphics;
 using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
 namespace Graphics2DDotNet
 {
     public static class DrawableFactory

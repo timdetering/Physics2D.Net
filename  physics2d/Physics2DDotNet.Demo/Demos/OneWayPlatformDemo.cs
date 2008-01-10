@@ -72,7 +72,7 @@ namespace Physics2DDotNet.Demo.Demos
             ignorer.AddGroup(bodies.ToArray());
             line.CollisionIgnorer = ignorer;
 
-            Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));// //AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
+            Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));
             ball.Transformation *=
                 Matrix2x3.FromRotationZ(1) *
                 Matrix2x3.FromScale(new Vector2D(.9f, .5f)) *

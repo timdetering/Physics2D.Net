@@ -67,7 +67,13 @@ namespace Physics2DDotNet.Demo
             //just leave this line it.
             string dir = Settings.DataDir;
 
-            //Create a new Layer 
+
+            //create a new window to display stuff
+            Window window = new Window(new System.Drawing.Size(1000, 750));
+            window.Title = "Physics2D.Net Demo";
+
+
+            //Create a new Scene 
             Scene scene = new Scene();
 
             //Get the scenes physics engine
@@ -77,9 +83,7 @@ namespace Physics2DDotNet.Demo
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
             physicsEngine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
 
-            //graphics engine is basically a window with some events that draws veiwports
-            Window window = new Window(new System.Drawing.Size(1000, 750));
-            window.Title = "Physics2D.Net Demo";
+
 
             Viewport viewport = new Viewport(
                 new Rectangle(0, 0, window.Size.Width, window.Size.Height), //where
@@ -121,7 +125,7 @@ namespace Physics2DDotNet.Demo
             return;
         }
 
-
+        //below here is code that displays the fps, ups and so on.
 
         static string numberString = "0123456789";
         static SurfacePolygons[] numbers2;
