@@ -67,6 +67,7 @@ Changed: Moved all static methods in the Shape classes into the new VertexHelper
 Removed: the shape object now all shape directly impliment IShape.
 Added: GroupedOneWayPlatformIgnorer
 Added: PhysicsTimer.IsRunningChanged
+Changed: Body.Collided Event to only be raised on initial contact. class in the event args can get rest.
 
 AdvanceMath
 1.7.0.0:

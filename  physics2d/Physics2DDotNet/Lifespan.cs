@@ -68,12 +68,12 @@ namespace Physics2DDotNet
             this.age = age;
             this.maxAge = maxAge;
         }
-        private Lifespan(Lifespan self)
+        private Lifespan(Lifespan copy)
         {
-            this.lastUpdate = self.lastUpdate;
-            this.age = self.age;
-            this.maxAge = self.maxAge;
-            this.isExpired = self.isExpired;
+            this.lastUpdate = -1;
+            this.age = copy.age;
+            this.maxAge = copy.maxAge;
+            this.isExpired = copy.isExpired;
         }
         #endregion
         #region properties
@@ -116,7 +116,7 @@ namespace Physics2DDotNet
         /// <summary>
         /// Gets if it is expired becuase of old age.
         /// </summary>
-        public bool OverAged
+        public bool IsOverAged
         {
             get
             {

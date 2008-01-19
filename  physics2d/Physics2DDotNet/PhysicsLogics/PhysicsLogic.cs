@@ -44,6 +44,11 @@ namespace Physics2DDotNet.PhysicsLogics
     {
         #region static
         private static ReadOnlyCollection<Body> none = new ReadOnlyCollection<Body>(new Body[0]);
+        protected static Lifespan GetLifeTime(Body body)
+        {
+            if (body == null) { throw new ArgumentNullException("body"); }
+            return body.Lifetime;
+        }
         #endregion
         #region events
         /// <summary>

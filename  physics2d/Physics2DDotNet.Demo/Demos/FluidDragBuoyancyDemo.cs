@@ -67,12 +67,14 @@ namespace Physics2DDotNet.Demo.Demos
             rect.Max.Y += 75;
             DemoHelper.AddShell(DemoInfo, rect, 100, Scalar.PositiveInfinity).ForEach(delegate(Body b) { b.IgnoresGravity = true; });
 
-
+            DemoHelper.AddRagDoll(DemoInfo, new Vector2D(340, 300));
+            DemoHelper.AddRagDoll(DemoInfo, new Vector2D(640, 300));
             IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 3, 16, 4);
 
             DemoHelper.AddShape(DemoInfo, shape, 200, new ALVector2D(0, new Vector2D(200, 300)));
             DemoHelper.AddShape(DemoInfo, shape, 100, new ALVector2D(0, new Vector2D(500, 300)));
-            DemoHelper.AddRectangle(DemoInfo, 50, 200, 25, new ALVector2D(0, 600, 600));
+            DemoHelper.AddRectangle(DemoInfo, 20, 200, 25 / 5, new ALVector2D(0, 600, 600));
+            DemoHelper.AddRectangle(DemoInfo, 20, 200, 25 / 5, new ALVector2D(0, 600, 620));
             DemoHelper.AddRectangle(DemoInfo, 50, 100, 50, new ALVector2D(0, 200, 400));
             DemoHelper.AddRectangle(DemoInfo, 50, 100, 50, new ALVector2D(0, 400, 200));
 

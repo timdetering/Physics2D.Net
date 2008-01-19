@@ -44,6 +44,10 @@ using SdlDotNet.Input;
 
 namespace Graphics2DDotNet
 {
+    /// <summary>
+    /// This is the window. the actaul window that will appear. It holds the timer that will 
+    /// Draw scenes via viewports.
+    /// </summary>
     public class Window
     {
         public event EventHandler<CollectionEventArgs<Viewport>> ViewportsAdded
@@ -58,6 +62,7 @@ namespace Graphics2DDotNet
         }
 
         public event EventHandler<SizeEventArgs> Resized;
+
         object syncRoot;
         Surface screen;
         Size size;
@@ -165,7 +170,9 @@ namespace Graphics2DDotNet
             }
         }
 
-
+        /// <summary>
+        /// Starts the drawing loop.
+        /// </summary>
         public void Run()
         {
             isRunning = true;

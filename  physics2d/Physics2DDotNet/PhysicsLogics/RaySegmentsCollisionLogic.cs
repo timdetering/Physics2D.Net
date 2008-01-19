@@ -74,11 +74,6 @@ namespace Physics2DDotNet.PhysicsLogics
                 info[index] = new RaySegmentsCollisionInfo();
             }
         }
-        static Lifespan GetLifespan(Body body)
-        {
-            if (body == null) { throw new ArgumentNullException("body"); }
-            return body.Lifetime;
-        }
 
         public event EventHandler NewInfo;
 
@@ -88,7 +83,7 @@ namespace Physics2DDotNet.PhysicsLogics
 
 
         public RaySegmentsCollisionLogic(Body body)
-            : base(GetLifespan(body))
+            : base(GetLifeTime(body))
         {
             this.body = body;
             RaySegmentsShape shape = body.Shape as RaySegmentsShape;

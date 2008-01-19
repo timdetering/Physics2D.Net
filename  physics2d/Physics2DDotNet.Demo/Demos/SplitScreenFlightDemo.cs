@@ -114,9 +114,12 @@ Move Up, Down
                             (isHit) ? (200) : (10));
                         if (isHit && !e1.Other.Lifetime.IsExpired)
                         {
-                            ExplosionLogic logic = new ExplosionLogic(e1.Other.State.Position.Linear, e1.Other.State.Velocity.Linear, 4000, 2, e1.Other.Mass.Mass, new Lifespan(.5f));
-                            Scene.Engine.AddLogic(logic);
-
+                            ExplosionLogic explosionLogic = new ExplosionLogic(
+                                e1.Other.State.Position.Linear, 
+                                e1.Other.State.Velocity.Linear, 
+                                9000, .1f, e1.Other.Mass.Mass, 
+                                new Lifespan(.5f));
+                            Scene.Engine.AddLogic(explosionLogic);
                             e1.Other.Lifetime.IsExpired = true;
                             particles[0].Removed += delegate(object sender2, RemovedEventArgs e2)
                             {
@@ -130,7 +133,8 @@ Move Up, Down
                                 }
                             };
                         }
-                        else if(e1.Other.Shape is CircleShape)
+                        else if (e1.Other.Shape is CircleShape && 
+                            !e1.Other.IgnoresCollisionResponse)
                         {
                             e1.Other.Lifetime.IsExpired = true;
                         }

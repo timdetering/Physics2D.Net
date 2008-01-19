@@ -79,7 +79,7 @@ namespace Physics2DDotNet.Demo
             //Get the scenes physics engine
             PhysicsEngine physicsEngine = scene.Engine;
             //initialize the engine 
-            physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
+            physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
             physicsEngine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
 
@@ -110,9 +110,8 @@ namespace Physics2DDotNet.Demo
             window.Intialize();
             window.DrawingInterval = .02f;
             //Add some intro text
-
-
             AddIntoText(window, viewport, scene);
+
             SetupStatus(window, scene);
 
 

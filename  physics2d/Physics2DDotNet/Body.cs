@@ -41,20 +41,6 @@ using Physics2DDotNet.Ignorers;
 
 namespace Physics2DDotNet
 {
-    public class BodyJointEventArgs : EventArgs
-    {
-        Joint joint;
-        public BodyJointEventArgs(Joint joint)
-        {
-            this.joint = joint; 
-        }
-        public Joint Joint
-        {
-            get { return joint; }
-        }
-    }
-
-
     /// <summary>
     /// This is the Physical Body that collides in the engine.
     /// </summary>
@@ -155,6 +141,8 @@ namespace Physics2DDotNet
 
         #endregion
         #region fields
+        Dictionary<string, object> tags;
+        
         internal LinkedList<BodyProxy> proxies;
         private List<Joint> joints;
         private PhysicsEngine engine;
@@ -184,6 +172,7 @@ namespace Physics2DDotNet
         private bool isTransformed;
         private bool isEventable;
         private bool isBroadPhaseOnly;
+        private bool transformChanged;
 
         private object tag;
         private object solverTag;
@@ -278,6 +267,11 @@ namespace Physics2DDotNet
         }
         #endregion
         #region properties
+        public Dictionary<string, object> Tags
+        {
+            get { return tags; }
+        }
+        
         /// <summary>
         /// This is the Baunding rectangle It is calculated on the call to apply matrix.
         /// </summary>
@@ -564,6 +558,7 @@ namespace Physics2DDotNet
             {
                 transformation = value;
                 isTransformed = value != Matrix2x3.Identity;
+                transformChanged = true;
             }
         }
         public bool IsTransformed{ get { return isTransformed; } }
@@ -801,14 +796,14 @@ namespace Physics2DDotNet
             return Duplicate();
         }
 
-        internal void OnCollision(TimeStep step, Body other, ReadOnlyCollection<IContactInfo> contacts)
+        internal void OnCollision(TimeStep step, Body other, IContact contact)
         {
             if (Collided != null &&
                 other.IsEventable &&
                 (eventIgnorer == null ||
                 Ignorer.CanCollide(this,other, eventIgnorer,other.eventIgnorer)))
             {
-                Collided(this, new CollisionEventArgs(step,other, contacts));
+                Collided(this, new CollisionEventArgs(step, other, contact));
             }
         }
         internal void OnCollision(TimeStep step, Body other, object customIntersectionInfo)
@@ -825,10 +820,12 @@ namespace Physics2DDotNet
         internal void OnPositionChanged()
         {
             if (PositionChanged != null &&
-                !ALVector2D.Equals(ref lastPosition, ref state.Position))
+                (transformChanged ||
+                !ALVector2D.Equals(ref lastPosition, ref state.Position)))
             {
                 PositionChanged(this, EventArgs.Empty);
                 lastPosition = state.Position;
+                transformChanged = false;
             }
         }
         internal void OnPending(PhysicsEngine engine)

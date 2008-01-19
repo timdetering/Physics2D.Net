@@ -89,7 +89,7 @@ namespace Physics2DDotNet.Demo
             dispose += DemoHelper.RegisterMaintainSpawning(info, SdlDotNet.Input.Key.N,
                 delegate(Vector2D position)
                 {
-                    ExplosionLogic result = new ExplosionLogic(position, Vector2D.Zero, 9000, .4f, 600, new Lifespan(.5f));
+                    ExplosionLogic result = new ExplosionLogic(position, Vector2D.Zero, 9000, .1f, 600, new Lifespan(.25f));
                     info.Scene.Engine.AddLogic(result);
                     return result;
                 });
@@ -430,6 +430,42 @@ namespace Physics2DDotNet.Demo
                 Events.KeyboardUp -= upHandler;
             };
         }
+        public static DisposeCallback RegisterClick(DemoOpenInfo info, Body body, MouseButton button, EventHandler handler)
+        {
+            if (handler == null) { throw new ArgumentNullException("handler"); }
+            bool buttonDown = false;
+            EventHandler<ViewportMouseButtonEventArgs> mouseDown = delegate(object sender, ViewportMouseButtonEventArgs e)
+            {
+                if (e.Button == button)
+                {
+                    Vector2D pos = body.Matrices.ToBody * e.Position;
+                    IntersectionInfo temp;
+                    buttonDown = body.Shape.TryGetIntersection(pos, out temp);
+                }
+            };
+            EventHandler<ViewportMouseButtonEventArgs> mouseUp = delegate(object sender, ViewportMouseButtonEventArgs e)
+            {
+                if (buttonDown &&
+                    e.Button == button)
+                {
+                    buttonDown = false;
+                    Vector2D pos = body.Matrices.ToBody * e.Position;
+                    IntersectionInfo temp;
+                    if (body.Shape.TryGetIntersection(pos, out temp))
+                    {
+                        handler(body, EventArgs.Empty);
+                    }
+                }
+            };
+
+            info.Viewport.MouseDown += mouseDown;
+            info.Viewport.MouseUp += mouseUp;
+            return delegate()
+            {
+                info.Viewport.MouseDown -= mouseDown;
+                info.Viewport.MouseUp -= mouseUp;
+            };
+        }
 
 
         public static DisposeCallback RegisterBodyTracking(DemoOpenInfo info, Body body, Matrix2x3 transformation)
@@ -585,7 +621,7 @@ namespace Physics2DDotNet.Demo
         public static Body AddRectangle(DemoOpenInfo info, Scalar height, Scalar width, Scalar mass, ALVector2D position)
         {
             Vector2D[] vertexes = VertexHelper.CreateRectangle(width, height);
-            vertexes = VertexHelper.Subdivide(vertexes, (height + width) / 9);
+            vertexes = VertexHelper.Subdivide(vertexes, Math.Min(height, width) / 5);
             IShape boxShape = ShapeFactory.CreateColoredPolygon(vertexes, Math.Min(height, width) / 5);
             Body body = new Body(new PhysicsState(position), boxShape, mass, Coefficients.Duplicate(), new Lifespan());
             info.Scene.AddGraphic(new BodyGraphic(body));

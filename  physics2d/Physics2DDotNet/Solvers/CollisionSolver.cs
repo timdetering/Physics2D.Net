@@ -58,7 +58,7 @@ namespace Physics2DDotNet.Solvers
             get { return engine; }
         }
 
-        protected internal abstract bool TryGetIntersection(TimeStep step, Body first, Body second, out ReadOnlyCollection<IContactInfo> contacts);
+        protected internal abstract bool TryGetIntersection(TimeStep step, Body first, Body second, out IContact contact);
         protected internal abstract void Solve(TimeStep step);
 
         internal void OnAddedInternal(PhysicsEngine engine)

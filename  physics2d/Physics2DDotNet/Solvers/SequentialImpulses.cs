@@ -58,7 +58,7 @@ namespace Physics2DDotNet.Solvers
     {
         #region sub-classes
         [Serializable]
-        sealed class Contact : IContactInfo
+        sealed class ContactPoint : IContactPointInfo
         {
             public int id;
             public Vector2D position;
@@ -72,50 +72,47 @@ namespace Physics2DDotNet.Solvers
             public Scalar bias;
             public Vector2D r1;
             public Vector2D r2;
-            Arbiter arbiter;
 
-            public Contact(Arbiter arbiter)
-            {
-                this.arbiter = arbiter;
-            }
 
-            Vector2D IContactInfo.Position
+            Vector2D IContactPointInfo.Position
             {
                 get { return position; }
             }
-            Vector2D IContactInfo.Normal
+            Vector2D IContactPointInfo.Normal
             {
                 get { return normal; }
             }
-            Scalar IContactInfo.Distance
+            Scalar IContactPointInfo.Distance
             {
                 get { return distance; }
             }
-            Body IContactInfo.Body1
-            {
-                get { return (id < 0) ? (arbiter.body1) : (arbiter.body2); }
-            }
-            Body IContactInfo.Body2
-            {
-                get { return (id < 0) ? (arbiter.body2) : (arbiter.body1); }
-            }
         }
         [Serializable]
-        sealed class Arbiter
+        sealed class Arbiter : IContact
         {
-            static Contact[] Empty = new Contact[0];
+
+
+            static ContactPoint[] Empty = new ContactPoint[0];
             static Scalar ZeroClamp(Scalar value)
             {
                 return ((value < 0) ? (0) : (value));
             }
+
+            public event EventHandler Updated;
+
+            public event EventHandler Ended;
+
+            ContactState state;
+
+
 
             int lastUpdate;
 
             CircleShape circle1;
             CircleShape circle2;
 
-            LinkedList<Contact> contacts;
-            Contact[] contactsArray;
+            LinkedList<ContactPoint> contacts;
+            ContactPoint[] contactsArray;
 
             public Body body1;
             public Body body2;
@@ -147,8 +144,13 @@ namespace Physics2DDotNet.Solvers
                         this.body2.Coefficients.DynamicFriction);
                 this.restitution = Math.Min(body1.Coefficients.Restitution, body2.Coefficients.Restitution);
                 this.parent = parent;
-                this.contacts = new LinkedList<Contact>();
+                this.contacts = new LinkedList<ContactPoint>();
                 this.lastUpdate = -1;
+                this.state = ContactState.New;
+            }
+            public ContactState State
+            {
+                get { return state; }
             }
             public int LastUpdate
             {
@@ -156,6 +158,10 @@ namespace Physics2DDotNet.Solvers
             }
             public void Update(TimeStep step)
             {
+                if (lastUpdate != -1)
+                {
+                    state = ContactState.Old;
+                }
                 lastUpdate = step.UpdateCount;
                 if (circle1 != null && circle2 != null &&
                     !body1.IsTransformed && !body2.IsTransformed)
@@ -167,6 +173,11 @@ namespace Physics2DDotNet.Solvers
                     Collide();
                 }
                 UpdateContacts();
+                if (Updated != null &&
+                    contactsArray.Length != 0)
+                {
+                    Updated(this, EventArgs.Empty);
+                }
             }
             void UpdateContacts()
             {
@@ -177,7 +188,7 @@ namespace Physics2DDotNet.Solvers
                 }
                 if (contactsArray == null || contactsArray.Length != contacts.Count)
                 {
-                    contactsArray = new Contact[contacts.Count];
+                    contactsArray = new ContactPoint[contacts.Count];
                 }
                 contacts.CopyTo(contactsArray, 0);
             }
@@ -200,10 +211,10 @@ namespace Physics2DDotNet.Solvers
                 }
                 else
                 {
-                    Contact contact;
+                    ContactPoint contact;
                     if (contacts.First == null)
                     {
-                        contact = new Contact(this);
+                        contact = new ContactPoint();
                         contacts.AddLast(contact);
                     }
                     else
@@ -222,7 +233,7 @@ namespace Physics2DDotNet.Solvers
                 BoundingRectangle bb2 = body2.Rectangle;
                 BoundingRectangle targetArea;
                 BoundingRectangle.FromIntersection(ref bb1, ref bb2, out targetArea);
-                LinkedListNode<Contact> node = contacts.First;
+                LinkedListNode<ContactPoint> node = contacts.First;
                 if (!body2.IgnoreVertexes &&
                     body1.Shape.CanGetIntersection)
                 {
@@ -234,7 +245,7 @@ namespace Physics2DDotNet.Solvers
                     Collide(ref node, this.body2, this.body1, true, ref targetArea);
                 }
             }
-            void Collide(ref LinkedListNode<Contact> node, Body b1, Body b2, bool inverse, ref BoundingRectangle targetArea)
+            void Collide(ref LinkedListNode<ContactPoint> node, Body b1, Body b2, bool inverse, ref BoundingRectangle targetArea)
             {
                 Vector2D[] vertexes = b2.Shape.Vertexes;
                 Vector2D[] normals = b2.Shape.VertexNormals;
@@ -249,7 +260,7 @@ namespace Physics2DDotNet.Solvers
 
                 IntersectionInfo info = IntersectionInfo.Zero;
                 ContainmentType contains;
-                Contact contact;
+                ContactPoint contact;
 
                 for (int index = 0; index < vertexes.Length; ++index)
                 {
@@ -263,7 +274,7 @@ namespace Physics2DDotNet.Solvers
                         Vector2D.Transform(ref b1ToBody, ref worldVertex, out bodyVertex);
                         isBad = !b1.Shape.TryGetIntersection(bodyVertex, out info);
                         if (!isBad && normals != null &&
-                            !body1.IgnoresCollisionResponse&&
+                            !body1.IgnoresCollisionResponse &&
                             !body2.IgnoresCollisionResponse)
                         {
                             Vector2D normal;
@@ -281,7 +292,7 @@ namespace Physics2DDotNet.Solvers
                     {
                         if (node != null && node.Value.id == Id)
                         {
-                            LinkedListNode<Contact> nextNode = node.Next;
+                            LinkedListNode<ContactPoint> nextNode = node.Next;
                             contacts.Remove(node);
                             node = nextNode;
                         }
@@ -290,7 +301,7 @@ namespace Physics2DDotNet.Solvers
                     {
                         if (node == null)
                         {
-                            contact = new Contact(this);
+                            contact = new ContactPoint();
                             contact.id = Id;
                             contacts.AddLast(contact);
                         }
@@ -307,7 +318,7 @@ namespace Physics2DDotNet.Solvers
                         }
                         else
                         {
-                            contact = new Contact(this);
+                            contact = new ContactPoint();
                             contact.id = Id;
                             contacts.AddBefore(node, contact);
                         }
@@ -332,7 +343,7 @@ namespace Physics2DDotNet.Solvers
 
                 for (int index = 0; index < contactsArray.Length; ++index)
                 {
-                    Contact c = contactsArray[index];
+                    ContactPoint c = contactsArray[index];
                     Vector2D.Subtract(ref c.position, ref body1.State.Position.Linear, out c.r1);
                     Vector2D.Subtract(ref c.position, ref body2.State.Position.Linear, out c.r2);
 
@@ -407,7 +418,7 @@ namespace Physics2DDotNet.Solvers
 
                 for (int index = 0; index < contactsArray.Length; ++index)
                 {
-                    Contact c = contactsArray[index];
+                    ContactPoint c = contactsArray[index];
 
                     // Relative velocity at contact
                     Vector2D dv;
@@ -569,15 +580,38 @@ namespace Physics2DDotNet.Solvers
             {
                 get { return contactsArray.Length > 0; }
             }
-            public ReadOnlyCollection<IContactInfo> Contacts
+            public void OnRemoved()
+            {
+                this.state = ContactState.Ended;
+                if (Ended != null) { Ended(this, EventArgs.Empty); }
+            }
+
+
+
+            Body IContact.Body1
+            {
+                get { return body1; }
+            }
+
+            Body IContact.Body2
+            {
+                get { return body2; }
+            }
+
+            ReadOnlyCollection<IContactPointInfo> IContact.Points
             {
                 get
                 {
-                    return new ReadOnlyCollection<IContactInfo>(
-                        new Physics2DDotNet.Collections.ImplicitCastCollection<IContactInfo, Contact>(contactsArray));
+                    return new ReadOnlyCollection<IContactPointInfo>(
+                        new Physics2DDotNet.Collections.ImplicitCastCollection<IContactPointInfo, ContactPoint>(contactsArray));
                 }
             }
-        } 
+
+
+
+
+
+        }
         #endregion
         #region static
         static bool IsJointRemoved(ISequentialImpulsesJoint joint)
@@ -648,7 +682,7 @@ namespace Physics2DDotNet.Solvers
         } 
         #endregion
         #region methods
-        protected internal override bool TryGetIntersection(TimeStep step, Body first, Body second, out ReadOnlyCollection<IContactInfo> contacts)
+        protected internal override bool TryGetIntersection(TimeStep step, Body first, Body second, out IContact contact)
         {
             long id = PairID.GetId(first.ID, second.ID);
             Arbiter arbiter;
@@ -657,6 +691,7 @@ namespace Physics2DDotNet.Solvers
                 arbiter.Update(step);
                 if (!arbiter.Collided)
                 {
+                    arbiter.OnRemoved();
                     arbiters.Remove(id);
                 }
             }
@@ -671,7 +706,7 @@ namespace Physics2DDotNet.Solvers
                     arbiters.Add(id, arbiter);
                 }
             }
-            contacts = arbiter.Contacts;
+            contact = arbiter;
             return arbiter.Collided;
         }
         void RemoveEmpty(TimeStep step)
@@ -682,6 +717,7 @@ namespace Physics2DDotNet.Solvers
                 Arbiter value = pair.Value;
                 if (!value.Collided || value.LastUpdate != step.UpdateCount)
                 {
+                    pair.Value.OnRemoved();
                     empty.Add(pair.Key);
                 }
             }

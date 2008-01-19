@@ -114,7 +114,7 @@ namespace Physics2DDotNet.PhysicsLogics
             time += step.Dt;
             radius = 1 + time * pressurePulseSpeed;
             explosionBody.Transformation = Matrix2x3.FromScale(new Vector2D(radius, radius));
-            items.Clear();
+            base.UpdateTime(step);
         }
         protected internal override void RunLogic(TimeStep step)
         {

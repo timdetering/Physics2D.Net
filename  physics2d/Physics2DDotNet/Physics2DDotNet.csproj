@@ -41,6 +41,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Collections\ReadOnlyThreadSafeCollection.cs" />
+    <Compile Include="DataTypes\BodyJointEventArgs.cs" />
     <Compile Include="DataTypes\BodyProxy.cs" />
     <Compile Include="DataTypes\CollectionEventArgs.cs" />
     <Compile Include="DataTypes\DragInfo.cs" />
@@ -82,7 +83,6 @@
     <Compile Include="PhysicsLogics\GravityPointField.cs" />
     <Compile Include="PhysicsLogics\GravityPointMass.cs" />
     <Compile Include="PhysicsLogics\LineFluidLogic.cs" />
-    <Compile Include="PhysicsLogics\MousePickingLogic.cs" />
     <Compile Include="PhysicsLogics\PhysicsLogic.cs" />
     <Compile Include="PhysicsLogics\RaySegmentsCollisionLogic.cs" />
     <Compile Include="PhysicsLogics\VelocityLimitLogic.cs" />

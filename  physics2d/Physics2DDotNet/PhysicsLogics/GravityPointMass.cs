@@ -39,6 +39,8 @@ namespace Physics2DDotNet.PhysicsLogics
     [Serializable]
     public sealed class GravityPointMass : PhysicsLogic
     {
+
+
         Scalar metersPerDistanceUnit;
         Body body;
         /// <summary>
@@ -46,8 +48,8 @@ namespace Physics2DDotNet.PhysicsLogics
         /// </summary>
         /// <param name="body">The body that will be the source of gravity.</param>
         /// <param name="lifetime">A object Describing how long the object will be in the engine.</param>
-        public GravityPointMass(Body body, Lifespan lifetime):
-            this(body,1,lifetime)
+        public GravityPointMass(Body body):
+            this(body,1)
         {}
         /// <summary>
         /// Creates a new GravityPointMass Instance.
@@ -55,10 +57,9 @@ namespace Physics2DDotNet.PhysicsLogics
         /// <param name="body">The body that will be the source of gravity.</param>
         /// <param name="metersPerDistanceUnit">The scale of of the universe.</param>
         /// <param name="lifetime">A object Describing how long the object will be in the engine.</param>
-        public GravityPointMass(Body body, Scalar metersPerDistanceUnit, Lifespan lifetime)
-            : base(lifetime)
+        public GravityPointMass(Body body, Scalar metersPerDistanceUnit)
+            : base(GetLifeTime(body))
         {
-            if (body == null) { throw new ArgumentNullException("body"); }
             if (metersPerDistanceUnit <= 0) { throw new ArgumentOutOfRangeException("metersPerDistanceUnit"); }
             this.body = body;
             this.metersPerDistanceUnit = metersPerDistanceUnit;
@@ -87,23 +88,5 @@ namespace Physics2DDotNet.PhysicsLogics
         {
             if (body.Engine != engine) { throw new InvalidOperationException("The Body must be added to the Engine before the GravityPointMass."); }
         }
-        protected override void OnAdded(EventArgs e)
-        {
-            this.body.Removed += OnBodyRemoved;
-            base.OnAdded(e);
-        }
-        void OnBodyRemoved(object sender, RemovedEventArgs e)
-        {
-            this.Lifetime.IsExpired = true;
-        }
-        protected override void OnRemoved(RemovedEventArgs e)
-        {
-            if (!e.WasPending)
-            {
-                this.body.Removed -= OnBodyRemoved;
-            }
-            base.OnRemoved(e);
-        }
     }
-
 }

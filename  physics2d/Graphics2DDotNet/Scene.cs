@@ -47,6 +47,10 @@ using SdlDotNet.Input;
 
 namespace Graphics2DDotNet
 {
+    /// <summary>
+    /// this class represents a scene (a collection of objects that can be drawn)
+    /// that is drawn via a Viewport
+    /// </summary>
     public class Scene
     {
         public event EventHandler<CollectionEventArgs<Graphic>> GraphicsAdded
@@ -73,6 +77,9 @@ namespace Graphics2DDotNet
         internal List<Body> bodies;
         internal List<Joint> joints;
         internal List<PhysicsLogic> physicsLogics;
+        bool isPaused;
+
+
         object tag;
         public Scene()
         {
@@ -112,6 +119,11 @@ namespace Graphics2DDotNet
         {
             get { return tag; }
             set { tag = value; }
+        }
+        public bool IsPaused
+        {
+            get { return isPaused; }
+            set { isPaused = value; }
         }
         internal void AddViewport(Viewport item)
         {
@@ -196,7 +208,9 @@ namespace Graphics2DDotNet
         }
         protected virtual void Update(Scalar dt, Scalar trueDt)
         {
-            engine.Update(dt, trueDt);
+            engine.Update(
+                (isPaused) ? (0) : (dt),
+                trueDt);
         }
         public void Clear()
         {

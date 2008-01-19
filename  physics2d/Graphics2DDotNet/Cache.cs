@@ -43,6 +43,10 @@ using SdlDotNet.Graphics;
 using Color = System.Drawing.Color;
 namespace Graphics2DDotNet
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
     public static class Cache<TValue>
     {
         private sealed class TypeComparer : IComparer<Type>

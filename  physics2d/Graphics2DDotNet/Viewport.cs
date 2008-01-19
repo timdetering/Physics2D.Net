@@ -46,6 +46,9 @@ using SdlDotNet.Input;
 
 namespace Graphics2DDotNet
 {
+    /// <summary>
+    /// This represents a section of a Window. 
+    /// </summary>
     public class Viewport : Pendable<Window>
     {
         static int idCounter = 0;

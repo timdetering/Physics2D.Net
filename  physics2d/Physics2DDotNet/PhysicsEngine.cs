@@ -807,11 +807,12 @@ namespace Physics2DDotNet
             }
             else
             {
-                ReadOnlyCollection<IContactInfo> contacts;
-                if (solver.TryGetIntersection(step, body1, body2, out contacts))
+                IContact contact;
+                if (solver.TryGetIntersection(step, body1, body2, out contact) && 
+                    contact.State == ContactState.New)
                 {
-                    body1.OnCollision(step, body2, contacts);
-                    body2.OnCollision(step, body1, contacts);
+                    body1.OnCollision(step, body2, contact);
+                    body2.OnCollision(step, body1, contact);
                 }
             }
 

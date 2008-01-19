@@ -437,7 +437,7 @@ namespace Physics2DDemo
         {
             Body b1 = (Body)sender;
             Body b2 = e.Other;
-            Vector2D p = e.Contacts[0].Position;
+            Vector2D p = e.Contact.Points[0].Position;
             Vector2D p1, p2, rv;
             Vector2D.Subtract(ref p, ref b1.State.Position.Linear, out p1);
             Vector2D.Subtract(ref p, ref b2.State.Position.Linear, out p2);
@@ -1878,7 +1878,13 @@ namespace Physics2DDemo
                 e.Other == body2IT))
             {*/
                 Console.WriteLine("HAHA");
+                e.Contact.Ended += new EventHandler(Contact_Ended);
             //}
+        }
+
+        void Contact_Ended(object sender, EventArgs e)
+        {
+            Console.WriteLine("BLALBA");
         }
         const int Min = 0;
         const int Non = 1;

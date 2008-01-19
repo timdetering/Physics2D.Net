@@ -64,7 +64,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// Describes a Contact in a collision.
     /// </summary>
-    public interface IContactInfo
+    public interface IContactPointInfo
     {
         /// <summary>
         /// Gets The world coordinates of the contact.
@@ -78,6 +78,20 @@ namespace Physics2DDotNet
         /// Gets The distance the contact is inside the other object.
         /// </summary>
         Scalar Distance { get;}
+    }
+
+    public enum ContactState
+    {
+        New,
+        Old,
+        Ended
+    }
+
+    public interface IContact
+    {
+         event EventHandler Updated;
+         event EventHandler Ended;
+
         /// <summary>
         /// Gets The First Body that is part of the Contact.
         /// (The Normal belongs to this Body.)
@@ -88,8 +102,7 @@ namespace Physics2DDotNet
         /// (The Position of the Vertex belongs to this Body.)
         /// </summary>
         Body Body2 { get;}
+        ContactState State { get;}
+        ReadOnlyCollection<IContactPointInfo> Points { get;}
     }
-
- 
-
 }

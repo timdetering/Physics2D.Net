@@ -41,7 +41,7 @@ namespace Physics2DDotNet
     public class CollisionEventArgs : EventArgs
     {
         TimeStep step;
-        ReadOnlyCollection<IContactInfo> contacts;
+        IContact contact;
         Body other;
         object customIntersectionInfo;
         private CollisionEventArgs(TimeStep step, Body other)
@@ -49,10 +49,10 @@ namespace Physics2DDotNet
             this.step = step;
             this.other = other;
         }
-        public CollisionEventArgs(TimeStep step,Body other, ReadOnlyCollection<IContactInfo> contacts)
+        public CollisionEventArgs(TimeStep step, Body other, IContact contact)
             :this(step,other)
         {
-            this.contacts = contacts;
+            this.contact = contact;
         }
         public CollisionEventArgs(TimeStep step,Body other, object customIntersectionInfo)
             : this(step, other)
@@ -71,9 +71,9 @@ namespace Physics2DDotNet
         {
             get { return customIntersectionInfo; }
         }
-        public ReadOnlyCollection<IContactInfo> Contacts
+        public IContact Contact
         {
-            get { return contacts; }
+            get { return contact; }
         }
     }
 

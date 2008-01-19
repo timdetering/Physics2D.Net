@@ -190,7 +190,7 @@ namespace Physics2DDemo
         {
             lock (points)
             {
-                foreach (IContactInfo info in e.Contacts)
+                foreach (IContactPointInfo info in e.Contact.Points)
                 {
                     points.Add(info.Position);
                 }
