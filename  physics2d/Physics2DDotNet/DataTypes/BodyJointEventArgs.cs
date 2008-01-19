@@ -21,6 +21,9 @@
  */
 #endregion
 
+
+
+
 #if UseDouble
 using Scalar = System.Double;
 #else
@@ -28,48 +31,26 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Text;
-using System.Drawing;
+using System.Collections.ObjectModel;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-using Graphics2DDotNet;
-using Physics2DDotNet;
-using Physics2DDotNet.Ignorers;
-using Physics2DDotNet.Joints;
 using Physics2DDotNet.Shapes;
-using Physics2DDotNet.PhysicsLogics;
+using Physics2DDotNet.Joints;
+using Physics2DDotNet.Ignorers;
 
-namespace Physics2DDotNet.Demo.Demos
+
+namespace Physics2DDotNet
 {
-    [PhysicsDemo("Simple", "Towers", "There are many towers.\r\nIts like dominoes, but different!")]
-    public class TowersDemo : BaseDemo
+    public class BodyJointEventArgs : EventArgs
     {
-        DisposeCallback dispose;
-        protected override void Open()
+        Joint joint;
+        public BodyJointEventArgs(Joint joint)
         {
-
-            dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
-            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
-
-            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
-            DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
-
-            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
-
-
-            DemoHelper.AddGrid(
-                DemoInfo, shape, 20,
-                new BoundingRectangle(300, 500, 900, 710),
-                50, 2);
-
-            Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));// //AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
+            this.joint = joint;
         }
-        protected override void Dispose(bool disposing)
+        public Joint Joint
         {
-            if (dispose != null) { dispose(); }
+            get { return joint; }
         }
     }
-
-
 }

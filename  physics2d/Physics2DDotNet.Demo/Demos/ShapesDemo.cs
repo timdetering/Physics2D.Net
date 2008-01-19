@@ -42,12 +42,15 @@ using Physics2DDotNet.PhysicsLogics;
 
 namespace Physics2DDotNet.Demo.Demos
 {
-    [PhysicsDemo("Simple", "Towers", "There are many towers.\r\nIts like dominoes, but different!")]
-    public class TowersDemo : BaseDemo
+    [PhysicsDemo("Simple", "Shapes Demo", "TODO")]
+    public class ShapesDemo : BaseDemo
     {
         DisposeCallback dispose;
         protected override void Open()
         {
+
+            Coefficients coefficients = DemoHelper.Coefficients;
+            DemoHelper.Coefficients.Restitution = 0;
 
             dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
             dispose += DemoHelper.BasicDemoSetup(DemoInfo);
@@ -55,21 +58,26 @@ namespace Physics2DDotNet.Demo.Demos
             Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
             DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
 
-            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
+            IShape piston = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("piston.png"), 0, 16, 1);
+            IShape socket = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("socket.png"), 0, 16, 1);
+            DemoHelper.AddShape(DemoInfo, piston, 10, new ALVector2D(0, 300, 300));
+            DemoHelper.AddShape(DemoInfo, socket, 10, new ALVector2D(0, 300, 300));
 
+            IShape fighter = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("fighter.png"), 3, 16, 3);
+            DemoHelper.AddShape(DemoInfo, fighter, 50, new ALVector2D(0, 500, 300));
+            DemoHelper.AddShape(DemoInfo, fighter, 50, new ALVector2D(0, 500, 100));
 
-            DemoHelper.AddGrid(
-                DemoInfo, shape, 20,
-                new BoundingRectangle(300, 500, 900, 710),
-                50, 2);
+            IShape starfury = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("Starfury.png"), 3, 16, 3);
+            DemoHelper.AddShape(DemoInfo, starfury, 50, new ALVector2D(0, 700, 300));
+            DemoHelper.AddShape(DemoInfo, starfury, 50, new ALVector2D(0, 700, 100));
+
 
             Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));// //AddShape(new CircleShape(80, 20), 4000, new ALVector2D(0, new Vector2D(1028, 272)));
+            DemoHelper.Coefficients = coefficients;
         }
         protected override void Dispose(bool disposing)
         {
             if (dispose != null) { dispose(); }
         }
     }
-
-
 }

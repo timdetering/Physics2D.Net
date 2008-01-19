@@ -75,6 +75,7 @@
     <Compile Include="Demos\PyramidDemo.cs" />
     <Compile Include="Demos\RagdollDemo.cs" />
     <Compile Include="Demos\RubeGoldbergChallenge.cs" />
+    <Compile Include="Demos\ShapesDemo.cs" />
     <Compile Include="Demos\SingleTowerDemo.cs" />
     <Compile Include="Demos\SpinningArchesDemo.cs" />
     <Compile Include="Demos\SplitScreenFlightDemo.cs" />
