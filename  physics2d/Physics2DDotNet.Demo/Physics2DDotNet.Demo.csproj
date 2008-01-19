@@ -57,6 +57,7 @@
     <Compile Include="DemoSelector.Designer.cs">
       <DependentUpon>DemoSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="Demos\BallMachineDemo.cs" />
     <Compile Include="Demos\BallRoomDemo.cs" />
     <Compile Include="Demos\BaseDemo.cs" />
     <Compile Include="Demos\BoxesStressDemo.cs" />

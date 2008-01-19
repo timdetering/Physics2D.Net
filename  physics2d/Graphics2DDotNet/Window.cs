@@ -113,7 +113,7 @@ namespace Graphics2DDotNet
                 Resize();
                 isResized = false;
             }
-            GlHelper.DoGlDeleteBuffersARB(refreshCount);
+            GlHelper.DoDelete(refreshCount);
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             Draw(dt, trueDt);
             Video.GLSwapBuffers();

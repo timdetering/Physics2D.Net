@@ -66,7 +66,7 @@ namespace Physics2DDotNet.Demo
 
         static DemoHelper()
         {
-            ParticleShape.Default.Tag = DrawableFactory.CreateSprite(Cache<Surface>.GetItem("particle.png"), new Vector2D(8, 8));
+            ParticleShape.Default.Tag = new GlListDrawable ( DrawableFactory.CreateSprite(Cache<Surface>.GetItem("particle.png"), new Vector2D(8, 8)));
         }
 
         public static Scalar NextScalar()

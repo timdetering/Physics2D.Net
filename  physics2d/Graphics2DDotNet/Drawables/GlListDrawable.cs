@@ -27,16 +27,27 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
+using Tao.OpenGl;
 namespace Graphics2DDotNet
 {
-    public abstract class BufferedDrawable : IDrawable, IDisposable
+    public sealed class GlListDrawable : IDrawable, IDisposable
     {
         object tag;
+        int list;
         int refresh;
         bool isDisposed;
-        protected BufferedDrawable()
+        IDrawable drawable;
+        BufferedDrawable bufferedDrawable;
+        public GlListDrawable(IDrawable drawable)
         {
+            if (drawable == null) { throw new ArgumentNullException("drawable"); }
             this.refresh = -1;
+            this.drawable = drawable;
+            this.bufferedDrawable = drawable as BufferedDrawable;
+        }
+        ~GlListDrawable()
+        {
+            Dispose(false);
         }
         public object Tag
         {
@@ -50,19 +61,14 @@ namespace Graphics2DDotNet
         public int LastRefresh
         {
             get { return refresh; }
-            protected set { refresh = value; }
         }
-        protected abstract void EnableState();
-        protected abstract void DisableState();
-        protected abstract void BufferData(int refresh);
-        protected abstract void DrawData(DrawInfo drawInfo, IDrawableState state);
-        internal void TestBuffer(DrawInfo drawInfo)
+        public IDrawable Drawable
         {
-            if (refresh != drawInfo.RefreshCount)
-            {
-                refresh = drawInfo.RefreshCount;
-                BufferData(drawInfo.RefreshCount);
-            }
+            get { return drawable; }
+        }
+        public IDrawableState CreateState()
+        {
+            return drawable.CreateState();
         }
         public void Draw(DrawInfo drawInfo, IDrawableState state)
         {
@@ -70,14 +76,21 @@ namespace Graphics2DDotNet
             if (refresh != drawInfo.RefreshCount)
             {
                 refresh = drawInfo.RefreshCount;
-                BufferData(drawInfo.RefreshCount);
+                list = Gl.glGenLists(1);
+                if (bufferedDrawable != null)
+                {
+                    bufferedDrawable.TestBuffer(drawInfo);
+                }
+                Gl.glNewList(list, Gl.GL_COMPILE);
+                drawable.Draw(drawInfo, state);
+                Gl.glEndList();
             }
-            EnableState();
-            DrawData(drawInfo, state);
-            DisableState();
+            Gl.glCallList(list);
         }
-        public abstract IDrawableState CreateState();
-        protected abstract void Dispose(bool disposing);
+        private void Dispose(bool disposing)
+        {
+            GlHelper.GlDeleteLists(refresh, list, 1);
+        }
         public void Dispose()
         {
             if (!isDisposed)
@@ -88,5 +101,4 @@ namespace Graphics2DDotNet
             }
         }
     }
-
 }

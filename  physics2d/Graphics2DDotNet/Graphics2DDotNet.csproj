@@ -43,6 +43,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawables\GlListDrawable.cs" />
     <Compile Include="Pendable.cs" />
     <Compile Include="OpenGl\ARBArrayBuffer.cs" />
     <Compile Include="OpenGl\MultiARBArrayBuffer.cs" />

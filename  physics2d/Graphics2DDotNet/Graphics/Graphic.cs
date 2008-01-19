@@ -71,7 +71,6 @@ namespace Graphics2DDotNet
         bool isLifetimeOwner;
 
 
-
         public Graphic(IDrawable drawable, Matrix2x3 matrix, Lifespan lifetime)
             : base(lifetime)
         {

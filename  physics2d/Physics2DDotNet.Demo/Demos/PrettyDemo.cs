@@ -67,10 +67,8 @@ A large number of particles being pushed arround by 2 spinning guys
             fighterGraphic2.Body.State.Velocity.Angular = -8.5f;
             Scene.AddGraphic(fighterGraphic2);
 
-            ParticleShape particleShape = new ParticleShape();
-            particleShape.Tag = DrawableFactory.CreateSprite(Cache<Surface>.GetItem("particle.png"), new Vector2D(8, 8));
 
-            Body template2 = new Body(new PhysicsState(new ALVector2D(0, 200, 200)), particleShape, 4, new Coefficients(0, 1), new Lifespan());
+            Body template2 = new Body(new PhysicsState(new ALVector2D(0, 200, 200)), ParticleShape.Default, 4, new Coefficients(0, 1), new Lifespan());
             Matrix2x3 m = Matrix2x3.FromRotationZ(2);
             int count = 0;
             for (int x = -0; x < 1000; x += 25)
