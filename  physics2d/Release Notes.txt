@@ -2,7 +2,7 @@ Release Notes fo Physics2D.Net
 
 Since God Created me and Jesus Saved me All glory goes to God.
 
-NEXT:
+2.0.0.0:
 
 Quite a few changes to this release. And quite a few of them breaking.
 

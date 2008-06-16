@@ -7,7 +7,7 @@ Physics2D.Net.Demo
 Added This!
 
 AdvanceMath
-NextVersion:
+2.0.0.0:
 Added: the struct Matrix3x2 and changes to other classes to make it work.
 Fixed: Line's GetDistance method
 Added: Line.Transform
@@ -16,7 +16,7 @@ Fixed: BoundingPolygon.Intersects (thanks DW)
 
 
 Physics2D.Net
-NextVersion:
+2.0.0.0:
 Fixed: bug with PhysicsTimer that would let it run faster then it should. 
 Changed: Made Pivot and Hinge Joint Breakable by adding the DistanceTolerance Property.
 Changed: Made it so the PhysicsEngine.Update commands Removes Expired Bodies First instead of last.
