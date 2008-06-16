@@ -311,7 +311,9 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-
+            Console.WriteLine(Scalar.PositiveInfinity*0);
+            Console.ReadLine();
+            return;
 
             PhysicsEngine engine = new PhysicsEngine();
             engine.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();

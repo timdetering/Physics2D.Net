@@ -76,12 +76,13 @@ namespace Physics2DDotNet.Demo
             //Create a new Scene 
             Scene scene = new Scene();
 
-            //Get the scenes physics engine
+            //Get the scene's physics engine
             PhysicsEngine physicsEngine = scene.Engine;
             //initialize the engine 
             physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
             physicsEngine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            //physicsEngine.Solver = new Physics2DDotNet.Solvers.Box2DSolver();
 
 
 
@@ -110,7 +111,7 @@ namespace Physics2DDotNet.Demo
             window.Intialize();
             window.DrawingInterval = .02f;
             //Add some intro text
-            AddIntoText(window, viewport, scene);
+            AddIntroText(window, viewport, scene);
 
             SetupStatus(window, scene);
 
@@ -130,7 +131,7 @@ namespace Physics2DDotNet.Demo
         static SurfacePolygons[] numbers2;
         static IShape[] numbers;
 
-        private static void AddIntoText(Window window, Viewport viewport, Scene scene)
+        private static void AddIntroText(Window window, Viewport viewport, Scene scene)
         {
             DemoHelper.AddText(
     new DemoOpenInfo(window, viewport, scene),
@@ -146,6 +147,12 @@ TO POLYGON ALGORITHM.
 LOAD THE INTRO TEXT DEMO TO MANIPULATE 
 THIS TEXT.", new Vector2D(20, 20), 40);
         }
+
+        /// <summary>
+        /// creates a overlay scene to display status text.
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="scene"></param>
         private static void SetupStatus(Window window, Scene scene)
         {
 

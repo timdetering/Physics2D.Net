@@ -11,6 +11,8 @@ NextVersion:
 Added: the struct Matrix3x2 and changes to other classes to make it work.
 Fixed: Line's GetDistance method
 Added: Line.Transform
+Fixed: BoundingPolygon.Intersects (thanks DW)
+
 
 
 Physics2D.Net
@@ -67,7 +69,9 @@ Changed: Moved all static methods in the Shape classes into the new VertexHelper
 Removed: the shape object now all shape directly impliment IShape.
 Added: GroupedOneWayPlatformIgnorer
 Added: PhysicsTimer.IsRunningChanged
-Changed: Body.Collided Event to only be raised on initial contact. class in the event args can get rest.
+Changed: Body.Collided Event to only be raised on initial contact. Contact in the event args can get rest.
+Changed: Moved where ApplyPosition is called from.
+
 
 AdvanceMath
 1.7.0.0:

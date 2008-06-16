@@ -619,7 +619,6 @@ namespace Physics2DDotNet
             state.Position.Linear.X += state.Velocity.Linear.X * step.Dt;
             state.Position.Linear.Y += state.Velocity.Linear.Y * step.Dt;
             state.Position.Angular += state.Velocity.Angular * step.Dt;
-            ApplyPosition();
         }
         public void UpdatePosition(TimeStep step, ALVector2D extraVelocity)
         {
@@ -631,7 +630,6 @@ namespace Physics2DDotNet
             state.Position.Linear.X += (state.Velocity.Linear.X + extraVelocity.Linear.X) * step.Dt;
             state.Position.Linear.Y += (state.Velocity.Linear.Y + extraVelocity.Linear.Y) * step.Dt;
             state.Position.Angular += (state.Velocity.Angular + extraVelocity.Angular) * step.Dt;
-            ApplyPosition();
         }
         public void UpdateVelocity(TimeStep step)
         {

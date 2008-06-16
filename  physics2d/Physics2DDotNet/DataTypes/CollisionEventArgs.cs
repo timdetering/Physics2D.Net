@@ -76,5 +76,4 @@ namespace Physics2DDotNet
             get { return contact; }
         }
     }
-
 }

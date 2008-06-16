@@ -102,6 +102,7 @@ namespace Physics2DDotNet
         /// (The Position of the Vertex belongs to this Body.)
         /// </summary>
         Body Body2 { get;}
+        bool IgnoresCollisionResponse { get;}
         ContactState State { get;}
         ReadOnlyCollection<IContactPointInfo> Points { get;}
     }

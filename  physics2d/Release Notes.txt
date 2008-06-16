@@ -29,6 +29,9 @@ The ExplosionLogic simulates a simple explosion.
 
 Also Added Dampening to the Body.
 
+The collision event has also changed. it will only be raised on the initial collision between 2 objects, but dont worry the Contact property in the EventArg has a event that will be raised every time step the collision persists. 
+
+
 1.5.0.0
 There were quite a few things renamed because FXcop did not like them or I did not like them, the renames where mostly just changing of the case so these should be easy to fix.
 

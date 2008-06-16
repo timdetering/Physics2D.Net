@@ -37,6 +37,7 @@ using Physics2DDotNet.Joints;
 namespace Physics2DDotNet.Solvers
 {
 
+
     [Serializable]
     public abstract class CollisionSolver
     {

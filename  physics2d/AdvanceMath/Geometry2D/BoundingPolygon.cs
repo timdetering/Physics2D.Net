@@ -120,7 +120,7 @@ namespace AdvanceMath.Geometry2D
                 v2 = vertexes1[index1];
                 for (int index2 = 0; index2 < vertexes2.Length; ++index2, v3 = v4)
                 {
-                    v4 = vertexes1[index2];
+                    v4 = vertexes2[index2];
                     LineSegment.Intersects(ref v1, ref v2, ref v3, ref v4, out result);
                     if (result) { return; }
                 }

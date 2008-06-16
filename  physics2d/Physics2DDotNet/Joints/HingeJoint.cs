@@ -48,7 +48,7 @@ namespace Physics2DDotNet.Joints
     [Serializable]
     public sealed class HingeJoint : Joint, Solvers.ISequentialImpulsesJoint
     {
-        Solvers.SequentialImpulsesSolver solver;
+        Solvers.SequentialImpulsesSolver sisolver;
         Body body1;
         Body body2;
         Matrix2x2 M;
@@ -116,7 +116,7 @@ namespace Physics2DDotNet.Joints
         }
         protected override void OnAdded(EventArgs e)
         {
-            this.solver = (Solvers.SequentialImpulsesSolver)Engine.Solver;
+            this.sisolver = Engine.Solver as Solvers.SequentialImpulsesSolver;
             base.OnAdded(e);
         }
         void Solvers.ISequentialImpulsesJoint.PreStep(TimeStep step)
@@ -170,7 +170,7 @@ namespace Physics2DDotNet.Joints
                 this.Lifetime.IsExpired = true;
             }
 
-            if (solver.PositionCorrection)
+            if (sisolver.PositionCorrection)
             {
                 //bias = -0.1f * dtInv * dp;
                 Scalar flt = -biasFactor * step.DtInv;
@@ -180,7 +180,7 @@ namespace Physics2DDotNet.Joints
             {
                 bias = Vector2D.Zero;
             }
-            if (solver.WarmStarting)
+            if (sisolver.WarmStarting)
             {
                 PhysicsHelper.SubtractImpulse(
                     ref body1.State.Velocity, ref accumulatedImpulse,
@@ -212,7 +212,7 @@ namespace Physics2DDotNet.Joints
                 ref state1.Velocity, ref state2.Velocity,
                 ref r1, ref r2, out dv);
 
-           
+
 
             Vector2D impulse;
             impulse.X = bias.X - dv.X - softness * accumulatedImpulse.X;

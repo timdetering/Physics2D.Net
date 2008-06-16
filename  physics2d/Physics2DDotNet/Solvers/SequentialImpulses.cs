@@ -121,7 +121,9 @@ namespace Physics2DDotNet.Solvers
 
             SequentialImpulsesSolver parent;
             Scalar restitution;
+            bool ignoresCollisionResponse;
 
+           
             Scalar friction;
             public Arbiter(SequentialImpulsesSolver parent, Body body1, Body body2)
             {
@@ -147,6 +149,11 @@ namespace Physics2DDotNet.Solvers
                 this.contacts = new LinkedList<ContactPoint>();
                 this.lastUpdate = -1;
                 this.state = ContactState.New;
+                this.ignoresCollisionResponse = body1.IgnoresCollisionResponse || body2.IgnoresCollisionResponse;
+            }
+            public bool IgnoresCollisionResponse
+            {
+                get { return ignoresCollisionResponse; }
             }
             public ContactState State
             {
@@ -634,7 +641,11 @@ namespace Physics2DDotNet.Solvers
 
         Scalar biasFactor = 0.7f;
         Scalar allowedPenetration = 0.1f;
-        int iterations = 12; 
+        int iterations = 12;
+
+        List<long> empty = new List<long>();
+        List<Arbiter> arbs2 = new List<Arbiter>();
+
         #endregion
         #region constructors
         public SequentialImpulsesSolver()
@@ -699,9 +710,7 @@ namespace Physics2DDotNet.Solvers
             {
                 arbiter = new Arbiter(this, first, second);
                 arbiter.Update(step);
-                if (!first.IgnoresCollisionResponse &&
-                    !second.IgnoresCollisionResponse &&
-                    arbiter.Collided)
+                if (arbiter.Collided)
                 {
                     arbiters.Add(id, arbiter);
                 }
@@ -709,9 +718,8 @@ namespace Physics2DDotNet.Solvers
             contact = arbiter;
             return arbiter.Collided;
         }
-        void RemoveEmpty(TimeStep step)
+        Arbiter[] RemoveEmpty(TimeStep step)
         {
-            List<long> empty = new List<long>();
             foreach (KeyValuePair<long, Arbiter> pair in arbiters)
             {
                 Arbiter value = pair.Value;
@@ -720,17 +728,25 @@ namespace Physics2DDotNet.Solvers
                     pair.Value.OnRemoved();
                     empty.Add(pair.Key);
                 }
+                else if (!value.IgnoresCollisionResponse)
+                {
+                    arbs2.Add(value);
+                }
             }
             for (int index = 0; index < empty.Count; ++index)
             {
                 arbiters.Remove(empty[index]);
             }
+            Arbiter[] result = arbs2.ToArray();
+            empty.Clear();
+            arbs2.Clear();
+            return result;
         }
 
         protected internal override void Solve(TimeStep step)
         {
             Detect(step);
-            RemoveEmpty(step);
+            Arbiter[] arbs = RemoveEmpty(step);
             this.Engine.RunLogic(step);
             for (int index = 0; index < tags.Count; ++index)
             {
@@ -739,9 +755,6 @@ namespace Physics2DDotNet.Solvers
                 tag.body.UpdateVelocity(step);
                 tag.body.ClearForces();
             }
-
-            Arbiter[] arbs = new Arbiter[arbiters.Count];
-            arbiters.Values.CopyTo(arbs, 0);
             for (int index = 0; index < arbs.Length; ++index)
             {
                 arbs[index].PreApply(step.DtInv);
@@ -772,6 +785,8 @@ namespace Physics2DDotNet.Solvers
                 {
                     tag.body.UpdatePosition(step);
                 }
+                tag.body.ApplyPosition();
+
             }
         }
         protected internal override void AddBodyRange(List<Body> collection)
