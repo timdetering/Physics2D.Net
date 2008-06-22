@@ -17,11 +17,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
 
-
+#if !(CompactFramework || WindowsCE || PocketPC || XBOX360)
 #if !UNSAFE
 [assembly: SecurityPermission(SecurityAction.RequestRefuse, UnmanagedCode = true)]
 #endif
 [assembly: FileIOPermission(SecurityAction.RequestOptional, Unrestricted = true)]
+#endif
 
 
 
@@ -43,4 +44,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("2.0.0.*")]
+#if !(CompactFramework || WindowsCE || PocketPC || XBOX360)
 [assembly: AssemblyFileVersion("2.0.0.0")]
+#endif

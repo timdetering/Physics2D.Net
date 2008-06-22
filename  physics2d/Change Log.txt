@@ -1,3 +1,12 @@
+AdvanceMath
+NEXT RELEASE:
+changed: made the AssemblyInfo.cs compact framework compatible.
+
+Physics2D.Net
+NEXT RELEASE:
+changed: made the AssemblyInfo.cs compact framework compatible.
+
+
 Graphics2D.Net
 1.0.0.0:
 Added This!

@@ -17,8 +17,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
 
+#if !(CompactFramework || WindowsCE || PocketPC || XBOX360)
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, Execution = true)]
 [assembly: PermissionSet(SecurityAction.RequestOptional, Name = "Nothing")]
+#endif
 
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -42,4 +44,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("2.0.0.0")]
+#if !(CompactFramework || WindowsCE || PocketPC || XBOX360)
 [assembly: AssemblyFileVersion("2.0.0.0")]
+#endif
