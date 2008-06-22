@@ -1,10 +1,17 @@
+Physics2D.Net.Demo
+NEXT RELEASE:
+Added: JumpDemo
+
 AdvanceMath
 NEXT RELEASE:
 changed: made the AssemblyInfo.cs compact framework compatible.
+Added: a new constructor for Line that takes 2 points on the line. 
 
 Physics2D.Net
 NEXT RELEASE:
 changed: made the AssemblyInfo.cs compact framework compatible.
+
+
 
 
 Graphics2D.Net

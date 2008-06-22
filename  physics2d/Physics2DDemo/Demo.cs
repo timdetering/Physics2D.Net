@@ -1836,7 +1836,8 @@ namespace Physics2DDemo
             Reset(false);
             hasWater = true;
             //engine.AddLogic(new GlobalFluidLogic(2.95f, .02f, new Vector2D(0, 0), new Lifespan()));
-            engine.AddLogic(new LineFluidLogic(new Line(0, -1, -400), 1.95f, .02f, new Vector2D(0, 0), new Lifespan()));
+            engine.AddLogic(new LineFluidLogic(new Line(new Vector2D(0, 400),new Vector2D(6, 400)), 1.95f, .02f, new Vector2D(0, 0), new Lifespan()));
+           // engine.AddLogic(new LineFluidLogic(new Line(0, -1, -400), 1.95f, .02f, new Vector2D(0, 0), new Lifespan()));
             AddGravityField();
 
             BoundingRectangle rect = this.clipper.Rectangle;

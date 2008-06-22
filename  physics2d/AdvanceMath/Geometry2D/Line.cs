@@ -94,6 +94,15 @@ namespace AdvanceMath.Geometry2D
             this.Normal.Y = nY;
             this.D = d;
         }
+        public Line(Vector2D point1, Vector2D point2)
+        {
+            Scalar x = point1.X - point2.X;
+            Scalar y = point1.Y - point2.Y;
+            Scalar magInv = 1 / MathHelper.Sqrt(x * x + y * y);
+            this.Normal.X = -y * magInv;
+            this.Normal.Y = x * magInv;
+            this.D = point1.X * this.Normal.X + point1.Y * this.Normal.Y;
+        }
 
         public Scalar GetDistance(Vector2D point)
         {
