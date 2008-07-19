@@ -99,7 +99,7 @@ namespace Physics2DDotNet.Ignorers
                 {
                     return false;
                 }
-                if (groups[index] < item)
+                if (groups[index] > item)
                 {
                     groups.Insert(index, item);
                     return true;

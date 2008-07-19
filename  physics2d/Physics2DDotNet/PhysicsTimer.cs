@@ -96,7 +96,7 @@ namespace Physics2DDotNet
         /// Creates a new PhysicsTimer Instance.
         /// </summary>
         /// <param name="callback">The callback to call.</param>
-        /// <param name="targetDt">The target change in time.</param>
+        /// <param name="targetDt">The target change in time. (in seconds)</param>
         public PhysicsTimer(PhysicsCallback callback, Scalar targetInterval)
         {
             if (callback == null) { throw new ArgumentNullException("callback"); }

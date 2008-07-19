@@ -47,6 +47,7 @@ using System.Diagnostics;
 using AdvanceMath.Design;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
+using Physics2DDotNet.Ignorers;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.Joints;
 
@@ -311,7 +312,17 @@ namespace ConsoleDriver
         static void Main(string[] args)
         {
 
-            Console.WriteLine(Scalar.PositiveInfinity*0);
+            GroupCollection collection1 = new GroupCollection();
+            GroupCollection collection2 = new GroupCollection();
+           /* collection1.AddRange(new int[] { 1 });
+            collection1.AddRange(new int[] {  3 });
+            collection1.AddRange(new int[] {  2 });*/
+            collection1.Add(1);
+            collection1.Add(3);
+            collection1.Add(2);
+            collection2.Add(1);
+            Console.WriteLine(GroupCollection.Intersect(collection1, collection2));
+
             Console.ReadLine();
             return;
 

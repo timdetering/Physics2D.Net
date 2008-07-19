@@ -10,8 +10,9 @@ Added: a new constructor for Line that takes 2 points on the line.
 Physics2D.Net
 NEXT RELEASE:
 changed: made the AssemblyInfo.cs compact framework compatible.
-
-
+Added: X and Y properties to the ALVector2D struct
+fixed: a bug with GroupCollection.Add
+Added: PhysicsEngine.UpdateCount 
 
 
 Graphics2D.Net

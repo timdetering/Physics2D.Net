@@ -103,6 +103,23 @@ namespace Physics2DDotNet
             this.Linear = new Vector2D(x, y);
         }
 
+        /// <summary>
+        /// The Linear.X component
+        /// </summary>
+        public Scalar X
+        {
+            get { return Linear.X; }
+            set { Linear.X = value; }
+        }
+        /// <summary>
+        /// The Linear.Y component
+        /// </summary>
+        public Scalar Y
+        {
+            get { return Linear.Y; }
+            set { Linear.Y = value; }
+        }
+
 
         public static ALVector2D Add(ALVector2D left, ALVector2D right)
         {

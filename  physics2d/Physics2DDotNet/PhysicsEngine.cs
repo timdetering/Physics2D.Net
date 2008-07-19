@@ -248,6 +248,14 @@ namespace Physics2DDotNet
                 }
             }
         }
+        /// <summary>
+        /// The number of updates that the engine has completed.
+        /// </summary>
+        /// <remarks>
+        /// This is used for making sure actions are not duplicated on a single time step.
+        /// </remarks>
+        public int UpdateCount { get { return updateCount; } }
+
         #endregion
         #region methods
         /// <summary>
@@ -492,7 +500,7 @@ namespace Physics2DDotNet
             if (dt < 0) { throw new ArgumentOutOfRangeException("dt"); }
             CheckState();
             rwLock.EnterWrite();
-            TimeStep step = new TimeStep(dt,trueDt, updateCount++);
+            TimeStep step = new TimeStep(dt,trueDt, updateCount);
             inUpdate = true;
             try
             {
@@ -509,6 +517,7 @@ namespace Physics2DDotNet
             }
             finally
             {
+                updateCount++;
                 inUpdate = false;
                 rwLock.ExitWrite();
             }

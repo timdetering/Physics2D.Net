@@ -70,6 +70,7 @@ namespace Graphics2DDotNet
                 clipper.IgnoresPhysicsLogics = true;
                 clipper.IgnoresCollisionResponse = true;
                 clipper.Transformation = viewport.ToWorld;
+                clipper.IsBroadPhaseOnly = true;
                 clipper.IsEventable = false;
                 clipper.Collided += clipper_Collided;
                 viewport.Changed += viewport_Changed;
@@ -100,7 +101,6 @@ namespace Graphics2DDotNet
             {
                 SetVertexes();
                 clipper.Shape = shape;
-                clipper.IsBroadPhaseOnly = true;
                 clipper.Transformation = viewport.ToWorld;
             }
             void SetVertexes()
