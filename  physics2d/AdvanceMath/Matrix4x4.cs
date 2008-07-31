@@ -38,7 +38,7 @@ namespace AdvanceMath
 {
     [StructLayout(LayoutKind.Sequential, Size = Matrix4x4.Size)]
     [AdvBrowsableOrder("Rx,Ry,Rz,Rw"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix4x4>))]
 #endif
     public struct Matrix4x4 : IMatrix<Matrix4x4, Vector4D, Vector4D>
@@ -1724,7 +1724,7 @@ namespace AdvanceMath
             ParseHelper.ParseMatrix<Matrix4x4>(s, ref rv);
             return rv;
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
         public static bool TryParse(string s, out Matrix4x4 result)
         {
             result = Zero;

@@ -6,6 +6,7 @@ AdvanceMath
 NEXT RELEASE:
 changed: made the AssemblyInfo.cs compact framework compatible.
 Added: a new constructor for Line that takes 2 points on the line. 
+Added: SilverLight Beta compatibility.
 
 Physics2D.Net
 NEXT RELEASE:
@@ -13,7 +14,7 @@ changed: made the AssemblyInfo.cs compact framework compatible.
 Added: X and Y properties to the ALVector2D struct
 fixed: a bug with GroupCollection.Add
 Added: PhysicsEngine.UpdateCount 
-
+Added: SilverLight Beta compatibility.
 
 Graphics2D.Net
 1.0.0.0:

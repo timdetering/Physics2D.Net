@@ -36,7 +36,7 @@ namespace AdvanceMath.Geometry2D
 {
     [StructLayout(LayoutKind.Sequential, Size = BoundingRectangle.Size)]
     [AdvBrowsableOrder("Min,Max"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<BoundingRectangle>))]
 #endif
     public struct BoundingRectangle : IEquatable<BoundingRectangle>

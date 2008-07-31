@@ -50,7 +50,7 @@ namespace AdvanceMath
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Size = Matrix2x2.Size)]
     [AdvBrowsableOrder("Rx,Ry"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix2x2>))]
 #endif
     public struct Matrix2x2 : IMatrix<Matrix2x2, Vector2D, Vector2D>
@@ -457,7 +457,7 @@ namespace AdvanceMath
             ParseHelper.ParseMatrix<Matrix2x2>(s, ref rv);
             return rv;
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
         public static bool TryParse(string s, out Matrix2x2 result)
         {
             result = Zero;

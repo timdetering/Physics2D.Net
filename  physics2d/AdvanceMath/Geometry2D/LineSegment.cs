@@ -36,7 +36,7 @@ namespace AdvanceMath.Geometry2D
 {
     [StructLayout(LayoutKind.Sequential, Size = LineSegment.Size), Serializable]
     [AdvBrowsableOrder("Vertex1,Vertex2")]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<LineSegment>))]
 #endif
     public struct LineSegment : IEquatable<LineSegment>

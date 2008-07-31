@@ -36,7 +36,7 @@ namespace AdvanceMath.Geometry2D
 {
     [StructLayout(LayoutKind.Sequential, Size = Line.Size)]
     [AdvBrowsableOrder("Normal,D"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Line>))]
 #endif
     public struct Line : IEquatable<Line>

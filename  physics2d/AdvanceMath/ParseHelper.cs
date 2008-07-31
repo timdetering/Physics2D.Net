@@ -47,7 +47,7 @@ namespace AdvanceMath
             {
                 builder.Replace(r, ' ');
             }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
             return builder.ToString().Split(new char[] { divider, ' ' }, StringSplitOptions.RemoveEmptyEntries);
 #else
             string[] temp = s.Split(new char[] { divider, ' ' });
@@ -71,7 +71,7 @@ namespace AdvanceMath
             {
                 builder.Replace(r, " ");
             }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
             return builder.ToString().Split(new char[] { divider, ' ' }, StringSplitOptions.RemoveEmptyEntries);
 #else
             string[] temp = s.Split(new char[] { divider, ' ' });
@@ -116,7 +116,7 @@ namespace AdvanceMath
             }
             valueType.CopyFrom(result, 0);
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
         public static bool TryParseMatrix<T>(string s, ref T valueType)
             where T : IAdvanceValueType
         {

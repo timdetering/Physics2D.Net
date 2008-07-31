@@ -57,7 +57,7 @@ namespace Physics2DDotNet.Collections
             }
         }
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
         ReaderWriterLock rwLock = new ReaderWriterLock();
 #else
         object syncRoot = new object();
@@ -79,7 +79,7 @@ namespace Physics2DDotNet.Collections
 
         public void EnterRead()
         {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
             rwLock.AcquireReaderLock(Timeout.Infinite);
 #else
             Monitor.Enter(syncRoot);
@@ -87,7 +87,7 @@ namespace Physics2DDotNet.Collections
         }
         public void EnterWrite()
         {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
             rwLock.AcquireWriterLock(Timeout.Infinite);
 #else
             Monitor.Enter(syncRoot);
@@ -95,7 +95,7 @@ namespace Physics2DDotNet.Collections
         }
         public void ExitRead()
         {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
             rwLock.ReleaseReaderLock();
 #else
             Monitor.Exit(syncRoot);
@@ -103,7 +103,7 @@ namespace Physics2DDotNet.Collections
         }
         public void ExitWrite()
         {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
             rwLock.ReleaseWriterLock();
 #else
             Monitor.Exit(syncRoot);

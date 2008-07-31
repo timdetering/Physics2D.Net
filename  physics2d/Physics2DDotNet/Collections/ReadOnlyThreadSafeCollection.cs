@@ -27,8 +27,6 @@ using System;
 using System.Collections.Generic;
 namespace Physics2DDotNet.Collections
 {
-
-
     public sealed class ReadOnlyThreadSafeCollection<T> : IList<T>
     {
         sealed class ThreadSafeEnumerator : IEnumerator<T>
@@ -102,63 +100,13 @@ namespace Physics2DDotNet.Collections
         }
 
 
-        public int BinarySearch(T item)
-        {
-            using (rwLock.Read)
-            {
-                return self.BinarySearch(item);
-            }
-        }
-        public int BinarySearch(T item, IComparer<T> comparer)
-        {
-            using (rwLock.Read)
-            {
-                return self.BinarySearch(item, comparer);
-            }
-        }
-        public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
-        {
-            using (rwLock.Read)
-            {
-                return self.BinarySearch(index, count, item, comparer);
-            }
-        }
 
-        public bool Contains(T item)
-        {
-            using (rwLock.Read)
-            {
-                return self.Contains(item);
-            }
-        }
+#if !SILVERLIGHT
         public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter)
         {
             using (rwLock.Read)
             {
                 return self.ConvertAll<TOutput>(converter);
-            }
-        }
-
-
-        public void CopyTo(T[] array)
-        {
-            using (rwLock.Read)
-            {
-                self.CopyTo(array);
-            }
-        }
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            using (rwLock.Read)
-            {
-                self.CopyTo(array, arrayIndex);
-            }
-        }
-        public void CopyTo(int index, T[] array, int arrayIndex, int count)
-        {
-            using (rwLock.Read)
-            {
-                self.CopyTo(index, array, arrayIndex, count);
             }
         }
         public bool Exists(Predicate<T> match)
@@ -231,6 +179,66 @@ namespace Physics2DDotNet.Collections
                 return self.FindLastIndex(startIndex, count, match);
             }
         }
+        public bool TrueForAll(Predicate<T> match)
+        {
+            using (rwLock.Read)
+            {
+                return self.TrueForAll(match);
+            }
+        }
+#endif
+        public int BinarySearch(T item)
+        {
+            using (rwLock.Read)
+            {
+                return self.BinarySearch(item);
+            }
+        }
+        public int BinarySearch(T item, IComparer<T> comparer)
+        {
+            using (rwLock.Read)
+            {
+                return self.BinarySearch(item, comparer);
+            }
+        }
+        public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
+        {
+            using (rwLock.Read)
+            {
+                return self.BinarySearch(index, count, item, comparer);
+            }
+        }
+
+        public bool Contains(T item)
+        {
+            using (rwLock.Read)
+            {
+                return self.Contains(item);
+            }
+        }
+
+        public void CopyTo(T[] array)
+        {
+            using (rwLock.Read)
+            {
+                self.CopyTo(array);
+            }
+        }
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            using (rwLock.Read)
+            {
+                self.CopyTo(array, arrayIndex);
+            }
+        }
+        public void CopyTo(int index, T[] array, int arrayIndex, int count)
+        {
+            using (rwLock.Read)
+            {
+                self.CopyTo(index, array, arrayIndex, count);
+            }
+        }
+
         public List<T> GetRange(int index, int count)
         {
             using (rwLock.Read)
@@ -280,13 +288,7 @@ namespace Physics2DDotNet.Collections
                 return self.LastIndexOf(item, index, count);
             }
         }
-        public bool TrueForAll(Predicate<T> match)
-        {
-            using (rwLock.Read)
-            {
-                return self.TrueForAll(match);
-            }
-        }
+
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -318,5 +320,4 @@ namespace Physics2DDotNet.Collections
             return new ThreadSafeEnumerator(rwLock.Read, self.GetEnumerator());
         }
     }
-
 }

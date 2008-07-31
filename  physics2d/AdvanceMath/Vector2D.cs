@@ -42,7 +42,7 @@ namespace AdvanceMath
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     [StructLayout(LayoutKind.Sequential, Size = Vector2D.Size)]
     [AdvBrowsableOrder("X,Y"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector2D>))]
 #endif
     public struct Vector2D : IVector<Vector2D>
@@ -1186,7 +1186,7 @@ namespace AdvanceMath
             return ToStringInternal(FormatString);
         }
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
         public static bool TryParse(string s, out Vector2D result)
         {
             if (s == null)

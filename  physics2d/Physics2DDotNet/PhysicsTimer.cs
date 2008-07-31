@@ -78,7 +78,7 @@ namespace Physics2DDotNet
         static int threadCount;
         #endregion
         #region events
-        public event EventHandler IsRunningChanged; 
+        public event EventHandler IsRunningChanged;
         #endregion
         #region fields
         bool isBackground;
@@ -89,7 +89,7 @@ namespace Physics2DDotNet
         Scalar targetInterval;
         PhysicsCallback callback;
         AutoResetEvent waitHandle;
-        Thread engineThread; 
+        Thread engineThread;
         #endregion
         #region constructors
         /// <summary>
@@ -106,7 +106,7 @@ namespace Physics2DDotNet
             this.targetInterval = targetInterval;
             this.callback = callback;
             this.waitHandle = new AutoResetEvent(true);
-        } 
+        }
         #endregion
         #region properties
         /// <summary>
@@ -193,7 +193,7 @@ namespace Physics2DDotNet
                 if (value == null) { throw new ArgumentNullException("value"); }
                 callback = value;
             }
-        } 
+        }
         #endregion
         #region methods
         /// <summary>
@@ -226,7 +226,11 @@ namespace Physics2DDotNet
                     {
                         state = TimerState.Fast;
                         int sleep = (int)Math.Ceiling(desiredDt - currentDt);
+#if SILVERLIGHT
+                        waitHandle.WaitOne(sleep);
+#else
                         waitHandle.WaitOne(sleep, false);
+#endif
                     }
                     else
                     {
@@ -241,7 +245,7 @@ namespace Physics2DDotNet
                             state = TimerState.Normal;
                         }
                         lastRun = now;
-                        callback(targetInterval,dt*(1/1000f));
+                        callback(targetInterval, dt * (1 / 1000f));
                     }
                 }
                 else

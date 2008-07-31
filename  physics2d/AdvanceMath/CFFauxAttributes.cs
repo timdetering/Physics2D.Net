@@ -32,7 +32,7 @@ namespace System
     //Attributes for the CompactFramework that dont exist int the CompactFramework so
     //this can compile under the CompactFramework without rewritting.
     //or having compiler directives surrounding all of these Attributes.
-#if CompactFramework || WindowsCE || PocketPC
+#if CompactFramework || WindowsCE || PocketPC || SILVERLIGHT
     [ComVisible(true)]
     [AttributeUsage(
         AttributeTargets.Delegate |
@@ -42,6 +42,8 @@ namespace System
         Inherited = false)]
     public sealed class SerializableAttribute : Attribute
     { }
+#endif
+#if CompactFramework || WindowsCE || PocketPC 
     namespace Runtime.Serialization
     {
         [Serializable]
@@ -54,7 +56,7 @@ namespace System
         }
     }
 #endif
-#if CompactFramework || WindowsCE || PocketPC || XBOX360
+#if CompactFramework || WindowsCE || PocketPC || XBOX360 || SILVERLIGHT
     [ComVisible(true)]
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
     public sealed class NonSerializedAttribute : Attribute
@@ -91,5 +93,47 @@ namespace System
         }
     }
 #endif
+#if SILVERLIGHT
 
+    [ComVisible(true)]
+    public interface ICloneable
+    {
+        object Clone();
+    }
+
+    public static class ExtensionMethods
+    {
+        public static int RemoveAll<T>(this System.Collections.Generic.List<T> self, Predicate<T> match)
+        {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            int index = 0;
+            while ((index < self.Count) && !match(self[index]))
+            {
+                index++;
+            }
+            if (index >= self.Count)
+            {
+                return 0;
+            }
+            int index2 = index + 1;
+            while (index2 < self.Count)
+            {
+                while ((index2 < self.Count) && match(self[index2]))
+                {
+                    index2++;
+                }
+                if (index2 < self.Count)
+                {
+                    self[index++] = self[index2++];
+                }
+            }
+            int result = self.Count - index;
+            self.RemoveRange(index, result);
+            return result;
+        }
+    }
+#endif
 }

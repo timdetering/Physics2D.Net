@@ -54,7 +54,7 @@ namespace AdvanceMath
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Size = Matrix3x3.Size)]
     [AdvBrowsableOrder("Rx,Ry,Rz"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Matrix3x3>))]
 #endif
     public struct Matrix3x3 : IMatrix<Matrix3x3, Vector3D, Vector3D>
@@ -1149,7 +1149,7 @@ namespace AdvanceMath
             ParseHelper.ParseMatrix<Matrix3x3>(s, ref rv);
             return rv;
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
         public static bool TryParse(string s, out Matrix3x3 result)
         {
             result = Zero;

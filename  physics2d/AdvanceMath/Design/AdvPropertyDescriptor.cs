@@ -30,7 +30,7 @@ using System.Reflection;
 
 namespace AdvanceMath.Design
 {
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
     public class AdvPropertyDescriptor : PropertyDescriptor, ICustomTypeDescriptor, IEquatable<AdvPropertyDescriptor>
     {
         private static Attribute[] GetAttributes(MemberInfo property)

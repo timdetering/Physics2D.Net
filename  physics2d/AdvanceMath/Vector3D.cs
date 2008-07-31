@@ -39,7 +39,7 @@ namespace AdvanceMath
     /// <remarks><seealso href="http://en.wikipedia.org/wiki/Vector_%28spatial%29"/></remarks>
     [StructLayout(LayoutKind.Sequential, Size = Vector3D.Size)]
     [AdvBrowsableOrder("X,Y,Z"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector3D>))]
 #endif
     public struct Vector3D : IVector<Vector3D>
@@ -1083,7 +1083,7 @@ namespace AdvanceMath
             return ToStringInternal(FormatString);
         }
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
         public static bool TryParse(string s, out Vector3D result)
         {
             if (s == null)

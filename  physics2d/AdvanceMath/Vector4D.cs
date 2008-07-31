@@ -40,7 +40,7 @@ namespace AdvanceMath
     //[StructLayout(LayoutKind.Sequential), Serializable]
     [StructLayout(LayoutKind.Sequential, Size = Vector4D.Size)]
     [AdvBrowsableOrder("X,Y,Z,W"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Vector4D>))]
 #endif
     public struct Vector4D : IVector<Vector4D>
@@ -1061,7 +1061,7 @@ namespace AdvanceMath
         }
 
 
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
         public static bool TryParse(string s, out Vector4D result)
         {
             if (s == null)

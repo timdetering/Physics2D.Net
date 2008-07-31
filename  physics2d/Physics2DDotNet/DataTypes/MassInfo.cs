@@ -40,7 +40,7 @@ namespace Physics2DDotNet
     /// <summary>
     /// This class Stores mass information and Moment of Inertia Together since they are very closly related.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<MassInfo>))]
 #endif
     [AdvBrowsableOrder("Mass,MomentofInertia"), Serializable]

@@ -39,7 +39,7 @@ namespace Physics2DDotNet
     /// Class Used to store a Linear Value along with an Angular Value. Like Position and Orientation. 
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Size = ALVector2D.Size), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<ALVector2D>))]
 #endif
     [AdvBrowsableOrder("Angular,Linear")]

@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
 
-#if !(CompactFramework || WindowsCE || PocketPC || XBOX360)
+#if !(CompactFramework || WindowsCE || PocketPC || XBOX360 || SILVERLIGHT)
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, Execution = true)]
 [assembly: PermissionSet(SecurityAction.RequestOptional, Name = "Nothing")]
 #endif

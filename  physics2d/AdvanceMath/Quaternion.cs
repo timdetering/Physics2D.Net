@@ -74,7 +74,7 @@ namespace AdvanceMath
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [AdvBrowsableOrder("W,X,Y,Z"), Serializable]
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Quaternion>))]
 #endif
     public struct Quaternion

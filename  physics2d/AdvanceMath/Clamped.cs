@@ -37,7 +37,7 @@ namespace AdvanceMath
     /// <summary>
     /// A class that keeps a value clamped.
     /// </summary>
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
     [System.ComponentModel.TypeConverter(typeof(AdvTypeConverter<Clamped>))]
 #endif
     [AdvBrowsableOrder("Min,Value,Max"),Serializable]
@@ -50,7 +50,7 @@ namespace AdvanceMath
             {
                 throw new ArgumentNullException("s");
             }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT
 
             string[] vals = s.Split(new char[] { '<', '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
 #else
@@ -75,7 +75,7 @@ namespace AdvanceMath
                 Scalar.Parse(vals[0]),
                 Scalar.Parse(vals[2]));
         }
-#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 
+#if !CompactFramework && !WindowsCE && !PocketPC && !XBOX360 && !SILVERLIGHT 
         public static bool TryParse(string s, out Clamped result)
         {
             if (s != null)
