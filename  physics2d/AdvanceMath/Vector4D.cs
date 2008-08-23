@@ -57,9 +57,9 @@ namespace AdvanceMath
         #endregion
         #region readonly fields
         /// <summary>
-        /// Vector4D(0,0,0,0)
+        /// Vector3D(1,1,1,1)
         /// </summary>
-        public static readonly Vector4D Origin = new Vector4D();
+        public static readonly Vector4D One = new Vector4D(1, 1, 1, 1);
         /// <summary>
         /// Vector4D(0,0,0,0)
         /// </summary>

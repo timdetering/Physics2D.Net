@@ -81,7 +81,9 @@ namespace Physics2DDotNet.Demo
             //initialize the engine 
             physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
-            physicsEngine.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            Physics2DDotNet.Solvers.SequentialImpulsesSolver solver= new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            solver.Iterations = 3;
+            physicsEngine.Solver = solver;
             //physicsEngine.Solver = new Physics2DDotNet.Solvers.Box2DSolver();
 
 
@@ -160,7 +162,10 @@ THIS TEXT.", new Vector2D(20, 20), 40);
             PhysicsEngine physicsEngine2 = scene2.Engine;
             physicsEngine2.BroadPhase = new Physics2DDotNet.Detectors.SelectiveSweepDetector();
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
-            physicsEngine2.Solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            Physics2DDotNet.Solvers.SequentialImpulsesSolver solver = new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
+            solver.Iterations = 1;
+            
+            physicsEngine2.Solver = solver;
 
             Viewport viewport2 = new Viewport(
                     new Rectangle(0, 0, window.Size.Width, window.Size.Height), //where

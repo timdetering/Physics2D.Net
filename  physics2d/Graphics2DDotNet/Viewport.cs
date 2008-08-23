@@ -52,7 +52,7 @@ namespace Graphics2DDotNet
     public class Viewport : Pendable<Window>
     {
         static int idCounter = 0;
-        class ViewportClipperLogic : Physics2DDotNet.PhysicsLogics.PhysicsLogic
+        sealed class ViewportClipperLogic : Physics2DDotNet.PhysicsLogics.PhysicsLogic
         {
             Viewport viewport;
             Body clipper;

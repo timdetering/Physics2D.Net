@@ -59,6 +59,10 @@ namespace AdvanceMath
         #endregion
         #region readonly fields
         /// <summary>
+        /// Vector2D(1,1)
+        /// </summary>
+        public static readonly Vector2D One = new Vector2D(1,1);
+        /// <summary>
         /// Vector2D(0,0)
         /// </summary>
         public static readonly Vector2D Zero = new Vector2D();

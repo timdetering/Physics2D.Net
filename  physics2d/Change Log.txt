@@ -7,6 +7,7 @@ NEXT RELEASE:
 changed: made the AssemblyInfo.cs compact framework compatible.
 Added: a new constructor for Line that takes 2 points on the line. 
 Added: SilverLight Beta compatibility.
+Added: Vector*D.One (Tom wanted it)
 
 Physics2D.Net
 NEXT RELEASE:
