@@ -158,10 +158,11 @@ namespace Physics2DDotNet
         private Ignorer collisionIgnorer;
 
         private ALVector2D lastPosition;
-        private int id;
         private Scalar linearDamping;
         private Scalar angularDamping;
-        
+        private int id;
+        internal int idleCount;
+
         internal bool isChecked;
         private bool ignoreVertexes;
         private bool ignoresGravity;
@@ -173,6 +174,7 @@ namespace Physics2DDotNet
         private bool isEventable;
         private bool isBroadPhaseOnly;
         private bool transformChanged;
+        private bool isFrozen;
 
         private object tag;
         private object solverTag;
@@ -269,9 +271,25 @@ namespace Physics2DDotNet
         #region properties
         public Dictionary<string, object> Tags
         {
-            get { return tags; }
+            get { if (tags == null) { new Dictionary<string, object>(); } return tags; }
         }
-        
+
+        public bool IsFrozen
+        {
+            get { return isFrozen; }
+            internal set 
+            {
+                if (!value && 
+                    massInfo.MassInv == 0 && 
+                    massInfo.MomentOfInertiaInv == 0 && 
+                    state.Velocity == ALVector2D.Zero)
+                {
+                    return;
+                }
+                
+                isFrozen = value; }
+        }
+
         /// <summary>
         /// This is the Baunding rectangle It is calculated on the call to apply matrix.
         /// </summary>
@@ -633,11 +651,14 @@ namespace Physics2DDotNet
         }
         public void UpdateVelocity(TimeStep step)
         {
-            if (massInfo.MassInv != 0)
+            if (!isFrozen)
             {
-                UpdateAcceleration(ref state.Acceleration, ref state.ForceAccumulator);
+                if (massInfo.MassInv != 0)
+                {
+                    UpdateAcceleration(ref state.Acceleration, ref state.ForceAccumulator);
+                }
+                UpdateVelocity(ref state.Velocity, ref state.Acceleration, step.Dt);
             }
-            UpdateVelocity(ref state.Velocity, ref state.Acceleration, step.Dt);
             if (proxies.Count != 0)
             {
                 ApplyProxy();
@@ -663,7 +684,6 @@ namespace Physics2DDotNet
             if (collisionIgnorer != null) { collisionIgnorer.UpdateTime(step); }
             if (Updated != null) { Updated(this, new UpdatedEventArgs(step)); }
         }
-
         /// <summary>
         /// Updates all the values caluclated from the State.Position.
         /// Re-calculates the Matrices property the re-calculates the Rectangle property
@@ -780,7 +800,7 @@ namespace Physics2DDotNet
         public void ApplyImpulse(ref Vector2D impulse, ref Vector2D position)
         {
             Scalar massInv = massInfo.MassInv;
-            Scalar IInv = massInfo.MomentOfInertia;
+            Scalar IInv = massInfo.MomentOfInertiaInv;
             PhysicsHelper.AddImpulse(ref state.Velocity, ref impulse, ref position, ref massInv, ref IInv);
         }
 

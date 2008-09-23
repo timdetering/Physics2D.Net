@@ -138,4 +138,44 @@ namespace Physics2DDotNet.Demo.Demos
             if (dispose != null) { dispose(); }
         }
     }
+
+
+    [PhysicsDemo("111", "FreezingDemo", "There is a single Tower of stacking blocks")]
+    public class FreezingDemo : BaseDemo
+    {
+        DisposeCallback dispose;
+        protected override void Open()
+        {
+
+
+
+
+
+
+
+            dispose += DemoHelper.BasicDemoSetup(DemoInfo);
+          //  dispose += DemoHelper.CreateTank(DemoInfo, new Vector2D(50, 0));
+
+            Scene.Engine.AddLogic(new GravityField(new Vector2D(0, 1000), new Lifespan()));
+
+
+            DemoHelper.AddFloor(DemoInfo, new ALVector2D(0, new Vector2D(700, 750)));
+
+            IShape shape = ShapeFactory.CreateSprite(Cache<SurfacePolygons>.GetItem("block.png"), 3, 7, 4);
+
+            DemoHelper.AddShape(DemoInfo, shape, 20, new ALVector2D(0,300, 700));
+
+            DemoHelper.AddGrid(
+                DemoInfo, shape, 20,
+                new BoundingRectangle(440, 450, 500, 730),
+                1, 1);
+
+
+          //  Body ball = DemoHelper.AddCircle(DemoInfo, 80, 20, 4000, new ALVector2D(0, 1028, 272));
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (dispose != null) { dispose(); }
+        }
+    }
 }

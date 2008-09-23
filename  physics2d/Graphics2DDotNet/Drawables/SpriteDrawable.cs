@@ -520,7 +520,7 @@ namespace Graphics2DDotNet
             coordinates.Bind();
             Gl.glTexCoordPointer(Vector2D.Count, GlHelper.GlScalar, 0, IntPtr.Zero);
 
-            GlHelper.GlColor4(color.Red, color.Green, color.Blue, color.Alpha);
+           // GlHelper.GlColor4(color.Red, color.Green, color.Blue, color.Alpha);
 
             Gl.glDrawArrays(Gl.GL_QUADS, 0, vertexes.Length);
         }

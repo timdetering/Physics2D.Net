@@ -81,6 +81,12 @@ namespace Physics2DDotNet.Joints
         {
             get { return new ReadOnlyCollection<Body>(new Body[1] { body }); }
         }
+
+        public override void CheckFrozen()
+        {
+
+        }
+
         void Solvers.ISequentialImpulsesJoint.PreStep(TimeStep step)
         {
             Scalar difference = body.State.Position.Angular - angle;

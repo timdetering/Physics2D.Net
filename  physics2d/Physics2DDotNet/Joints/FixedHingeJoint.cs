@@ -75,6 +75,8 @@ namespace Physics2DDotNet.Joints
             this.biasFactor = 0.2f;
             this.distanceTolerance = Scalar.PositiveInfinity;
         }
+
+
         public Vector2D Anchor
         {
             get { return anchor; }
@@ -107,6 +109,11 @@ namespace Physics2DDotNet.Joints
         {
             get { return new ReadOnlyCollection<Body>(new Body[1] { body }); }
         }
+        public override void CheckFrozen()
+        {
+            
+        }
+
         protected override void OnAdded(EventArgs e)
         {
             this.solver = (Solvers.SequentialImpulsesSolver)Engine.Solver;

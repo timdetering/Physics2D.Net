@@ -114,6 +114,17 @@ namespace Physics2DDotNet.Joints
         {
             get { return new ReadOnlyCollection<Body>(new Body[2] { body1, body2 }); }
         }
+
+        public override void CheckFrozen()
+        {
+            if (body1.IsFrozen ^ body2.IsFrozen)
+            {
+                body1.IsFrozen = false;
+                body2.IsFrozen = false;
+                body1.idleCount = 0;
+                body2.idleCount = 0;
+            }
+        }
         protected override void OnAdded(EventArgs e)
         {
             this.sisolver = Engine.Solver as Solvers.SequentialImpulsesSolver;

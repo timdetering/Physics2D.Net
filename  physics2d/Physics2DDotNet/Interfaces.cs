@@ -59,6 +59,7 @@ namespace Physics2DDotNet
     }
     public interface IJoint : IPhysicsEntity
     {
+        void CheckFrozen();
         ReadOnlyCollection<Body> Bodies { get;}
     }
     /// <summary>

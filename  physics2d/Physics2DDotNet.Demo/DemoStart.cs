@@ -82,7 +82,7 @@ namespace Physics2DDotNet.Demo
             physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SweepAndPruneDetector();
             //physicsEngine.BroadPhase = new Physics2DDotNet.Detectors.SpatialHashDetector();
             Physics2DDotNet.Solvers.SequentialImpulsesSolver solver= new Physics2DDotNet.Solvers.SequentialImpulsesSolver();
-            solver.Iterations = 3;
+            //solver.Iterations = 3;
             physicsEngine.Solver = solver;
             //physicsEngine.Solver = new Physics2DDotNet.Solvers.Box2DSolver();
 

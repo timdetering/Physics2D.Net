@@ -122,6 +122,7 @@ namespace Physics2DDotNet.Joints
         /// </summary>
         public abstract ReadOnlyCollection<Body> Bodies { get;}
 
+        public abstract void CheckFrozen();
 
         protected internal virtual void UpdateTime(TimeStep step)
         {
@@ -159,6 +160,8 @@ namespace Physics2DDotNet.Joints
             bool isPending = IsPending;
             foreach (Body b in Bodies)
             {
+                b.IsFrozen = false;
+                b.idleCount = 0;
                 if (!isPending)
                 {
                     b.RemoveJoint(this);
@@ -185,6 +188,10 @@ namespace Physics2DDotNet.Joints
         }
         protected virtual void OnRemoved(RemovedEventArgs e)
         {
+            foreach (Body b in Bodies)
+            {
+                b.IsFrozen = false;
+            }
             if (Removed != null) { Removed(this, e); }
         }
         /// <summary>
@@ -193,5 +200,8 @@ namespace Physics2DDotNet.Joints
         /// </summary>
         /// <param name="engine">The engine the item is about to be added too.</param>
         protected virtual void BeforeAddCheck(PhysicsEngine engine) { }
+
+
+
     }
 }

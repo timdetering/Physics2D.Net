@@ -46,6 +46,7 @@ namespace Physics2DDotNet.Solvers
     [Serializable]
     sealed class SequentialImpulsesTag
     {
+        public ALVector2D lastAccel;
         public ALVector2D biasVelocity;
         public Body body;
         public SequentialImpulsesTag(Body body)
@@ -105,8 +106,8 @@ namespace Physics2DDotNet.Solvers
             ContactState state;
 
 
-
             int lastUpdate;
+
 
             CircleShape circle1;
             CircleShape circle2;
@@ -123,7 +124,7 @@ namespace Physics2DDotNet.Solvers
             Scalar restitution;
             bool ignoresCollisionResponse;
 
-           
+
             Scalar friction;
             public Arbiter(SequentialImpulsesSolver parent, Body body1, Body body2)
             {
@@ -151,6 +152,8 @@ namespace Physics2DDotNet.Solvers
                 this.state = ContactState.New;
                 this.ignoresCollisionResponse = body1.IgnoresCollisionResponse || body2.IgnoresCollisionResponse;
             }
+
+
             public bool IgnoresCollisionResponse
             {
                 get { return ignoresCollisionResponse; }
@@ -163,23 +166,47 @@ namespace Physics2DDotNet.Solvers
             {
                 get { return lastUpdate; }
             }
+            bool everCollided;
+
             public void Update(TimeStep step)
             {
                 if (lastUpdate != -1)
                 {
-                    state = ContactState.Old;
+                    if (lastUpdate != step.UpdateCount - 1)
+                    {
+                        state = ContactState.New;
+                    }
+                    else
+                    {
+                        state = ContactState.Old;
+                    }
                 }
-                lastUpdate = step.UpdateCount;
-                if (circle1 != null && circle2 != null &&
-                    !body1.IsTransformed && !body2.IsTransformed)
+
+
+                if ((!body1.IsFrozen || !body2.IsFrozen))
                 {
-                    CollideCircles();
+                    if (circle1 != null && circle2 != null &&
+                        !body1.IsTransformed && !body2.IsTransformed)
+                    {
+                        CollideCircles();
+                    }
+                    else
+                    {
+                        Collide();
+                    }
+                    UpdateContacts();
+                    if (Collided)
+                    {
+                        body1.IsFrozen = false;
+                        body2.IsFrozen = false;
+                        everCollided = true;
+                    }
                 }
-                else
+                if (Collided)
                 {
-                    Collide();
+                    lastUpdate = step.UpdateCount;
                 }
-                UpdateContacts();
+
                 if (Updated != null &&
                     contactsArray.Length != 0)
                 {
@@ -585,10 +612,17 @@ namespace Physics2DDotNet.Solvers
             }
             public bool Collided
             {
-                get { return contactsArray.Length > 0; }
+                get { return contactsArray != null && contactsArray.Length > 0; }
             }
             public void OnRemoved()
             {
+                if (everCollided)
+                {
+                    body1.IsFrozen = false;
+                    body2.IsFrozen = false;
+                   // body1.idleCount -= 3;
+                   // body2.idleCount -= 3;
+                }
                 this.state = ContactState.Ended;
                 if (Ended != null) { Ended(this, EventArgs.Empty); }
             }
@@ -637,7 +671,16 @@ namespace Physics2DDotNet.Solvers
         bool splitImpulse = true;
         bool accumulateImpulses = true;
         bool warmStarting = true;
-        bool positionCorrection = true;
+        bool positionCorrection = true ;
+        bool freezing = false;
+
+
+
+        int freezeTimeout = 50;
+        ALVector2D freezeVelocityTolerance = new ALVector2D(.1f, 5, 5);
+
+        int removeTimout = 5;
+
 
         Scalar biasFactor = 0.7f;
         Scalar allowedPenetration = 0.1f;
@@ -690,7 +733,24 @@ namespace Physics2DDotNet.Solvers
         {
             get { return iterations; }
             set { iterations = value; }
-        } 
+        }
+
+        public bool Freezing
+        {
+            get { return freezing; }
+            set { freezing = value; }
+        }
+        public int FreezeTimeout
+        {
+            get { return freezeTimeout; }
+            set { freezeTimeout = value; }
+        }
+        public ALVector2D FreezeVelocityTolerance
+        {
+            get { return freezeVelocityTolerance; }
+            set { freezeVelocityTolerance = value; }
+        }
+
         #endregion
         #region methods
         protected internal override bool TryGetIntersection(TimeStep step, Body first, Body second, out IContact contact)
@@ -700,35 +760,43 @@ namespace Physics2DDotNet.Solvers
             if (arbiters.TryGetValue(id, out arbiter))
             {
                 arbiter.Update(step);
-                if (!arbiter.Collided)
+               /* if (!arbiter.Collided)
                 {
                     arbiter.OnRemoved();
                     arbiters.Remove(id);
-                }
+                }*/
             }
             else
             {
                 arbiter = new Arbiter(this, first, second);
                 arbiter.Update(step);
-                if (arbiter.Collided)
-                {
+                //if (arbiter.Collided)
+                //{
                     arbiters.Add(id, arbiter);
-                }
+                //}
             }
             contact = arbiter;
             return arbiter.Collided;
         }
+
         Arbiter[] RemoveEmpty(TimeStep step)
         {
             foreach (KeyValuePair<long, Arbiter> pair in arbiters)
             {
                 Arbiter value = pair.Value;
-                if (!value.Collided || value.LastUpdate != step.UpdateCount)
+                //if (!value.Collided || value.LastUpdate != step.UpdateCount)
+                if (value.LastUpdate + removeTimout < step.UpdateCount)
                 {
                     pair.Value.OnRemoved();
                     empty.Add(pair.Key);
                 }
-                else if (!value.IgnoresCollisionResponse)
+                else if (value.IgnoresCollisionResponse ||
+                    value.body1.IsFrozen &&
+                    value.body2.IsFrozen)
+                {
+
+                }
+                else if (value.Collided && value.LastUpdate == step.UpdateCount)
                 {
                     arbs2.Add(value);
                 }
@@ -743,15 +811,65 @@ namespace Physics2DDotNet.Solvers
             return result;
         }
 
+ 
         protected internal override void Solve(TimeStep step)
         {
             Detect(step);
             Arbiter[] arbs = RemoveEmpty(step);
             this.Engine.RunLogic(step);
+            if (freezing)
+            {
+                for (int index = 0; index < siJoints.Count; ++index)
+                {
+                    siJoints[index].CheckFrozen();
+                }
+            }
             for (int index = 0; index < tags.Count; ++index)
             {
                 SequentialImpulsesTag tag = tags[index];
                 tag.biasVelocity = ALVector2D.Zero;
+
+                if (freezing)
+                {
+                    bool accelSame = tag.body.State.Acceleration == tag.lastAccel;
+
+                    ALVector2D vel = tag.body.State.Velocity;
+                    ALVector2D force = tag.body.State.ForceAccumulator;
+
+
+                    bool isVelZero =
+                        Math.Abs(vel.X) < freezeVelocityTolerance.X &&
+                        Math.Abs(vel.Y) < freezeVelocityTolerance.Y &&
+                        Math.Abs(vel.Angular) < freezeVelocityTolerance.Angular;
+                    bool isForceZero = tag.body.State.ForceAccumulator == ALVector2D.Zero;
+
+
+                    if (accelSame && isVelZero && isForceZero)
+                    {
+                        if (tag.body.Joints.Count == 0)
+                        {
+                            tag.body.idleCount++;
+                        }
+                        if (tag.body.idleCount > freezeTimeout)
+                        {
+                            tag.body.idleCount = freezeTimeout;
+                            tag.body.IsFrozen = true;
+                            tag.body.State.Velocity = ALVector2D.Zero;
+                        }
+                    }
+                    else
+                    {
+                        tag.body.IsFrozen = false;
+                        tag.body.idleCount = 0;
+                    }
+                    tag.lastAccel = tag.body.State.Acceleration;
+                    if (tag.body.IsFrozen)
+                    {
+                        tag.body.State.ForceAccumulator = ALVector2D.Zero;
+                        tag.body.State.Acceleration = ALVector2D.Zero;
+                    }
+                }
+
                 tag.body.UpdateVelocity(step);
                 tag.body.ClearForces();
             }
@@ -786,7 +904,6 @@ namespace Physics2DDotNet.Solvers
                     tag.body.UpdatePosition(step);
                 }
                 tag.body.ApplyPosition();
-
             }
         }
         protected internal override void AddBodyRange(List<Body> collection)

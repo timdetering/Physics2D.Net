@@ -16,6 +16,7 @@ Added: X and Y properties to the ALVector2D struct
 fixed: a bug with GroupCollection.Add
 Added: PhysicsEngine.UpdateCount 
 Added: SilverLight Beta compatibility.
+Added: A Experimental implementation of Freezing.
 
 Graphics2D.Net
 1.0.0.0:

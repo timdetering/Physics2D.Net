@@ -65,6 +65,8 @@ namespace Physics2DDotNet.Joints
             this.softness = 0.001f;
             this.biasFactor = 0.2f;
         }
+
+
         public Scalar Angle
         {
             get { return angle; }
@@ -84,6 +86,18 @@ namespace Physics2DDotNet.Joints
         {
             get { return new ReadOnlyCollection<Body>(new Body[2] { body1, body2 }); }
         }
+
+        public override void CheckFrozen()
+        {
+            if (body1.IsFrozen ^ body2.IsFrozen)
+            {
+                body1.IsFrozen = false;
+                body2.IsFrozen = false;
+                body1.idleCount = 0;
+                body2.idleCount = 0;
+            }
+        }
+
         void Solvers.ISequentialImpulsesJoint.PreStep(TimeStep step)
         {
             Scalar difference = MathHelper.ClampAngle(body1.State.Position.Angular - body2.State.Position.Angular) - angle;

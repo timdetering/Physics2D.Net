@@ -129,7 +129,7 @@ Move Up, Down
                                     e1.Other.State.Position = new ALVector2D(DemoHelper.NextScalar(-600, 900), DemoHelper.NextScalar(-600, 900), DemoHelper.NextScalar(-600, 900));
                                     e1.Other.ApplyPosition();
                                     e1.Other.Lifetime.IsExpired = false;
-                                    Scene.AddGraphic(new BodyGraphic(e1.Other));
+                                    Scene.AddGraphic((BodyGraphic)e1.Other.Tag);
                                 }
                             };
                         }
