@@ -644,7 +644,7 @@ namespace Physics2DDotNet
             broadPhase.RemoveExpiredBodies();
             for (int index = 0; index < logics.Count; ++index)
             {
-                logics[0].RemoveExpiredBodies();
+                logics[index].RemoveExpiredBodies();
             }
             if (BodiesRemoved != null)
             {
