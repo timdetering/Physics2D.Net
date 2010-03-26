@@ -1,14 +1,19 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C024C0B1-401B-4644-8918-D87C28716898}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Physics2DDotNet</RootNamespace>
     <AssemblyName>Physics2DDotNet</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,6 +82,7 @@
     <Compile Include="PhysicsEngine.cs" />
     <Compile Include="Body.cs" />
     <Compile Include="DataTypes\PhysicsState.cs" />
+    <Compile Include="PhysicsLogics\MoveToPointLogic.cs" />
     <Compile Include="PhysicsLogics\ExplosionLogic.cs" />
     <Compile Include="PhysicsLogics\GlobalFluidLogic.cs" />
     <Compile Include="PhysicsLogics\GravityField.cs" />

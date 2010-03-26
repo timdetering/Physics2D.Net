@@ -1,14 +1,19 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9AAE3AC7-59FF-462B-ADB7-2B7D3FAF6ED8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Physics2DDotNet.Demo</RootNamespace>
     <AssemblyName>Physics2DDotNet.Demo</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,6 +69,7 @@
     <Compile Include="Demos\BumpMappingDemo.cs" />
     <Compile Include="Demos\CirclesContainedStressDemo.cs" />
     <Compile Include="Demos\CirclesStressDemo.cs" />
+    <Compile Include="Demos\MovementDemo.cs" />
     <Compile Include="Demos\JumpDemo.cs" />
     <Compile Include="Demos\PyramidStressDemo.cs" />
     <Compile Include="Demos\DynamicGravityDemo.cs" />

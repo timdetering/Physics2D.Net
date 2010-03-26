@@ -144,6 +144,8 @@ namespace Physics2DDotNet.Demo
 
 
 
+
+
             return dispose;
         }
 
@@ -611,6 +613,21 @@ namespace Physics2DDotNet.Demo
                 Events.KeyboardUp -= upHandler;
             };
         }
+        public static DisposeCallback RegisterSpawning(DemoOpenInfo info, Key key, SpawnCallback callback)
+        {
+            EventHandler<KeyboardEventArgs> downHandler = delegate(object sender, KeyboardEventArgs e)
+            {
+                if (e.Key == key)
+                {
+                     callback(info.Viewport.MousePosition);
+                }
+            };
+            Events.KeyboardDown += downHandler;
+            return delegate()
+            {
+                Events.KeyboardDown -= downHandler;
+            };
+        }
 
         public static List<Body> AddParticles(DemoOpenInfo info, Vector2D position, Vector2D velocity, int count)
         {
@@ -821,7 +838,24 @@ namespace Physics2DDotNet.Demo
             }
             return bodies;
         }
+       /* public static List<Body> AddSpringChain(DemoOpenInfo info, Vector2D position, Scalar boxLenght, Scalar boxWidth, Scalar boxMass, Scalar spacing, Scalar length)
+        {
+            List<Body> bodies = new List<Body>();
+            Body last = null;
+            for (Scalar x = 0; x < length; x += boxLenght + spacing, position.X += boxLenght + spacing)
+            {
+                Body current = AddRectangle(info, boxWidth, boxLenght, boxMass, new ALVector2D(0, position));
+                bodies.Add(current);
+                if (last != null)
+                {
 
+                    SpringJoint joint = new SpringJoint(last, Vector2D.Zero, current, Vector2D.Zero, 100, 100, new Lifespan());
+                    info.Scene.Engine.AddJoint(joint);
+                }
+                last = current;
+            }
+            return bodies;
+        }*/
         public static List<Body> AddRagDoll(DemoOpenInfo info, Vector2D location)
         {
             List<Body> result = new List<Body>();

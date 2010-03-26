@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Physics2DDotNet", "Physics2DDotNet\Physics2DDotNet.csproj", "{C024C0B1-401B-4644-8918-D87C28716898}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Physics2DDemo", "Physics2DDemo\Physics2DDemo.csproj", "{8878EA53-F114-4D81-BA93-B5100CF62E16}"

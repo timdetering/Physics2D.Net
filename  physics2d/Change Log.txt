@@ -1,3 +1,6 @@
+ALL
+Changed Solution and projects to use VS2008
+
 Physics2D.Net.Demo
 NEXT RELEASE:
 Added: JumpDemo
@@ -17,6 +20,8 @@ fixed: a bug with GroupCollection.Add
 Added: PhysicsEngine.UpdateCount 
 Added: SilverLight Beta compatibility.
 Added: A Experimental implementation of Freezing.
+Added: MoveToPointLogic At the Request of AJ
+
 
 Graphics2D.Net
 1.0.0.0:
