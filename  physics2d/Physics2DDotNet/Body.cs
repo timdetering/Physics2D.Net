@@ -271,7 +271,7 @@ namespace Physics2DDotNet
         #region properties
         public Dictionary<string, object> Tags
         {
-            get { if (tags == null) { new Dictionary<string, object>(); } return tags; }
+            get { if (tags == null) { tags = new Dictionary<string, object>(); } return tags; }
         }
 
         public bool IsFrozen
@@ -298,7 +298,7 @@ namespace Physics2DDotNet
             get { return rectangle; }
         }
         /// <summary>
-        /// The Matrices that are tranfroming this bodies Shape.
+        /// The Matrices that are tranfroming this body's Shape.
         /// </summary>
         public Matrices Matrices
         {

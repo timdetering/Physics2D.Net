@@ -56,11 +56,9 @@ namespace System
         }
     }
 #endif
-#if CompactFramework || WindowsCE || PocketPC || XBOX360 || SILVERLIGHT
-    [ComVisible(true)]
-    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
-    public sealed class NonSerializedAttribute : Attribute
-    { }
+
+#if CompactFramework || WindowsCE || PocketPC || XBOX360
+
     namespace Xml.Serialization
     {
         [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
@@ -84,6 +82,16 @@ namespace System
             public DescriptionAttribute(string description) { }
         }
     }
+#endif
+
+
+#if CompactFramework || WindowsCE || PocketPC || XBOX360 || SILVERLIGHT
+    [ComVisible(true)]
+    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
+    public sealed class NonSerializedAttribute : Attribute
+    { }
+
+
     namespace Runtime.Serialization
     {
         [ComVisible(true)]

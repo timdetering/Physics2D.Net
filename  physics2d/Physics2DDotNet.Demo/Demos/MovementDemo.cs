@@ -47,6 +47,7 @@ namespace Physics2DDotNet.Demo.Demos
     [PhysicsDemo("Simple", "Movement Demo", "Press H to move one of the balls to where the Mouse is.")]
     public class MovementDemo : BaseDemo
     {
+        Random rand = new Random();
         DisposeCallback dispose;
         protected override void Open()
         {
@@ -54,8 +55,8 @@ namespace Physics2DDotNet.Demo.Demos
 
             IShape shape = ShapeFactory.CreateColoredCircle(8, 15);
             List<Body> bodies = DemoHelper.AddGrid(DemoInfo, shape, 40,
-                          new BoundingRectangle(200, 200, 400, 400),
-                          5, 5);
+                          new BoundingRectangle(100, 100, 600, 600),
+                          40, 40);
 
             MoveToPointLogic logic = null;
 
@@ -66,9 +67,35 @@ namespace Physics2DDotNet.Demo.Demos
                 {
                     logic.Lifetime.IsExpired = true;
                 }
-                logic = new MoveToPointLogic(bodies[0], position, 9000, 200000);
+                logic = new MoveToPointLogic(bodies[0], position, 90, 200000);
                 this.DemoInfo.Scene.Engine.AddLogic(logic);
                 return logic;
+            });
+
+            List<MoveToPointLogic> logics = new List<MoveToPointLogic>();
+            dispose += DemoHelper.RegisterSpawning(this.DemoInfo, SdlDotNet.Input.Key.J,
+            delegate(Vector2D position)
+            {
+                foreach (MoveToPointLogic logic2 in logics)
+                {
+                    logic2.Lifetime.IsExpired = true;
+                }
+                logics.Clear();
+
+                Vector2D center = Vector2D.Zero;
+                foreach (Body body in bodies)
+                {
+                    center += body.State.Position.Linear;
+                }
+                center *= (1f/(Scalar)bodies.Count);
+                foreach (Body body in bodies)
+                {
+                    MoveToPointLogic logic2 = new MoveToPointLogic(body, position + body.State.Position.Linear - center, 90000, Scalar.MaxValue, true, new Lifespan());
+                    logics.Add(logic2);
+                    this.DemoInfo.Scene.Engine.AddLogic(logic2);
+                }
+
+                return null;
             });
         }
         protected override void Dispose(bool disposing)

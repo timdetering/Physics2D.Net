@@ -49,7 +49,7 @@ namespace Physics2DDotNet.PhysicsLogics
         /// <param name="body">The Body this logic will act on.</param>
         /// <param name="destination">The Point it will move the Body too.</param>
         /// <param name="maxAcceleration">The maximum acceleration to be applied to the Body</param>
-        public MoveToPointLogic(Body body, Vector2D destination, Scalar maxAcceleration) : this(body, destination, maxAcceleration, Scalar.MaxValue) { }
+        public MoveToPointLogic(Body body, Vector2D destination, Scalar maxAcceleration) : this(body, destination, maxAcceleration, Scalar.MaxValue, false, new Lifespan()) { }
         /// <summary>
         /// Creates a new MoveToPointLogic object.
         /// </summary>
@@ -57,8 +57,18 @@ namespace Physics2DDotNet.PhysicsLogics
         /// <param name="destination">The Point it will move the Body too.</param>
         /// <param name="maxAcceleration">The maximum acceleration to be applied to the Body</param>
         /// <param name="maxVelocity">The maximum velocity this logic will accelerate the Body too.</param>
-        public MoveToPointLogic(Body body, Vector2D destination, Scalar maxAcceleration, Scalar maxVelocity)
-            : base(new Lifespan())
+        public MoveToPointLogic(Body body, Vector2D destination, Scalar maxAcceleration, Scalar maxVelocity) : this(body, destination, maxAcceleration, maxVelocity, false, new Lifespan()) { }
+        /// <summary>
+        /// Creates a new MoveToPointLogic object.
+        /// </summary>
+        /// <param name="body">The Body this logic will act on.</param>
+        /// <param name="destination">The Point it will move the Body too.</param>
+        /// <param name="maxAcceleration">The maximum acceleration to be applied to the Body</param>
+        /// <param name="maxVelocity">The maximum velocity this logic will accelerate the Body too.</param>
+        /// <param name="isStationKeeping">states if the logic will maintian the bodies location even after it reaches its destination.</param>
+        /// <param name="lifetime">the LifeTime of the object. The object will be removed from the engine when it is Expired.</param>
+        public MoveToPointLogic(Body body, Vector2D destination, Scalar maxAcceleration, Scalar maxVelocity, bool isStationKeeping, Lifespan lifetime)
+            : base(lifetime)
         {
             if (maxAcceleration <= 0) { throw new ArgumentOutOfRangeException("maxAcceleration", "maxAcceleration must be greater then zero"); }
             if (maxVelocity <= 0) { throw new ArgumentOutOfRangeException("maxVelocity", "maxVelocity must be greater then zero"); }
@@ -67,7 +77,13 @@ namespace Physics2DDotNet.PhysicsLogics
             this.maxVelocity = maxVelocity;
             this.destination = destination;
             this.body = body;
+            this.IsStationKeeping = isStationKeeping;
         }
+
+        /// <summary>
+        /// Gets and Sets if the logic will maintian the bodies location even after it reaches its destination. 
+        /// </summary>
+        public bool IsStationKeeping { get; set; }
 
         protected internal override void RunLogic(TimeStep step)
         {
@@ -80,11 +96,14 @@ namespace Physics2DDotNet.PhysicsLogics
             Vector2D.Dot(ref body.State.Velocity.Linear, ref normal, out velocity);
             Vector2D.Dot(ref body.State.Velocity.Linear, ref tangent, out tangentVelocity);
 
-            if (distance < Math.Abs(step.Dt * (step.Dt * maxAcceleration - Math.Abs(velocity))))
+            if ( distance < Math.Abs(step.Dt * (step.Dt * maxAcceleration - Math.Abs(velocity))))
             {
                 body.State.Velocity.Linear = Vector2D.Zero;
                 body.State.Position.Linear = destination;
-                this.Lifetime.IsExpired = true;
+                if (!IsStationKeeping)
+                {
+                    this.Lifetime.IsExpired = true;
+                }
             }
             else
             {
