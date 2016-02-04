@@ -1,0 +1,269 @@
+﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0E838541-B70C-435B-B358-D9C287C6772B}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Physics2DDotNet</RootNamespace>
+    <AssemblyName>SL.Physics2DDotNet</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows" />
+    <Reference Include="mscorlib" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Browser" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Physics2DDotNet\ALVector2D.cs">
+      <Link>ALVector2D.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Body.cs">
+      <Link>Body.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Collections\AdvReaderWriterLock.cs">
+      <Link>Collections\AdvReaderWriterLock.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Collections\ImplicitCastCollection.cs">
+      <Link>Collections\ImplicitCastCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Collections\ReadOnlyThreadSafeCollection.cs">
+      <Link>Collections\ReadOnlyThreadSafeCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\BodyJointEventArgs.cs">
+      <Link>DataTypes\BodyJointEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\BodyProxy.cs">
+      <Link>DataTypes\BodyProxy.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\Coefficients.cs">
+      <Link>DataTypes\Coefficients.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\CollectionEventArgs.cs">
+      <Link>DataTypes\CollectionEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\CollisionEventArgs.cs">
+      <Link>DataTypes\CollisionEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\DragInfo.cs">
+      <Link>DataTypes\DragInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\IntersectionInfo.cs">
+      <Link>DataTypes\IntersectionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\MassInfo.cs">
+      <Link>DataTypes\MassInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\Matrices.cs">
+      <Link>DataTypes\Matrices.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\PairID.cs">
+      <Link>DataTypes\PairID.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\PhysicsState.cs">
+      <Link>DataTypes\PhysicsState.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\RemovedEventArgs.cs">
+      <Link>DataTypes\RemovedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\TimeStep.cs">
+      <Link>DataTypes\TimeStep.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DataTypes\UpdatedEventArgs.cs">
+      <Link>DataTypes\UpdatedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Detectors\BroadPhaseCollisionDetector.cs">
+      <Link>Detectors\BroadPhaseCollisionDetector.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Detectors\BruteForceDetector.cs">
+      <Link>Detectors\BruteForceDetector.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Detectors\FrameCoherentSAPDetector.cs">
+      <Link>Detectors\FrameCoherentSAPDetector.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Detectors\SelectiveSweepDetector.cs">
+      <Link>Detectors\SelectiveSweepDetector.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Detectors\SpatialHashDetector.cs">
+      <Link>Detectors\SpatialHashDetector.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Detectors\SweepAndPruneDetector.cs">
+      <Link>Detectors\SweepAndPruneDetector.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\DistanceGrid.cs">
+      <Link>DistanceGrid.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Ignorers\AdvGroupIgnorer.cs">
+      <Link>Ignorers\AdvGroupIgnorer.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Ignorers\GroupCollection.cs">
+      <Link>Ignorers\GroupCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Ignorers\GroupIgnorer.cs">
+      <Link>Ignorers\GroupIgnorer.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Ignorers\Ignorer.cs">
+      <Link>Ignorers\Ignorer.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Ignorers\ObjectIgnorer.cs">
+      <Link>Ignorers\ObjectIgnorer.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Ignorers\OneWayPlatformIgnorer.cs">
+      <Link>Ignorers\OneWayPlatformIgnorer.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Interfaces.cs">
+      <Link>Interfaces.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Joints\AngleJoint.cs">
+      <Link>Joints\AngleJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Joints\FixedAngleJoint.cs">
+      <Link>Joints\FixedAngleJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Joints\FixedHingeJoint.cs">
+      <Link>Joints\FixedHingeJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Joints\HingeJoint.cs">
+      <Link>Joints\HingeJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Joints\Joint.cs">
+      <Link>Joints\Joint.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Joints\SpringJoint.cs">
+      <Link>Joints\SpringJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Lifespan.cs">
+      <Link>Lifespan.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsEngine.cs">
+      <Link>PhysicsEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsHelper.cs">
+      <Link>PhysicsHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\ExplosionLogic.cs">
+      <Link>PhysicsLogics\ExplosionLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\GlobalFluidLogic.cs">
+      <Link>PhysicsLogics\GlobalFluidLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\GravityField.cs">
+      <Link>PhysicsLogics\GravityField.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\GravityPointField.cs">
+      <Link>PhysicsLogics\GravityPointField.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\GravityPointMass.cs">
+      <Link>PhysicsLogics\GravityPointMass.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\LineFluidLogic.cs">
+      <Link>PhysicsLogics\LineFluidLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\MoveToPointLogic.cs">
+      <Link>PhysicsLogics\MoveToPointLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\PhysicsLogic.cs">
+      <Link>PhysicsLogics\PhysicsLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\RaySegmentsCollisionLogic.cs">
+      <Link>PhysicsLogics\RaySegmentsCollisionLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsLogics\VelocityLimitLogic.cs">
+      <Link>PhysicsLogics\VelocityLimitLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\PhysicsTimer.cs">
+      <Link>PhysicsTimer.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\BitmapHelper.cs">
+      <Link>Shapes\BitmapHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\CircleShape.cs">
+      <Link>Shapes\CircleShape.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\MultiPolygonShape.cs">
+      <Link>Shapes\MultiPolygonShape.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\ParticleShape.cs">
+      <Link>Shapes\ParticleShape.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\PolygonShape.cs">
+      <Link>Shapes\PolygonShape.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\RaySegmentsShape.cs">
+      <Link>Shapes\RaySegmentsShape.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\Shape.cs">
+      <Link>Shapes\Shape.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\ShapeHelper.cs">
+      <Link>Shapes\ShapeHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Shapes\VertexHelper.cs">
+      <Link>Shapes\VertexHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Solvers\CollisionSolver.cs">
+      <Link>Solvers\CollisionSolver.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Solvers\ISequentialImpulsesJoint.cs">
+      <Link>Solvers\ISequentialImpulsesJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\Physics2DDotNet\Solvers\SequentialImpulses.cs">
+      <Link>Solvers\SequentialImpulses.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SL.AdvanceMath\SL.AdvanceMath.csproj">
+      <Project>{5A5ED85A-FCE4-4D32-8315-AC73A3AC26B1}</Project>
+      <Name>SL.AdvanceMath</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("This Runs Physics2DDotNet.Demo")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DemoRunner")]
+[assembly: AssemblyProduct("Physics2DDotNet")]
 [assembly: AssemblyCopyright("Copyright © Jonathan Mark Porter 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

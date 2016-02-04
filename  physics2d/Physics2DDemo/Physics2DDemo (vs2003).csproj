@@ -1,0 +1,127 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8878EA53-F114-4D81-BA93-B5100CF62E16}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Physics2DDemo</RootNamespace>
+    <AssemblyName>Physics2DDemo</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="SdlDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
+      <HintPath>..\lib\SdlDotNet.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SdlDotNet.OpenGl, Version=1.0.0.29966, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
+      <HintPath>..\lib\SdlDotNet.OpenGl.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Tao.OpenGl, Version=2.1.0.4, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
+      <HintPath>..\lib\Tao.OpenGl.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Tao.Sdl, Version=1.2.11.1, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
+      <HintPath>..\lib\Tao.Sdl.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Demo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="OpenGlObject.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="OpenGlWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AdvanceMath\AdvanceMath.csproj">
+      <Project>{A979FDB4-7AB7-444E-9632-77D69D22D743}</Project>
+      <Name>AdvanceMath</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Graphics2DDotNet\Graphics2DDotNet.csproj">
+      <Project>{3519FB5B-9D32-41A4-AA2C-D4C3E6730831}</Project>
+      <Name>Graphics2DDotNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics2DDotNet.Demo\Physics2DDotNet.Demo.csproj">
+      <Project>{9AAE3AC7-59FF-462B-ADB7-2B7D3FAF6ED8}</Project>
+      <Name>Physics2DDotNet.Demo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics2DDotNet\Physics2DDotNet.csproj">
+      <Project>{C024C0B1-401B-4644-8918-D87C28716898}</Project>
+      <Name>Physics2DDotNet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="jpeg.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libpng12.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libtiff.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL_gfx.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL_image.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL_mixer.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL_ttf.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zlib1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

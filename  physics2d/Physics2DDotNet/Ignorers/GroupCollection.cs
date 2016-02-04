@@ -34,7 +34,7 @@ using System.Collections.Generic;
 namespace Physics2DDotNet.Ignorers
 {
     /// <summary>
-    /// A collection that stores ints that represent groups
+    /// A collection that stores integers that represent groups.
     /// </summary>
     [Serializable]
     public class GroupCollection : ICollection<int>
