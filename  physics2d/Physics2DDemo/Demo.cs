@@ -60,7 +60,7 @@ namespace Physics2DDemo
     class Demo
     {
         #region fields
-        static readonly string dataDir = @"..|..|..|data".Replace('|',Path.DirectorySeparatorChar);
+        private const string DataDir = "data";
         static Random rand = new Random();
         PhysicsEngine engine;
         PhysicsTimer timer;
@@ -93,11 +93,9 @@ namespace Physics2DDemo
             Events.MouseMotion += new EventHandler<SdlDotNet.Input.MouseMotionEventArgs>(Events_MouseMotion);
             objects = new List<OpenGlObject>();
 
-
-
-            font = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 40);
+            font = new Font(Path.Combine(DataDir, "FreeSans.ttf"), 40);
             font.Bold = true;
-            font2 = new Font(Path.Combine(dataDir, "FreeSans.ttf"), 15);
+            font2 = new Font(Path.Combine(DataDir, "FreeSans.ttf"), 15);
             font2.Bold = true;
             pauseSprite = new SurfaceGl(font.Render("PAUSED", System.Drawing.Color.White, System.Drawing.Color.Black, true));
             upsSprite = new SurfaceGl(font2.Render("UPS:", System.Drawing.Color.White, System.Drawing.Color.Black, true));
@@ -149,7 +147,7 @@ namespace Physics2DDemo
             Sprite result;
             if (!sprites.TryGetValue(path, out result))
             {
-                result = new Sprite(Path.Combine(dataDir, path));
+                result = new Sprite(Path.Combine(DataDir, path));
                 sprites.Add(path, result);
             }
             return result;
