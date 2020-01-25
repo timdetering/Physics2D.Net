@@ -26,7 +26,9 @@ using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
+
 using System;
+
 namespace Graphics2DDotNet
 {
     public interface ICacheMethods<T>

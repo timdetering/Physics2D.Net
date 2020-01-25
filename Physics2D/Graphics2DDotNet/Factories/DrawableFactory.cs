@@ -26,20 +26,10 @@ using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
+using SdlDotNet.Graphics;
 using Tao.OpenGl;
 
-using SdlDotNet.Core;
-using SdlDotNet.Graphics;
-using SdlDotNet.Input;
 namespace Graphics2DDotNet
 {
     public static class DrawableFactory
@@ -91,6 +81,7 @@ namespace Graphics2DDotNet
             coordinates[2] = new Vector2D(xScale, 0);
             return new SpriteDrawable(surface, vertexes, coordinates);
         }
+
         public static BumpmapSpriteDrawable CreateSprite(
             Surface surface, Surface bumpmap, bool xInverted, bool yInverted,
             Vector2D offset, Light light)

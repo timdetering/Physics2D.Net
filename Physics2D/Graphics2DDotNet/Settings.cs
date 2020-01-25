@@ -55,6 +55,7 @@ namespace Graphics2DDotNet
         public static readonly string DataDir;
         public static readonly string FontDir;
         public static readonly string ImageDir;
+
         static Settings()
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(SettingsXML));
@@ -78,6 +79,7 @@ namespace Graphics2DDotNet
             FontDir = settings.FontDir;
             ImageDir = settings.ImageDir;
         }
+
         static SettingsXML LoadSettings(XmlSerializer xmlSerializer)
         {
             using (FileStream stream = File.OpenRead(SettingsFile))
@@ -85,10 +87,11 @@ namespace Graphics2DDotNet
                 return (SettingsXML)xmlSerializer.Deserialize(stream);
             }
         }
+
         static SettingsXML SaveDefault(XmlSerializer xmlSerializer)
         {
             SettingsXML settings = new SettingsXML();
-            settings.DataDir = @"..|..|..|data".Replace('|', Path.DirectorySeparatorChar);
+            settings.DataDir = "data";
             settings.FontDir = settings.DataDir;
             settings.ImageDir = settings.DataDir;
 

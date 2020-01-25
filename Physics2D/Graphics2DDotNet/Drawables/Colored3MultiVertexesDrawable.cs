@@ -29,6 +29,7 @@ using Scalar = System.Single;
 using System;
 using AdvanceMath;
 using Tao.OpenGl;
+
 namespace Graphics2DDotNet
 {
     public sealed class Colored3MultiVertexesDrawable : BufferedDrawable

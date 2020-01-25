@@ -46,7 +46,7 @@ using System.Media;
 using Tao.OpenGl;
 using SdlDotNet.Core;
 using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
+//using SdlDotNet.OpenGl;
 using SdlDotNet.Graphics;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.Joints;
@@ -63,7 +63,7 @@ namespace Physics2DDotNet.Demo
         /// </summary>
         public static void Run()
         {
-            //do this becuase .Net has been erroring with file permissions
+            //do this because .Net has been erroring with file permissions
             //just leave this line it.
             string dir = Settings.DataDir;
 

@@ -46,7 +46,7 @@ using System.Media;
 using Tao.OpenGl;
 using SdlDotNet.Core;
 using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
+//using SdlDotNet.OpenGl;
 using SdlDotNet.Graphics;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.Joints;

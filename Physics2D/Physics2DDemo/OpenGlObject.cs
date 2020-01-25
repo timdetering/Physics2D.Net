@@ -21,24 +21,16 @@
  */
 #endregion
 
-
-
-
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.PhysicsLogics;
-
-using SdlDotNet.Core;
 using SdlDotNet.Graphics;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
+//using SdlDotNet.OpenGl;
 using Tao.OpenGl;
-using Tao.Sdl;
 using Color = System.Drawing.Color;
 
 #if UseDouble

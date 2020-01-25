@@ -29,19 +29,7 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Drawing;
-using AdvanceMath;
-using AdvanceMath.Geometry2D;
 using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
-using Tao.OpenGl;
-using SdlDotNet.Graphics;
-using SdlDotNet.Core;
-using SdlDotNet.Input;
 
 namespace Graphics2DDotNet
 {

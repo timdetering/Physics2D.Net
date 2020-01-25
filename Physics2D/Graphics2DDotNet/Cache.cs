@@ -27,20 +27,9 @@ using Scalar = System.Double;
 using Scalar = System.Single;
 #endif
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using System.Reflection;
-using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
-using Tao.OpenGl;
-using SdlDotNet;
-using SdlDotNet.Graphics;
-using Color = System.Drawing.Color;
+
 namespace Graphics2DDotNet
 {
     /// <summary>
@@ -99,9 +88,9 @@ namespace Graphics2DDotNet
         {
             return type.FindInterfaces(IsCacheLoaderInterface, null).Length > 0;
         }
+
         private static bool TryGetValue(string name, out TValue result)
         {
-
             WeakReference weakReference;
             if (cache.TryGetValue(name, out weakReference) &&
                 weakReference.IsAlive)
@@ -125,7 +114,11 @@ namespace Graphics2DDotNet
 
         public static TValue GetItem(string name, params object[] loadArgs)
         {
-            if (name == null) { throw new ArgumentNullException("name"); }
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             lock (syncRoot)
             {
                 TValue result;
@@ -137,6 +130,7 @@ namespace Graphics2DDotNet
                 return result;
             }
         }
+
         public static bool Remove(string name)
         {
             if (name == null) { throw new ArgumentNullException("name"); }

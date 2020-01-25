@@ -21,31 +21,12 @@
  */
 #endregion
 
-
-
-
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Text;
-using System.Drawing;
-using AdvanceMath;
-using Graphics2DDotNet;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.PhysicsLogics;
-using SdlDotNet;
-using SdlDotNet.Graphics;
+
 namespace Physics2DDemo
 {
-
-
-
-
     class Program
     {
-
-
         [STAThread]
         static void Main(string[] args)
         {

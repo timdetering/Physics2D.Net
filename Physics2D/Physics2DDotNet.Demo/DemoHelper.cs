@@ -27,42 +27,34 @@ using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using System.Threading;
-using System.IO;
-using System.Security.Permissions;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using Physics2DDotNet;
-using Physics2DDotNet.PhysicsLogics;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-
-using System.Media;
-using Tao.OpenGl;
-using SdlDotNet.Core;
-using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
-using SdlDotNet.Graphics;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Joints;
-using Physics2DDotNet.Ignorers;
 using Graphics2DDotNet;
+using Physics2DDotNet.Ignorers;
+using Physics2DDotNet.Joints;
+using Physics2DDotNet.PhysicsLogics;
+using Physics2DDotNet.Shapes;
+using SdlDotNet.Core;
+using SdlDotNet.Graphics;
+using SdlDotNet.Input;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using Tao.OpenGl;
+using Font = SdlDotNet.Graphics.Font;
+
+//using SdlDotNet.OpenGl;
 
 namespace Physics2DDotNet.Demo
 {
     public sealed class StateColorProperty : IDrawProperty
     {
-
-         Body body;
+        private readonly Body body;
 
         public StateColorProperty(Body body) 
         {
-            this.body = body; }
+            this.body = body;
+        }
 
         public void Apply()
         {
@@ -91,7 +83,8 @@ namespace Physics2DDotNet.Demo
 
         static DemoHelper()
         {
-            ParticleShape.Default.Tag = new GlListDrawable ( DrawableFactory.CreateSprite(Cache<Surface>.GetItem("particle.png"), new Vector2D(8, 8)));
+            var particle = Cache<Surface>.GetItem("particle.png");
+            ParticleShape.Default.Tag = new GlListDrawable ( DrawableFactory.CreateSprite(particle, new Vector2D(8, 8)));
         }
 
         public static Scalar NextScalar()

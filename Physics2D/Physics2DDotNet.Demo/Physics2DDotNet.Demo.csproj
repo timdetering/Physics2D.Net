@@ -36,22 +36,13 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SdlDotNet, Version=6.0.1.0, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\SdlDotNet.dll</HintPath>
-    </Reference>
-    <Reference Include="SdlDotNet.OpenGl, Version=1.0.0.28006, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\SdlDotNet.OpenGl.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tao.OpenGl, Version=2.1.0.7, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Tao.OpenGl.dll</HintPath>
+    <Reference Include="Tao.OpenGl">
+      <HintPath>..\..\..\SDL.net\SdlDotNet\lib\net-2.0\Tao.OpenGl.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +93,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\SDL.net\SdlDotNet\src\SdlDotNet.csproj">
+      <Project>{7b28e1b7-fadb-4d0a-ba54-77e2be941418}</Project>
+      <Name>SdlDotNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AdvanceMath\AdvanceMath.csproj">
       <Project>{A979FDB4-7AB7-444E-9632-77D69D22D743}</Project>
       <Name>AdvanceMath</Name>

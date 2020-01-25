@@ -21,7 +21,6 @@
  */
 #endregion
 
-
 #if UseDouble
 using Scalar = System.Double;
 #else
@@ -30,23 +29,18 @@ using Scalar = System.Single;
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using System.Threading;
 using System.IO;
-using System.Security.Permissions;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using Physics2DDotNet;
-using Physics2DDotNet.PhysicsLogics;
+
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
-
-using System.Media;
 using Tao.OpenGl;
 using SdlDotNet.Core;
-using SdlDotNet.OpenGl;
+//using SdlDotNet.OpenGl;
 using SdlDotNet.Graphics;
+
+using Physics2DDotNet;
+using Physics2DDotNet.PhysicsLogics;
 using Physics2DDotNet.Shapes;
 using Physics2DDotNet.Joints;
 using Physics2DDotNet.Ignorers;
@@ -97,7 +91,10 @@ namespace Physics2DDemo
             font.Bold = true;
             font2 = new Font(Path.Combine(DataDir, "FreeSans.ttf"), 15);
             font2.Bold = true;
-            pauseSprite = new SurfaceGl(font.Render("PAUSED", System.Drawing.Color.White, System.Drawing.Color.Black, true));
+            //pauseSprite = new SurfaceGl(font.Render("PAUSED", System.Drawing.Color.White, System.Drawing.Color.Black, true));
+            var foo = font.Render("PAUSED", System.Drawing.Color.White, System.Drawing.Color.Black, true);
+            pauseSprite = new SurfaceGl(foo);
+
             upsSprite = new SurfaceGl(font2.Render("UPS:", System.Drawing.Color.White, System.Drawing.Color.Black, true));
             CreateNumbers();
 
@@ -120,6 +117,7 @@ namespace Physics2DDemo
             }
         }
         #endregion
+
         #region methods
 
         bool wasPaused;

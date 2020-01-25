@@ -21,15 +21,12 @@
  */
 #endregion
 
-
-
-
 using System;
 
 using SdlDotNet.Core;
 using SdlDotNet.Graphics;
 using SdlDotNet.Input;
-using SdlDotNet.OpenGl;
+//using SdlDotNet.OpenGl;
 using Tao.OpenGl;
 
 namespace Physics2DDemo

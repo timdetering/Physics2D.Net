@@ -44,6 +44,7 @@ using SdlDotNet;
 using SdlDotNet.Graphics;
 using SdlDotNet.Input;
 using Color = System.Drawing.Color;
+
 namespace Graphics2DDotNet
 {
     public class ViewportMouseButtonEventArgs : EventArgs

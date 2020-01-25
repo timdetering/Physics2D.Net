@@ -26,15 +26,6 @@ using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Collections;
-using Tao.OpenGl;
 
 
 namespace Graphics2DDotNet

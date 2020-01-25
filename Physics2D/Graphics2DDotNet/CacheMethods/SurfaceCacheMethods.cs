@@ -28,29 +28,20 @@ using Scalar = System.Single;
 #endif
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Reflection;
-using AdvanceMath;
-using AdvanceMath.Geometry2D;
-using Physics2DDotNet;
-using Physics2DDotNet.Shapes;
-using Physics2DDotNet.Collections;
-using Tao.OpenGl;
-using SdlDotNet;
-using SdlDotNet.Graphics;
 using Color = System.Drawing.Color;
+using SdlDotNet.Graphics;
+
 namespace Graphics2DDotNet
 {
     public class SurfaceCacheMethods : ICacheMethods<Surface>
     {
         public Surface LoadItem(string name, object[] loadArgs)
         {
+            Surface surface = null;
             int index = name.LastIndexOf('|');
             if (index == -1)
             {
-                return new Surface(Path.Combine(Settings.ImageDir, name));
+                surface = new Surface(Path.Combine(Settings.ImageDir, name));
             }
             else
             {
@@ -79,7 +70,10 @@ namespace Graphics2DDotNet
                         throw new Exception();
                 }
             }
+
+            return surface;
         }
+
         public void DisposeItem(Surface item)
         {
             item.Dispose();

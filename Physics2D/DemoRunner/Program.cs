@@ -20,7 +20,9 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 #endregion
+
 using System;
+
 namespace DemoRunner
 {
     class Program
