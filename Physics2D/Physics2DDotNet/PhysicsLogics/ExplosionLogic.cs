@@ -118,7 +118,7 @@ namespace Physics2DDotNet.PhysicsLogics
         }
         protected internal override void RunLogic(TimeStep step)
         {
-            Scalar area = MathHelper.Pi * radius * radius;
+            Scalar area = MathHelper.PI * radius * radius;
             Scalar density = explosionBody.Mass.Mass / area;
             BoundingCircle circle = new BoundingCircle(explosionBody.State.Position.Linear, radius);
             Matrix2x3 temp;

@@ -101,7 +101,7 @@ namespace AdvanceMath.Geometry2D
         {
             get
             {
-                return MathHelper.Pi * Radius * Radius;
+                return MathHelper.PI * Radius * Radius;
             }
         }
         public Scalar Perimeter

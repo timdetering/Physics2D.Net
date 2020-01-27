@@ -1,4 +1,4 @@
-#region MIT License
+﻿#region MIT License
 /*
  * Copyright (c) 2005-2008 Jonathan Mark Porter. http://physics2d.googlepages.com/
  * 
@@ -21,24 +21,25 @@
  */
 #endregion
 
-
-
-
 #if UseDouble
 using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
-using System;
 
+using System;
 
 namespace AdvanceMath
 {
     public static class MathHelper
     {
-        #region consts
         public const Scalar E = (Scalar)System.Math.E;
-        public const Scalar Pi = (Scalar)System.Math.PI;
+
+        /// <summary>
+        /// Represents the ratio of the circumference of a circle to its diameter, specified by the constant, π.
+        /// </summary>
+        public const Scalar PI = (Scalar)System.Math.PI;
+
         public const Scalar TwoPi = (Scalar)(System.Math.PI * 2);
         public const Scalar PiOver2 = (Scalar)(System.Math.PI / 2);
         public const Scalar PiOver4 = (Scalar)(System.Math.PI / 4);
@@ -50,7 +51,7 @@ namespace AdvanceMath
         public const Scalar Epsilon = 1e-03f;
 
         internal static Scalar Two = 2;
-        #endregion
+
         #region methods
 
         public static Scalar Lerp(Scalar left, Scalar right, Scalar amount)
@@ -163,22 +164,22 @@ namespace AdvanceMath
 
         public static Scalar ClampAngle(Scalar angle)
         {
-            if (-Pi <= angle && angle < Pi) { return angle; }
-            Scalar rem = (angle + Pi) % (TwoPi);
-            return rem + ((rem < 0) ? (Pi) : (-Pi));
+            if (-PI <= angle && angle < PI) { return angle; }
+            Scalar rem = (angle + PI) % (TwoPi);
+            return rem + ((rem < 0) ? (PI) : (-PI));
         }
         [CLSCompliant(false)]
         public static void ClampAngle(ref Scalar angle)
         {
-            if (-Pi <= angle && angle < Pi) { return; }
-            Scalar rem = (angle + Pi) % (TwoPi);
-            angle = rem + ((rem < 0) ? (Pi) : (-Pi));
+            if (-PI <= angle && angle < PI) { return; }
+            Scalar rem = (angle + PI) % (TwoPi);
+            angle = rem + ((rem < 0) ? (PI) : (-PI));
         }
         public static void ClampAngle(ref Scalar angle, out Scalar result)
         {
-            if (-Pi <= angle && angle < Pi) { result = angle; return; }
-            Scalar rem = (angle + Pi) % (TwoPi);
-            result = rem + ((rem < 0) ? (Pi) : (-Pi));
+            if (-PI <= angle && angle < PI) { result = angle; return; }
+            Scalar rem = (angle + PI) % (TwoPi);
+            result = rem + ((rem < 0) ? (PI) : (-PI));
         }
 
         public static Scalar AngleSubtract(Scalar angle1, Scalar angle2)

@@ -104,7 +104,7 @@ namespace Physics2DDotNet.Shapes
         }
         public Scalar Area
         {
-            get { return radius * radius * MathHelper.Pi; }
+            get { return radius * radius * MathHelper.PI; }
         }
         /// <summary>
         /// the distance from the position where the circle ends.
