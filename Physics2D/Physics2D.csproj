@@ -1,0 +1,240 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C6E13639-0002-416A-9E44-9BCD8C012BBF}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>Physics2D</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Physics2D</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BaseCollidable.cs" />
+    <Compile Include="BaseRemovableObject.cs" />
+    <Compile Include="BaseTimed.cs" />
+    <Compile Include="DataTypes\CollisionIgnoreInfo.cs" />
+    <Compile Include="CollisionDetection\CollisionDetector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollisionDetection\CollisionInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollisionDetection\CollisionPair.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollisionDetection\CollisionPartPair.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollisionDetection\CollisionPointInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollisionDetection\RayICollidablePair.cs" />
+    <Compile Include="CollisionDetection\RayICollidablePartPair.cs" />
+    <Compile Include="CollisionDetection\SweepPruneCollisionFilter.cs" />
+    <Compile Include="DataTypes\Coefficients.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\CollisionEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\CollisionState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\ForceInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\CollidablePair.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\InterferenceInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\MassInertia.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\PhysicsState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Delegates.cs" />
+    <Compile Include="Enums\BodyFlags.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Enums\Vector2DTransformType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Friction\WorldFriction.cs" />
+    <Compile Include="CollidableAreas\ImpulseRay.cs" />
+    <Compile Include="FormlessBody.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\GravitySourceList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Gravity\StaticGravityField.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Gravity\StaticGravityPoint.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollidableBodies\ImpulseWave.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\IBaseCollidable.cs" />
+    <Compile Include="Interfaces\ICollidableArea.cs" />
+    <Compile Include="Interfaces\IManageable.cs" />
+    <Compile Include="Interfaces\ICollisionFilter.cs" />
+    <Compile Include="Interfaces\IRay2DEffect.cs" />
+    <Compile Include="Interfaces\ICollidableBody.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\ICollidablePart.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\IGravitySource.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\IJoint.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\ILifeTime.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\IMassive.cs" />
+    <Compile Include="Interfaces\IRemovable.cs" />
+    <Compile Include="Interfaces\ITimed.cs" />
+    <Compile Include="Interfaces\IUpdatable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Joints\Anchor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Joints\JointBreakInfo.cs" />
+    <Compile Include="Joints\PinJoint.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Joints\TrackedAnchor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LifeTime.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollidableAreas\LightningRayGroup.cs" />
+    <Compile Include="Collections\BaseCollidableList.cs" />
+    <Compile Include="Collections\CollidableList.cs" />
+    <Compile Include="Collections\JointList.cs" />
+    <Compile Include="Collections\RemovableList.cs" />
+    <Compile Include="Collections\TimedList.cs" />
+    <Compile Include="Collections\UpdatableList.cs" />
+    <Compile Include="Physics.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollidableAreas\Ray2DEffectGroup.cs" />
+    <Compile Include="CollidableBodies\RigidBody.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollidableBodies\RigidBodyPart.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CollidableBodies\RigidBodyTemplate.cs" />
+    <Compile Include="World2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AdvanceMath\AdvanceMath.csproj">
+      <Project>{A979FDB4-7AB7-444E-9632-77D69D22D743}</Project>
+      <Name>AdvanceMath</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AdvanceSystem\AdvanceSystem.csproj">
+      <Project>{69F0DEE1-E9D3-4FC2-9F46-7BC79AF58812}</Project>
+      <Name>AdvanceSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Geometry2D\Geometry2D.csproj">
+      <Project>{DF696BAE-7557-4C4F-8CB6-CB2A7B19036F}</Project>
+      <Name>Geometry2D</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,11 @@
+Basically started working to make all the classes xmlserializable and viewable from a property grid.
+I also removed all abilities to describe color for an object since color is not important for Newtonian physics.
+Also made it so direct X is no longer the renderer for the windows driver. So you no longer need 
+the DirectX SDK. 
+
+The properties editor works, but is not yet integrated into the windows driver
+to allow you to edit the objects in it.
+
+Since a lot of prayer has gone into this engine:
+Soli Deo Gloria! To God alone be the glory!
+

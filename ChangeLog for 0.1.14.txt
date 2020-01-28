@@ -1,0 +1,33 @@
+General:
+Changed: made a few changes to allow for the properties editor.
+
+AdvanceSystem:
+Added: this.
+Added: Bounded class.
+Added: Functions class.
+Added: a bunch of classes.
+
+AdvanceMath:
+Added: a Parse method for ALVector2D.
+Change: Made all of the Vector classes to have type convertors so they can be used by the property grid control.
+Fixed: A bug with BoundingBox2D.FromVectors
+
+Geometry2D:
+Removed: IBaseGeometry and all the classes that implimented it. Polygon2D and Circle2D now have all the logic.
+Removed: a bunch of methods and properties that were not being used.
+
+Physics2D:
+Fixed: a Bug with rays not hitting long objects.
+Fixed: a Bug with ray collision detection throwing a null reference exception on a collision with a circle.
+Removed: IBaseCollidable.IsCollidable. Made CollisionIgnoreInfo impliment it.
+Removed: IColoredPart.
+Fixed: a Bug with null reference exception with a huge number of objects.
+
+Driver (ConsoleDriver):
+None.
+
+Driver (WindowsDriver):
+Changed: updated the scenerios with the changes.
+Changed: switched from OpenGl to DirectX
+
+ 
