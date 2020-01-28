@@ -52,6 +52,7 @@ namespace WindowsDriver
             }
         }
         OpenGlDemoForm form;
+
         private void bRunDemo_Click(object sender, EventArgs e)
         {
             if (currentDemo != null)
@@ -60,7 +61,6 @@ namespace WindowsDriver
                 {
                     AppDomain domain = AppDomain.CreateDomain("demoDomain");
                     domain.ExecuteAssembly("WindowsDriver.exe",
-                        new System.Security.Policy.Evidence(),
                         new string[] { currentDemo.GetType().FullName });
                     AppDomain.Unload(domain);
                     //form = new OpenGlDemoForm(currentDemo.CreateNew());
