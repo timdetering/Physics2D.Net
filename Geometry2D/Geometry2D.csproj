@@ -57,6 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="BoundingBox2D.cs" />
     <Compile Include="Circle2D.cs" />
     <Compile Include="Edge2D.cs" />

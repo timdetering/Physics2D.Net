@@ -77,6 +77,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Demos\2PlayerGame.cs" />
     <Compile Include="Demos\BaseControlDemo.cs" />
     <Compile Include="Demos\BaseDisplayDemo.cs" />

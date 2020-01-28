@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 //  The Application.UserAppDataPath and Application.UserAppDataRegistry properties use the company name in the 
 //  directory and registry keys where information is found.
 //
-[assembly: AssemblyCompany("RD Technologies")]
+[assembly: AssemblyCompany("Physics 2D")]
 
 //
 //  AssemblyConfiguration: The AssemblyConfiguration attribute must have the configuration that was used to build the 
@@ -43,7 +43,7 @@ using System.Runtime.InteropServices;
 //  (See Circular 3: Copyright Notice from the U.S. Copyright Office for information about copyright notices in the 
 //  United States, http://www.copyright.gov/circs/circ03.pdf.)
 //
-[assembly: AssemblyCopyright("Copyright © RD Technologies 2007-2017")]
+[assembly: AssemblyCopyright("Copyright © 2005-2006 Jonathan Mark Porter, 2020 Timothy Detering")]
 
 //
 //  The culture that the assembly was built for.
@@ -79,7 +79,7 @@ using System.Runtime.InteropServices;
 //  The product name of the product that this assembly is a part of.
 //  The product is the deliverable to the customer.
 //
-//[assembly: AssemblyProduct("TODO")]
+[assembly: AssemblyProduct("Physics 2D")]
 
 //
 //  The friendly name of this particular assembly. A friendly name can contain spaces and other punctuation.
@@ -90,7 +90,7 @@ using System.Runtime.InteropServices;
 //  The AssemblyTrademark attribute should be included if any trademarks or service marks are used in the assembly.
 //  Trademarks should be stated in complete sentences with a period at the end.
 //
-[assembly: AssemblyTrademark("BaconBytes is a trademark of RD Technologies.")]
+[assembly: AssemblyTrademark("")]
 
 //
 //  FxCop CA1016: Mark assemblies with AssemblyVersionAttribute
@@ -125,7 +125,7 @@ using System.Runtime.InteropServices;
 //  You can specify all the values or you can default the Revision and Build Numbers by using the '*' as shown below:
 //      [assembly: AssemblyVersion("1.0.*")]
 //
-[assembly: AssemblyVersion("0.9.*")]
+[assembly: AssemblyVersion("0.1.15.*")]
 
 //
 //  The AssemblyFileVersion attribute may be set to the version number of the specific file of the assembly.
@@ -172,7 +172,7 @@ using System.Runtime.InteropServices;
 
 //
 //  FxCop CA1017: Mark assemblies with ComVisibleAttribute
-//  The ComVisible attribute must be present and indicates the default visability to COM.
+//  The ComVisible attribute must be present and indicates the default visibility to COM.
 //  Setting ComVisible to false makes the types in this assembly not visible to COM components.
 //  If you need to access a type in this assembly from COM, set the ComVisible attribute to true on that type.
 //
