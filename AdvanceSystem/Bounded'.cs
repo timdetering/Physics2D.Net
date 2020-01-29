@@ -192,6 +192,7 @@ namespace AdvanceSystem
         }
         #endregion
     }
+
     [Serializable, StructLayout(LayoutKind.Sequential)]
     [System.ComponentModel.TypeConverter(typeof(ComponentModel.UniversalTypeConvertor)), ComponentModel.UTCPropertiesSupported]
     public abstract class NumberBinder<T> : ICloneable

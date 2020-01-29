@@ -20,13 +20,14 @@
  * 
  */
 #endregion
+
 using System;
 using Physics2D.CollisionDetection;
 using AdvanceMath;
 using AdvanceMath.Geometry2D;
+
 namespace Physics2D.CollidableBodies
 {
-
     [Serializable]
     public class RigidBodyTemplate
     {

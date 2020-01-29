@@ -26,40 +26,42 @@ using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
+
 using System;
 using System.Collections.Generic;
 using AdvanceMath;
+
 namespace AdvanceMath.Geometry2D
 {
-	/// <summary>
-	/// This class is used to descibe a the smallest box that can contain a Polygon2D object.
-	/// </summary>
+    /// <summary>
+    /// This class is used to descibe a the smallest box that can contain a Polygon2D object.
+    /// </summary>
     [Serializable]
     public sealed class BoundingBox2D
-	{
-		/// <summary>
-		/// Creates a new BoundingBox2D Instance from 2 Vector2Ds.
-		/// </summary>
-		/// <param name="first">the first Vector2D.</param>
-		/// <param name="second">the second Vector2D.</param>
-		/// <returns>a new BoundingBox2D</returns>
-		/// <remarks>The Upper and Lower values are automatically determined.</remarks>
-		public static BoundingBox2D From2Vectors(Vector2D first, Vector2D second)
-		{
+    {
+        /// <summary>
+        /// Creates a new BoundingBox2D Instance from 2 Vector2Ds.
+        /// </summary>
+        /// <param name="first">the first Vector2D.</param>
+        /// <param name="second">the second Vector2D.</param>
+        /// <returns>a new BoundingBox2D</returns>
+        /// <remarks>The Upper and Lower values are automatically determined.</remarks>
+        public static BoundingBox2D From2Vectors(Vector2D first, Vector2D second)
+        {
             Vector2D Upper = second;
             Vector2D Lower = first;
-			if(first.X>second.X)
-			{
-				Upper.X = first.X;
-				Lower.X = second.X;
-			}
-			if(first.Y>second.Y)
-			{
-				Upper.Y = first.Y;
-				Lower.Y = second.Y;
-			}
-			return new BoundingBox2D(Upper,Lower);
-		}
+            if(first.X>second.X)
+            {
+                Upper.X = first.X;
+                Lower.X = second.X;
+            }
+            if(first.Y>second.Y)
+            {
+                Upper.Y = first.Y;
+                Lower.Y = second.Y;
+            }
+            return new BoundingBox2D(Upper,Lower);
+        }
         /// <summary>
         /// Creates a new BoundingBox2D Instance from multiple Vector2Ds.
         /// </summary>
@@ -179,37 +181,37 @@ namespace AdvanceMath.Geometry2D
                 );
         }
         /// <summary>
-		/// The Upper Bound.
-		/// </summary>
-		public readonly Vector2D Upper;
-		/// <summary>
-		/// The Lower Bound.
-		/// </summary>
-		public readonly Vector2D Lower;
-		/// <summary>
-		/// Creates a new BoundingBox2D Instance.
-		/// </summary>
-		/// <param name="upperX">The Upper Bound on the XAxis.</param>
-		/// <param name="upperY">The Upper Bound on the YAxis.</param>
-		/// <param name="lowerX">The Lower Bound on the XAxis.</param>
-		/// <param name="lowerY">The Lower Bound on the YAxis.</param>
-		public BoundingBox2D(Scalar upperX,Scalar upperY,Scalar lowerX,Scalar lowerY)
-		{
-			this.Upper.X = upperX;
-			this.Upper.Y = upperY;
-			this.Lower.X = lowerX;
-			this.Lower.Y = lowerY;
-		}
-		/// <summary>
-		/// Creates a new BoundingBox2D Instance from 2 Vector2Ds.
-		/// </summary>
-		/// <param name="Upper">The Upper Vector2D.</param>
-		/// <param name="Lower">The Lower Vector2D.</param>
-		public BoundingBox2D(Vector2D Upper, Vector2D Lower)
-		{
-			this.Upper = Upper;
-			this.Lower = Lower;
-		}
+        /// The Upper Bound.
+        /// </summary>
+        public readonly Vector2D Upper;
+        /// <summary>
+        /// The Lower Bound.
+        /// </summary>
+        public readonly Vector2D Lower;
+        /// <summary>
+        /// Creates a new BoundingBox2D Instance.
+        /// </summary>
+        /// <param name="upperX">The Upper Bound on the XAxis.</param>
+        /// <param name="upperY">The Upper Bound on the YAxis.</param>
+        /// <param name="lowerX">The Lower Bound on the XAxis.</param>
+        /// <param name="lowerY">The Lower Bound on the YAxis.</param>
+        public BoundingBox2D(Scalar upperX,Scalar upperY,Scalar lowerX,Scalar lowerY)
+        {
+            this.Upper.X = upperX;
+            this.Upper.Y = upperY;
+            this.Lower.X = lowerX;
+            this.Lower.Y = lowerY;
+        }
+        /// <summary>
+        /// Creates a new BoundingBox2D Instance from 2 Vector2Ds.
+        /// </summary>
+        /// <param name="Upper">The Upper Vector2D.</param>
+        /// <param name="Lower">The Lower Vector2D.</param>
+        public BoundingBox2D(Vector2D Upper, Vector2D Lower)
+        {
+            this.Upper = Upper;
+            this.Lower = Lower;
+        }
         public Vector2D[] Corners
         {
             get
@@ -222,24 +224,24 @@ namespace AdvanceMath.Geometry2D
                 return returnvalue;
             }
         }
-		/// <summary>
-		/// Determines if this bounding box is in Contact with another.
-		/// </summary>
-		/// <param name="otherBox">The other BoundingBox2D to check against.</param>
-		/// <returns>true if they are in contact; otherwise false.</returns>
-		public bool TestIntersection(BoundingBox2D otherBox)
-		{
-			return !((Lower.X >= otherBox.Upper.X) || (Upper.X <= otherBox.Lower.X) ||
+        /// <summary>
+        /// Determines if this bounding box is in Contact with another.
+        /// </summary>
+        /// <param name="otherBox">The other BoundingBox2D to check against.</param>
+        /// <returns>true if they are in contact; otherwise false.</returns>
+        public bool TestIntersection(BoundingBox2D otherBox)
+        {
+            return !((Lower.X >= otherBox.Upper.X) || (Upper.X <= otherBox.Lower.X) ||
                 (otherBox.Lower.Y >= Upper.Y) || (otherBox.Upper.Y <= Lower.Y));
-		}
-		/// <summary>
-		/// Moves a BoundingBox2D Linearly.
-		/// </summary>
-		/// <param name="changeInPosition">How far the box will be moved.</param>
-		/// <returns>The repositioned BoundingBox2D.</returns>
-		public BoundingBox2D Move(Vector2D changeInPosition)
-		{
-			return new BoundingBox2D(Upper + changeInPosition,Lower+ changeInPosition);
-		}
-	}
+        }
+        /// <summary>
+        /// Moves a BoundingBox2D Linearly.
+        /// </summary>
+        /// <param name="changeInPosition">How far the box will be moved.</param>
+        /// <returns>The repositioned BoundingBox2D.</returns>
+        public BoundingBox2D Move(Vector2D changeInPosition)
+        {
+            return new BoundingBox2D(Upper + changeInPosition,Lower+ changeInPosition);
+        }
+    }
 }

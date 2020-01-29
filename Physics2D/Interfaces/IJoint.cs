@@ -20,25 +20,27 @@
  * 
  */
 #endregion
+
 using System;
 
 namespace Physics2D
 {
-	/// <summary>
-	/// the interface that describes the methods and properties required for an object to be a Joint.
-	/// </summary>
+    /// <summary>
+    /// the interface that describes the methods and properties required for an object to be a Joint.
+    /// </summary>
     public interface IJoint : IRemovable, ITimed
-	{
-		/// <summary>
-		/// Tells the object to calculate the variables that wont change till the next call to UpdatePosition.
-		/// </summary>
+    {
+        /// <summary>
+        /// Tells the object to calculate the variables that wont change till the next call to UpdatePosition.
+        /// </summary>
         /// <param name="dt">The change in time in seconds, from the last time this method was called. </param>
-		void PreCalc(float dt);
-		/// <summary>
-		/// Calculates and applies impulse if required.
-		/// </summary>
+        void PreCalc(float dt);
+
+        /// <summary>
+        /// Calculates and applies impulse if required.
+        /// </summary>
         /// <param name="dt">The change in time in seconds, from the last time this method was called. </param>
-		/// <returns>true if impulse was applied; otherwise false.</returns>
-		bool CalcAndApply(float dt);
-	}
+        /// <returns>true if impulse was applied; otherwise false.</returns>
+        bool CalcAndApply(float dt);
+    }
 }

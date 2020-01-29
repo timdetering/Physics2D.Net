@@ -20,9 +20,11 @@
  * 
  */
 #endregion
+
 using System;
 using System.ComponentModel;
 using System.Xml.Serialization;
+
 namespace Physics2D
 {
     [Serializable]

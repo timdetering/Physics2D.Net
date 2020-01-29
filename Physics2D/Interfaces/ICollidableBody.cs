@@ -20,6 +20,7 @@
  * 
  */
 #endregion
+
 using System;
 using Physics2D.CollisionDetection;
 using AdvanceMath.Geometry2D;
@@ -27,10 +28,9 @@ using AdvanceMath;
 
 namespace Physics2D
 {
-
-	/// <summary>
-	/// Describes the methods and properties required for the object to be IsCollidable.
-	/// </summary>
+    /// <summary>
+    /// Describes the methods and properties required for the object to be IsCollidable.
+    /// </summary>
     public interface ICollidableBody : IMassive, IBaseCollidable
     {
         #region properties
@@ -48,19 +48,19 @@ namespace Physics2D
         CollisionState CollisionState { get;}
         #endregion
         #region methods
-		/// <summary>
-		/// Calculates the Value used in LastImpulse Calculations.
-		/// </summary>
-		/// <param name="pointRelativeToBody">The location where to calculate K at.</param>
-		/// <param name="normal">The normal of the collision.</param>
-		/// <returns>The K value.</returns>
-		float GetK(Vector2D pointRelativeToBody,Vector2D normal);
-		/// <summary>
-		/// Changes the current Velocity of the object by applying impulse.
-		/// </summary>
-		/// <param name="pointRelativeToBody">where to apply impulse at.</param>
-		/// <param name="LastImpulse">the impulse being applied.</param>
-		void ApplyImpulse(Vector2D pointRelativeToBody,Vector2D Impulse);
+        /// <summary>
+        /// Calculates the Value used in LastImpulse Calculations.
+        /// </summary>
+        /// <param name="pointRelativeToBody">The location where to calculate K at.</param>
+        /// <param name="normal">The normal of the collision.</param>
+        /// <returns>The K value.</returns>
+        float GetK(Vector2D pointRelativeToBody,Vector2D normal);
+        /// <summary>
+        /// Changes the current Velocity of the object by applying impulse.
+        /// </summary>
+        /// <param name="pointRelativeToBody">where to apply impulse at.</param>
+        /// <param name="LastImpulse">the impulse being applied.</param>
+        void ApplyImpulse(Vector2D pointRelativeToBody,Vector2D Impulse);
         /// <summary>
         /// Gets the BoundingRadius of the Entire ICollidableBody.
         /// </summary>
