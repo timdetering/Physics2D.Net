@@ -245,20 +245,6 @@
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AdvanceMath\AdvanceMath.csproj">
-      <Project>{A979FDB4-7AB7-444E-9632-77D69D22D743}</Project>
-      <Name>AdvanceMath</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AdvanceSystem\AdvanceSystem.csproj">
-      <Project>{69F0DEE1-E9D3-4FC2-9F46-7BC79AF58812}</Project>
-      <Name>AdvanceSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Geometry2D\Geometry2D.csproj">
-      <Project>{DF696BAE-7557-4C4F-8CB6-CB2A7B19036F}</Project>
-      <Name>Geometry2D</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

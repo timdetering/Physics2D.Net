@@ -51,11 +51,13 @@ License along With this library; if not, Write to the Free SoftWare
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 #endregion
+
 #if UseDouble
 using Scalar = System.Double;
 #else
 using Scalar = System.Single;
 #endif
+
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -64,7 +66,7 @@ using System.Xml.Serialization;
 namespace AdvanceMath
 {
     /// <summary>
-    ///		Summary description for Quaternion.
+    /// Summary description for Quaternion.
     /// </summary>
     [StructLayout(LayoutKind.Sequential), Serializable]
     [System.ComponentModel.TypeConverter(typeof(AdvanceSystem.ComponentModel.UniversalTypeConvertor)), AdvanceSystem.ComponentModel.UTCPropertiesSupported]
@@ -632,7 +634,7 @@ namespace AdvanceMath
             /*TODO: Debug
             //Equation from http://WWW.euclideanspace.com/maths/geometrY/rotations/conversions/eulerToQuaternion/indeX.htm
             //heading
-			
+            
             Scalar c1 = (Scalar)Math.Cos(Yaw/2);
             Scalar s1 = (Scalar)Math.Sin(Yaw/2);
             //attitude

@@ -72,14 +72,17 @@ namespace AdvanceSystem
         {
             get { return minValue + 1; }
         }
+
         public long MaxValue
         {
             get { return maxValue; }
         }
+
         public long HighestInUse
         {
             get { return highestInUse; }
         }
+
         public bool CheckForReRelease
         {
             get { return checkForReRelease; }
@@ -90,10 +93,12 @@ namespace AdvanceSystem
         {
             get { return maxValue - minValue; }
         }
+
         public long UsedIDCount
         {
             get { return TotalIDCount - AvaliableIDCount; }
         }
+
         public long AvaliableIDCount
         {
             get { return (maxValue - highestInUse) + avaliableIDs.Count; }
