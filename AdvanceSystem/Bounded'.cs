@@ -212,8 +212,7 @@ namespace AdvanceSystem
             {
                 throw new FormatException(string.Format("Cannot parse the text '{0}' because it does not have 3 parts.", text));
             }
-            else
-            {
+
                 try
                 {
                     Type t = typeof(T);
@@ -226,7 +225,6 @@ namespace AdvanceSystem
                 {
                     throw new FormatException("The parts of the vectors must be decimal numbers", ex);
                 }
-            }
         }
 
         public static NumberBinder<T> GetBinder(T lower, T upper, bool wrap)
@@ -273,7 +271,7 @@ namespace AdvanceSystem
         protected internal T upper;
         protected internal T lower;
         protected T range;
-        protected internal Boolean wrap;
+        protected internal readonly bool wrap;
 
         [ComponentModel.UTCConstructor]
         protected NumberBinder(T lower, T upper, bool wrap)
@@ -354,6 +352,7 @@ namespace AdvanceSystem
         }
 
         public abstract object Clone();
+
         #region sub-classes
         #region unsigned
         [Serializable, StructLayout(LayoutKind.Sequential)]
@@ -361,7 +360,7 @@ namespace AdvanceSystem
         sealed class ByteBinder : NumberBinder<Byte>
         {
             [ComponentModel.UTCConstructor]
-            public ByteBinder(Byte lower, Byte upper, Boolean wrap)
+            public ByteBinder(Byte lower, Byte upper, bool wrap)
                 : base(lower, upper, wrap)
             {
                 this.range = (Byte)((upper - lower) + 1);
@@ -443,7 +442,8 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
-            public override Byte GetEmptyValue(Byte value)
+
+            public override byte GetEmptyValue(byte value)
             {
                 return (Byte)(lower - value);
             }
@@ -490,19 +490,23 @@ namespace AdvanceSystem
                 }
                 return value;
             }
+
             public override double GetPercent(UInt16 value)
             {
                 return (value - lower) / (range - 1);
             }
+
             public override UInt16 SetPercent(double percent)
             {
                 return (UInt16)(((double)range - 1) * (double)percent + (double)lower);
             }
+
             public override bool CanAddUnBounded(UInt16 value, UInt16 value2)
             {
                 value += value2;
                 return value >= lower && value <= upper;
             }
+
             public override UInt16 GetOverflow(ref UInt16 current, UInt16 dv)
             {
                 current += dv;
@@ -536,11 +540,13 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
+
             public override UInt16 GetEmptyValue(UInt16 value)
             {
                 return (UInt16)(lower - value);
             }
         }
+
         [Serializable, StructLayout(LayoutKind.Sequential)]
         [System.ComponentModel.TypeConverter(typeof(ComponentModel.UniversalTypeConvertor)), ComponentModel.UTCPropertiesSupported]
         sealed class UInt32Binder : NumberBinder<UInt32>
@@ -552,10 +558,12 @@ namespace AdvanceSystem
                 this.range = upper - lower + 1;
             }
             public UInt32Binder(NumberBinder<UInt32> copy) : base(copy) { }
+
             public override object Clone()
             {
                 return new UInt32Binder(this);
             }
+
             public override UInt32 Bind(UInt32 value)
             {
                 if (wrap)
@@ -582,19 +590,23 @@ namespace AdvanceSystem
                 }
                 return value;
             }
+
             public override double GetPercent(UInt32 value)
             {
                 return (value - lower) / (range - 1);
             }
+
             public override UInt32 SetPercent(double percent)
             {
-                return (UInt32)(((double)range - 1) * (double)percent + (double)lower);
+                return (UInt32)(((double)range - 1.0) * (double)percent + (double)lower);
             }
+
             public override bool CanAddUnBounded(UInt32 value, UInt32 value2)
             {
                 value += value2;
                 return value >= lower && value <= upper;
             }
+
             public override UInt32 GetOverflow(ref UInt32 current, UInt32 dv)
             {
                 current += dv;
@@ -628,6 +640,7 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
+
             public override UInt32 GetEmptyValue(UInt32 value)
             {
                 return lower - value;
@@ -639,7 +652,7 @@ namespace AdvanceSystem
         sealed class UInt64Binder : NumberBinder<UInt64>
         {
             [ComponentModel.UTCConstructor]
-            public UInt64Binder(UInt64 lower, UInt64 upper, Boolean wrap)
+            public UInt64Binder(UInt64 lower, UInt64 upper, bool wrap)
                 : base(lower, upper, wrap)
             {
                 this.range = upper - lower + 1;
@@ -678,19 +691,23 @@ namespace AdvanceSystem
                 }
                 return value;
             }
+
             public override double GetPercent(UInt64 value)
             {
-                return (value - lower) / (range - 1);
+                return (value - lower) / (range - 1UL);
             }
+
             public override UInt64 SetPercent(double percent)
             {
-                return (UInt64)(((double)range - 1) * (double)percent + (double)lower);
+                return (UInt64)(((double)range - 1.0) * (double)percent + (double)lower);
             }
+
             public override bool CanAddUnBounded(UInt64 value, UInt64 value2)
             {
                 value += value2;
                 return value >= lower && value <= upper;
             }
+
             public override UInt64 GetOverflow(ref UInt64 current, UInt64 dv)
             {
                 current += dv;
@@ -730,13 +747,14 @@ namespace AdvanceSystem
             }
         }
         #endregion
+
         #region signed
         [Serializable, StructLayout(LayoutKind.Sequential)]
         [System.ComponentModel.TypeConverter(typeof(ComponentModel.UniversalTypeConvertor)), ComponentModel.UTCPropertiesSupported]
-        sealed class SByteBinder : NumberBinder<SByte>
+        sealed class SByteBinder : NumberBinder<sbyte>
         {
             [ComponentModel.UTCConstructor]
-            public SByteBinder(SByte lower, SByte upper, Boolean wrap)
+            public SByteBinder(sbyte lower, sbyte upper, bool wrap)
                 : base(lower, upper, wrap)
             {
                 this.range = (SByte)((upper - lower) + 1);
@@ -746,6 +764,7 @@ namespace AdvanceSystem
             {
                 return new SByteBinder(this);
             }
+
             public override SByte Bind(SByte value)
             {
                 if (wrap)
@@ -772,13 +791,15 @@ namespace AdvanceSystem
                 }
                 return value;
             }
-            public override double GetPercent(SByte value)
+
+            public override double GetPercent(sbyte value)
             {
                 return (value - lower) / (range - 1);
             }
-            public override SByte SetPercent(double percent)
+
+            public override sbyte SetPercent(double percent)
             {
-                return (SByte)(((double)range - 1) * (double)percent + (double)lower);
+                return (SByte)(((double)range - 1.0) * (double)percent + (double)lower);
             }
             public override bool CanAddUnBounded(SByte value, SByte value2)
             {
@@ -788,8 +809,8 @@ namespace AdvanceSystem
             public override SByte GetOverflow(ref SByte current, SByte dv)
             {
                 current += dv;
-                SByte boundedCurrent = current;
-                SByte leftover = 0;
+                sbyte boundedCurrent = current;
+                sbyte leftover = 0;
                 if (wrap)
                 {
                     while (lower > boundedCurrent)
@@ -823,6 +844,7 @@ namespace AdvanceSystem
                 return (SByte)(lower - value);
             }
         }
+
         [Serializable, StructLayout(LayoutKind.Sequential)]
         [System.ComponentModel.TypeConverter(typeof(ComponentModel.UniversalTypeConvertor)), ComponentModel.UTCPropertiesSupported]
         sealed class Int16Binder : NumberBinder<Int16>
@@ -833,11 +855,14 @@ namespace AdvanceSystem
             {
                 this.range = (Int16)((upper - lower) + 1);
             }
+
             public Int16Binder(NumberBinder<Int16> copy) : base(copy) { }
+
             public override object Clone()
             {
                 return new Int16Binder(this);
             }
+
             public override Int16 Bind(Int16 value)
             {
                 if (wrap)
@@ -864,19 +889,23 @@ namespace AdvanceSystem
                 }
                 return value;
             }
+
             public override double GetPercent(Int16 value)
             {
                 return (value - lower) / (range - 1);
             }
+
             public override Int16 SetPercent(double percent)
             {
-                return (Int16)(((double)range - 1) * (double)percent + (double)lower);
+                return (Int16)(((double)range - 1.0) * (double)percent + (double)lower);
             }
+
             public override bool CanAddUnBounded(Int16 value, Int16 value2)
             {
                 value += value2;
                 return value >= lower && value <= upper;
             }
+
             public override Int16 GetOverflow(ref Int16 current, Int16 dv)
             {
                 current += dv;
@@ -910,7 +939,8 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
-            public override Int16 GetEmptyValue(Int16 value)
+
+            public override short GetEmptyValue(short value)
             {
                 return (Int16)(lower - value);
             }
@@ -928,10 +958,12 @@ namespace AdvanceSystem
             }
 
             public Int32Binder(NumberBinder<Int32> copy) : base(copy) { }
+
             public override object Clone()
             {
                 return new Int32Binder(this);
             }
+
             public override Int32 Bind(Int32 value)
             {
                 if (wrap)
@@ -958,20 +990,24 @@ namespace AdvanceSystem
                 }
                 return value;
             }
-            public override double GetPercent(Int32 value)
+
+            public override double GetPercent(int value)
             {
                 return (value - lower) / (range - 1);
             }
-            public override Int32 SetPercent(double percent)
+
+            public override int SetPercent(double percent)
             {
                 return (Int32)(((double)range - 1.0) * (double)percent + (double)lower);
             }
-            public override bool CanAddUnBounded(Int32 value, Int32 value2)
+
+            public override bool CanAddUnBounded(int value, int value2)
             {
                 value += value2;
                 return value >= lower && value <= upper;
             }
-            public override Int32 GetOverflow(ref Int32 current, Int32 dv)
+
+            public override int GetOverflow(ref int current, int dv)
             {
                 current += dv;
                 Int32 boundedCurrent = current;
@@ -1004,7 +1040,8 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
-            public override Int32 GetEmptyValue(Int32 value)
+
+            public override int GetEmptyValue(int value)
             {
                 return lower - value;
             }
@@ -1020,11 +1057,14 @@ namespace AdvanceSystem
             {
                 this.range = upper - lower + 1L;
             }
+
             public Int64Binder(NumberBinder<Int64> copy) : base(copy) { }
+
             public override object Clone()
             {
                 return new Int64Binder(this);
             }
+
             public override Int64 Bind(Int64 value)
             {
                 if (wrap)
@@ -1101,12 +1141,14 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
+
             public override Int64 GetEmptyValue(Int64 value)
             {
                 return lower - value;
             }
         }
         #endregion
+
         #region floating point
         [Serializable, StructLayout(LayoutKind.Sequential)]
         [System.ComponentModel.TypeConverter(typeof(ComponentModel.UniversalTypeConvertor)), ComponentModel.UTCPropertiesSupported]
@@ -1260,7 +1302,7 @@ namespace AdvanceSystem
 
             public override double SetPercent(double percent)
             {
-                return ((range - 1) * percent + lower);
+                return ((range - 1.0) * percent + lower);
             }
 
             public override bool CanAddUnBounded(double value, double value2)
@@ -1302,6 +1344,7 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
+
             public override Double GetEmptyValue(Double value)
             {
                 return lower - value;
@@ -1405,6 +1448,7 @@ namespace AdvanceSystem
                 current = boundedCurrent;
                 return leftover;
             }
+
             public override Decimal GetEmptyValue(Decimal value)
             {
                 return lower - value;
